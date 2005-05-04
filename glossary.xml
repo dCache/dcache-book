@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE part PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<part id="gl">
+<!-- <?dbhtml dir="glossary"?> -->
+  <title>Glossary</title>
+  
+  <para>
+    This part contains descriptions of the phrases used when writing
+    and talking about dCache.  Depending on the context this might
+    just be a glossary which is referenced by the remainder of this
+    guide. It contains also information about the PNFS server, since
+    its concepts heavily influence dCache.
+  </para>
+
+  <chapter id="gl-general">
+    <title>General</title>
+
+    <glosslist>
+
+      <glossentry>
+	<glossterm id="gl-tape_backend">tape backend</glossterm>
+	<glossdef>
+	  <para>
+	    A mass storage system which stores data on magnetic tapes
+	    and is connected to the dCache system. Each dCache pool
+	    will write files to a tape backend as soon as they have
+	    been completely written to the pool (if the pool is not
+	    configured as a <glossterm
+	    linkend="gl-lfs">LFS</glossterm>). The tape system is not
+	    part of dCache. However, it is possible to use any mass
+	    storage system as tape backend via a simple interface.
+	  </para>
+	</glossdef>
+      </glossentry>
+
+
+      <glossentry>
+	<glossterm id="gl-hsm">Hierachical Storage Manager (<abbrev>HSM</abbrev>)</glossterm>
+	<abbrev>HSM</abbrev>
+	<glosssee otherterm="gl-tape_backend">tape backend</glosssee>
+      </glossentry>
+      
+      <glossentry>
+	<glossterm id="gl-lfs">Large File Store (<abbrev>LFS</abbrev>)</glossterm>
+	<abbrev>LFS</abbrev>
+	<glossdef>
+	  <para>
+	    If a dCache instance does not have a <glossterm
+	    linkend="gl-tape_backend">tape backend</glossterm>, it is
+	    not a cache but a large file store. There are two lfs
+	    modes: <glossterm>precious</glossterm> and
+	    <glossterm>transient</glossterm> mode.
+	  </para>
+	</glossdef>
+      </glossentry>
+      
+      <glossentry>
+	<glossterm id="gl-store">to store</glossterm>
+	<glossdef>
+	  <para>
+	    Copying a file from a dCache pool to the <glossterm
+	    linkend="gl-tape_backend">tape backend</glossterm>.
+	  </para>
+	</glossdef>
+      </glossentry>
+      
+      <glossentry>
+	<glossterm id="gl-restore">to restore</glossterm>
+	<glossdef>
+	  <para>
+	    Copying a file from the <glossterm
+	    linkend="gl-tape_backend">tape backend</glossterm> to one
+	    of the dCache pools.
+	  </para>
+	</glossdef>
+      </glossentry>
+      
+      <glossentry>
+	<glossterm id="gl-stage">to stage</glossterm>
+	<glosssee otherterm="gl-restore">to restore</glosssee>
+      </glossentry>
+
+      <glossentry>
+	<glossterm id="gl-transfer">transfer</glossterm>
+	<glossdef>
+	  <para>
+	    Any kind of transfer performed by a dCache pool. There are
+	    <glossterm linkend="gl-store">store</glossterm>,
+	    <glossterm linkend="gl-restore">restore</glossterm>, read
+	    and write transfers. The latter two are client transfers.
+	  </para>
+	  <glossseealso otherterm="gl-mover">mover</glossseealso>
+	</glossdef>
+      </glossentry>
+
+      <glossentry>
+	<glossterm id="gl-mover">mover</glossterm>
+	<glossdef>
+	  <para>
+	    The process/tread within a pool which performs a
+	    <glossterm linkend="gl-transfer">transfer</glossterm>.
+	  </para>
+	  <glossseealso otherterm="gl-transfer">transfer</glossseealso>
+	</glossdef>
+      </glossentry>
+
+    </glosslist>
+
+  </chapter>
+
+<!--  
+  <chapter id="gl-pnfs">
+    <title>The PNFS File System</title>
+    
+    <section id="gl-pnfs-nfs">
+      <title>Just a regular NFS server?</title>
+    </section>
+    
+    <section id="gl-pnfs-gloss">
+      <title>Tags, Levels and all that</title>
+    </section>
+  </chapter>
+
+  <chapter id="gl-cell">
+     <title>The Cell Package</title>
+  </chapter>
+-->
+
+  <chapter id="gl-pm">
+    <title>The Pool Manager</title>
+    
+    
+    
+    <section id="gl-pm-comp">
+      <title>Components of the Pool Manager</title>
+      <glosslist>
+	<glossentry>
+	  <glossterm id="gl-pm-comp-cm">Cost Module</glossterm>
+	  <glossdef>
+	    <para>
+	      Responsible for determining the cost for copying a file
+	      to a pool. The pool manager will choose the pool with
+	      the least cost.
+	    </para>
+	  </glossdef>
+	</glossentry>
+
+	<glossentry>
+	  <glossterm id="gl-pm-comp-psu">Pool Selection Unit</glossterm>
+	  <glossdef>
+	    <para>
+	      Responsible for determining all pools allowable for a
+	      specific transaction. A detailed account of its
+	      configuration and behaviour is given in <xref
+	      linkend="cf-pm-psu"/>.
+	    </para>
+	  </glossdef>
+	</glossentry>
+      </glosslist>
+    </section>
+    
+    <section id="gl-pm-cm">
+      <title>The Cost Module</title>
+
+      <glosslist>
+	<glossentry>
+	  <glossterm id="gl-cost">cost</glossterm>
+	  <glossdef>
+
+	    <para>
+	      The pool manager determines the pool used for storing a
+	      file by calculating a cost value for each available
+	      pool. The pool with the lowest cost is used. The costs
+	      are calculated by the cost module as described in <xref
+	      linkend="cf-pm-cm"/>. The total cost is a linear
+	      combination of the <glossterm
+	      linkend="gl-performance_cost">performance</glossterm>
+	      and <glossterm linkend="gl-space_cost">space
+	      cost</glossterm>.
+
+	      I.e.
+
+<screen><varname>cost</varname> = <varname>ccf</varname> * <varname>performance_cost</varname> + <varname>scf</varname> * <varname>space_cost</varname>,</screen>
+
+	      where <varname>ccf</varname> and <varname>scf</varname>
+	      are configurable with the command <command
+	      moreinfo="refentry"><xref
+	      linkend="cmd-set_pool_decision"/></command>.
+	    </para>
+
+	  </glossdef>
+	</glossentry>
+
+	<glossentry>
+	  <glossterm id="gl-performance_cost">performance
+	  cost</glossterm>
+	  <glossdef>
+
+	    <para>
+	      
+	    </para>
+
+	    <glossseealso>gl-cost</glossseealso>
+
+	  </glossdef>
+	</glossentry>
+
+	<glossentry>
+	  <glossterm id="gl-space_cost">space
+	  cost</glossterm>
+	  <glossdef>
+
+	    <para>
+	      
+	    </para>
+
+	    <glossseealso>gl-cost</glossseealso>
+
+	  </glossdef>
+	</glossentry>
+
+
+      </glosslist>
+
+    </section>
+  </chapter>
+  
+<!--
+  <chapter id="gl-dcap">
+    <title>The dCap Protocol</title>
+  </chapter>
+-->
+
+</part>
+
+
+<!-- The end -->

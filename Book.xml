@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+
+<book id="dCacheBook" xmlns:xi="http://www.w3.org/2001/XInclude">
+<!-- <?dbhtml dir="dCacheBook" ?> -->
+
+  <title>dCache Book</title>
+    <titleabbrev>dcb</titleabbrev>
+
+
+        
+  <bookinfo>
+    <abstract>
+      <para>
+	The dCache Book is the guide for administratos of dCache
+	systems. The first part describes the installation of a simple
+	single-host dCache instance up to a large, topologically
+	complex, and heterogenous system. The second part describes
+	the components of dCache and in what ways they can be
+	configured. This is the place for finding information about
+	the role and functionality of components in dCache as needed
+	by an administrator. The third part contains solutions for
+	several problems and tasks which might occur during operating
+	of a dCache system. Finally, the last two parts contain a
+	glossary and a parameter and command reference. 
+      </para>
+    </abstract>
+    <!--
+    <date>2004-10-14</date>
+    
+    <corpauthor>DESY Hamburg, Germany</corpauthor>
+    
+    <authorgroup>
+      <author>
+        <firstname>Patrick</firstname><surname>Fuhrmann</surname>
+      </author>
+      <author>
+        <firstname>Judit</firstname><surname>Novak</surname>
+      </author>
+      <author>
+        <firstname>Tigran</firstname><surname>Mkrtchyan</surname>
+      </author>
+      <author>
+        <firstname>Mathias</firstname><surname>de Riese</surname>
+      </author>
+    </authorgroup>
+    -->
+  </bookinfo>
+
+  <toc></toc>
+
+  <xi:include href="install.xml"></xi:include>
+
+  <xi:include href="config.xml"></xi:include>
+
+  <xi:include href="cookbook.xml"></xi:include>
+
+  <xi:include href="glossary.xml"></xi:include>
+
+  <xi:include href="reference.xml"></xi:include>
+
+</book>

@@ -1,0 +1,86 @@
+body { 
+    background: #FFFFFF;
+}
+
+h1, h2, h3, h4, h5 { 
+#    color: #800000; 
+    font-family: sans-serif; 
+}
+
+p,ul,ol,li,div,td,th,address,nobr,b,i { font-size:12pt; }
+
+i.replaceable { color: #009000; }
+
+span.term { 
+    font-weight: bold; 
+}
+
+div.sidebar { 
+    background: #F0E0E0; 
+    border: 1px solid gray; 
+    padding: 5px; 
+    margin: 20px; 
+}
+
+div.toc { 
+#    background: #E0E0E0; 
+    border: 1px solid gray; 
+    padding: 5px; 
+    margin: 20px; 
+}
+
+pre.programlisting { 
+    background: #F0E0E0; 
+    border: 1px solid gray; 
+    padding: 2px; 
+    font-size: 12pt;
+    white-space: pre;
+}
+
+pre.screen { 
+    background: #E0F0E0; 
+    border: 1px solid gray; 
+    padding: 2px; 
+    font-size: 12pt;
+    white-space: pre;
+}
+
+.inlineequation { 
+    background: #E0E0F0; 
+    font-weight: bold;
+#    font-size: 14pt;
+}
+
+div.equation { 
+    background: #E0E0F0; 
+    border: 1px solid gray; 
+    padding: 10px;
+    padding-left: 30px;
+    font-weight: bold;
+#    font-size: 14pt;
+}
+
+div.informalequation { 
+  background: #E0E0F0; 
+  border: 1px solid gray; 
+  padding: 10px;
+  padding-left: 30px;
+  font-weight: bold;
+#  font-size: 14pt;
+}
+
+div.informalequation td { 
+  padding-right: 10px;
+  font-weight: bold;
+#  font-size: 14pt;
+ }
+
+div.glosslist dt { 
+    font-weight: bold;
+    color: #FF874B;
+}
+
+.command { 
+    font-weight: bold;
+    color: #900000;
+}

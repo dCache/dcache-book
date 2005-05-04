@@ -1,0 +1,976 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+
+<chapter id="cf-pm">
+  
+  
+  <title>Configuring the Pool Manager</title>
+
+  <!--
+  <para>(We assume a basic knowledge of the functionality and terminology of
+  dCache. Pool, domain, cell, how to log into a cell, and execute
+  commands)</para>
+  -->
+
+  <para>The heart of a dCache system is the <firstterm>pool
+  manager</firstterm>. When a user performs an action on a file - reading or
+  writing - a <firstterm>transfer request</firstterm> is sent to the dCache
+  system. The pool manager then decides how to handle this request.</para>
+
+  <para>If a file the user wishes to read resides on one of the storage-pools
+  within the dCache system, it will be transferred from that pool to the user.
+  If it resides on several pools, the file will be retrieved from the pool
+  which is least busy. If all pools the file is stored on are busy, a new copy
+  of the file on an idle pool will be created and this pool will answer the
+  request.</para>
+
+  <para>A new copy can either be created by a <firstterm>pool to pool
+  transfer</firstterm> (<abbrev>p2p</abbrev>) or by fetching it from a
+  connected <firstterm>tertiary storage system</firstterm> (sometimes called
+  <abbrev>HSM</abbrev> - hierarchical storage manager). Fetching a file from a
+  tertiary storage system is called <firstterm>staging</firstterm>. It is also
+  performed if the file is not present on any of the pools in the dCache
+  system. The pool manager also has to decide on which pool the new copy will
+  be created, i.e. staged or p2p-copied.</para>
+
+  <para>The behaviour of the pool manager is highly configurable. In order to
+  exploit the full potential of the software it is essential to understand the
+  mechanisms used and how they are configured. The pool manager is a unique
+  cell in the domain <quote><literal>dCacheDomain</literal></quote> and
+  consists of several sub-modules: The important ones are the <firstterm>pool
+  selection unit</firstterm> (<abbrev>PSU</abbrev>) and the <firstterm>cost
+  manager</firstterm> (<abbrev>CM</abbrev>).</para>
+
+  <para>The PSU is responsible for finding the pools which the pool manager is
+  allowed to use for a specific transfer-request. From those the CM selects
+  the optimal one. By telling the PSU which pools are permitted for which type
+  of transfer-request, the administrator of the dCache system can adjust the
+  system to any kind of scenario: Separate organizations served by separate
+  pools, special pools for writing the data to a tertiary storage system,
+  pools in a DMZ which serves only a certain kind of data (e.g. for the grid).
+  The following section explains the mechanism employed by the PSU and shows
+  how to configure it with several examples.</para>
+
+  <section id="cf-pm-psu">
+    <title>The Pool Selection Mechanism</title>
+
+    <para>The PSU generates a list of allowable storage-pools for each
+    incoming transfer-request. The PSU-configuration described below tells the
+    PSU which combinations of transfer-request and storage-pool are allowed.
+    Imagine a two-dimensional table with a row for each possible
+    transfer-request and a column for each pool - each field in the table
+    containing either <quote>yes</quote> or <quote>no</quote>. For an incoming
+    transfer-request the PSU will return a list of all pools with
+    <quote>yes</quote> in the corresponding row.</para>
+
+    <para>Instead of <quote>yes</quote> and <quote>no</quote> the table really
+    contains a <firstterm>preference</firstterm> - a non-negative integer.
+    However, the PSU configuration is easier to understand if this is
+    ignored.</para>
+
+    <para>Actually maintaining such a table in memory (and as user in a
+    configuration file) would be quite inefficient, because of the many
+    possibilities for the transfer-requests. Instead, the PSU consults a set
+    of rules in order to generate the list of allowed pools. Each such rule is
+    called a <firstterm>link</firstterm> because it links a set of
+    transfer-requests to a group of pools. A link consists of a set of
+    condition and a list of pools. If all the conditions are satisfied, the
+    pools belonging to the link are added to the list of allowable
+    pools.</para>
+
+    <para>The main task is to understand how the conditions in a link are
+    defined. After we have dealt with that, the preference values will be
+    discussed and a few examples will follow.</para>
+
+    <section>
+      <title>The Condition of a Link</title>
+
+      <para>The properties of a transfer-request, which are relevant for the
+      PSU, are the following:<variablelist>
+          <varlistentry>
+            <term>Location of the File</term>
+
+            <listitem>
+              <para>The directory of the file in the file system
+              (<firstterm>perfectly normal file system</firstterm> -
+              <abbrev>pnfs</abbrev>).</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>IP Address</term>
+
+            <listitem>
+              <para>The IP address of the requesting host.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>Type of Transfer</term>
+
+            <listitem>
+              <para>The type of transfer is either <quote>read</quote>,
+              <quote>write</quote>, or "cache". A request for reading a file
+              which is not stored in the cache, but has to be staged from a
+              connected tertiary storage system will trigger a
+              <quote>cache</quote>-request and a subsequent
+              <quote>read</quote>-request. These will be treated as two
+              separate requests.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>The location of the file in the file system is not used
+      directly. Each file has the following two properties which can be set
+      per directory:<variablelist>
+          <varlistentry>
+            <term>Storage Class</term>
+
+            <listitem>
+              <para>The storage class is a string. It is used by a tertiary
+              storage system to decide where to store the file (i.e. on which
+              set of tapes) and dCache can use the storage class for a similar
+              purpose (i.e. on which pools the file can be stored.). A
+              detailed description of the syntax and how to set the storage
+              class of a directory in the PNFS is given in <xref
+              linkend="secStorageClass" />.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>Cache Class</term>
+
+            <listitem>
+              <para>The cache class is a string with essentially the same
+              functionality as the storage class, except that it is not used
+              by a tertiary storage system. It is used in cases, where the
+              storage class does not provide enough flexibility. It should
+              only be used, if an existing configuration using storage classes
+              does not provide sufficient flexibility</para>
+            </listitem>
+          </varlistentry>
+        </variablelist></para>
+
+      <para>Each link contains one or more <firstterm>conditions</firstterm>,
+      all of which have to be satisfied by the transfer-request. Each
+      condition in turn contains several <firstterm>elementary
+      conditions</firstterm>. The condition is satisfied if at least one of
+      the elementary conditions is satisfied. For the mathematically inclined
+      this logical structure can be expressed by the following
+      formula:<informalexample>
+          <programlisting>link ==     ( elemCond1 or elemCond2 ) 
+        and ( elemCond3 or elemCond4 or elemCond5 ) 
+        and ... and ( ... ),</programlisting>
+        </informalexample>where the parentheses are the conditions. The first
+      condition contains the elementary conditions
+      <literal>elemCond1</literal> and <literal>elemCond2</literal>, and the
+      second one contains <literal>elemCond3</literal>,
+      <literal>elemCond4</literal>, and<literal> elemCond5</literal>.</para>
+
+      <para>There are 3 types of elementary conditions: elementary network
+      (<literal>-net</literal>), storage class (<literal>-store</literal>),
+      and cache class conditions (<literal>-dcache</literal>). Each type
+      imposes a condition on the IP address, the storage class, and the cache
+      class, respectively.</para>
+
+      <para>An <emphasis>elementary network condition</emphasis> consists of
+      an IP address and a net mask written as
+      <quote><literal><replaceable>&lt;IP-address&gt;</replaceable>/<replaceable>&lt;net
+      mask&gt;</replaceable></literal></quote>, say
+      <quote><literal>111.111.111.0/255.255.255.0</literal></quote>. It is
+      satisfied, if the request is coming from a host with IP address within
+      the subnet given by the address/netmask pair.</para>
+
+      <para>An <emphasis>elementary storage class condition</emphasis> is
+      given by a storage class. It is satisfied if the requested file has this
+      storage class. Simple wild cards are allowed: For this it is important
+      to know that a storage class always contains exactly one
+      <literal>@</literal>-sign as will be explained in <xref
+      linkend="secStorageClass" />. In an elementary storage class condition
+      the part before the <literal>@</literal>-sign, or the part after it, or
+      both may be replaced by a <quote><literal>*</literal></quote>. The
+      <quote><literal>*</literal></quote> represents any string. Note, that
+      this is not a true wild card: The <quote><literal>*</literal></quote>
+      may only replace the whole part before or the whole part after the
+      <quote><literal>@</literal></quote>-sign.</para>
+
+      <para>An <emphasis>elementary cache class condition</emphasis> is given
+      by a cache class. It is satisfied, if the cache class of the requested
+      file agrees with it.</para>
+
+      <para>The conditions for the <emphasis>type of transfer</emphasis> are
+      not specified with elementary conditions. Instead, each link contains
+      three attributes <quote><literal>-readpref</literal></quote>,
+      <quote><literal>-writepref</literal></quote>, and
+      <quote><literal>-cachepref</literal></quote>, which specify a preference
+      value for the respective types of transfer. If all the conditions in the
+      link are satisfied, the corresponding preference is assigned to each
+      pool the link points to. Since we are ignoring different preference
+      values at the moment, a preference of <literal>0</literal> stands for
+      <quote>no</quote> and a non-zero preference stands for
+      <quote>yes</quote>.</para>
+
+      <para>The following explanation of the preference values can be skipped
+      at first reading. It will not be relevant, if all non-zero preference
+      values are the same. If you want to try configuring the pool manager
+      right now without bothering about the preferences, you should only use
+      <literal>0</literal> (for <quote>no</quote>) and, say,
+      <literal>10</literal> (for <quote>yes</quote>) as preferences. The first
+      examples below are of this type.</para>
+    </section>
+
+    <section>
+      <title>Preference Values</title>
+
+      <para>If more than one preference value different from zero is used, the
+      PSU will not generate a single list but a set of lists, each containing
+      pools with the same preference. The Cost Manager will use the list of
+      pools with highest preference and select the one with the lowest cost
+      for the transfer. Only if all pools with the highest preference are
+      unavailable, the next list will be considered by the Cost Manager. This
+      can be used to configure a set of fall-back pools which are used if none
+      of the other pools are available.</para>
+    </section>
+
+    <section>
+      <title>Syntax and Examples</title>
+
+      <para>The syntax of the commands for configuring the PSU will be
+      explained with the examples below. These commands can be issued within
+      the <literal>PoolManager</literal>-cell to change the configuration
+      while the system is running. The <command>save</command>-command can
+      then be used to save the current configuration to the file
+      <filename>config/PoolManager.conf</filename> in the dCache
+      program-directory. This file will be parsed, whenever the dCache system
+      starts up. It is a simple text file containing the corresponding
+      commands. It can therefore also be edited before the system is started.
+      It can also be loaded into a running system with the
+      <command>reload</command>-command.</para>
+
+      <section>
+        <title>Pool Groups</title>
+
+        <para>Pools can be grouped together to pool groups. Consider a host
+        <literal>pool1</literal> with two pools, <literal>pool1_1</literal>
+        and <literal>pool1_2</literal>, and a host <literal>pool2</literal>
+        with one pool <literal>pool2_1</literal>. If you want to treat them in
+        the same way, you would create a pool group and put all of them in
+        it:<programlisting><command>psu create pgroup</command> <replaceable>normal-pools</replaceable>
+<command>psu create pool</command> <replaceable>pool1_1</replaceable>
+<command>psu addto pgroup</command> <replaceable>normal-pools</replaceable> <replaceable>pool1_1</replaceable>
+<command>psu create pool</command> <replaceable>pool1_2</replaceable>
+<command>psu addto pgroup</command> <replaceable>normal-pools</replaceable> <replaceable>pool1_2</replaceable>
+<command>psu create pool</command> <replaceable>pool2_1</replaceable>
+<command>psu addto pgroup</command> <replaceable>normal-pools</replaceable> <replaceable>pool2_1</replaceable></programlisting>If
+        you later want to treat <literal>pool1_2</literal> differently from
+        the others, you would remove it from this pool group and add it to a
+        new one:<programlisting><command>psu removefrom pgroup</command> <replaceable>normal-pools</replaceable> <replaceable>pool1_2</replaceable>
+<command>psu create pgroup</command> <replaceable>special-pools</replaceable>
+<command>psu addto pgroup</command> <replaceable>special-pools</replaceable> <replaceable>pool1_2</replaceable></programlisting>In
+        the following, we will assume that the necessary pool groups already
+        exist. All names ending with <quote><literal>-pools</literal></quote>
+        will denote pool groups.</para>
+
+        <para>Note that a pool-node will register itself with the pool
+        manager: The pool will be created within the PSU and added to the pool
+        group <quote><literal>default</literal></quote>, if that exists. This
+        is why the dCache system will automatically use any new pool-nodes in
+        the standard configuration: All pools are in
+        <quote><literal>default</literal></quote> and can therefore handle any
+        request.</para>
+      </section>
+
+      <section id="secExReadWrite">
+        <title>Separate Write and Read Pools</title>
+
+        <para>The dCache we are going to configure receives data from a
+        running experiment, stores the data onto a tertiary storage system,
+        and serves as a read cache for users who want to analyze the data.
+        While the new data from the experiment should be stored on highly
+        reliable and therefore expensive systems, the cache functionality may
+        be provided by inexpensive hardware. It is therefore desirable to have
+        a set of pools dedicated for writing the new data and a separate set
+        for reading.</para>
+
+        <para>The simplest configuration for such a setup would consist of two
+        links <quote>write-link</quote> and <quote>read-link</quote>. The
+        configuration is as follows:<programlisting><command>psu create unit</command> <parameter>-net</parameter> <replaceable>0.0.0.0/0.0.0.0</replaceable>
+<command>psu create ugroup</command> <replaceable>allnet-cond</replaceable>
+<command>psu addto ugroup</command> <replaceable>allnet-cond</replaceable> <replaceable>0.0.0.0/0.0.0.0</replaceable>
+
+<command>psu create link</command> <replaceable>read-link</replaceable> <replaceable>allnet-cond</replaceable>
+<command>psu set link</command> <replaceable>read-link</replaceable> <parameter>-readpref=</parameter><replaceable>10</replaceable> <parameter>-writepref=</parameter><replaceable>0</replaceable> <parameter>-cachepref=</parameter><replaceable>10</replaceable>
+<command>psu add link</command> <replaceable>read-link</replaceable> <replaceable>read-pools</replaceable>
+
+<command>psu create link</command> <replaceable>write-link</replaceable> <replaceable>allnet-cond</replaceable>
+<command>psu set link</command> <replaceable>write-link</replaceable> <parameter>-readpref=</parameter><replaceable>0</replaceable> <parameter>-writepref=</parameter><replaceable>10</replaceable> <parameter>-cachepref=</parameter><replaceable>0</replaceable>
+<command>psu add link</command> <replaceable>write-link</replaceable> <replaceable>write-pools</replaceable></programlisting>Why
+        is the condition <literal>allnet-cond</literal> necessary? It is used
+        as a condition which is always true in both links. This is needed,
+        because each link contains at least one condition. The commands
+        contain the words <literal>unit</literal> and
+        <literal>ugroup</literal> for historical reasons. They denote
+        elementary conditions and conditions in our nomenclature.</para>
+      </section>
+
+      <section>
+        <title>Restricted Access by IP Address</title>
+
+        <para>You might not want to give access to the pools for the whole
+        network, as in the previous example (<xref
+        linkend="secExReadWrite" />), though. Assume, the experiment data is
+        copied into the cache from the hosts with IP
+        <literal>111.111.111.201</literal>,
+        <literal>111.111.111.202</literal>, and
+        <literal>111.111.111.203</literal>. As you might guess, the subnet of
+        the site is <literal>111.111.111.0/255.255.255.0</literal>. Access
+        from outside should be denied. Then you would modify the above
+        configuration as follows:<programlisting><command>psu create unit</command> <parameter>-net</parameter> <replaceable>111.111.111.0/255.255.255.0</replaceable>
+<command>psu create ugroup</command> <replaceable>allnet-cond</replaceable>
+<command>psu addto ugroup</command> <replaceable>allnet-cond</replaceable> <replaceable>111.111.111.0/255.255.255.0</replaceable>
+
+<command>psu create unit</command> <parameter>-net</parameter> <replaceable>111.111.111.201/255.255.255.255</replaceable>
+<command>psu create unit</command> <parameter>-net</parameter> <replaceable>111.111.111.202/255.255.255.255</replaceable>
+<command>psu create unit</command> <parameter>-net</parameter> <replaceable>111.111.111.203/255.255.255.255</replaceable>
+<command>psu create ugroup</command> <replaceable>write-cond</replaceable>
+<command>psu addto ugroup</command> <replaceable>write-cond</replaceable> <replaceable>111.111.111.201/255.255.255.255</replaceable>
+<command>psu addto ugroup</command> <replaceable>write-cond</replaceable> <replaceable>111.111.111.202/255.255.255.255</replaceable>
+<command>psu addto ugroup</command> <replaceable>write-cond</replaceable> <replaceable>111.111.111.203/255.255.255.255</replaceable>
+
+<command>psu create link</command> <replaceable>read-link</replaceable> <replaceable>allnet-cond</replaceable>
+<command>psu set link</command> <replaceable>read-link</replaceable> <parameter>-readpref=</parameter><replaceable>10</replaceable> <parameter>-writepref=</parameter><replaceable>0</replaceable> <parameter>-cachepref=</parameter><replaceable>10</replaceable>
+<command>psu add link</command> <replaceable>read-link</replaceable> <replaceable>read-pools</replaceable>
+
+<command>psu create link</command> <replaceable>write-link</replaceable> <replaceable>write-cond</replaceable>
+<command>psu set link</command> <replaceable>write-link</replaceable> <parameter>-readpref=</parameter><replaceable>0</replaceable> <parameter>-writepref=</parameter><replaceable>10</replaceable> <parameter>-cachepref=</parameter><replaceable>0</replaceable>
+<command>psu add link</command> <replaceable>write-link</replaceable> <replaceable>write-pools</replaceable></programlisting></para>
+      </section>
+
+      <section>
+        <title>Reserving Pools for Storage and Cache Classes</title>
+
+        <para>If pools are financed by one experimental group, they probably
+        do not like it, if it is also used by another group. The best way to
+        restrict data belonging to one experiment to a set of pools is with
+        the help of storage class conditions. If more flexibility is needed,
+        cache class conditions can be used for the same purpose.</para>
+
+        <para>Assume, data of experiment A obtained in 2004 is written into
+        subdirectories in the PNFS tree which are tagged with the storage
+        class <quote><literal>exp-a:run2004@osm</literal></quote>, and
+        similarly for the other years. (How this is done is described in <xref
+        linkend="secStorageClass" />.) Experiment B uses the storage class
+        <quote><literal>exp-b:alldata@osm</literal></quote> for all its data.
+        Especially important data is tagged with the cache class
+        <quote><literal>important</literal></quote>. (This is described in
+        <xref linkend="secCacheClass" />.) A suitable setup would
+        be<programlisting><command>psu create ugroup</command> <replaceable>exp-a-cond</replaceable>
+
+<command>psu create unit</command> -store <replaceable>exp-a:run2003@*</replaceable>
+<command>psu addto ugroup</command> <replaceable>exp-a-cond</replaceable> <replaceable>exp-a:run2003@*</replaceable>
+<command>psu create unit</command> -store <replaceable>exp-a:run2004@*</replaceable>
+<command>psu addto ugroup</command> <replaceable>exp-a-cond</replaceable> <replaceable>exp-a:run2004@*</replaceable>
+
+<command>psu create link</command> <replaceable>exp-a-link</replaceable> <replaceable>allnet-cond</replaceable> <replaceable>exp-a-cond</replaceable>
+<command>psu set link</command> <replaceable>exp-a-link</replaceable> <parameter>-readpref=</parameter><replaceable>10</replaceable> <parameter>-writepref=</parameter><replaceable>10</replaceable> <parameter>-cachepref=</parameter><replaceable>10</replaceable>
+<command>psu add link</command> <replaceable>exp-a-link</replaceable> <replaceable>exp-a-pools</replaceable>
+
+<command>psu create ugroup</command> <replaceable>exp-b-cond</replaceable>
+
+<command>psu create unit</command> <parameter>-store</parameter> <replaceable>exp-b:alldata@*</replaceable>
+<command>psu addto ugroup</command> <replaceable>exp-b-cond</replaceable> <replaceable>exp-b:alldata@*</replaceable>
+
+<command>psu create ugroup</command> <replaceable>imp-cond</replaceable>
+<command>psu create unit</command> <parameter>-dcache</parameter> <replaceable>important</replaceable>
+<command>psu addto ugroup</command> <replaceable>imp-cond</replaceable> <replaceable>important</replaceable>
+
+<command>psu create link</command> <replaceable>exp-b-link</replaceable> <replaceable>allnet-cond</replaceable> <replaceable>exp-b-cond</replaceable>
+<command>psu set link</command> <replaceable>exp-b-link</replaceable> <parameter>-readpref=</parameter><replaceable>10</replaceable> <parameter>-writepref=</parameter><replaceable>10</replaceable> <parameter>-cachepref=</parameter><replaceable>10</replaceable>
+<command>psu add link</command> <replaceable>exp-b-link</replaceable> <replaceable>exp-a-pools</replaceable>
+
+<command>psu create link</command> <replaceable>exp-b-imp-link</replaceable> <replaceable>allnet-cond</replaceable> <replaceable>exp-b-cond</replaceable> <replaceable>imp-cond</replaceable>
+<command>psu set link</command> <replaceable>exp-b-imp-link</replaceable> <parameter>-readpref=</parameter><replaceable>20</replaceable> <parameter>-writepref=</parameter><replaceable>20</replaceable> <parameter>-cachepref=</parameter><replaceable>20</replaceable>
+<command>psu add link</command> <replaceable>exp-b-link</replaceable> <replaceable>exp-b-imp-pools</replaceable></programlisting></para>
+
+        <para>Data tagged with cache class
+        <quote><literal>important</literal></quote> will always be written and
+        read from pools in the pool group <literal>exp-b-imp-pools</literal>,
+        except when all pools in this group cannot be reached. Then the pools
+        in <literal>exp-a-pools</literal> will be used.</para>
+
+        <para>Note again that these will never be used otherwise. Not even, if
+        all pools in <literal>exp-b-imp-pools</literal> are very busy and some
+        pools in <literal>exp-a-pools</literal> have nothing to do and lots of
+        free space.</para>
+
+        <para>Note also that the elementary storage class conditions are
+        always given in the form
+        <literal><replaceable>&lt;something&gt;</replaceable>@*</literal>.
+        This way it is possible to transparently migrate to a new tertiary
+        storage system, say from <literal>osm</literal> to
+        <literal>tsm</literal>.</para>
+
+        <para>The central IT department might also want to set up a few pools,
+        which are used as fall-back, if none of the pools of the experiments
+        are functioning. These will also be used for internal testing. The
+        following would have to be added to the previous
+        setup:<programlisting><command>psu create link</command> <replaceable>fallback-link</replaceable> <replaceable>allnet-cond</replaceable>
+<command>psu set link</command> <replaceable>fallback-link</replaceable> <parameter>-readpref=</parameter><replaceable>5</replaceable> <parameter>-writepref=</parameter><replaceable>5</replaceable> <parameter>-cachepref=</parameter><replaceable>5</replaceable>
+<command>psu add link</command> <replaceable>fallback-link</replaceable> <replaceable>it-pools</replaceable></programlisting>Note
+        again that these will only be used, if none of the experiments pools
+        can be reached, or if the storage class is not of the form
+        <literal>exp-a:run2003@*</literal>,
+        <literal>exp-a:run2004@*</literal>, or
+        <literal>exp-b:alldata@*</literal>. If the administrator fails to
+        create the elementary condition <literal>exp-a:run2005@*</literal> and
+        add it to the condition <literal>exp-a-cond</literal>, the fall-back
+        pools will be used eventually.</para>
+      </section>
+    </section>
+
+    <section id="secStorageClass">
+      <title>Storage Classes</title>
+
+      <para>The storage class is a string of the form
+      <literal><replaceable>&lt;StoreDescriptor&gt;</replaceable>@<replaceable>&lt;hsm&gt;</replaceable></literal>,
+      where <replaceable>&lt;hsm&gt;</replaceable> denotes the type of
+      tertiary storage system in use, and
+      <replaceable>&lt;StoreDescriptor&gt;</replaceable> is a string
+      describing the storage class in a syntax which depends on the used
+      tertiary storage system. If no tertiary storage system is used, it is
+      probably best to use
+      <literal><replaceable>&lt;hsm&gt;</replaceable>=osm</literal>, since
+      this is tested best. Then the
+      <replaceable>&lt;StoreDescriptor&gt;</replaceable> has the syntax
+      <literal><replaceable>&lt;Store&gt;</replaceable>:<replaceable>&lt;StorageGroup&gt;</replaceable></literal>.
+      These can be set within PNFS per directory. Consider for example the
+      following setup:<screen><prompt>[admin] # </prompt><command>cd</command> <filename>/pnfs/<replaceable>&lt;domain&gt;</replaceable>/<replaceable>&lt;experiment-a&gt;</replaceable>/</filename>
+<prompt>[admin] # </prompt><command>cat</command> "<filename>.(tag)(OSMTemplate)</filename>"
+StoreName myStore
+<prompt>[admin] # </prompt><command>cat</command> "<filename>.(tag)(sGroup)</filename>"
+STRING</screen>This is the setup after a fresh installation and it will lead
+      to the storage class <literal>myStore:STRING@osm</literal>. An
+      adjustment to more sensible values will look like<screen><prompt>[admin] # </prompt><command>echo</command> "StoreName exp-a" &gt;! "<filename>.(tag)(OSMTemplate)</filename>"
+<prompt>[admin] # </prompt><command>echo</command> "run2004" &gt;! "<filename>.(tag)(sGroup)</filename>"</screen>and
+      will result in the storage class <literal>exp-a:run2004@osm</literal>.
+      To summarize: The storage class will depend on the directory, the data
+      is stored in and is configurable.</para>
+    </section>
+
+    <section id="secCacheClass">
+      <title>Cache Class</title>
+
+      <para>Storage classes might already be in use for the configuration of a
+      tertiary storage system. In most cases they should be flexible enough to
+      configure the PSU. However, in rare cases the existing configuration and
+      convention for storage classes might not be flexible enough.</para>
+
+      <para>Consider for example a situation, where data produced by an
+      experiment always has the same storage class
+      <literal>exp-a:alldata@osm</literal>. This is good for the tertiary
+      storage system, since all data is supposed to go to the same tape set
+      sequentially. However, the data also contains a relatively small amount
+      of meta-data, which is accessed much more often by analysis jobs than
+      the rest of the data. You would like to keep the meta-data on a
+      dedicated set of dCache pools. However, the storage class does not
+      provide means to accomplish that.</para>
+
+      <para>The cache class of a directory is set by the tag
+      <literal>cacheClass</literal> as follows:<screen><prompt>[admin] # </prompt><command>echo</command> "metaData" &gt;! "<filename>.(tag)(cacheClass)</filename>"</screen>In
+      the above example the meta-data is stored in directories which are
+      tagged in this way.</para>
+
+      <para>There is a nice trick for easy checking of the existing tags in
+      one directory:<screen><prompt>[admin] # </prompt><command>grep</command> '' `<command>cat</command> '.(tags)()'`
+.(tag)(OSMTemplate):StoreName exp-a
+.(tag)(sGroup):run2004
+.(tag)(cacheClass):metaData</screen>This only works, if the quote-symbols are
+      used correctly. (tick, tick, back-tick, tick, tick, back-tick).</para>
+
+      <para>Tags are inherited by sub-directories: Changing a tag of a
+      directory will change the tag of each sub-directory, if the tag has
+      never been changed for this sub-directory directly. Changing tags breaks
+      these inheritance links. Directories in PNFS should never be moved,
+      since this will mess up the inheritance structure and eventually break
+      the whole system.</para>
+    </section>
+  </section>
+
+  <section id="cf-pm-cm">
+    <title>The Cost Module</title>
+
+    <para>
+      From the allowable pools as determined by the <glossterm
+      linkend="gl-pm-comp-psu">pool selection unit</glossterm>, the pool
+      manager determines the pool used for storing or reading a file
+      by calculating a <glossterm linkend="gl-cost">cost</glossterm>
+      value for each pool. The pool with the lowest cost is used.
+    </para>
+
+    <para>
+      If a client requests to read a file which is stored on more than
+      one allowable pool, the <glossterm
+      linkend="gl-performance_cost">performance costs</glossterm> are
+      calculated for these pools. In short, this cost value describes
+      how much the pool is currently occupied with transfers.
+    </para>
+
+    <para>
+      If a pool has to be selected for storing a file, which is either
+      written by a client or <glossterm
+      linkend="gl-restore">restored</glossterm> from a <glossterm
+      linkend="gl-tape_backend">tape backend</glossterm>, this
+      performance cost is combined with a <glossterm
+      linkend="gl-space_cost">space cost</glossterm> value to a
+      <glossterm linkend="gl-cost">total cost</glossterm> value for
+      the decision. The space cost describes how much it
+      <quote>hurts</quote> to free space on the pool for the file.
+    </para>
+
+    <para>
+      The <glossterm linkend="gl-pm-comp-cm">cost module</glossterm> is
+      responsible for calculating the cost values for all pools.  The
+      pools regularly send all necessary information about space usage
+      and request queue lengths to the cost module.  It can be
+      regarded as a cache for all this information.  This way it is
+      not necessary to send <quote>get cost</quote> requests to the
+      pools for each client request. The cost module interpolates the
+      expected costs until a new precise information package is coming
+      from the pools.  This mechanism prevents clumping of requests.
+    </para>
+
+    <para>
+      Calculating the cost for a data transfer is done in two
+      steps. First, the cost module merges all information about space
+      and transfer queues of the pools to calucate the performance and
+      space costs separately.  Second, in the case of a write or stage
+      request, these two numbers are merged to build the total cost
+      for each pool.  The first step is isolated within a separate
+      loadable class.  The second step is done by the cost
+      module.<footnote>
+	<para>
+	  The next development step will be to add the second
+	  calculation as well to the customizable (loadable) class.
+	</para>
+      </footnote>
+    </para>
+
+    <section>
+      <title>The Performance Cost</title>
+
+      <para>
+	The load of a pool is determined by comparing the current
+	number of active and waiting <glossterm>transfers</glossterm>
+	to the maximum number of concurrent transfers allowed.
+
+	This is done separately for each of the transfer types
+	(<glossterm linkend="gl-store">store</glossterm>, <glossterm
+	linkend="gl-restore">restore</glossterm>, pool-to-pool client,
+	pool-to-pool server, and client request) with the following
+	equation:
+	
+	<equation>
+	  perfCost(per Type) = ( activeTransfers + waitingTransfers ) / maxAllowed .
+	</equation>
+
+	The maximum number of concurrent transfers
+	(<symbol>maxAllowed</symbol>) can be configured with the commands
+	<command moreinfo="refentry"><xref linkend="cmd-st_set_max_active"/></command> (store),
+	<command moreinfo="refentry"><xref linkend="cmd-rh_set_max_active"/></command> (restore),
+	<command moreinfo="refentry"><xref linkend="cmd-mover_set_max_active"/></command> (client request),
+	<command moreinfo="refentry"><xref linkend="cmd-p2p_set_max_active"/></command> (pool-to-pool server), and
+	<command moreinfo="refentry"><xref linkend="cmd-pp_set_max_active"/></command> (pool-to-pool client). 
+        (NOCLUE: <command moreinfo="refentry"><xref linkend="cmd-flush_set_max_active"/></command>)
+
+	NOCLUE: Some more info about the meanings of these parameters would be nice.
+      </para>
+
+
+      <para>
+	Then the average is taken for each mover type where
+	<symbol>maxAllowed</symbol> is not zero. For a pool where
+	store, restore and client transfers are allowed, e.g.:
+
+	<informalequation>
+	  perfCost(total) = ( perfCost(store) + perfCost(restore) + perfCost(client) ) / 3 ,
+	</informalequation>
+  
+	and for a read only pool:
+  
+	<informalequation>
+	  perfCost(total) = ( perfCost(restore) + perfCost(client) ) / 2 .
+	</informalequation>
+
+  	For a well balanced system, the performance cost should not exceed 1.0.
+      </para>
+
+    </section>
+
+    <section>
+      <title>The Space Cost</title>
+
+      <para>
+	In this section only the new scheme for calculating the space
+	cost will be described. Be aware, that the old scheme will be
+	used if the <glossterm linkend="gl-breakeven">breakeven
+	parameter</glossterm> of a pool is larger or equal 1.0.
+      </para>
+      
+      <para>
+	The cost value used for determining a pool for storing a file
+	depends either on the free space on the pool or on the age of
+	the <glossterm linkend="gl-lru">least recently used (LRU)
+	file</glossterm>, which whould have to be deleted. 
+      </para>
+
+      <para>
+	The space cost is calculated as follows:
+
+	<informalequation>
+	  <informaltable frame="none">
+	    <tgroup cols="6">
+	      <tbody>
+		<row>
+		  <entry>If </entry>
+		  <entry>
+		    <inlineequation>
+		      freeSpace &gt; gapPara
+		    </inlineequation>
+		  </entry>
+		  <entry></entry>
+		  <entry></entry>
+		  <entry> then </entry>
+		  <entry>		  
+		    <inlineequation>
+		      spaceCost = 3 * newFileSize / freeSpace
+		    </inlineequation>
+		  </entry>
+		</row>
+		<row>
+		  <entry>If </entry>
+		  <entry>
+		    <inlineequation>
+		      freeSpace &lt;= gapPara
+		    </inlineequation>
+		  </entry>
+		  <entry>
+		    and
+		  </entry>
+		  <entry>
+		    <inlineequation>
+		      lruAge &lt; 60
+		    </inlineequation>
+		  </entry>
+		  <entry> then </entry>
+		  <entry>		  
+		    <inlineequation>
+		      spaceCost = 1 + costForMinute
+		    </inlineequation>
+		  </entry>
+		</row>
+		<row>
+		  <entry>If </entry>
+		  <entry>
+		    <inlineequation>
+		      freeSpace &lt;= gapPara
+		    </inlineequation>
+		  </entry>
+		  <entry>
+		    and
+		  </entry>
+		  <entry>
+		    <inlineequation>
+		      lruAge &gt;= 60
+		    </inlineequation>
+		  </entry>
+		  <entry> then </entry>
+		  <entry>		  
+		    <inlineequation>
+		      spaceCost = 1 + costForMinute * 60 / lruAge
+		    </inlineequation>
+		  </entry>
+		</row>
+	      </tbody>
+	    </tgroup>
+	  </informaltable>
+	</informalequation>
+
+	where the variable names have the following meanings:
+
+	<variablelist>
+	  <varlistentry>
+	    <term>freeSpace</term>
+	    <listitem>
+	      <para>
+		The free space left on the pool
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>newFileSize</term>
+	    <listitem>
+	      <para>
+		The size of the file to be written to one of the pools, and at least 50MB.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>lruAge</term>
+	    <listitem>
+	      <para>
+		The age of the <glossterm linkend="gl-lru">least
+		  recently used file</glossterm> on the pool.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>gapPara</term>
+	    <listitem>
+	      <para>
+		The gap parameter. Default is 4GB. The size of free
+		space below which it will be assumed that the pool is
+		full and consequently the least recently used file has
+		to be removed. If, on the other hand, the free space
+		is greater than <varname>gapPara</varname>, it will be
+		expensive to store a file on the pool which exceeds
+		the free space.
+	      </para>
+	      <para>
+		It can be set per pool with the <command
+		moreinfo="refentry"><xref
+		linkend="cmd-set_gap"/></command> command. This has to
+		be done in the pool cell and not in the pool manager
+		cell. Nevertheless it only influences the cost
+		calculation scheme within the pool manager and not the
+		bahaviour of the pool itself.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>costForMinute</term>
+	    <listitem>
+	      <para>
+		A parameter which fixes the space cost of a
+		one-minute-old LRU file to <inlineequation>(1 +
+		costForMinute)</inlineequation>.  It can be set with
+		the <command moreinfo="refentry"><xref
+		linkend="cmd-set_breakeven"/></command>, where
+		<informalequation>
+		  costForMinute = breakeven * 7 * 24 * 60.
+		</informalequation>
+		I.e. the the space cost of a one-week-old LRU file
+		will be <inlineequation>(1 +
+		breakeven)</inlineequation>. Not again, that all this
+		only applies if <inlineequation>breakeven &lt;
+		1.0</inlineequation>
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+	
+	The prescription above can be stated a little differently as follows:
+	<informalequation>
+	  <informaltable frame="none">
+	    <tgroup cols="4">
+	      <tbody>
+		<row>
+		  <entry>If </entry>
+		  <entry>
+		    <inlineequation>
+		      freeSpace &gt; gapPara
+		    </inlineequation>
+		  </entry>
+		  <entry> then </entry>
+		  <entry>		  
+		    <inlineequation>
+		      spaceCost = 3 * newFileSize / freeSpace
+		    </inlineequation>
+		  </entry>
+		</row>
+		<row>
+		  <entry>If </entry>
+		  <entry>
+		    <inlineequation>
+		      freeSpace &lt;= gapPara
+		    </inlineequation>
+		  </entry>
+		  <entry> then </entry>
+		  <entry>		  
+		    <inlineequation>
+		      spaceCost = 1 + breakeven * 7 * 24 * 60 * 60 / lruAge
+		    </inlineequation>,
+		  </entry>
+		</row>
+	      </tbody>
+	    </tgroup>
+	  </informaltable>
+	</informalequation>
+
+	where <varname>newFileSize</varname> is at least 50MB and
+	<varname>lruAge</varname> at least one minute.
+      </para>
+
+      <section>
+	<title>Rationale</title>
+
+	<para>
+	NOCLUE
+	</para>
+
+	<para>
+	  As the last version of the formula suggests, a pool can be
+	  in two states: Either <inlineequation>freeSpace &gt;
+	  gapPara</inlineequation> or <inlineequation>freeSpace &lt;=
+	  gapPara</inlineequation> - either there is free space left
+	  to store files without deleting cached files or there
+	  isn't. 
+	</para>
+
+	<para>
+	  Therefore, <varname>gapPara</varname> should be around the
+	  size of the smallest files which frequently might be written
+	  to the pool. If files smaller than
+	  <varname>gapPara</varname> appear very seldom or never, the
+	  pool might get stuck in the first of the two cases with a
+	  high cost.
+	</para>
+
+	<para>
+	  If the LRU file is smaller than the new file, other files
+	  might have to be deleted. If these are much younger than the
+	  LRU file, this space cost calculation scheme might not lead
+	  to a selection of the optimal pool. However, in praxis this
+	  happens very seldomly and this scheme turns out to be very
+	  efficient.
+	</para>
+      
+      </section>
+
+    </section>
+    
+    <section>
+      <title>The Total Cost</title>
+    
+    <para>
+      The total cost is a linear combination of the <glossterm
+      linkend="gl-performance_cost">performance</glossterm> and
+      <glossterm linkend="gl-space_cost">space cost</glossterm>.
+
+      I.e.
+
+<!-- 
+<screen><varname>cost</varname> = <varname>ccf</varname> * <varname>performance_cost</varname> + <varname>scf</varname> * <varname>space_cost</varname>,</screen>
+-->
+      <equation>
+	<m:math xmlns:m="http://www.w3.org/1998/Math/MathML">
+	  <m:mrow>
+	    <m:mi>totalCost</m:mi>
+	    <m:mo>=</m:mo>
+	    <m:mi>ccf</m:mi>
+	    <m:mo>*</m:mo>
+	    <m:mi>perfCost</m:mi>
+	    <m:mo>+</m:mo>
+	    <m:mi>scf</m:mi>
+	    <m:mo>*</m:mo>
+	    <m:mi>spaceCost</m:mi>
+	  </m:mrow>
+	</m:math>,
+ 	<!--
+	<m:math xmlns:m="http://www.w3.org/1998/Math/MathML">
+	  <m:mrow>
+	  <m:apply>
+	    <m:eq/>
+	    <m:ci>totalCost</m:ci>
+	    <m:apply>
+	      <m:plus/>
+	      <m:apply>
+		<m:times/>
+		<m:ci>ccf</m:ci>
+		<m:ci>perfCost</m:ci>
+	      </m:apply>
+	      <m:apply>
+		<m:times/>
+		<m:ci>scf</m:ci>
+		<m:ci>spaceCost</m:ci>
+	      </m:apply>
+	    </m:apply>
+	  </m:apply>
+	  </m:mrow>
+	</m:math>
+	-->
+	<alt>totalCost = ccf * perfCost + scf * spaceCost</alt>
+      </equation>
+
+
+      where <varname>ccf</varname> and <varname>scf</varname> are
+      configurable with the command <command moreinfo="refentry"><xref
+      linkend="cmd-set_pool_decision"/></command>.
+
+      E.g.
+
+<screen><dcpmprompt/><command>set pool decision</command> <option>-spacecostfactor=3</option> <option>-cpucostfactor=1</option></screen>
+
+      will give the <glossterm linkend="gl-space_cost">space
+      cost</glossterm> three times the weight of the <glossterm
+      linkend="gl-performance_cost">performance cost</glossterm>.
+    </para>
+
+    </section>
+
+    <section>
+      <title>Advanced Customization of the Cost Calculation</title>
+      <para>
+	The cost calcuation scheme described above can be overwritten
+	by the pool manager
+	<quote><command>create</command></quote>-option:
+	
+<screen><option>-costCalculator=<replaceable>newCostCalculator</replaceable></option></screen>
+
+	The default value for
+	<replaceable>newCostCalculator</replaceable> is
+	<literal>CostCalculationV5</literal>. The goal is to compare
+	different pool costs without intermediatly calculating scalar
+	values for performance and space.
+      </para>
+    </section>
+
+    <!--
+    
+    <a name="lrucost">
+   </blockquote>
+</blockquote>
+-->
+  </section>
+  
+  <section id="cf-pm-devel">
+    <title>Devel</title>
+    
+    <para>
+      In addition, the PoolCellInfo now is just the CellInfo plus the
+      PoolCostInfo.  The WebCollectorV3 has been modified
+      accordingly. The WebCollectorV0 has been removed.
+    </para>
+
+    <section>
+      <title>Pool 2 Pool transfer client</title>
+
+      <para>
+	The pool 2 pool client transfers are now added to the total
+	cost of a pool and they are reported to the 'pool request' web
+	page as well.
+      </para>
+      
+      <para>
+	Although client pool 2 pool transfers seem to be handled
+	within regular queues, they are not.  Queuing both, p2p server
+	and queue requests, has a (even though small) probability of
+	deadlocks.  So, p2p client requests are never actually queued
+	but they start immediately after they have been requested.
+	The p2p client 'max number of transfers' is only used to
+	calculate the costs for those transfers.
+      </para>
+      
+    </section>
+    
+
+  </section>
+
+</chapter>

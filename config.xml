@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE part PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">     
+
+<part id="cf" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <!-- <?dbhtml dir="config" ?> -->
+  <title>Configuration of <productname>dCache</productname></title>
+  
+  <partintro>
+    <para>
+      This part contains descriptions of the components of dCache,
+      their role, functionality within the framework. In short, all
+      information necessary for configuring them.
+    </para>
+  </partintro>
+
+<!--  
+  <chapter id="cf-pnfs">
+    <title>Configuring in PNFS (???)</title>
+    
+    <section>
+      <title>Directory Tags</title>
+      
+      <para>
+
+<screen><rootprompt/><userinput><command>cd</command> <filename>/pnfs/domain/data/exp-a/</filename></userinput>
+<rootprompt/><userinput><command>grep</command> -e '.*' `cat ".(tags)()"`</userinput>
+.(tag)(OSMTemplate):StoreName myStore
+.(tag)(sGroup):STRING
+<prompt>  [admin] # </prompt></screen>
+	
+	The file
+	<filename>/pnfs/fs/admin/etc/exports/<replaceable>&lt;hostIP&gt;</replaceable></filename>
+	contains one line per NFS mount point which contain the
+	following four fields:
+	<itemizedlist>
+	  <listitem>
+	    <para>Mount point for NFS (the part after the colon in
+	      e.g.  host:/mountpoint)</para>
+	  </listitem>
+	  
+	  <listitem>
+	    <para>The virtual PNFS path which is mounted</para>
+	  </listitem>
+	  
+	  <listitem>
+	    <para>A number: 0: all permissions 30: restricted</para>
+	  </listitem>
+	  
+	  <listitem>
+	    <para>Options (usually: nooptions)</para>
+	  </listitem>
+	</itemizedlist></para>
+    </section>
+  </chapter>
+-->
+
+<!--
+  <chapter id="cf-admindoor">
+    <title>Administration Interface</title>
+    <screen>
+Please create an rsa dcache  admin keypair :
+
+ssh-keygen -b 1024 -t rsa1 -f  dcache-admin-key -N ""
+
+and add the public part to the :
+
+/opt/d-cache/config/authorized_keys
+
+file. Allow up to a minute before the key is
+automatically activated. 
+
+The <quote>comment</quote> at the end of the public key line has to be
+changed to <quote>admin</quote>.
+    </screen>
+  </chapter>
+-->
+  
+  <xi:include href="config-PoolManager.xml"></xi:include>
+
+</part>

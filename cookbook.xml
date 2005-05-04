@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE part PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">     
+
+<part id="cb" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <!-- <?dbhtml dir="cookbook" ?> -->
+  <title>Cookbook</title>
+  
+  <partintro>
+    <para>
+      This part contains guides for specific tasks a system
+      administrator might want to perform. 
+    </para> 
+  </partintro>
+  
+  <chapter id="cb-pool">
+    <title>Pool Operations</title>
+    
+    
+    <section id="cb-pool-remove">
+      <title>Removing a Pool</title>
+      
+      <section id="cb-pool-remove-precious">
+	<title>Removing a Pool with Precious Files on it</title>
+	
+	<para>
+	  TODO
+	</para>
+      </section>
+      
+      <section id="cb-pool-remove-cached">
+	<title>Removing a Pool with only cached Files</title>
+	
+	<para>
+	  TODO
+	</para>
+      </section>
+      
+    </section>
+    
+    <section id="cb-pool-rename">
+      <title>Renaming a Pool</title>
+      
+      <para>A pool may be renamed with the following procedure,
+	regardless of the type of files stored on it.</para>
+      
+      <para>
+	Disable file transfers from and to the pool with
+	<screen><dcpoolprompt></dcpoolprompt><command>pool disable</command> <option>-strict</option></screen>
+	Then make shure, no transfers are being processed anymore.
+	All the following commands should give no output:
+	<screen><dcpoolprompt></dcpoolprompt><command>queue ls queue</command>
+<dcpoolprompt></dcpoolprompt><command>mover ls</command>
+<dcpoolprompt></dcpoolprompt><command>p2p ls</command>
+<dcpoolprompt></dcpoolprompt><command>pp ls</command>
+<dcpoolprompt></dcpoolprompt><command>st jobs ls</command>
+<dcpoolprompt></dcpoolprompt><command>rh jobs ls</command></screen>
+	Now the files on the pools have to be unregistered on the 
+	PNFS server with
+	<screen><dcpoolprompt></dcpoolprompt><command>pnfs unregister</command></screen>
+	Even if the pool contains precious files, this is no problem, since
+	we will register them again in a moment. The files might not be available
+	for a short moment, though.
+	Log out of the pool, and stop the service: TODO
+	Rename the pool in the <filename><replaceable>poolDomain</replaceable>.poollist</filename>-file.
+	Restart the service: TODO
+	Register the files on the pool with
+	<screen><dcpoolprompt/><command>pnfs register</command></screen>
+      </para>
+      
+    </section>
+
+    <section id="cb-pool-pin">
+      <title>Pinning Files to a Pool</title>
+
+      <para>
+	You may pin a file locally within the private pool repository:
+        <screen><command>rep set sticky</command> <replaceable>pnfsid</replaceable> <option>on|off</option></screen> 
+        the 'sticky' mode will stay with the file as long as the file
+        is in the pool.  If the file is removed from the pool and
+        recreated afterwards this information gets lost.  
+      </para>
+
+      <para>
+	You may use the same mechanism globally:  in the command line
+	interface (local mode) there is the command
+	<screen><command>set sticky</command> <replaceable>pnfsid</replaceable></screen>
+	This command does: 
+	<orderedlist>
+	  <listitem>
+	    flags the file as sticky in the name space database
+	    (pnfs). So from now the filename is globally set sticky.
+	  </listitem>
+	  <listitem>
+	    will go to all pools where it finds the file and will flag
+	    it sticky in the pools.
+	  </listitem>
+	  <listitem>
+	    all new copies of the file will become sticky.
+	  </listitem>
+	</orderedlist>
+      </para>
+    </section>
+  </chapter>
+  
+  
+<!--
+  <chapter id="cb-pool-op">
+    <title>Pool Operation</title> 
+
+    <para>
+      Each file in a pool has one of the 4 primary states: "cached",
+      "precious", "from client", "from store". You can find out about
+      it with "rep ls &lt;PNSFID&gt;": &lt;C- - -....&gt; means "cached", &lt;-P- - -...&gt;
+      means "precious", &lt;- -C-...&gt; means from client, and &lt;- - -S...&gt;
+      means from store. "rep set cached" simply sets it to cached. It
+      could cause a file which is only stored on disk to be
+      deleted. That is why it is potentially dangerous. Since your
+      files are on tape, there is no danger.
+    </para>
+
+    <para>
+      If the stageing hasnt finished before the time-out, the file
+      might not be complete. You should be able to check that with the
+      size and/or checksum: In PoolManager:
+<screen>storageinfoof &lt;PNFSID&gt;</screen>
+      gives the desired size and - maybe, depending on the method the
+      file was written - the ALDER checksum in
+      <quote>flag-c=1:&lt;alder32(hex)&gt;</quote>. You can compare it
+      with the file on disk.
+    </para>
+
+    <para>
+      My guess would be:
+
+      If the state is "from store", the file is not complete and you
+      have to stage it again. If it is complete, you can set it to
+      cached with no harm. It should not be in any other state.
+    </para>
+
+    <para>
+      If "ls rep" does not list it at all: I know that there is a
+      mechanism to register files, which are on disk - including
+      checking the checksums and generating the local control
+      data. Unfortunately, i do not know of a way to trigger it other
+      than to restart the whole pool. It will then do this
+      registration for all files it finds which have incomplete
+      controll information. This might take a while if there are a lot
+      of them.
+    </para>
+  </chapter>
+-->
+
+  <chapter id="cb-net">
+    <title>Complex Network Topologies</title>
+
+    <para>
+      This chapter contains solutions for several non-trivial network
+      topologies. Even though not every case is covered, these cases
+      might help solve other problems, as well.
+    </para>
+
+    <section id="cb-net-dmz">
+      <title>Doors in the DMZ</title>
+
+      <section>
+	<title>Description</title>
+	<para>
+	  Some doors - e.g. for grid access - are located in the DMZ
+	  while the rest of the dCache instance is in the
+	  intranet. The firewall is configured in such a way that the
+	  doors cannot reach the location manager (usually on the
+	  admin node together with the pool manager) via port NOCLUE.
+	</para>
+      </section>
+
+      <section>
+	<title>Solution</title>
+	<para>
+	  The location manager needs to be configured in such a way
+	  that it will contact the doors actively and not wait for
+	  them to contact him as in the default configuration.
+	</para>
+      </section>
+
+    </section>
+
+    <section id="cb-net-pool-priv">
+      <title>Pools in a Private Subnet</title>
+
+      <section>
+	<title>Description</title>
+	<para>
+	  
+	</para>
+      </section>
+
+      <section>
+	<title>Solution</title>
+	<para>
+	  
+	</para>
+      </section>
+
+    </section>
+
+    <section id="cb-net-second-if">
+      <title>Connection via a Secondary Interface</title>
+
+      <section>
+	<title>Description</title>
+	<para>
+	  
+	</para>
+      </section>
+
+      <section>
+	<title>Solution</title>
+	<para>
+	  
+	</para>
+      </section>
+
+    </section>
+
+  </chapter>
+
+
+</part>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE part PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+
+<part id="in">
+<!-- <?dbhtml dir="install"?> -->
+  <title>Installation of dCache Components</title>
+
+  <partintro>
+    <para>
+      This part should some day contain the guide for RPM-based
+      installation as well as a completely manual installation.
+    </para>
+  </partintro>
+
+<!--
+  <chapter id="in-rpm">
+     <title>RPM-based Installation</title>
+
+  <section id="in-rpm-deinstall">
+    <title>Deinstallation (for New Install on Testsystems)</title>
+
+    <section id="in-rpm-deinstall-pnfs">
+      <title>Deinstallation of PNFS</title>
+
+      <orderedlist>
+        <listitem>
+          <para>The <application>pnfs</application>-services are stopped with
+          <screen><prompt>[root@machine ~ ] # </prompt><userinput><command>/opt/pnfs.3.1.10/pnfs/bin/pnfs</command> stop</userinput></screen></para>
+        </listitem>
+
+        <listitem>
+          <para>To remove the installation of PNFS in
+          <filename>/opt/pnfs.3.1.10/</filename> type <screen><prompt>[root@machine ~ ] # </prompt><userinput><command>rpm</command> -e pnfs</userinput></screen></para>
+        </listitem>
+
+        <listitem>
+          <para>If the logfile has been created, delete it with <screen><prompt>[root@machine ~ ] # </prompt><userinput><command>rm</command> /var/log/pnfsd.log</userinput></screen>
+          It is not always there (When is it created?)</para>
+        </listitem>
+
+        <listitem>
+          <para>Remove the database directory, so that a new installation does
+          not use it: <screen><prompt>[root@machine ~ ] # </prompt><userinput><command>rm</command> -r /opt/pnfsdb</userinput></screen></para>
+        </listitem>
+
+        <listitem>
+          <para>Next, emove the mount point directory: <screen><prompt>[root@machine ~ ] # </prompt> <userinput><command>rm</command> -r /pnfs</userinput></screen>
+          It might be better to only remove the directory
+          <filename>/pnfs/fs</filename>, if the mount point is needed later
+          for installation of a POOL-node.</para>
+        </listitem>
+
+        <listitem>
+          <para>Since at least the configuration file
+          <filename>/opt/pnfs.3.1.10/pnfs/etc/pnfs_config</filename> will not
+          be removed by the <quote><userinput><command>rpm</command> -e
+          pnfs</userinput></quote>-command, it is necessary to remove
+          <filename>/opt/pnfs.3.1.10/</filename> manually: <screen><prompt>[root@machine ~ ] # </prompt> <userinput><command>rm</command> -r /opt/pnfs.3.1.10</userinput></screen>
+          This should be done last, so that we are always able to check in the
+          configuration file for the configured paths.</para>
+        </listitem>
+      </orderedlist>
+    </section>
+
+    <section id="in-rpm-deinstall-dcache">
+      <title>Deinstallation of dCache</title>
+
+      <orderedlist>
+        <listitem>
+          <para>Deinstall the old packages with rpm: <screen><prompt>[root@machine ~ ] # </prompt> <userinput><command>rpm</command> -e d-cache-core</userinput>
+<prompt>[root@machine ~ ] # </prompt> <userinput><command>rpm</command> -e d-cache-opt</userinput>
+<prompt>[root@machine ~ ] # </prompt> <userinput><command>rpm</command> -e d-cache-client</userinput></screen></para>
+        </listitem>
+
+        <listitem>
+          <para>Remove the POOL-directories as listed in
+          <filename>/opt/d-cache/etc/pool_path</filename>: <screen><prompt>[root@machine ~ ] # </prompt> <userinput><command>rm</command> -r /where/ever/the/pool/path/is</userinput></screen></para>
+        </listitem>
+
+        <listitem>
+          <para>For the same reason as with NFS, the directory
+          <filename>/opt/d-cache/</filename> has to be removed: <screen><prompt>[root@machine ~ ] # </prompt> <userinput><command>rm</command> -r /opt/d-cache/</userinput></screen></para>
+        </listitem>
+      </orderedlist>
+    </section>
+  </section>
+
+  <section id="in-rpm-pool">
+    <title>Installation of a Pool Node</title>
+
+    <orderedlist>
+      <listitem>
+        <para>Mount the PNFS (needed?) <screen><prompt>[root@machine ~ ] # </prompt> <userinput>mkdir -p /pnfs/<replaceable>domain</replaceable></userinput>
+<prompt>[root@machine ~ ] # </prompt> <userinput><command>mount</command> -o intr,rw,noac,hard  <replaceable>server</replaceable>:/pnfs /pnfs/<replaceable>doma</replaceable></userinput></screen></para>
+      </listitem>
+
+      <listitem>
+        <para>q<screen><prompt>[root@machine ~ ] # </prompt> <userinput>mkdir -p /pnfs/<replaceable>domain</replaceable></userinput>
+<prompt>[root@machine ~ ] # </prompt> <userinput><command>mount</command> -o intr,rw,noac,hard  <replaceable>server</replaceable>:/pnfs /pnfs/<replaceable>doma</replaceable></userinput></screen></para>
+      </listitem>
+    </orderedlist>
+  </section>
+  </chapter>
+-->
+
+</part>
