@@ -14,7 +14,10 @@
 #
 export XML_CATALOG_FILES=/some/suitable/catalog
 
-
+# on solaris with docbook-xsl installed in /usr/local/share/...
+# 
+XML_CATALOG_FILES=/usr/local/share/docbook-xsl-1.68.1/catalog.xml
+export XML_CATALOG_FILES
 
 ###### Static HTML into ./build/
 #
