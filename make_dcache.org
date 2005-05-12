@@ -15,13 +15,17 @@ cd $SOURCE_DIR
 #
 cp xsl/dcb.css ${DOCUMENT_ROOT}/${DCB_SUBDIR}/
 
+### Transform to pure docbook
+#
+xsltproc --nonet --xinclude -o Book.db.xml xsl/docbook-from-dcb-extensions.xsl Book.xml
+
 ### Compile Sidebar
 #
 rm -rf build
 mkdir build
-xsltproc --nonet --xinclude -o build/ xsl/html-dcache.org-sidebar.xsl Book.xml
+xsltproc --nonet --xinclude -o build/ xsl/html-dcache.org-sidebar.xsl Book.db.xml
 cp build/index.shtml ${DOCUMENT_ROOT}/${DCB_SUBDIR}/sidebar-index.shtml
 
 ### Compile Book
 #
-xsltproc --nonet --xinclude -o ${DOCUMENT_ROOT}/${DCB_SUBDIR}/ xsl/html-dcache.org.xsl Book.xml
+xsltproc --nonet --xinclude -o ${DOCUMENT_ROOT}/${DCB_SUBDIR}/ xsl/html-dcache.org.xsl Book.db.xml

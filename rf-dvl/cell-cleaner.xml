@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">     
+
+
+<refentry id="cell-cleaner">
+  
+  <refmeta>
+    <refentrytitle>Cell <cellname>diskCacheV111.cells.CleanerV2</cellname></refentrytitle>
+  </refmeta>
+  
+  <refnamediv>
+    <refname><cellname>diskCacheV111.cells.CleanerV2</cellname></refname>
+    <refpurpose>One line descr.</refpurpose>
+  </refnamediv>
+  
+  <cellattributes>
+    <cellattrclassname>diskCacheV111.cells.CleanerV2</cellattrclassname>
+    <cellattrtype>Cleaner</cellattrtype>
+    <cellattrname>cleaner</cellattrname>
+    <cellattrmlt>single instance only</cellattrmlt>
+    <cellattrversion>1.16</cellattrversion>
+  </cellattributes>
+  
+  <refsection>
+    <title>Description</title>
+    
+    <para>
+      The dCache Cleaner cell is responsible for receiving
+      <quote>file removed</quote>-events from the connected
+      filesystem (PNFS) and for removing those files from the
+      corresponding pools. The cleaner must run on the same
+      host, the PNFS server is running.
+    </para>
+    
+  </refsection>
+  
+  <refsection>
+    <title>Modules</title>
+    
+    <para>
+      None.
+    </para>
+    
+  </refsection>
+  
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command>create</command>
+      <literal> diskCacheV111.cells.CleanerV2</literal>
+      <literal> cleaner</literal>
+      <sbr/>
+      <literal>"default</literal>
+      <sbr/>
+      <arg choice="req">-db=<replaceable>DatabaseDir</replaceable></arg>
+      <sbr/>
+      <arg>-trash=<replaceable>TrashDir</replaceable></arg>
+      <sbr/>
+      <arg>-usePnfsManager=<group choice="req">
+	  <arg>off</arg><arg><replaceable>PnfsManagerName</replaceable></arg></group></arg>
+      <sbr/>
+      <arg>-useFilesystem=<group choice="req">
+	  <arg>off</arg><arg>on</arg></group></arg>
+      <sbr/>
+      <arg><option>-processFilesPerRun=</option><replaceable>FilesPerRun</replaceable></arg>
+      <arg><option>-refresh=</option><replaceable>RefreshTimeInSeconds</replaceable></arg>
+      <arg><option>-recover=</option><replaceable></replaceable></arg>
+      <literal>"</literal>
+    </cmdsynopsis>
+    
+    <celloptions>
+      <cellopt choice="req">
+	<celloptname>db</celloptname>
+	<celloptvalues>Local filesystem directory</celloptvalues>
+	<celloptdefault>none</celloptdefault>
+	<celloptdescr>Cleaner working directory and archive infos</celloptdescr>
+      </cellopt>
+      <cellopt>
+	<celloptname>trash</celloptname>
+	<celloptvalues>Local filesystem directory</celloptvalues>
+	<celloptdefault>(autodetected)</celloptdefault>
+	<celloptdescr>The pnfs <filename class='directory'>trash/2</filename> directory</celloptdescr>
+      </cellopt>
+      <cellopt>
+	<celloptname>usePnfsManager</celloptname>
+	<celloptvalues>
+	  <group choice="req">
+	    <arg>off</arg>
+	    <arg><replaceable>PnfsManagerName</replaceable></arg>
+	  </group>
+	</celloptvalues>
+	<celloptdefault>PnfsManager</celloptdefault>
+	<celloptdescr>Ask this cell for CacheInfo</celloptdescr>
+      </cellopt>
+      <cellopt>
+	<celloptname>useFilesystem</celloptname>
+	<celloptvalues>
+	  <group>
+	    <arg>on</arg>
+	    <arg>off</arg>
+	  </group>
+	</celloptvalues>
+	<celloptdefault>on</celloptdefault>
+	<celloptdescr>Ask filesystem for CacheInfo</celloptdescr>
+      </cellopt>
+      <cellopt>
+	<celloptname>processFilesPerRun</celloptname>
+	<celloptvalues>Integer &gt; 0</celloptvalues>
+	<celloptdefault>100</celloptdefault>
+	<celloptdescr>Number of files to be processed per run</celloptdescr>
+      </cellopt>
+      <cellopt id="cell-cleaner-o-refresh">
+	<celloptname>refresh</celloptname>
+	<celloptvalues>Integer &gt; 0 (seconds)</celloptvalues>
+	<celloptdefault>300</celloptdefault>
+	<celloptdescr>Seconds between two runs</celloptdescr>
+      </cellopt>
+      <cellopt>
+	<celloptname>recover</celloptname>
+	<celloptvalues>
+	  <group>
+	    <arg>Integer &gt; 0 (minutes)</arg>
+	    <arg>0 (disabled)</arg>
+	  </group>
+	</celloptvalues>
+	<celloptdefault>0</celloptdefault>
+	<celloptdescr>Minutes between two recovery runs</celloptdescr>
+      </cellopt>
+      <cellopt>
+	<celloptname>reportRemove</celloptname>
+	<celloptvalues>
+	  <group>
+	    <arg><replaceable>CellName</replaceable></arg>
+	    <arg>none</arg>
+	  </group>
+	</celloptvalues>
+	<celloptdefault>none</celloptdefault>
+	<celloptdescr>Send remove info to this cell (broadcaster)</celloptdescr>
+      </cellopt>
+      <celloptionsdescr>
+	<title>usePnfsManager, useFilesystem</title>
+
+	<para>
+	  Copy here.
+	</para>
+
+      </celloptionsdescr>
+      <celloptionsdescr>
+	<title>refresh, recover, processFilesPerRun, db</title>
+
+	<para>
+	  Copy here.
+	</para>
+
+      </celloptionsdescr>
+    </celloptions>
+  </refsynopsisdiv>
+  
+  <refsection>
+    <title>CL Command Set</title>
+    
+    <variablelist>
+
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>set recover</command>
+	    <arg><replaceable>refreshTimeInMinutes</replaceable></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Same as <xref linkend="cell-cleaner-o-refresh"/> option.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+    
+  </refsection>
+  
+  <refsection>
+    <title>Debug Command Set</title>
+    
+    <para>
+      
+    </para>
+    
+  </refsection>
+  
+  <refsection>
+    <title>API Command Set</title>
+    
+    <para>
+      
+    </para>
+    
+  </refsection>
+
+  <refsection>
+    <title>Dependencies</title>
+    
+    <refsection>
+    <title>Location</title>
+
+
+    </refsection>
+    
+    <refsection>
+    <title>Other Cells</title>
+
+
+    </refsection>
+    
+  </refsection>
+  
+  <refsection>
+    <title>Example</title>
+    
+    <informalexample>    
+      <programlisting>create diskCacheV111.cells.CleanerV1    cleaner       \
+          "default                                    \
+	   -refresh=120                               \
+      </programlisting>
+    </informalexample>
+    
+  </refsection>
+  
+
+
+</refentry>
+      
+

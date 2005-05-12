@@ -6,6 +6,11 @@
 # Maintainer: Mathias de Riese <mathias.de.riese@desy.de>
 #
 
+###### Transforming dCache-Book-extended Docbook to Docbook
+#
+xsltproc --nonet --xinclude -o Book.db.xml xsl/docbook-from-dcb-extensions.xsl Book.xml
+
+
 
 ###### Catalog inclusion
 #
@@ -19,12 +24,14 @@ export XML_CATALOG_FILES=/some/suitable/catalog
 XML_CATALOG_FILES=/usr/local/share/docbook-xsl-1.68.1/catalog.xml
 export XML_CATALOG_FILES
 
+
+
 ###### Static HTML into ./build/
 #
 rm -rf build
 mkdir build
 cp xsl/dcb.css build/dcb.css
-xsltproc --nonet --xinclude -o build/ xsl/html-chunk.xsl Book.xml
+xsltproc --nonet --xinclude -o build/ xsl/html-chunk.xsl Book.db.xml
 
 
 
@@ -47,12 +54,12 @@ cp xsl/dcb.css ${DOCUMENT_ROOT}/${DCB_SUBDIR}/
 #
 rm -rf build
 mkdir build
-xsltproc --nonet --xinclude -o build/ xsl/html-dcache.org-sidebar.xsl Book.xml
+xsltproc --nonet --xinclude -o build/ xsl/html-dcache.org-sidebar.xsl Book.db.xml
 cp build/index.shtml ${DOCUMENT_ROOT}/${DCB_SUBDIR}/sidebar-index.shtml
 
 # 3. Compile acutal document
 #
-xsltproc --nonet --xinclude -o ${DOCUMENT_ROOT}/${DCB_SUBDIR}/ xsl/html-dcache.org.xsl Book.xml
+xsltproc --nonet --xinclude -o ${DOCUMENT_ROOT}/${DCB_SUBDIR}/ xsl/html-dcache.org.xsl Book.db.xml
 
 
 

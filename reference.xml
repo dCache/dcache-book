@@ -9,358 +9,375 @@
     <title>Setup Parameters</title>
   </chapter>
   
-  <chapter id="rf-commoncommands">
-    <title>Common Cell Commands</title>
+  <chapter id="rf-cc">
+    <title>dCache Cell Commands</title>
     
-    <refentry id="cmd-pin">        
-      <refmeta><refentrytitle><command>pin</command></refentrytitle></refmeta>
-      <refnamediv><refname><command>pin</command></refname>
-	<refpurpose>Adds a comment to the pinboard.</refpurpose>
-      </refnamediv>
-      
-      <refsynopsisdiv>
-	<cmdsynopsis>
-	  <command>pin</command>
-	  <arg choice="req">
-	    <replaceable>comment</replaceable>
-	  </arg>
-	</cmdsynopsis>
-	<variablelist>
-	  <title>Arguments</title>
-	  <varlistentry>
-	    <term>comment</term>
-	    <listitem>
-	      <para>
-		A string which is added to the pinboard.
-	      </para>
-	    </listitem>
-	  </varlistentry>
-	</variablelist>
-      </refsynopsisdiv>
-      
-      <refsection>
-	<title>Description</title>
-	
-	<para>
-	</para>
-	
-      </refsection>
-    </refentry>
-
-
-    <refentry id="cmd-info">        
-      <refmeta><refentrytitle><command>info</command></refentrytitle></refmeta>
-      <refnamediv><refname><command>info</command></refname>
-	<refpurpose>Print info about the cell.</refpurpose>
-      </refnamediv>
-      
-      <refsynopsisdiv>
-	<cmdsynopsis>
-	  <command>info</command>
-	  <arg>-a</arg>
-	  <arg>-l</arg>
-	</cmdsynopsis>
-	<variablelist>
-	  <title>Arguments</title>
-	  <varlistentry>
-	    <term>-a</term>
-	    <listitem>
-	      <para>
-		Display more information.
-	      </para>
-	    </listitem>
-	  </varlistentry>
-	  <varlistentry>
-	    <term>-l</term>
-	    <listitem>
-	      <para>
-		Display long information.
-	      </para>
-	    </listitem>
-	  </varlistentry>
-	</variablelist>
-      </refsynopsisdiv>
-      
-      <refsection>
-	<title>Description</title>
-	
-	<para>
-	  The info printed by <command>info</command> depends on the cell class.
-	</para>
-	
-      </refsection>
-    </refentry>
+    <para>
+      This is the reference to all (important) cell commands in
+      dCache. You should not use any command not documented here,
+      unless you really know what you are doing. Commands not in this
+      reference are used for debugging by the developers.
+    </para>
     
+    <para>
+      This chapter serves two purposes: The other parts of this book
+      refer to it, whenever a command is mentioned. Secondly, an
+      administrator may check here, if he wonders what a command does.
+    </para>
     
-    <refentry id="cmd-exec_context">        
-      <refmeta><refentrytitle><command>exec context</command></refentrytitle></refmeta>
-      <refnamediv><refname><command>exec context</command></refname>
-	<refpurpose>NOCLUE</refpurpose>
-      </refnamediv>
+    <section id="rf-cc-common">
+      <title>Common Cell Commands</title>
       
-      <refsynopsisdiv>
-	<cmdsynopsis>
-	  <command>exec context</command>
-	  <arg choice="req">
-	    <replaceable>arg-0</replaceable>
-	  </arg>
-	</cmdsynopsis>
-	<variablelist>
-	  <title>Arguments</title>
-	  <varlistentry>
-	    <term>arg-0</term>
-	    <listitem><para>.</para></listitem>
-	  </varlistentry>
-	</variablelist>
-      </refsynopsisdiv>
+      <refentry id="cmd-pin">        
+	<refmeta><refentrytitle><command>pin</command></refentrytitle></refmeta>
+	<refnamediv><refname><command>pin</command></refname>
+	  <refpurpose>Adds a comment to the pinboard.</refpurpose>
+	</refnamediv>
+	
+	<refsynopsisdiv>
+	  <cmdsynopsis>
+	    <command>pin</command>
+	    <arg choice="req">
+	      <replaceable>comment</replaceable>
+	    </arg>
+	  </cmdsynopsis>
+	  <variablelist>
+	    <title>Arguments</title>
+	    <varlistentry>
+	      <term>comment</term>
+	      <listitem>
+		<para>
+		  A string which is added to the pinboard.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	  </variablelist>
+	</refsynopsisdiv>
+	
+	<refsection>
+	  <title>Description</title>
+	  
+	  <para>
+	  </para>
+	  
+	</refsection>
+      </refentry>
       
-      <refsection>
-	<title>Description</title>
-	
-	<para>
-	</para>
-	
-      </refsection>
-    </refentry>
-    
-    
-    <refentry id="cmd-dump_pinboard">        
-      <refmeta><refentrytitle><command>dump pinboard</command></refentrytitle></refmeta>
-      <refnamediv><refname><command>dump pinboard</command></refname>
-	<refpurpose>Dump the full pinboard of the cell to a file.</refpurpose>
-      </refnamediv>
       
-      <refsynopsisdiv>
-	<cmdsynopsis>
-	  <command>dump pinboard</command>
-	  <arg choice="req">
-	    <replaceable>filename</replaceable>
-	  </arg>
-	</cmdsynopsis>
-	<variablelist>
-	  <title>Arguments</title>
-	  <varlistentry>
-	    <term>filename</term>
-	    <listitem><para>The file the current content of the pinboard is stored in.</para></listitem>
-	  </varlistentry>
-	</variablelist>
-      </refsynopsisdiv>
+      <refentry id="cmd-info">        
+	<refmeta><refentrytitle><command>info</command></refentrytitle></refmeta>
+	<refnamediv><refname><command>info</command></refname>
+	  <refpurpose>Print info about the cell.</refpurpose>
+	</refnamediv>
+	
+	<refsynopsisdiv>
+	  <cmdsynopsis>
+	    <command>info</command>
+	    <arg>-a</arg>
+	    <arg>-l</arg>
+	  </cmdsynopsis>
+	  <variablelist>
+	    <title>Arguments</title>
+	    <varlistentry>
+	      <term>-a</term>
+	      <listitem>
+		<para>
+		  Display more information.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>-l</term>
+	      <listitem>
+		<para>
+		  Display long information.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	  </variablelist>
+	</refsynopsisdiv>
+	
+	<refsection>
+	  <title>Description</title>
+	  
+	  <para>
+	    The info printed by <command>info</command> depends on the cell class.
+	  </para>
+	  
+	</refsection>
+      </refentry>
       
-      <refsection>
-	<title>Description</title>
-	
-	<para>
-	</para>
-	
-      </refsection>
-    </refentry>
-    
-    
-    <refentry id="cmd-show_pinboard">        
-      <refmeta><refentrytitle><command>show pinboard</command></refentrytitle></refmeta>
-      <refnamediv><refname><command>show pinboard</command></refname>
-	<refpurpose>Print a part of the pinboard of the cell to STDOUT.</refpurpose>
-      </refnamediv>
       
-      <refsynopsisdiv>
-	<cmdsynopsis>
-	  <command>show pinboard</command>
-	  <arg choice="opt">
-	    <replaceable>lines</replaceable>
-	  </arg>
-	</cmdsynopsis>
-	<variablelist>
-	  <title>Arguments</title>
-	  <varlistentry>
-	    <term>lines</term>
-	    <listitem><para>The number of lines which are displayed. Default: all.</para></listitem>
-	  </varlistentry>
-	</variablelist>
-      </refsynopsisdiv>
+      <refentry id="cmd-exec_context">        
+	<refmeta><refentrytitle><command>exec context</command></refentrytitle></refmeta>
+	<refnamediv><refname><command>exec context</command></refname>
+	  <refpurpose>NOCLUE</refpurpose>
+	</refnamediv>
+	
+	<refsynopsisdiv>
+	  <cmdsynopsis>
+	    <command>exec context</command>
+	    <arg choice="req">
+	      <replaceable>arg-0</replaceable>
+	    </arg>
+	  </cmdsynopsis>
+	  <variablelist>
+	    <title>Arguments</title>
+	    <varlistentry>
+	      <term>arg-0</term>
+	      <listitem><para>.</para></listitem>
+	    </varlistentry>
+	  </variablelist>
+	</refsynopsisdiv>
+	
+	<refsection>
+	  <title>Description</title>
+	  
+	  <para>
+	  </para>
+	  
+	</refsection>
+      </refentry>
       
-      <refsection>
-	<title>Description</title>
-	
-	<para>
-	</para>
-	
-      </refsection>
-    </refentry>
-    
-
-    <refentry id="cmd-set_printout">        
-      <refmeta><refentrytitle><command>set printout</command></refentrytitle></refmeta>
-      <refnamediv><refname><command>set printout</command></refname>
-	<refpurpose>NOCLUE</refpurpose>
-      </refnamediv>
       
-      <refsynopsisdiv>
-	<cmdsynopsis>
-	  <command>set printout</command>
-	  <arg choice="req">
-	    <replaceable>arg-0</replaceable>
-	  </arg>
-	</cmdsynopsis>
-	<variablelist>
-	  <title>Arguments</title>
-	  <varlistentry>
-	    <term>arg-0</term>
-	    <listitem><para></para></listitem>
-	  </varlistentry>
-	</variablelist>
-      </refsynopsisdiv>
+      <refentry id="cmd-dump_pinboard">        
+	<refmeta><refentrytitle><command>dump pinboard</command></refentrytitle></refmeta>
+	<refnamediv><refname><command>dump pinboard</command></refname>
+	  <refpurpose>Dump the full pinboard of the cell to a file.</refpurpose>
+	</refnamediv>
+	
+	<refsynopsisdiv>
+	  <cmdsynopsis>
+	    <command>dump pinboard</command>
+	    <arg choice="req">
+	      <replaceable>filename</replaceable>
+	    </arg>
+	  </cmdsynopsis>
+	  <variablelist>
+	    <title>Arguments</title>
+	    <varlistentry>
+	      <term>filename</term>
+	      <listitem><para>The file the current content of the pinboard is stored in.</para></listitem>
+	    </varlistentry>
+	  </variablelist>
+	</refsynopsisdiv>
+	
+	<refsection>
+	  <title>Description</title>
+	  
+	  <para>
+	  </para>
+	  
+	</refsection>
+      </refentry>
       
-      <refsection>
-	<title>Description</title>
-	
-	<para>
-	</para>
-	
-      </refsection>
-    </refentry>
-    
-    <refentry id="cmd-xgetcellinfo">        
-      <refmeta><refentrytitle><command>xgetcellinfo</command></refentrytitle></refmeta>
-      <refnamediv><refname><command>xgetcellinfo</command></refname>
-	<refpurpose>NOCLUE</refpurpose>
-      </refnamediv>
       
-      <refsynopsisdiv>
-	<cmdsynopsis>
-	  <command>xgetcellinfo</command>
-	</cmdsynopsis>
-      </refsynopsisdiv>
+      <refentry id="cmd-show_pinboard">        
+	<refmeta><refentrytitle><command>show pinboard</command></refentrytitle></refmeta>
+	<refnamediv><refname><command>show pinboard</command></refname>
+	  <refpurpose>Print a part of the pinboard of the cell to STDOUT.</refpurpose>
+	</refnamediv>
+	
+	<refsynopsisdiv>
+	  <cmdsynopsis>
+	    <command>show pinboard</command>
+	    <arg choice="opt">
+	      <replaceable>lines</replaceable>
+	    </arg>
+	  </cmdsynopsis>
+	  <variablelist>
+	    <title>Arguments</title>
+	    <varlistentry>
+	      <term>lines</term>
+	      <listitem><para>The number of lines which are displayed. Default: all.</para></listitem>
+	    </varlistentry>
+	  </variablelist>
+	</refsynopsisdiv>
+	
+	<refsection>
+	  <title>Description</title>
+	  
+	  <para>
+	  </para>
+	  
+	</refsection>
+      </refentry>
       
-      <refsection>
-	<title>Description</title>
-	
-	<para>
-	</para>
-	
-      </refsection>
-    </refentry>
-    
-    
-    <refentry id="cmd-say">        
-      <refmeta><refentrytitle><command>say</command></refentrytitle></refmeta>
-      <refnamediv><refname><command>say</command></refname>
-	<refpurpose>NOCLUE</refpurpose>
-      </refnamediv>
       
-      <refsynopsisdiv>
-	<cmdsynopsis>
-	  <command>say</command>
-	  <arg choice="req">
-	    <replaceable>arg-0</replaceable>
-	  </arg>
-	</cmdsynopsis>
-	<variablelist>
-	  <title>Arguments</title>
-	  <varlistentry>
-	    <term>arg-0</term>
-	    <listitem><para>.</para></listitem>
-	  </varlistentry>
-	  <varlistentry>
-	    <term>key</term>
-	    <listitem><para>The flag which will be removed.</para></listitem>
-	  </varlistentry>
-	  <varlistentry>
-	    <term>...</term>
-	    <listitem><para>NO CLUE</para></listitem>
-	  </varlistentry>
-	</variablelist>
-      </refsynopsisdiv>
+      <refentry id="cmd-set_printout">        
+	<refmeta><refentrytitle><command>set printout</command></refentrytitle></refmeta>
+	<refnamediv><refname><command>set printout</command></refname>
+	  <refpurpose>NOCLUE</refpurpose>
+	</refnamediv>
+	
+	<refsynopsisdiv>
+	  <cmdsynopsis>
+	    <command>set printout</command>
+	    <arg choice="req">
+	      <replaceable>arg-0</replaceable>
+	    </arg>
+	  </cmdsynopsis>
+	  <variablelist>
+	    <title>Arguments</title>
+	    <varlistentry>
+	      <term>arg-0</term>
+	      <listitem><para></para></listitem>
+	    </varlistentry>
+	  </variablelist>
+	</refsynopsisdiv>
+	
+	<refsection>
+	  <title>Description</title>
+	  
+	  <para>
+	  </para>
+	  
+	</refsection>
+      </refentry>
       
-      <refsection>
-	<title>Description</title>
+      <refentry id="cmd-xgetcellinfo">        
+	<refmeta><refentrytitle><command>xgetcellinfo</command></refentrytitle></refmeta>
+	<refnamediv><refname><command>xgetcellinfo</command></refname>
+	  <refpurpose>NOCLUE</refpurpose>
+	</refnamediv>
 	
-	<para>
-	</para>
+	<refsynopsisdiv>
+	  <cmdsynopsis>
+	    <command>xgetcellinfo</command>
+	  </cmdsynopsis>
+	</refsynopsisdiv>
 	
-      </refsection>
-    </refentry>
-    
-    
-  </chapter>
+	<refsection>
+	  <title>Description</title>
+	  
+	  <para>
+	  </para>
+	  
+	</refsection>
+      </refentry>
+      
+      
+      <refentry id="cmd-say">        
+	<refmeta><refentrytitle><command>say</command></refentrytitle></refmeta>
+	<refnamediv><refname><command>say</command></refname>
+	  <refpurpose>NOCLUE</refpurpose>
+	</refnamediv>
+	
+	<refsynopsisdiv>
+	  <cmdsynopsis>
+	    <command>say</command>
+	    <arg choice="req">
+	      <replaceable>arg-0</replaceable>
+	    </arg>
+	  </cmdsynopsis>
+	  <variablelist>
+	    <title>Arguments</title>
+	    <varlistentry>
+	      <term>arg-0</term>
+	      <listitem><para>.</para></listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>key</term>
+	      <listitem><para>The flag which will be removed.</para></listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>...</term>
+	      <listitem><para>NO CLUE</para></listitem>
+	    </varlistentry>
+	  </variablelist>
+	</refsynopsisdiv>
+	
+	<refsection>
+	  <title>Description</title>
+	  
+	  <para>
+	  </para>
+	  
+	</refsection>
+      </refentry>
+      
+      
+    </section>
   
-  <chapter id="rf-pnfsm">
-    <title>PnfsManager Commands</title>
-    
-    <refentry id="cmd-pnfsidof">        
-      <refmeta><refentrytitle><command>pnfsidof</command></refentrytitle></refmeta>
-      <refnamediv><refname><command>pnfsidof</command></refname>
-	<refpurpose>Print the PNFS id of a file given by its global path.</refpurpose>
-      </refnamediv>
+    <section id="rf-cc-pnfsm">
+      <title>PnfsManager Commands</title>
       
-      <refsynopsisdiv>
-	<cmdsynopsis>
-	  <command>pnfsidof</command>
-	  <arg choice="req">
-	    <replaceable>globalPath</replaceable>
-	  </arg>
-	  <!-- <arg choice="opt" rep="repeat">file</arg> -->
-	</cmdsynopsis>
-      </refsynopsisdiv>
+      <refentry id="cmd-pnfsidof">        
+	<refmeta><refentrytitle><command>pnfsidof</command></refentrytitle></refmeta>
+	<refnamediv><refname><command>pnfsidof</command></refname>
+	  <refpurpose>Print the PNFS id of a file given by its global path.</refpurpose>
+	</refnamediv>
+	
+	<refsynopsisdiv>
+	  <cmdsynopsis>
+	    <command>pnfsidof</command>
+	    <arg choice="req">
+	      <replaceable>globalPath</replaceable>
+	    </arg>
+	    <!-- <arg choice="opt" rep="repeat">file</arg> -->
+	  </cmdsynopsis>
+	</refsynopsisdiv>
+	
+	<refsection>
+	  <title>Description</title>
+	  
+	  <para>
+	    Print the PNFS id of a file given by its global path. The
+	    global path always starts with the
+	    <quote>VirtualGlobalPath</quote> as given by the
+	    <quote><command>info</command></quote>-command.
+	  </para>
+	  
+	</refsection>
+      </refentry>
       
-      <refsection>
-	<title>Description</title>
-	
-	<para>
-	  Print the PNFS id of a file given by its global path. The global path
-	  always starts with the <quote>VirtualGlobalPath</quote> as given by
-	  the <quote><command>info</command></quote>-command.
-	</para>
-	
-      </refsection>
-    </refentry>
     
     
-    
-    <refentry id="cmd-flags_remove">        
-      <refmeta><refentrytitle><command>flags remove</command></refentrytitle></refmeta>
-      <refnamediv><refname><command>flags remove</command></refname>
-	<refpurpose>Remove a flag from a file.</refpurpose>
-      </refnamediv>
-      
-      <refsynopsisdiv>
-	<cmdsynopsis>
-	  <command>flags remove</command>
-	  <arg choice="req">
-	    <replaceable>pnfsId</replaceable>
-	  </arg>
-	  <arg choice="req">
-	    <replaceable>key</replaceable>
-	  </arg>
-	  <arg choice="opt" rep="repeat">
-	    <replaceable>...</replaceable>
-	  </arg>
-	  <!-- <arg choice="opt" rep="repeat">file</arg> -->
-	</cmdsynopsis>
-	<variablelist>
-	  <title>Arguments</title>
-	  <varlistentry>
-	    <term>pnfsId</term>
-	    <listitem><para>The PNFS id of the file of which a flag will be removed.</para></listitem>
-	  </varlistentry>
-	  <varlistentry>
-	    <term>key</term>
-	    <listitem><para>The flag which will be removed.</para></listitem>
-	  </varlistentry>
-	  <varlistentry>
-	    <term>...</term>
-	    <listitem><para>NO CLUE</para></listitem>
-	  </varlistentry>
-	</variablelist>
-      </refsynopsisdiv>
-      
-      <refsection>
-	<title>Description</title>
+      <refentry id="cmd-flags_remove">        
+	<refmeta><refentrytitle><command>flags remove</command></refentrytitle></refmeta>
+	<refnamediv><refname><command>flags remove</command></refname>
+	  <refpurpose>Remove a flag from a file.</refpurpose>
+	</refnamediv>
 	
-	<para>
-	</para>
+	<refsynopsisdiv>
+	  <cmdsynopsis>
+	    <command>flags remove</command>
+	    <arg choice="req">
+	      <replaceable>pnfsId</replaceable>
+	    </arg>
+	    <arg choice="req">
+	      <replaceable>key</replaceable>
+	    </arg>
+	    <arg choice="opt" rep="repeat">
+	      <replaceable>...</replaceable>
+	    </arg>
+	    <!-- <arg choice="opt" rep="repeat">file</arg> -->
+	  </cmdsynopsis>
+	  <variablelist>
+	    <title>Arguments</title>
+	    <varlistentry>
+	      <term>pnfsId</term>
+	      <listitem><para>The PNFS id of the file of which a flag will be removed.</para></listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>key</term>
+	      <listitem><para>The flag which will be removed.</para></listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>...</term>
+	      <listitem><para>NO CLUE</para></listitem>
+	    </varlistentry>
+	  </variablelist>
+	</refsynopsisdiv>
 	
-      </refsection>
-    </refentry>
+	<refsection>
+	  <title>Description</title>
+	  
+	  <para>
+	  </para>
+	  
+	</refsection>
+      </refentry>
     
     
     
@@ -751,9 +768,9 @@
 	  
 
 
-  </chapter>
+  </section>
 
-  <chapter id="rf-pool">
+  <section id="rf-cc-pool">
     <title>Pool Commands</title>
 
     <refentry id="cmd-st_set_max_active">
@@ -971,12 +988,12 @@
       </refsection>
     </refentry>
 
-  </chapter>
+  </section>
 
-  <chapter id="rf-pm">
+  <section id="rf-cc-pm">
     <title>Pool Manager Commands</title>
     
-    <section id="rf-pm-cm">
+    <section id="rf-cc-pm-cm">
       <title>Cost Module</title>
 
       <refentry id="cmd-set_pool_decision">
@@ -1044,11 +1061,15 @@
 	</refsection>
 	
       </refentry>
-
-
+	
+	
+	
+      </section>
       
     </section>
-
+    
   </chapter>
+
+  <xi:include href="rf-dvl.xml"/>
 
 </part>
