@@ -85,6 +85,37 @@ div.glosslist dt {
     color: #900000;
 }
 
-.celloptreq { 
-  background: #FFAAAA;
+.cellattributes table { 
+  background: #FFFFFF;
+  border: 0;
  }
+
+.cellattributes td { 
+  background: #EEEEEE;
+  border: 0;
+ }
+
+.cellattributes th { 
+  background: #DDDDDD;
+  border: 0;
+ }
+
+.celloptions table { 
+  background: #FFFFFF;
+  border: 0;
+ }
+
+.celloptions td { 
+  background: #EEEEEE;
+  border: 0;
+ }
+
+.celloptions th { 
+  background: #DDDDDD;
+  border: 0;
+ }
+
+.celloptreq td{ 
+  background: #EEAAAA;
+ }
+

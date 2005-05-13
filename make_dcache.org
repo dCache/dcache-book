@@ -11,6 +11,10 @@ export XML_CATALOG_FILES
 
 cd $SOURCE_DIR
 
+### Get current version
+#
+/opt/sfw/bin/cvs update -d
+
 ### Copy stylesheet
 #
 cp xsl/dcb.css ${DOCUMENT_ROOT}/${DCB_SUBDIR}/
