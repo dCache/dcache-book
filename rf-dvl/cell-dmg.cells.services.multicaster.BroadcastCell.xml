@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">     
+
+
+<refentry id="cell-cleaner">
+  
+  <refmeta>
+    <refentrytitle>Cell <cellname>dmg.cells.services.multicast.BroadcastCell</cellname></refentrytitle>
+  </refmeta>
+  
+  <refnamediv>
+    <refname><cellname>dmg.cells.services.multicast.BroadcastCell</cellname></refname>
+    <refpurpose>Forwards incoming messages to a configurable set of targets</refpurpose>
+  </refnamediv>
+  
+  <cellattributes>
+    <cellattrclassname>diskCacheV111.cells.CleanerV2</cellattrclassname>
+    <cellattrtype>Cleaner</cellattrtype>
+    <cellattrname>cleaner</cellattrname>
+    <cellattrmlt>single instance only</cellattrmlt>
+    <cellattrversion>1.16</cellattrversion>
+  </cellattributes>
+  
+  <refsection>
+    <title>Description</title>
+    Messages sent to the Broadcast cell are forwarded to one more more other cells. Target cells
+    are configured based on the message object class. Configuration can be done by
+    the broadcast cell command line interface or by 
+    <para>
+      
+    </para>
+    
+  </refsection>
+  
+  <refsection>
+    <title>Modules</title>
+    
+    <para>
+      None.
+    </para>
+    
+  </refsection>
+  
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command>create</command>
+      <literal> dmg.cells.services.multicast.BroadcastCell</literal>
+      <literal> broadcaster</literal>
+      <arg><option>"default -debug"</option></arg>
+    </cmdsynopsis>
+    
+    <celloptions>
+      <cellopt>
+	<celloptname>-debug</celloptname>
+	<celloptvalues>none</celloptvalues>
+	<celloptdefault>none</celloptdefault>
+	<celloptdescr>Just a little bit more of printout</celloptdescr>
+      </cellopt>
+      <celloptionsdescr>
+      </celloptionsdescr>
+    </celloptions>
+  </refsynopsisdiv>
+  
+  <refsection>
+    <title>CL Command Set</title>
+    
+    <variablelist>
+
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>register</command>
+	    <arg><replaceable>MessageClassName</replaceable></arg>
+	    <arg><replaceable>CellPath</replaceable></arg>
+            <sbr/>
+	    <arg><option>-cancelonfailure=</option><replaceable>on|off</replaceable></arg>
+	    <arg><option>-expires=</option><replaceable>timeInSeconds</replaceable></arg>
+	    <arg><option>-send</option></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+          <title>MessageClassName, CellPath</title>
+	  <para>
+	    MessageClass should be forwarded to CellPath.
+	  </para>
+          <title>-cancelonfailure</title>
+	  <para>
+	    Forward is cancelled if destination cell has disappeared.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+    
+  </refsection>
+  
+  <refsection>
+    <title>Debug Command Set</title>
+    
+    <para>
+      
+    </para>
+    
+  </refsection>
+  
+  <refsection>
+    <title>API Command Set</title>
+    
+    <para>
+      
+    </para>
+    
+  </refsection>
+
+  <refsection>
+    <title>Dependencies</title>
+    
+    <refsection>
+    <title>Location</title>
+
+
+    </refsection>
+    
+    <refsection>
+    <title>Other Cells</title>
+
+
+    </refsection>
+    
+  </refsection>
+  
+  <refsection>
+    <title>Example</title>
+    
+    <informalexample>    
+      <programlisting>
+        create diskCacheV111.cells.CleanerV2  cleaner   \
+              "default                             \
+               -refresh=120                        \
+               -processFilesPerRun=100             \
+               -db=${config}/cleaner               \
+               -recover=120                        \
+               -reportRemove=broadcaster           \
+               -usePnfsManager=PnfsManager         \
+               -useFilesystem=off                  \
+               -nullBug"
+     </programlisting>
+    </informalexample>
+    
+  </refsection>
+  
+
+
+</refentry>
+      
+
