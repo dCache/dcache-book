@@ -159,9 +159,67 @@
       might help solve other problems, as well.
     </para>
 
+    <section id="cb-net-second-if">
+      <title>GridFTP Connections via two or more Network Interfaces</title>
+      
+      <section>
+	<title>Description</title>
+	<para>
+	  The host on which the GridFTP door is running has several
+	  network interfaces and is supposed to accept client
+	  connections via all those interfaces. The interfaces might
+	  even belong to separate networks with no routing from one
+	  network to the other.
+
+          As long as the data connection is opened by the GridFTP
+          server (active FTP mode), there is no problem with having
+          more than one interface. However, when the client opens the
+          data connection (passive FTP mode), the door (FTP server)
+          has to supply it with the correct interface it should
+          connect to. If this is the wrong interface, the client might
+          not be able to connect to it, because there is no route or
+          the connection might be inefficient.
+
+	  Also, since a GridFTP server has to authenticate with a SSL
+	  certificate and key, there needs to be a separate
+	  certificate and key pair for each name of the host. Since
+	  each network interface might have a different name, several
+	  certificates and keys are needed and the correct one has to
+	  be used, when authenticating via each of the interfaces.
+	</para>
+      </section>
+      
+      <section>
+	<title>Solution</title>
+	<para>
+	  
+	</para>
+      </section>
+      
+    </section> 
+    
+    <section id="cb-net-pool-priv">
+      <title>Pools in a Private Subnet</title>
+
+      <section>
+	<title>Description</title>
+	<para>
+	  
+	</para>
+      </section>
+
+      <section>
+	<title>Solution</title>
+	<para>
+	  
+	</para>
+      </section>
+
+    </section>
+
     <section id="cb-net-dmz">
       <title>Doors in the DMZ</title>
-
+      
       <section>
 	<title>Description</title>
 	<para>
@@ -184,43 +242,7 @@
 
     </section>
 
-    <section id="cb-net-pool-priv">
-      <title>Pools in a Private Subnet</title>
 
-      <section>
-	<title>Description</title>
-	<para>
-	  
-	</para>
-      </section>
-
-      <section>
-	<title>Solution</title>
-	<para>
-	  
-	</para>
-      </section>
-
-    </section>
-
-    <section id="cb-net-second-if">
-      <title>Connection via a Secondary Interface</title>
-
-      <section>
-	<title>Description</title>
-	<para>
-	  
-	</para>
-      </section>
-
-      <section>
-	<title>Solution</title>
-	<para>
-	  
-	</para>
-      </section>
-
-    </section>
 
   </chapter>
 
