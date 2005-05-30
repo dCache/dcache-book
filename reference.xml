@@ -6,7 +6,15 @@
   <title>Reference</title>
     
   <chapter id="rf-setup">
-    <title>Setup Parameters</title>
+    <title>dCache Start-Up Parameters</title>
+    
+    <para>
+      The important variables in the <glossterm
+      linkend="gl-dcachesetup-file">dCacheSetup file</glossterm> and
+      parameters in the <glossterm linkend="gl-batch-file">batch
+      files</glossterm> are described below. 
+    </para>
+
   </chapter>
   
   <chapter id="rf-cc">

@@ -170,7 +170,9 @@
 	  connections via all those interfaces. The interfaces might
 	  even belong to separate networks with no routing from one
 	  network to the other.
+	</para>
 
+	<para>
           As long as the data connection is opened by the GridFTP
           server (active FTP mode), there is no problem with having
           more than one interface. However, when the client opens the
@@ -179,9 +181,11 @@
           connect to. If this is the wrong interface, the client might
           not be able to connect to it, because there is no route or
           the connection might be inefficient.
+	</para>
 
-	  Also, since a GridFTP server has to authenticate with a SSL
-	  certificate and key, there needs to be a separate
+	<para>
+	  Also, since a GridFTP server has to authenticate with an SSL
+	  grid certificate and key, there needs to be a separate
 	  certificate and key pair for each name of the host. Since
 	  each network interface might have a different name, several
 	  certificates and keys are needed and the correct one has to
@@ -192,7 +196,13 @@
       <section>
 	<title>Solution</title>
 	<para>
-	  
+	  Start a separate GridFTP server cell on the host for each
+	  interface on which connections should be accepted.
+	</para>
+	
+	<para>
+	  The cells may be started in one domain or in separate
+	  domains. 
 	</para>
       </section>
       

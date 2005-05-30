@@ -74,6 +74,115 @@ changed to <quote>admin</quote>.
     </screen>
   </chapter>
 -->
+
+  <chapter id="cf-cell-startup">
+    <title>Cell Package Start-Up Framework</title>
+
+    <para>
+      Apart from the PNFS server, all of dCache makes use of the cell
+      package. It is a framework for a distributed and scalable server
+      system in Java. The dCache system divided into cells which
+      communicate with each other via messages. Several cells run
+      simultaneously in one domain.
+    </para>
+
+    <para>
+      Each domain runs in a separate Java virtual machine and each
+      cell is run as a separate thread therein. The domains
+      communicate with each other via network connection which are
+      established at start-up. In the standard setup all domains
+      connect with the <quote>dCacheDomain</quote> which routes all
+      messages to the appropriate domains. Note, that actual data
+      transfers are not done via these established connections.
+    </para>
+
+    <para>
+      A domain is started with shell script
+      <filename>jobs/<replaceable>domainName</replaceable>.sh</filename><footnote>
+	<para>
+	  Filenames will always be relative to the dCache installation
+	  directory, which defaults to
+	  <filename>/opt/d-cache/</filename>.
+	</para>
+      </footnote>
+      (which in the standard setup is for all domains a link to
+      <filename>jobs/wrapper2.sh</filename>).  This will use the
+      configuration variables in
+      <filename>config/<replaceable>domainName</replaceable>Setup</filename>
+      (which normally is a link to
+      <filename>config/dCacheDomain</filename>), start the Java
+      virtual machine and execute the cell package commands in
+      <filename>config/<replaceable>domainName</replaceable>.batch</filename>.
+      The main task of these commands is to start up all the cells
+      which should be running in the domain. It follows a typical batch file.
+    </para>
+
+    <informalexample>
+      <programlisting>set printout default 2
+set printout CellGlue none
+onerror shutdown
+
+check -strong setupFile
+copy file:${setupFile} context:setupContext
+import context -c setupContext
+check -strong serviceLocatorPort serviceLocatorHost
+check -strong sshPort ftpPort
+
+create dmg.cells.services.RoutingManager  RoutingMgr
+create dmg.cells.services.LocationManager lm \
+       "${serviceLocatorHost} ${serviceLocatorPort}"
+
+create dmg.cells.services.login.LoginManager GFTP \
+            "2811 \
+             -export \
+             diskCacheV111.doors.GsiFtpDoorV1 \
+             -prot=raw \
+             -clientDataPortRange=${clientDataPortRange} \
+             -root=${ftpBase} \
+             -kpwd-file=${kpwdFile} \
+             -tlog=/tmp/dcache-ftp-tlog \
+             -maxLogin=100 \
+             -brokerUpdateTime=5 \
+             -protocolFamily=gsiftp \
+             -loginBroker=LoginBroker \
+             -poolManagerTimeout=5400 \
+             -pnfsTimeout=120 \
+             -maxRetries=80 \
+             -maxStreamsPerClient=10 \
+             -ftp-adapter-internal-interface=10.0.1.1 \
+"
+    </informalexample>
+      
+    <para>
+      It is not necessary to understand every detail of the syntax of
+      the batch files even for the most advanced dCache administration
+      tasks. The following explanations should be sufficient: The
+      first tree lines set some logging behaviour. 
+    </para>
+
+    <para>
+      The next 5 lines import the variables from the
+      <filename>config/<replaceable>domainName</replaceable>Setup</filename>
+      file into the <glossterm
+      linkend="gl-context">context</glossterm> of the domain.
+      
+      The values of the variables defined in the setup file are placed
+      whereever
+      <literal>${<replaceable>variableName</replaceable>}</literal>
+      appears.
+    </para>
+
+    <para>
+      The <command>create</command> commands at the end start three
+      cells. It takes up to three parameters: The Java class to start,
+      the name of the cell and the argument string which is passed to
+      the class. In the standard setup, most parameters to the cells
+      are either set to reasonable values or are filled from variables
+      defined in the setup file. This way, the batch files only need
+      to be changed for more advanced configuration tasks.
+    </para>
+
+  </chapter>
   
   <xi:include href="config-PoolManager.xml"></xi:include>
 
