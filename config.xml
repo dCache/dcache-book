@@ -97,7 +97,36 @@ changed to <quote>admin</quote>.
     </para>
 
     <para>
-      A domain is started with shell script
+      Within this framework, cells send messages to other cells
+      addressing them in the form
+      <literal><replaceable>cellName</replaceable>@<replaceable>domainName</replaceable></literal>.
+      This way, cells can communicate without knowledge about the host
+      they run on. Some cells are <glossterm
+      linkend="gl-well-known-cell">well known</glossterm>, i.e. they
+      can be addressed just by their name without
+      <literal>@<replaceable>domainName</replaceable></literal>. Evidently,
+      this can only work properly if the name of the cell is unique
+      throuout the hole system. 
+    </para>
+
+    <para>
+      If two well known cells with the same name are present, the
+      system will behave in an undefined way.  Therefore it is wise to
+      take care when starting, naming, and renaming the well known
+      cells. Some cell types, like the <literal>PoolManager</literal>
+      will always be well known, while others may be made well known
+      by the <literal>-export</literal> option. Some cell types can
+      and should never be well known. The same problem can arise if
+      two dCache instances which are meant to be separate use the same
+      <glossterm linkend="gl-location-manager">location
+      manager</glossterm> due to a miss-configuration: Messages meant
+      for e.g. the pool manager of one instance get routed to the pool
+      manager of the other instance which generally will not be able
+      to handle the request properly.
+    </para>
+
+    <para>
+      A domain is started with a shell script
       <filename>jobs/<replaceable>domainName</replaceable>.sh</filename><footnote>
 	<para>
 	  Filenames will always be relative to the dCache installation
@@ -117,7 +146,8 @@ changed to <quote>admin</quote>.
       which should be running in the domain. It follows a typical batch file.
     </para>
 
-    <informalexample>
+    <example>
+      <title>Example batch file <filename>config/gridftpdoor.batch</filename></title>
       <programlisting>set printout default 2
 set printout CellGlue none
 onerror shutdown
@@ -150,8 +180,8 @@ create dmg.cells.services.login.LoginManager GFTP \
              -maxRetries=80 \
              -maxStreamsPerClient=10 \
              -ftp-adapter-internal-interface=10.0.1.1 \
-"
-    </informalexample>
+"</programlisting>
+    </example>
       
     <para>
       It is not necessary to understand every detail of the syntax of
@@ -180,6 +210,13 @@ create dmg.cells.services.login.LoginManager GFTP \
       are either set to reasonable values or are filled from variables
       defined in the setup file. This way, the batch files only need
       to be changed for more advanced configuration tasks.
+    </para>
+
+    <para>
+      The routing manager and location manager cells are started in
+      each domain are part of the underlying cell package
+      structure. Each domain will contain at least one cell in
+      addition to them.
     </para>
 
   </chapter>
