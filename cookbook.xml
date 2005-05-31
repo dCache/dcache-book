@@ -197,12 +197,100 @@
 	<title>Solution</title>
 	<para>
 	  Start a separate GridFTP server cell on the host for each
-	  interface on which connections should be accepted.
+	  interface on which connections should be
+	  accepted. Background information on how to configure the
+	  cell start-up is given in <xref linkend="cf-cell-startup"/>.
 	</para>
 	
 	<para>
 	  The cells may be started in one domain or in separate
-	  domains. 
+	  domains. The cells have to have different names, since they
+	  are <glossterm linkend="gl-well-known">well
+	  known</glossterm> cells. Each cell has to be configured,
+	  only to listen on the interface it should serve with the
+	  <option>-listen</option> option. The locations of the grid
+	  host certificate and key files for the interface have to be
+	  specified explicitly with the <option>-service-cert</option>
+	  and <option>-service-key</option> options.
+	</para>
+
+	<para>
+	  The following example shows a setup for two network
+	  interfaces with the hostnames
+	  <literal>door-a.grid.domain</literal> (111.111.111.5) and
+	  <literal>door-b.other.domain</literal> (222.222.222.5) which are served by two
+	  GridFTP door cells in one domain:
+	</para>
+	
+	<example>
+	  <title>Batch file for two GridFTP doors serving separate network interfaces</title>
+	  <programlisting>set printout default 2
+set printout CellGlue none
+onerror shutdown
+check -strong setupFile
+copy file:${setupFile} context:setupContext
+import context -c setupContext
+check -strong serviceLocatorPort serviceLocatorHost
+check -strong sshPort ftpPort
+create dmg.cells.services.RoutingManager  RoutingMgr
+create dmg.cells.services.LocationManager lm \
+       "${serviceLocatorHost} ${serviceLocatorPort}"
+
+create dmg.cells.services.login.LoginManager <emphasis>GFTP-door-a</emphasis> \
+            "2811 \
+	     <emphasis>-listen=111.111.111.5 \</emphasis>
+             -export \
+             diskCacheV111.doors.GsiFtpDoorV1 \
+             -prot=raw \
+             <emphasis>-service-cert=/etc/grid-security/door-a.grid.domain-cert.pem \
+             -service-key=/etc/grid-security/door-a.grid.domain-key.pem \</emphasis>
+             -clientDataPortRange=${clientDataPortRange} \
+             -root=${ftpBase} \
+             -kpwd-file=${kpwdFile} \
+             -tlog=/tmp/dcache-ftp-tlog \
+             -maxLogin=100 \
+             -brokerUpdateTime=5 \
+             -protocolFamily=gsiftp \
+             -loginBroker=LoginBroker \
+             -poolManagerTimeout=5400 \
+             -pnfsTimeout=120 \
+             -maxRetries=80 \
+             -maxStreamsPerClient=10 \
+"
+
+create dmg.cells.services.login.LoginManager <emphasis>GFTP-door-b</emphasis> \
+            "2811 \
+             <emphasis>-listen=222.222.222.5 \</emphasis>
+             -export \
+             diskCacheV111.doors.GsiFtpDoorV1 \
+             -prot=raw \
+             <emphasis>-service-cert=/etc/grid-security/door-b.other.domain-cert.pem \
+             -service-key=/etc/grid-security/door-b.other.domain-key.pem \</emphasis>
+             -clientDataPortRange=${clientDataPortRange} \
+            -root=${ftpBase} \
+             -kpwd-file=${kpwdFile} \
+             -tlog=/tmp/dcache-ftp-tlog \
+             -maxLogin=100 \
+             -brokerUpdateTime=5 \
+             -protocolFamily=gsiftp \
+             -loginBroker=LoginBroker \
+             -poolManagerTimeout=5400 \
+             -pnfsTimeout=120 \
+             -maxRetries=80 \
+             -maxStreamsPerClient=10 \
+"</programlisting>
+	</example>
+
+	<para>
+	  This batch file is very similar to the batch file for the
+	  GridFTP door in the standard setup. (Comments have been left
+	  out.) It only contains an additional create command for the
+	  second cell and the emphasized changes within the two create
+	  commands: The cell names, the <option>-listen</option>
+	  option with the IP address of the corresponding interface
+	  and the <option>-service-cert</option> and
+	  <option>-service-key</option> options with the host
+	  certificate and key files.
 	</para>
       </section>
       
