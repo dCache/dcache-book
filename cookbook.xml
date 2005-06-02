@@ -546,9 +546,22 @@ create dmg.cells.services.login.LoginManager GFTP \
       </footnote>
       A typical line looks like
       <informalexample>
-	<screen>TODO</screen>
+	<screen>05.31 22:35:16 [pool:<replaceable>pool-name</replaceable>:transfer] [000100000000000000001320,24675] myStore:STRING@osm 24675 474 true {GFtp-1.0 <replaceable>client-host-fqn</replaceable> 37592} {0:""}</screen>
       </informalexample>
       EXPLAIN! SYNOPSIS? Maybe too confusing
+      
+      It seems (though we are not sure) that the ftp transfer
+      into the system was interrupted after having transferred
+      14 bytes. Here you possibly found a small problem in the
+      dCache :-) . The 14 in [PNFSID,14] is the number of bytes
+      on the pool disk. The number '-1' SHOULD be the bytes
+      transferred into the pool. This is inconsistent.
+      It is supposed to be -1 if the mover HASN"T finished the transfer
+      ftp protocolwise. On the other hand, if it was
+      interrupted, it SHOULDN"T  say    {0,""} because
+      this means : no error detected.
+      The 474 is the number of milliseconds the transfer took
+      and the 37592 is the client host data transfer listen port.
     </para>
 
     <para>
