@@ -11,6 +11,118 @@
       administrator might want to perform. 
     </para> 
   </partintro>
+
+  <chapter id="cb-general">
+    <title>General Problems</title>
+
+    <section id="cb-general-opteron">
+      <title>Installing dCache on Opteron Machines</title>
+
+      <para>
+	The PNFS server, dCache server, and dCache client software
+	have to be taken care of:
+      </para>
+
+      
+
+      <section id="cb-general-opteron-server">
+	<title>The dCache Server</title>
+
+	<para>
+	  The major part of the dCache server softwar is written in
+	  Java. Therefore the Java Virtual Machine with 64 bit
+	  extension needs to be installed. It either is included in
+	  the regular Java distribution or additional packages have to
+	  be downloaded.
+	</para>
+
+      </section>
+
+      <section id="cb-general-opteron-client">
+	<title>The dCache Client</title>
+
+	<para>
+	  The <glossterm id="gl-dcap-library">dCap library</glossterm>
+	  and the command line tool <command>dccp</command> may be
+	  downloaded from <ulink
+	  url="http://www.dcache.org/downloads/">
+	  http://www.dcache.org/downloads/</ulink> for several
+	  architectures. The source of the client software may also be
+	  downloaded from <ulink
+	  url="http://www.dcache.org/downloads/cvs.shtml">
+	  http://www.dcache.org/downloads/cvs.shtml</ulink> and
+	  compiled. As of this writing, this has not been tested for
+	  the Opteron architecture. Please, contact
+	  <email>support@dcache.org</email> when encountering any
+	  problems with this.
+	</para>
+
+      </section>
+
+      <section id="cb-general-opteron-pnfs">
+	<title>PNFS Server</title>
+
+	<para>
+	  The current version of the PNFS server software is written
+	  in C and has never been compiled for any 64-bit
+	  architecture. Since a Java implementation is in preparation,
+	  there are no plans to do that. Therefore the PNFS server has
+	  to be run in compat mode.
+	</para>
+
+      </section>
+
+    </section>
+
+  </chapter>
+
+  <chapter id="cb-mon-op">
+    <title>Monitoring and Operation of a dCache System</title>
+
+    <para>Maybe this should go into the configuration part.</para>
+
+    <para>
+      This chapter describes the various methods to monitor a running
+      dCache system and gives a general introduction on its operation.
+      Every administrator should be familiar with this material.
+    </para>
+    
+    <section id="cb-mon-op-web">
+      <title>The Web Interface</title>
+
+      <para>
+	In the standard configuration the dCache web interface is
+	started on the admin node and can be reached via port
+	<literal>2288</literal> (configurable in
+	<filename>config/dCacheSetup</filename><footnote>
+	  <para>
+	    Filenames will always be relative to the dCache
+	    installation directory, which defaults to
+	    <filename>/opt/d-cache/</filename>.
+	  </para>
+	</footnote>). Point a web browser to <ulink
+	url="http://your-admin-node.your-domain:2288/">http://<replaceable>your-admin-node</replaceable>.<replaceable>your-domain</replaceable>:2288/</ulink>
+	to get to the main menue of the dCache web interface.  The
+	contents of the web interface are self-explanatory and are
+	useful for most monitoring tasks.
+    </para>
+    </section>
+
+    <section id="cb-mon-op-ssh">
+      <title>The SSH Login Interface</title>
+
+      
+
+    </section>
+
+    <section id="cb-mon-op-gui">
+      <title>The Graphical Administration Interface</title>
+
+      
+
+    </section>
+
+  </chapter>
   
   <chapter id="cb-pool">
     <title>Pool Operations</title>
@@ -414,5 +526,105 @@ create dmg.cells.services.login.LoginManager GFTP \
 
   </chapter>
 
+
+  <chapter id="cb-accounting">
+    <title>Accounting</title>
+
+    <para>
+      TODO: There are a few loose ends in this chapter. A meta-intro might
+      also be in order.
+    </para>
+
+    <para>
+      The raw information about all dCache activities can be found in
+      <filename>billing/<replaceable>YYYY</replaceable>/<replaceable>MM</replaceable>/billing-<replaceable>YYYY.MM.DD</replaceable></filename>.<footnote>
+	<para>
+	  Filenames will always be relative to the dCache installation
+	  directory, which defaults to
+	  <filename>/opt/d-cache/</filename>. 
+	</para>
+      </footnote>
+      A typical line looks like
+      <informalexample>
+	<screen>TODO</screen>
+      </informalexample>
+      EXPLAIN! SYNOPSIS? Maybe too confusing
+    </para>
+
+    <para>
+      The dCache web interface (described in <xref
+      linkend="cb-mon-op-web"/>) contains under the menue point
+      <quote>Actions Log</quote> summary information extracted from
+      the information in the <filename>billing</filename>-directory.
+    </para>
+
+    <para>
+      The accounting information can also be redirected into a
+      database. For this the start-up configuration of the standard
+      admin node has to be modified. (See <xref
+      linkend="cf-cell-startup"/> for background information.) The
+      billing information is written by the <quote>billing</quote>
+      cell, which is started in the <quote>httpd</quote>
+      domain. Therefore, the corresponding
+      <command>create</command>-line in the
+      <filename>config/httpd.batch</filename> file has to be changed
+      to something like
+      <programlisting>create ... TODO: FILL</programlisting>
+
+      TODO: Create Tables? Schema?
+
+      After that, the <quote>httpd</quote> domain has to be restarted with
+<screen><rootprompt/><replaceable>/opt/d-cache/</replaceable>jobs/httpd stop
+<rootprompt/><replaceable>/opt/d-cache/</replaceable>jobs/httpd -logfile=<replaceable>/opt/d-cache/</replaceable>log/httpd.log start</screen>
+    </para>
+
+    <para>
+      There is also a nice little script which converts the billing
+      files into something nice and neat. It can be found at
+      <email>support@dcache.org</email>.
+    </para>
+
+  </chapter>
+
+  <chapter id="cb-proto">
+    <title>Protocols</title>
+    
+    <section id="cb-proto-dis-dcap">
+      <title>Disableing unauthenticated dCap via SRM</title>
+
+      <para>
+	NOCLUE: Meta-intro? Where to put this? A more general section about
+	protocolls in Configuration?
+      </para>
+
+      <para>
+	In some cases SRM transfers fail because they are tried via
+	the plain dCap protocol (URL starts with
+	<literal>dcap://</literal>). Since plain dCap is
+	unauthenticated, the dCache server will have no information
+	about the user trying to access the system. While the transfer
+	will succeed if the UNIX file permissions allow access to
+	anybody (e.g. mode 777), it will fail otherwise. 
+      </para>
+
+      <para>
+	Usually all doors are registered in SRM as potential access
+	points for dCache. During a protocol negotiation the SRM
+	chooses one of the available doors. You can force srmcp to use
+	the gsidcap protocol (<option>-protocol=gsidcap</option>) or
+	you can unregister plain, unauthenticated dCap from known
+	protocols: From the file
+	<filename>config/door.batch</filename> remove
+	<option>-loginBroker=LoginBroker</option> and restart dcap
+	door with
+
+<screen><rootprompt/><replaceable>/opt/d-cache/</replaceable>jobs/door stop
+<rootprompt/><replaceable>/opt/d-cache/</replaceable>jobs/door -logfile=<replaceable>/opt/d-cache/</replaceable>log/door.log start</screen>
+
+      </para>
+
+    </section>
+
+  </chapter>
 
 </part>

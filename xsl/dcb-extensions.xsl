@@ -21,6 +21,11 @@
     <prompt>[root@machine ~ ] # </prompt>
   </xsl:template>
 
+  <xsl:template match="cellcommandref">
+    <xsl:param name="linkend"/>
+    <command moreinfo="refentry"><xref linkend="$linkend"/></command>
+  </xsl:template>
+  
   <xsl:template match="cellname">
     <classname>
       <xsl:apply-templates/>
