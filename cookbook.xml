@@ -640,4 +640,204 @@ create dmg.cells.services.login.LoginManager GFTP \
 
   </chapter>
 
+  <chapter id="cb-adv">
+    <title>Advanced Tuning</title>
+
+    <para>
+      The use cases described in this chapter are only relevant for
+      large-scale dCache Instances which require special tuning
+      according to a longer experience with client behaviour.
+    </para>
+
+    <section id="cb-adv-multi-mover-queues">
+      <title>Multiple Queues for Movers in each Pool</title>
+
+
+      <section id="cb-adv-multi-mover-queues-d">
+	<title>Description</title>
+
+	<para>
+	  Client requests to a dCache system may have rather diverse
+	  bahaviour. Sometimes it is possible to classify them into
+	  several typical usage patterns. An example are the following
+	  two usage patterns: 
+	  <example>
+	    <title>To Concurrent Usage Patterns</title>
+	    <para>
+	      Data is copied with a high transfer rate to the dCache
+	      system from an external source. This is done via the
+	      GridFTP protocol. At the same time batch jobs on a local
+	      farm process data. Since they only need a small part of
+	      each file, they use the dCap protocol via the dCap
+	      library and seek to the position in the file they are
+	      interested in, read a few bytes, do a few hours of
+	      calculations, and finally read some more data.
+	    </para>
+	  </example>
+	  As long as the number of active requests do not exceed the
+	  maximum number of allowed active requests, the two types of
+	  requests are processed concurrently. The GridFTP transfers
+	  complete at a high rate while the processing jobs take hours
+	  to finish. This maximum number of allowed requests is set
+	  with <cellcommandref linkend="cmd-mover_set_max_active"/>
+	  and should be tuned according to capabilities of the pool
+	  host.
+	</para>
+
+	<para>
+	  However, if requests are queued, the slow processing jobs
+	  might clog up the queue and not let the fast GridFTP request
+	  through, even though the pool just sits there waiting for
+	  the processing jobs to request more data. While this could
+	  be temporarily remedied by setting the maximum active
+	  requests to a higher value, then in turn GridFTP request
+	  would put a very high load on the pool host.
+	</para>
+	
+	<para>
+	  The above example is pretty realistic: As a rule of thumb,
+	  GridFTP requests are fastest, dCap requests with the
+	  <command>dccp</command> program are a little slower and dCap
+	  requests with the dCap library are very slow. However, the
+	  usage patterns might be different at other sites and also
+	  might change over time.
+	</para>
+      </section>
+
+      <section id="cb-adv-multi-mover-queues-s">
+	<title>Solution</title>
+
+	<para>
+	  Use separate queues for the movers, depending on the door
+	  initiating them. This easily allows for a separation of
+	  requests of separate protocols. Multiple mover queues are
+	  only available in dCache version 1.6.6 or later.
+	</para>
+
+	<para>
+	  A finer grained queue selection mechanism based on, e.g. the
+	  IP of the client or the file which has been requested, is
+	  not possible with this mechanism. However, the <glossterm
+	  linkend="gl-pm-comp-psu">pool selection unit
+	  (PSU)</glossterm> may provide a separation onto separate
+	  pools using those criteria.
+	</para>
+	
+	<para>
+	  In the above example, two separate queues for fast GridFTP
+	  transfers and slow dCap library access would solve the
+	  problem. The maximum number of active movers for the GridFTP
+	  queue should be set to a lower value compared to the dCap
+	  queue since the fast GridFTP transfers will put a high load
+	  on the system while the dCap requests will be mostly idle.
+	</para>
+
+      </section>
+
+      <section id="cb-adv-multi-mover-queues-c">
+	<title>Configuration</title>
+
+	<para>
+<screen>
+	       With production-1-6-6 dCache supports up to 10 distinct mover queues per pool. They only cover client - dCache data movements (ftp,dcap,http). Pool to pool or HSM transfers are still handled by the already established queues. Each of the new queues is identified by its name, which is defined on creation of the pool. Different mover queues may have a different maximum number of movers allowed. (Which is actually the basic idea of diffent mover queues). Technically, different pools may have a different number of mover queues and/or different queue names, although this doesn't make too much sense. The first queue specified in the configuration (see below) is per definition the default mover queue, independed of its actual name. Requests, not requesting a particular mover queue or requests requesting a mover queue, not existing on the selected pool, are handled by the default mover queue.
+
+    Each door may be configured to use a particular mover queue. The pool, selected for this request, doesn't depend on the selected mover queue. So a request may go to a pool which doesn't have the particular mover queue configured and will consequently end up in the default mover queue of that pool.
+
+    For the dCap protocol, the corresponding door may be configured to allow the client to determine the mover queue name. In that case the client may use the extra option facility to specify a mover queue. 
+
+Configuration
+
+    Pool Configuration
+
+        Pool startup option :
+
+           create diskCacheV111.pools.MultiProtocolPool2  poolName  \
+                    "basicPoolPath                                  \
+                     -io-queues=queueName-1[,queueName-2[,...queueName-10]]    \
+                     [OTHER OPTIONS]"
+        
+
+        Up to 10 queue may be given. The first name specified will become the default mover queue. The default mover queue is choosen if an incoming request doesn't specify a queue or specifies a queue not available on that pool. 
+
+    Additional pool commands
+
+        mover ls
+
+            Compatibility command. Lists all requests from all queues. 
+
+        mover ls -queue
+
+            Lists all requests sorted according to the mover queue. 
+
+        mover ls -queue=mover queue name
+
+            Lists all requests of queue mover queue name. 
+
+        mover set max active maxActiveCount -queue=mover queue name
+
+            Sets the maximum number of allowed mover of queue mover queue name. 
+
+        mover set max active maxActiveCount
+
+            Compatibiltiy command. Sets the maximum number of allowed mover of the default mover queue. 
+
+    Ftp Door (Abstract) configuration
+
+        Gsi Ftp startup option :
+
+            create dmg.cells.services.login.LoginManager GFTP \
+                       "portName                 \
+                        diskCacheV111.doors.GsiFtpDoorV1 \
+                        -io-queue=queueName      \
+                        [OTHER OPTIONS]"
+        
+
+        All requests send from this door will ask to be scheduled to the given mover queue. The selection of the pool is not affected. 
+
+    DCap Door (Abstract) configuration
+
+        DCap startup option :
+
+           create dmg.cells.services.login.LoginManager DCap \
+                       "${dCapPort} \
+                        diskCacheV111.doors.DCapDoor \
+                        -io-queue=queueName\
+                        -io-queue-overwrite=allowed|denied \
+                        [OTHER OPTIONS]"
+        
+
+        All requests send from this door will ask to be scheduled to the given mover queue. The selection of the pool is not affected. If io-queue-overwrite=allowed is given the dcap client is allowed to request a certain mover queue. For the dCap library this is done, using the extra option.
+
+           dccp -X-io-queue=queueName   source destination [OPTION]
+        
+
+Cost module
+
+    The cost is correctly calculated for the individual queues. The cm set magic on option is not yet honored. 
+
+Queue web page
+
+    The mover queue web page shows all queues defined by the individual pools. Queues, not defined in a pool, are marked with '-1' instead of the actual mover numbers. 
+
+
+define context startPools endDefine
+  create diskCacheV111.pools.MultiProtocolPool2 ${0} \
+  "!MoverMap \
+  ${1} \
+  -recover-control=yes \
+  -version=4 \
+  -sticky=allowed \
+  -sendHitInfoMessages=yes \
+  -${2} -${3} -${4} -${5} -${6} -${7} -${8} \
+"
+</screen>
+
+	</para>
+
+      </section>
+
+    </section>
+
+  </chapter>
+
 </part>

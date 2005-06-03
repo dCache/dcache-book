@@ -852,18 +852,19 @@
       </refsection>
     </refentry>
 
-    <refentry id="cmd-mover_set_max_active">
-      <refmeta>
-	<refentrytitle><command>mover set max active</command></refentrytitle>
-      </refmeta>
-      <refnamediv>
-	<refname><command>mover set max active</command></refname>
-	<refpurpose>Set the maximum number of active client transfers.</refpurpose>
-      </refnamediv>
-      <refsynopsisdiv>
-	<cmdsynopsis>
-	  <command>mover set max active</command>
-	  <arg choice="req"><replaceable>maxActiveClientTransfers</replaceable></arg>
+      <refentry id="cmd-mover_set_max_active">
+	<refmeta>
+	  <refentrytitle><command>mover set max active</command></refentrytitle>
+	</refmeta>
+	<refnamediv>
+	  <refname><command>mover set max active</command></refname>
+	  <refpurpose>Set the maximum number of active client transfers.</refpurpose>
+	</refnamediv>
+	<refsynopsisdiv>
+	  <cmdsynopsis>
+	    <command>mover set max active</command>
+	    <arg choice="req"><replaceable>maxActiveClientTransfers</replaceable></arg>
+	    <arg><option>-queue=<replaceable>moverQueueName</replaceable></option></arg>
 	</cmdsynopsis>
 	<variablelist>
 	  <varlistentry>
@@ -871,6 +872,19 @@
 	    <listitem>
 	      <para>
 		The maximum number of active client transfers.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>moverQueueName</term>
+	    <listitem>
+	      <para>
+		  The mover queue for which the maximum number of
+		  active transfers should be set. If this is not
+		  specified, the default queue is assumed, in order to
+		  be compatible with previous versions which did not
+		  support multiple mover queues (before version
+		  1.6.6).
 	      </para>
 	    </listitem>
 	  </varlistentry>
