@@ -9,7 +9,7 @@ h1, h2, h3, h4, h5 {
 
 p,ul,ol,li,div,td,th,address,nobr,b,i { font-size:12pt; }
 
-i.replaceable { color: #009000; }
+.replaceable { color: #009000; }
 
 span.term { 
     font-weight: bold; 
@@ -74,6 +74,26 @@ div.informalequation td {
   font-weight: bold;
 #  font-size: 14pt;
  }
+
+div.example p.title{ 
+    background: #FFFFFF; 
+    border: none; 
+    padding: 0px;
+    padding-top: 10px;
+    margin-bottom: 0px;
+    font-weight: bold;
+    font-size: 14pt;
+}
+
+div.example p{ 
+    background: #F0E0F0; 
+    border: 1px solid gray; 
+    padding: 6px;
+#    padding-left: 30px;
+    margin-top: 5px;
+#    font-weight: bold;
+#    font-size: 14pt;
+}
 
 div.glosslist dt { 
     font-weight: bold;

@@ -35,6 +35,18 @@
   
   </xsl:template>
 
+<xsl:template match="replaceable" priority="1">
+  <xsl:param name="content">
+    <xsl:call-template name="anchor"/>
+    <xsl:call-template name="simple.xlink">
+      <xsl:with-param name="content">
+        <xsl:apply-templates/>
+      </xsl:with-param>
+    </xsl:call-template>
+  </xsl:param>
+  <i class="{local-name(.)}"><tt>&lt;<xsl:copy-of select="$content"/>&gt;</tt></i>
+</xsl:template>
+
 
 
 </xsl:stylesheet>

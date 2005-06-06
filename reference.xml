@@ -1010,6 +1010,127 @@
       </refsection>
     </refentry>
 
+    <refentry id="cmd-set_gap">
+      <refmeta>
+	<refentrytitle><command>set gap</command></refentrytitle>
+      </refmeta>
+      <refnamediv>
+	<refname><command>set gap</command></refname>
+	<refpurpose>Set the gap parameter - the size of free space below which it will be assumed that the pool is full within the cost calculations.</refpurpose>
+      </refnamediv>
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>set gap</command>
+	  <arg choice="req"><replaceable>gapPara</replaceable></arg>
+	</cmdsynopsis>
+	<variablelist>
+	  <varlistentry>
+	    <term>gapPara</term>
+	    <listitem>
+	      <para>
+		  The size of free space below which it will be
+		  assumed that the pool is full. Default is 4GB.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </refsynopsisdiv>
+      <refsection>
+	<title>Description</title>
+	<para>
+	    The gap parameter is used within the space cost
+	    calculation scheme described in <xref
+	    linkend="cf-pm-cm-space"/>. It specifies the size of free
+	    space below which it will be assumed that the pool is full
+	    and consequently the least recently used file has to be
+	    removed if a new file has to be stored on the pool. If, on
+	    the other hand, the free space is greater than gapPara, it
+	    will be expensive to store a file on the pool which
+	    exceeds the free space.
+	</para>
+      </refsection>
+    </refentry>
+
+    <refentry id="cmd-set_breakeven">
+      <refmeta>
+	<refentrytitle><command>set breakeven</command></refentrytitle>
+      </refmeta>
+      <refnamediv>
+	<refname><command>set breakeven</command></refname>
+	<refpurpose>Set the breakeven parameter - used within the cost calculations.</refpurpose>
+      </refnamediv>
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>set breakeven</command>
+	  <arg choice="req"><replaceable>breakevenPara</replaceable></arg>
+	</cmdsynopsis>
+	<variablelist>
+	  <varlistentry>
+	    <term>breakevenPara</term>
+	    <listitem>
+	      <para>
+		  The breakeven parameter has to be a positive number
+		  smaller than 1.0.  It specifies the impact of the
+		  age of the <glossterm linkend="gl-lru">least
+		  recently used file</glossterm> on space cost. It the
+		  LRU file is one week old, the space cost will be
+		  equal to <inlineequation>(1 +
+		  breakeven)</inlineequation>. Note that this will not
+		  be true, if the breakeven parameter has been set to
+		  a value greater or equal to 1.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </refsynopsisdiv>
+      <refsection>
+	<title>Description</title>
+	<para>
+		   The breakeven parameter is used within the space cost
+	    calculation scheme described in <xref
+	    linkend="cf-pm-cm-space"/>.
+	</para>
+      </refsection>
+    </refentry>
+
+    <refentry id="cmd-mover_ls">
+      <refmeta>
+	<refentrytitle><command>mover ls</command></refentrytitle>
+      </refmeta>
+      <refnamediv>
+	<refname><command>mover ls</command></refname>
+	<refpurpose>List the active and waiting client transfer requests.</refpurpose>
+      </refnamediv>
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>mover ls</command>
+	    <group>
+	      <arg choice="req">-queue</arg>
+	      <arg choice="req">-queue=<replaceable>queueName</replaceable></arg>
+	    </group>
+	</cmdsynopsis>
+	<variablelist>
+	  <varlistentry>
+	    <term>queueName</term>
+	    <listitem>
+	      <para>
+		  The name of the mover queue for which the transfers should be listed.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </refsynopsisdiv>
+      <refsection>
+	<title>Description</title>
+	<para>
+	    Without parameter all transfers are listed. With
+	    <option>-queue</option> all requests sorted according to
+	    the mover queue are listed. If a queue is explicitly
+	    specified, only transfers in that mover queue are listed.
+	</para>
+      </refsection>
+    </refentry>
+
   </section>
 
   <section id="rf-cc-pm">

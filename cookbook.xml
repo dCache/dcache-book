@@ -45,7 +45,7 @@
 	  The <glossterm id="gl-dcap-library">dCap library</glossterm>
 	  and the command line tool <command>dccp</command> may be
 	  downloaded from <ulink
-	  url="http://www.dcache.org/downloads/">
+	  url="http://www.dcache.org/downloads.shtml">
 	  http://www.dcache.org/downloads/</ulink> for several
 	  architectures. The source of the client software may also be
 	  downloaded from <ulink
@@ -79,7 +79,7 @@
   <chapter id="cb-mon-op">
     <title>Monitoring and Operation of a dCache System</title>
 
-    <para>Maybe this should go into the configuration part.</para>
+    <!-- <para>Maybe this should go into the configuration part.</para> -->
 
     <para>
       This chapter describes the various methods to monitor a running
@@ -128,7 +128,7 @@
     <title>Pool Operations</title>
     
     
-    <section id="cb-pool-remove">
+<!--    <section id="cb-pool-remove">
       <title>Removing a Pool</title>
       
       <section id="cb-pool-remove-precious">
@@ -148,14 +148,17 @@
       </section>
       
     </section>
+-->    
+
+  <section id="cb-pool-rename">
+    <title>Renaming a Pool</title>
     
-    <section id="cb-pool-rename">
-      <title>Renaming a Pool</title>
+    <para>
+      A pool may be renamed with the following procedure,
+      regardless of the type of files stored on it.
+    </para>
       
-      <para>A pool may be renamed with the following procedure,
-	regardless of the type of files stored on it.</para>
-      
-      <para>
+    <para>
 	Disable file transfers from and to the pool with
 	<screen><dcpoolprompt></dcpoolprompt><command>pool disable</command> <option>-strict</option></screen>
 	Then make shure, no transfers are being processed anymore.
@@ -172,9 +175,18 @@
 	Even if the pool contains precious files, this is no problem, since
 	we will register them again in a moment. The files might not be available
 	for a short moment, though.
-	Log out of the pool, and stop the service: TODO
+	Log out of the pool, and stop the service: 
+      <screen><rootprompt/>jobs/pool<footnote>
+	<para>
+	  Filenames will always be relative to the dCache installation
+	  directory, which defaults to
+	  <filename>/opt/d-cache/</filename>. 
+	</para>
+      </footnote> -pool=<replaceable>poolDomainName</replaceable> stop</screen>
 	Rename the pool in the <filename><replaceable>poolDomain</replaceable>.poollist</filename>-file.
-	Restart the service: TODO
+	Restart the service:
+      <screen><rootprompt/>jobs/pool -pool=<replaceable>poolDomainName</replaceable> -logfile=<replaceable>dCacheLocation</replaceable>/log/<replaceable>poolDomainName</replaceable>Domain.log start</screen>
+      
 	Register the files on the pool with
 	<screen><dcpoolprompt/><command>pnfs register</command></screen>
       </para>
@@ -508,7 +520,10 @@ create dmg.cells.services.login.LoginManager GFTP \
 	  while the rest of the dCache instance is in the
 	  intranet. The firewall is configured in such a way that the
 	  doors cannot reach the location manager (usually on the
-	  admin node together with the pool manager) via port NOCLUE.
+	  admin node together with the pool manager) via port 11111 
+          (or as configured in the variable 
+          <varname>serviceLocatorPort</varname> in 
+          <filename>config/lmSetup</filename>).
 	</para>
       </section>
 
@@ -530,10 +545,10 @@ create dmg.cells.services.login.LoginManager GFTP \
   <chapter id="cb-accounting">
     <title>Accounting</title>
 
-    <para>
+    <!-- <para>
       TODO: There are a few loose ends in this chapter. A meta-intro might
       also be in order.
-    </para>
+    </para> -->
 
     <para>
       The raw information about all dCache activities can be found in
@@ -548,20 +563,16 @@ create dmg.cells.services.login.LoginManager GFTP \
       <informalexample>
 	<screen>05.31 22:35:16 [pool:<replaceable>pool-name</replaceable>:transfer] [000100000000000000001320,24675] myStore:STRING@osm 24675 474 true {GFtp-1.0 <replaceable>client-host-fqn</replaceable> 37592} {0:""}</screen>
       </informalexample>
-      EXPLAIN! SYNOPSIS? Maybe too confusing
       
-      It seems (though we are not sure) that the ftp transfer
-      into the system was interrupted after having transferred
-      14 bytes. Here you possibly found a small problem in the
-      dCache :-) . The 14 in [PNFSID,14] is the number of bytes
-      on the pool disk. The number '-1' SHOULD be the bytes
-      transferred into the pool. This is inconsistent.
-      It is supposed to be -1 if the mover HASN"T finished the transfer
-      ftp protocolwise. On the other hand, if it was
-      interrupted, it SHOULDN"T  say    {0,""} because
-      this means : no error detected.
-      The 474 is the number of milliseconds the transfer took
-      and the 37592 is the client host data transfer listen port.
+      The first barcket contains the pool name, the second the 
+      <glossterm linkend="gl-pnfsid">PNFS Id</glossterm> and the size
+      of the file which is transferred. Then follows the <glossterm 
+      linkend="gl-storage_class">storage class</glossterm>, the actual 
+      amount of bytes transferred, and the number of milliseconds the 
+      transfer took. The next entry is <literal>true</literal> if the 
+      transfer was a wrote data to the pool. The first braces contain the
+      protocol, client FQN, and the client host data transfer listen port. 
+      The final bracket contains the return status and a possible error message.
     </para>
 
     <para>
@@ -573,7 +584,7 @@ create dmg.cells.services.login.LoginManager GFTP \
 
     <para>
       The accounting information can also be redirected into a
-      database. For this the start-up configuration of the standard
+      database. <!-- For this the start-up configuration of the standard
       admin node has to be modified. (See <xref
       linkend="cf-cell-startup"/> for background information.) The
       billing information is written by the <quote>billing</quote>
@@ -588,14 +599,15 @@ create dmg.cells.services.login.LoginManager GFTP \
 
       After that, the <quote>httpd</quote> domain has to be restarted with
 <screen><rootprompt/><replaceable>/opt/d-cache/</replaceable>jobs/httpd stop
-<rootprompt/><replaceable>/opt/d-cache/</replaceable>jobs/httpd -logfile=<replaceable>/opt/d-cache/</replaceable>log/httpd.log start</screen>
+<rootprompt/><replaceable>/opt/d-cache/</replaceable>jobs/httpd -logfile=<replaceable>/opt/d-cache/</replaceable>log/httpd.log start</screen>-->
+      When interested in this feature, please contact <email>support@dcache.org</email>.
     </para>
 
-    <para>
+    <!--<para>
       There is also a nice little script which converts the billing
       files into something nice and neat. It can be found at
       <email>support@dcache.org</email>.
-    </para>
+    </para>-->
 
   </chapter>
 
@@ -605,10 +617,10 @@ create dmg.cells.services.login.LoginManager GFTP \
     <section id="cb-proto-dis-dcap">
       <title>Disableing unauthenticated dCap via SRM</title>
 
-      <para>
+      <!-- <para>
 	NOCLUE: Meta-intro? Where to put this? A more general section about
 	protocolls in Configuration?
-      </para>
+      </para> -->
 
       <para>
 	In some cases SRM transfers fail because they are tried via
@@ -631,8 +643,8 @@ create dmg.cells.services.login.LoginManager GFTP \
 	<option>-loginBroker=LoginBroker</option> and restart dcap
 	door with
 
-<screen><rootprompt/><replaceable>/opt/d-cache/</replaceable>jobs/door stop
-<rootprompt/><replaceable>/opt/d-cache/</replaceable>jobs/door -logfile=<replaceable>/opt/d-cache/</replaceable>log/door.log start</screen>
+<screen><rootprompt/>jobs/door stop
+<rootprompt/>jobs/door -logfile=<replaceable>dCacheLocation</replaceable>/log/door.log start</screen>
 
       </para>
 

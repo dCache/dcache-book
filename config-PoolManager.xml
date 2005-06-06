@@ -553,7 +553,7 @@ STRING</screen>This is the setup after a fresh installation and it will lead
       </footnote>
     </para>
 
-    <section>
+    <section id="cf-pm-cm-perf">
       <title>The Performance Cost</title>
 
       <para>
@@ -578,9 +578,9 @@ STRING</screen>This is the setup after a fresh installation and it will lead
 	<command moreinfo="refentry"><xref linkend="cmd-mover_set_max_active"/></command> (client request),
 	<command moreinfo="refentry"><xref linkend="cmd-p2p_set_max_active"/></command> (pool-to-pool server), and
 	<command moreinfo="refentry"><xref linkend="cmd-pp_set_max_active"/></command> (pool-to-pool client). 
-        (NOCLUE: <command moreinfo="refentry"><xref linkend="cmd-flush_set_max_active"/></command>)
+        <!-- (NOCLUE: <command moreinfo="refentry"><xref linkend="cmd-flush_set_max_active"/></command>) -->
 
-	NOCLUE: Some more info about the meanings of these parameters would be nice.
+	<!-- NOCLUE: Some more info about the meanings of these parameters would be nice. -->
       </para>
 
 
@@ -604,7 +604,7 @@ STRING</screen>This is the setup after a fresh installation and it will lead
 
     </section>
 
-    <section>
+    <section id="cf-pm-cm-space">
       <title>The Space Cost</title>
 
       <para>
@@ -811,9 +811,9 @@ STRING</screen>This is the setup after a fresh installation and it will lead
       <section>
 	<title>Rationale</title>
 
-	<para>
+	<!-- <para>
 	NOCLUE
-	</para>
+	</para> -->
 
 	<para>
 	  As the last version of the formula suggests, a pool can be
@@ -846,7 +846,7 @@ STRING</screen>This is the setup after a fresh installation and it will lead
 
     </section>
     
-    <section>
+    <section id="cf-pm-cm-total">
       <title>The Total Cost</title>
     
     <para>
