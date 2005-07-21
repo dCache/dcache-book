@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<!DOCTYPE catalog PUBLIC "-//OASIS//DTD Entity Resolution XML Catalog V1.0//EN" "http://www.oasis-open.org/committees/entity/release/1.0/catalog.dtd">
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+  <delegatePublic publicIdStartString="-//OASIS//ELEMENTS DocBook" catalog="db43xml/catalog.xml"/>
+  <delegatePublic publicIdStartString="-//OASIS//ENTITIES DocBook" catalog="db43xml/catalog.xml"/>
+  <delegatePublic publicIdStartString="-//OASIS//DTD DocBook XML" catalog="db43xml/catalog.xml"/>
+  <rewriteURI uriStartString="http://docbook.sourceforge.net/release/xsl/current/" rewritePrefix="docbook-xsl/"/>
+</catalog>

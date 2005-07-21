@@ -8,6 +8,13 @@
           html/pdf/... generation. (e.g. dcb-dcache.org-website.xsl) (This does not work)
        2. Transformation of dCache-Book-extended docbook to
           standard docbook. (e.g. docbook-from-dcb-extensions.xsl)                -->
+
+
+  
+  <xsl:template match="namespacewrapper">
+    <xsl:apply-templates/>
+  </xsl:template>
+  
   
   <xsl:template match="dcpoolprompt">
     <prompt>(<replaceable>poolname</replaceable>) admin &gt; </prompt>
@@ -21,9 +28,21 @@
     <prompt>[root@machine ~ ] # </prompt>
   </xsl:template>
 
+  <xsl:template match="simpleequation">
+    <informalequation><mediaobject><textobject><para><xsl:apply-templates/></para></textobject></mediaobject></informalequation>
+  </xsl:template>
+  
+  <!--  <xsl:template match="inlineeq">
+    <inlineequation><inlinemediaobject><textobject><phrase revisionflag="added"><xsl:apply-templates/></phrase></textobject></inlinemediaobject></inlineequation>
+  </xsl:template> -->
+  
+  <xsl:template match="inlineeq">
+    <phrase role="inlineeq"><xsl:apply-templates/></phrase>
+  </xsl:template>
+  
   <xsl:template match="cellcommandref">
     <!--<xsl:param name="linkend"/>-->
-    <command moreinfo="refentry"><xref linkend="{@linkend}"/></command>
+    <xref linkend="{@linkend}"/>
   </xsl:template>
   
   <xsl:template match="cellname">
@@ -130,7 +149,12 @@
 
   <xsl:template match="cellopt">
     <row class="cellopt{@choice}">
-      <entry id="{@id}">
+      <entry>
+        <xsl:if test='not(@id = "")'>
+          <xsl:attribute name="id">
+            <xsl:value-of select="@id"/>
+          </xsl:attribute>
+        </xsl:if>
         <xsl:attribute name="xreflabel">
           <xsl:value-of select="celloptname"/>
         </xsl:attribute>
@@ -150,6 +174,14 @@
 
   <xsl:template match="celloptname|celloptvalues|celloptdefault|celloptdescr">
     <xsl:apply-templates/>
+  </xsl:template>
+
+  <xsl:template match="celloptvalues">
+    <cmdsynopsis>
+      <arg>
+        <xsl:apply-templates/>
+      </arg>
+    </cmdsynopsis>
   </xsl:template>
 
   <xsl:template match="celloptionsdescr">

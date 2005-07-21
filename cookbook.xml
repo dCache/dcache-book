@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE part PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">     
+<!DOCTYPE part PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
 
-<part id="cb" xmlns:xi="http://www.w3.org/2001/XInclude">
+<namespacewrapper xmlns:xi="http://www.w3.org/2001/XInclude">
+<part id="cb">
   <!-- <?dbhtml dir="cookbook" ?> -->
   <title>Cookbook</title>
   
@@ -111,14 +112,18 @@
     <section id="cb-mon-op-ssh">
       <title>The SSH Login Interface</title>
 
-      
+      <para>
+	TODO
+      </para>
 
     </section>
 
     <section id="cb-mon-op-gui">
       <title>The Graphical Administration Interface</title>
 
-      
+      <para>
+	TODO
+      </para>
 
     </section>
 
@@ -211,15 +216,21 @@
 	This command does: 
 	<orderedlist>
 	  <listitem>
-	    flags the file as sticky in the name space database
-	    (pnfs). So from now the filename is globally set sticky.
+	    <para>
+	      Flags the file as sticky in the name space database
+	      (pnfs). So from now the filename is globally set sticky.
+	    </para>
 	  </listitem>
 	  <listitem>
-	    will go to all pools where it finds the file and will flag
-	    it sticky in the pools.
+	    <para>
+	      Will go to all pools where it finds the file and will flag
+	      it sticky in the pools.
+	    </para>
 	  </listitem>
 	  <listitem>
-	    all new copies of the file will become sticky.
+	    <para>
+	      All new copies of the file will become sticky.
+	    </para>
 	  </listitem>
 	</orderedlist>
       </para>
@@ -332,7 +343,7 @@
 	<para>
 	  The cells may be started in one domain or in separate
 	  domains. The cells have to have different names, since they
-	  are <glossterm linkend="gl-well-known">well
+	  are <glossterm linkend="gl-well-known-cell">well
 	  known</glossterm> cells. Each cell has to be configured,
 	  only to listen on the interface it should serve with the
 	  <option>-listen</option> option. The locations of the grid
@@ -725,7 +736,7 @@ create dmg.cells.services.login.LoginManager GFTP \
 	  requests of separate protocols. Up to 10 mover queues for
 	  client transfers are available since dCache version
 	  1.6.6. Earlier versions support only one queue. (Transfers
-	  from an to a <glossterm linkend="gl-tape-backend">tape
+	  from an to a <glossterm linkend="gl-tape_backend">tape
 	  backend</glossterm> and <glossterm
 	  linkend="gl-p2p">pool-to-pool transfers</glossterm> are
 	  handled by separate queues, one for each of these transfers.)
@@ -875,3 +886,4 @@ create dmg.cells.services.login.LoginManager DCap \
   </chapter>
 
 </part>
+</namespacewrapper>

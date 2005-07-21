@@ -6,6 +6,46 @@
 # Maintainer: Mathias de Riese <mathias.de.riese@desy.de>
 #
 
+###### Some simple make commands
+#
+
+# Install most of the necessary software in directory software/
+#
+make install-software
+
+# Chunked HTML output in built/index.html
+#
+make html
+
+# One-File HTML in built/Book.html (built/dcb.css also needed)
+#
+make singlehtml
+
+# Update Book on www.dcache.org
+#
+WEB_LOCATION=/home/dcache.org/manuals/Book make dcachedotorg
+
+# PDF in Book.pdf (still miserable quality)
+#
+make pdf
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+############### Old stuff -- might be useful ######################
+
+
+
 ###### Transforming dCache-Book-extended Docbook to Docbook
 #
 xsltproc --nonet --xinclude -o Book.db.xml xsl/docbook-from-dcb-extensions.xsl Book.xml

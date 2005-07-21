@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">     
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
 
 
-<refentry id="cell-cleaner">
+<refentry id="cell-dmg.cells.services.multicast.BroadcastCell">
   
   <refmeta>
     <refentrytitle>Cell <cellname>dmg.cells.services.multicast.BroadcastCell</cellname></refentrytitle>
@@ -23,11 +23,12 @@
   
   <refsection>
     <title>Description</title>
-    Messages sent to the Broadcast cell are forwarded to one more more other cells. Target cells
-    are configured based on the message object class. Configuration can be done by
-    the broadcast cell command line interface or by 
+    
     <para>
-      
+      Messages sent to the Broadcast cell are forwarded to one more
+      more other cells. Target cells are configured based on the
+      message object class. Configuration can be done by the broadcast
+      cell command line interface or by
     </para>
     
   </refsection>
@@ -41,11 +42,13 @@
     
   </refsection>
   
-  <refsynopsisdiv>
+  <refsection>
+    <title>Synopsis</title>
+
     <cmdsynopsis>
       <command>create</command>
-      <literal> dmg.cells.services.multicast.BroadcastCell</literal>
-      <literal> broadcaster</literal>
+      <arg>dmg.cells.services.multicast.BroadcastCell</arg>
+      <arg>broadcaster</arg>
       <arg><option>"default -debug"</option></arg>
     </cmdsynopsis>
     
@@ -56,10 +59,8 @@
 	<celloptdefault>none</celloptdefault>
 	<celloptdescr>Just a little bit more of printout</celloptdescr>
       </cellopt>
-      <celloptionsdescr>
-      </celloptionsdescr>
     </celloptions>
-  </refsynopsisdiv>
+  </refsection>
   
   <refsection>
     <title>CL Command Set</title>
@@ -79,14 +80,24 @@
 	  </cmdsynopsis>
 	</term>
 	<listitem>
-          <title>MessageClassName, CellPath</title>
-	  <para>
-	    MessageClass should be forwarded to CellPath.
-	  </para>
-          <title>-cancelonfailure</title>
-	  <para>
-	    Forward is cancelled if destination cell has disappeared.
-	  </para>
+	  <variablelist>
+	    <varlistentry>
+	      <term>MessageClassName, CellPath</term>
+	      <listitem>
+		<para>
+		  MessageClass should be forwarded to CellPath.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>-cancelonfailure</term>
+	      <listitem>
+		<para>
+		  Forward is cancelled if destination cell has disappeared.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	  </variablelist>
 	</listitem>
       </varlistentry>
 
@@ -118,12 +129,18 @@
     <refsection>
     <title>Location</title>
 
+    <para>
+      
+    </para>
 
     </refsection>
     
     <refsection>
     <title>Other Cells</title>
 
+    <para>
+      
+    </para>
 
     </refsection>
     
@@ -144,13 +161,11 @@
                -usePnfsManager=PnfsManager         \
                -useFilesystem=off                  \
                -nullBug"
-     </programlisting>
+      </programlisting>
     </informalexample>
     
   </refsection>
   
-
-
 </refentry>
       
 

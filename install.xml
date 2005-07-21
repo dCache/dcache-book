@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE part PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<!DOCTYPE part PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">
 
+<namespacewrapper xmlns:xi="http://www.w3.org/2001/XInclude">
 <part id="in">
 <!-- <?dbhtml dir="install"?> -->
   <title>Installation of dCache Components</title>
@@ -12,10 +13,12 @@
     </para>
   </partintro>
 
-<!--
   <chapter id="in-rpm">
      <title>RPM-based Installation</title>
 
+    <para>This chapter will contain a description of the RPM-based installation of dCache.</para>
+    
+<!--
   <section id="in-rpm-deinstall">
     <title>Deinstallation (for New Install on Testsystems)</title>
 
@@ -100,7 +103,8 @@
       </listitem>
     </orderedlist>
   </section>
-  </chapter>
 -->
+  </chapter>
 
 </part>
+</namespacewrapper>

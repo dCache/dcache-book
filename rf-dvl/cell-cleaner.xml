@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">     
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
 
 
 <refentry id="cell-cleaner">
@@ -43,13 +43,14 @@
     
   </refsection>
   
-  <refsynopsisdiv>
+  <refsection>
+    <title>Synopsis</title>
     <cmdsynopsis>
       <command>create</command>
-      <literal> diskCacheV111.cells.CleanerV2</literal>
-      <literal> cleaner</literal>
+      <arg choice="req"> diskCacheV111.cells.CleanerV2</arg>
+      <arg choice="req"> cleaner</arg>
       <sbr/>
-      <literal>"default</literal>
+      <arg choice="req">"default</arg>
       <sbr/>
       <arg choice="req">-db=<replaceable>DatabaseDir</replaceable></arg>
       <sbr/>
@@ -63,8 +64,7 @@
       <sbr/>
       <arg><option>-processFilesPerRun=</option><replaceable>FilesPerRun</replaceable></arg>
       <arg><option>-refresh=</option><replaceable>RefreshTimeInSeconds</replaceable></arg>
-      <arg><option>-recover=</option><replaceable></replaceable></arg>
-      <literal>"</literal>
+      <arg><option>-recover=</option><replaceable></replaceable>"</arg>
     </cmdsynopsis>
     
     <celloptions>
@@ -153,7 +153,7 @@
 
       </celloptionsdescr>
     </celloptions>
-  </refsynopsisdiv>
+  </refsection>
   
   <refsection>
     <title>CL Command Set</title>
@@ -202,12 +202,19 @@
     <refsection>
     <title>Location</title>
 
+    <para>
+      
+    </para>
+    
 
     </refsection>
     
     <refsection>
     <title>Other Cells</title>
 
+    <para>
+      
+    </para>
 
     </refsection>
     

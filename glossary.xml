@@ -1,16 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE part PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
-<part id="gl">
-<!-- <?dbhtml dir="glossary"?> -->
-  <title>Glossary</title>
-  
-  <para>
-    This part contains descriptions of the phrases used when writing
-    and talking about dCache.  Depending on the context this might
-    just be a glossary which is referenced by the remainder of this
-    guide. It contains also information about the PNFS server, since
-    its concepts heavily influence dCache.
-  </para>
+<!DOCTYPE part PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">
+
+<namespacewrapper xmlns:xi="http://www.w3.org/2001/XInclude">
+  <part id="gl">
+    <!-- <?dbhtml dir="glossary"?> -->
+    <title>Glossary</title>
+    
+    <partintro>
+      <para>
+	This part contains descriptions of the phrases used when writing
+	and talking about dCache.  Depending on the context this might
+	just be a glossary which is referenced by the remainder of this
+	guide. It contains also information about the PNFS server, since
+	its concepts heavily influence dCache.
+      </para>
+    </partintro>
+    
 
   <chapter id="gl-general">
     <title>General</title>
@@ -104,6 +109,120 @@
 	</glossdef>
       </glossentry>
 
+      <glossentry>
+	<glossterm id="gl-dcachesetup-file"><filename>dCacheSetup</filename> File</glossterm>
+	<glossdef>
+	  <para>
+	  </para>
+	</glossdef>
+      </glossentry>
+
+      <glossentry>
+	<glossterm id="gl-primary-interface">Primary Network Interface</glossterm>
+	<glossdef>
+	  <para>
+	  </para>
+	</glossdef>
+      </glossentry>
+
+      <glossentry>
+	    <glossterm id="gl-poollist-file"><filename><replaceable>PoolDomainName</replaceable>.poollist</filename> File</glossterm>
+	<glossdef>
+	  <para>
+	  </para>
+	</glossdef>
+      </glossentry>
+
+      <glossentry>
+	<glossterm id="gl-location-manager">Location Manager</glossterm>
+	<glossdef>
+	  <para>
+	  </para>
+	</glossdef>
+      </glossentry>
+
+      <glossentry>
+	<glossterm id="gl-well-known-cell">Well Known Cell</glossterm>
+	<glossdef>
+	  <para>
+	  </para>
+	</glossdef>
+      </glossentry>
+
+      <glossentry>
+	<glossterm id="gl-breakeven">Breakeven Parameter</glossterm>
+	<glossdef>
+	  <para>
+	  </para>
+	</glossdef>
+      </glossentry>
+
+      <glossentry>
+	<glossterm id="gl-secondary-interface">Secondary Network Interface</glossterm>
+	<glossdef>
+	  <para>
+	  </para>
+	</glossdef>
+      </glossentry>
+
+      <glossentry>
+	<glossterm id="gl-lru">least recently used (LRU) File</glossterm>
+	<glossdef>
+	  <para>
+	  </para>
+	</glossdef>
+      </glossentry>
+
+      <glossentry>
+	<glossterm id="gl-default-mover-queue">Default Mover Queue</glossterm>
+	<glossdef>
+	  <para>
+	  </para>
+	</glossdef>
+      </glossentry>
+
+      <glossentry>
+	<glossterm id="gl-pnfsid">PNFS Id</glossterm>
+	<glossdef>
+	  <para>
+	  </para>
+	</glossdef>
+      </glossentry>
+
+      <glossentry>
+	<glossterm id="gl-p2p">Pool to Pool (PP or P2P) Transfer</glossterm>
+	<glossdef>
+	  <para>
+	  </para>
+	</glossdef>
+      </glossentry>
+
+      <glossentry>
+	<glossterm id="gl-storage_class">Storage Class</glossterm>
+	<glossdef>
+	  <para>
+	  </para>
+	</glossdef>
+      </glossentry>
+
+      <glossentry>
+	    <glossterm id="gl-batch-file"><filename><replaceable>DomainName</replaceable>.batch</filename> File</glossterm>
+	<glossdef>
+	  <para>
+	  </para>
+	</glossdef>
+      </glossentry>
+
+      <glossentry>
+	<glossterm id="gl-context">Context</glossterm>
+	<glossdef>
+	  <para>
+	  </para>
+	</glossdef>
+      </glossentry>
+
+
+
     </glosslist>
 
   </chapter>
@@ -183,9 +302,8 @@
 <screen><varname>cost</varname> = <varname>ccf</varname> * <varname>performance_cost</varname> + <varname>scf</varname> * <varname>space_cost</varname>,</screen>
 
 	      where <varname>ccf</varname> and <varname>scf</varname>
-	      are configurable with the command <command
-	      moreinfo="refentry"><xref
-	      linkend="cmd-set_pool_decision"/></command>.
+	      are configurable with the command <cellcommandref
+	      linkend="cmd-set_pool_decision"/>.
 	    </para>
 
 	  </glossdef>
@@ -232,6 +350,6 @@
 -->
 
 </part>
-
+</namespacewrapper>
 
 <!-- The end -->

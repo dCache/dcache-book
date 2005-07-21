@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE part PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">     
+<!DOCTYPE part PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
 
-<part id="rf" xmlns:xi="http://www.w3.org/2001/XInclude">
+<namespacewrapper xmlns:xi="http://www.w3.org/2001/XInclude">
+<part id="rf">
   <!-- <?dbhtml dir="reference" ?> -->
   <title>Reference</title>
     
@@ -403,7 +404,6 @@
 	  </arg>
 	</cmdsynopsis>
 	<variablelist>
-	    where
 	      <varlistentry>
 		<term>pnfsId</term>
 		<listitem><para>The PNFS id of the file of which a flag will be listed.</para></listitem>
@@ -1074,10 +1074,10 @@
 		  age of the <glossterm linkend="gl-lru">least
 		  recently used file</glossterm> on space cost. It the
 		  LRU file is one week old, the space cost will be
-		  equal to <inlineequation>(1 +
-		  breakeven)</inlineequation>. Note that this will not
-		  be true, if the breakeven parameter has been set to
-		  a value greater or equal to 1.
+		  equal to <inlineeq>(1 + breakeven)</inlineeq>. Note
+		  that this will not be true, if the breakeven
+		  parameter has been set to a value greater or equal
+		  to 1.
 	      </para>
 	    </listitem>
 	  </varlistentry>
@@ -1213,6 +1213,7 @@
     
   </chapter>
 
-  <xi:include href="rf-dvl.xml"/>
+  <xi:include href="rf-dvl.xml" />
 
 </part>
+</namespacewrapper>

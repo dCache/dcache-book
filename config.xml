@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE part PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">     
+<!DOCTYPE part PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
 
-<part id="cf" xmlns:xi="http://www.w3.org/2001/XInclude">
+<namespacewrapper xmlns:xi="http://www.w3.org/2001/XInclude">
+<part id="cf">
   <!-- <?dbhtml dir="config" ?> -->
   <title>Configuration of <productname>dCache</productname></title>
   
@@ -224,3 +225,4 @@ create dmg.cells.services.login.LoginManager GFTP \
   <xi:include href="config-PoolManager.xml"></xi:include>
 
 </part>
+</namespacewrapper>
