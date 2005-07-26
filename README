@@ -23,7 +23,7 @@ make singlehtml
 
 # Update Book on www.dcache.org
 #
-WEB_LOCATION=/home/dcache.org/manuals/Book make dcachedotorg
+CVS_BINARY=/opt/sfw/bin/cvs WEB_LOCATION=/home/dcache.org/manuals/Book make dcachedotorg
 
 # PDF in Book.pdf (still miserable quality)
 #

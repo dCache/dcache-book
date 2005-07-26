@@ -89,6 +89,8 @@
               <div style="position: fixed;">
                 -->
                 <h2><a href="index.shtml">dCache Book</a></h2>
+
+                <p><a href="dCacheBook.html">Print Version</a> | <a href="dCacheBook.pdf">PDF Version</a></p>
           
                 <xsl:comment>#include virtual="sidebar-index.shtml"</xsl:comment>
                 <!--   

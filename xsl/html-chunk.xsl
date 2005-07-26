@@ -8,6 +8,6 @@
   
   <xsl:include href="dcb-docbook-html-chunk-customizations.xsl"/>
   
-  <xsl:include href="dcb-extensions.xsl"/>
+  <!-- <xsl:include href="dcb-extensions.xsl"/> -->
   
 </xsl:stylesheet>
