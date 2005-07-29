@@ -45,13 +45,13 @@ CVS_BINARY ?= cvs
 # Generates and validates DocBook
 #
 Book.db.xml:	$(SOURCES) xsl/dcb-extensions.xsl xsl/docbook-from-dcb-extensions.xsl
-	XML_CATALOG_FILES=software/catalog xsltproc --nonet --xinclude -o Book.db.xml xsl/docbook-from-dcb-extensions.xsl Book.xml
+	XML_CATALOG_FILES=$(XML_CATALOG_FILES) xsltproc --nonet --xinclude -o Book.db.xml xsl/docbook-from-dcb-extensions.xsl Book.xml
 	xmllint --noout --dtdvalid software/db43xml/docbookx.dtd Book.db.xml
 
 # Generates DocBook and adds the correct DOCTYPE
 #
 Book.db2.xml:	$(SOURCES) xsl/dcb-extensions.xsl xsl/docbook-from-dcb-extensions.xsl
-	xsltproc --nonet --xinclude -o Book.db2.xml xsl/docbook-from-dcb-extensions.xsl Book.xml
+	XML_CATALOG_FILES=$(XML_CATALOG_FILES) xsltproc --nonet --xinclude -o Book.db2.xml xsl/docbook-from-dcb-extensions.xsl Book.xml
 	echo '<?xml version="1.0" encoding="UTF-8"?>' > tmp.xml
 	echo '<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">' >> tmp.xml
 	grep -v '<?xml' Book.db2.xml >> tmp.xml
@@ -64,14 +64,14 @@ Book.db2.xml:	$(SOURCES) xsl/dcb-extensions.xsl xsl/docbook-from-dcb-extensions.
 #
 html:		.html.built
 .html.built:	$(STYLESHEETS_CHUNK) Book.db.xml $(HTML_LOCATION)/dcb.css
-	xsltproc --nonet -o $(HTML_LOCATION)/ xsl/html-chunk.xsl Book.db.xml
+	XML_CATALOG_FILES=$(XML_CATALOG_FILES) xsltproc --nonet -o $(HTML_LOCATION)/ xsl/html-chunk.xsl Book.db.xml
 	touch .html.built
 
 # Plain single HTML
 #
 singlehtml: $(HTML_LOCATON)/Book.html 
 $(HTML_LOCATON)/Book.html: $(STYLESHEETS_HTML) Book.db.xml $(HTML_LOCATION)/dcb.css 
-	xsltproc --nonet -o $(HTML_LOCATION)/Book.html xsl/html.xsl Book.db.xml
+	XML_CATALOG_FILES=$(XML_CATALOG_FILES) xsltproc --nonet -o $(HTML_LOCATION)/Book.html xsl/html.xsl Book.db.xml
 
 # Just copying the CSS
 #
@@ -91,7 +91,7 @@ dcachedotorg: cvs shtml singlehtml pdf
 # Titlepage customization for Sidebar
 #
 xsl/dcb-dcache.org-sidebar-title.xsl: xsl/dcb-dcache.org-sidebar-title-tpl.xml
-	xsltproc -nonet -output xsl/dcb-dcache.org-sidebar-title.xsl \
+	XML_CATALOG_FILES=$(XML_CATALOG_FILES) xsltproc -nonet -output xsl/dcb-dcache.org-sidebar-title.xsl \
 	http://docbook.sourceforge.net/release/xsl/current/template/titlepage.xsl \
 	xsl/dcb-dcache.org-sidebar-title-tpl.xml
 
@@ -100,14 +100,14 @@ xsl/dcb-dcache.org-sidebar-title.xsl: xsl/dcb-dcache.org-sidebar-title-tpl.xml
 $(WEB_LOCATION)/sidebar-index.shtml: $(STYLESHEETS_SIDEBAR) Book.db.xml
 	mkdir -p $(HTML_LOCATION)
 	mkdir -p $(WEB_LOCATION)
-	xsltproc --nonet --xinclude -o $(HTML_LOCATION)/ xsl/html-dcache.org-sidebar.xsl Book.db.xml
+	XML_CATALOG_FILES=$(XML_CATALOG_FILES) xsltproc --nonet --xinclude -o $(HTML_LOCATION)/ xsl/html-dcache.org-sidebar.xsl Book.db.xml
 	cp $(HTML_LOCATION)/index.shtml $(WEB_LOCATION)/sidebar-index.shtml
 
 # Main part 
 #
 shtml:		.shtml.built
 .shtml.built:	$(STYLESHEETS_MAIN) Book.db.xml $(WEB_LOCATION)/dcb.css $(WEB_LOCATION)/sidebar-index.shtml
-	xsltproc --nonet -o $(WEB_LOCATION)/ xsl/html-dcache.org.xsl Book.db.xml
+	XML_CATALOG_FILES=$(XML_CATALOG_FILES) xsltproc --nonet -o $(WEB_LOCATION)/ xsl/html-dcache.org.xsl Book.db.xml
 	touch .shtml.built
 
 # Just copying the CSS
@@ -123,7 +123,7 @@ $(WEB_LOCATION)/dcb.css: xsl/dcb.css
 #
 fo:		Book.fo
 Book.fo:	Book.db.xml
-#	XML_CATALOG_FILES=software/catalog xsltproc --nonet http://docbook.sourceforge.net/release/xsl/current/fo/docbook.xsl Book.db.xml > Book.fo
+#	XML_CATALOG_FILES=$(XML_CATALOG_FILES)  xsltproc --nonet http://docbook.sourceforge.net/release/xsl/current/fo/docbook.xsl Book.db.xml > Book.fo
 	software/fop/xalan.sh -in Book.db.xml -xsl software/docbook-xsl/fo/docbook.xsl -out Book.fo
 
 # PDF from XSL-FO
