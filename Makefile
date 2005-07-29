@@ -1,4 +1,4 @@
-export XML_CATALOG_FILES := software/catalog
+Export XML_CATALOG_FILES := software/catalog
 
 ### Configuration
 #
@@ -150,18 +150,27 @@ cvs:
 #
 install-software:	software/db43xml/docbookx.dtd software/docbook-xsl/README software/fop/fop.sh software/catalog
 
-software/db43xml/docbookx.dtd:
+software/db43xml/docbook-xml-4.3.zip: 
 	mkdir -p software/db43xml/
-	cd software/db43xml/ && wget http://docbook.org/xml/4.3/docbook-xml-4.3.zip && unzip docbook-xml-4.3.zip
+	cd software/db43xml/ && wget http://docbook.org/xml/4.3/docbook-xml-4.3.zip
 
-software/docbook-xsl/README:
-	mkdir -p software/
-	cd software/ && wget http://mesh.dl.sourceforge.net/sourceforge/docbook/docbook-xsl-1.68.1.tar.bz2  && \
-	tar xjf docbook-xsl-1.68.1.tar.bz2 && ln -s docbook-xsl-1.68.1 docbook-xsl
+software/db43xml/docbookx.dtd: software/db43xml/docbook-xml-4.3.zip
+	cd software/db43xml/ && unzip docbook-xml-4.3.zip
 
-software/fop/fop.sh:
+software/docbook-xsl-1.68.1.tar.bz2:
 	mkdir -p software/
-	cd software/ && wget http://ftp.uni-erlangen.de/pub/mirrors/apache/xml/fop/fop-current-bin.tar.gz && tar xzf fop-current-bin.tar.gz && ln -s fop-0* fop
+	cd software/ && wget http://mesh.dl.sourceforge.net/sourceforge/docbook/docbook-xsl-1.68.1.tar.bz2
+
+software/docbook-xsl/README: software/docbook-xsl-1.68.1.tar.bz2
+	cd software/ && \
+	bzcat docbook-xsl-1.68.1.tar.bz2 | tar xf - && ln -s docbook-xsl-1.68.1 docbook-xsl
+
+software/fop-current-bin.tar.gz:
+	mkdir -p software/
+	cd software/ && wget http://ftp.uni-erlangen.de/pub/mirrors/apache/xml/fop/fop-current-bin.tar.gz
+
+software/fop/fop.sh: software/fop-current-bin.tar.gz
+	cd software/ && gunzip -c fop-current-bin.tar.gz | tar xf - && ln -s fop-0* fop
 
 software/catalog: xsl/catalog
 	mkdir -p software/

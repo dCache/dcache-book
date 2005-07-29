@@ -105,7 +105,7 @@
             </row>
             <row>
               <entry>
-                Production CVS Version
+                since (CVS Version) 
               </entry>
               <entry>
                 <xsl:apply-templates select="cellattrversion"/>
