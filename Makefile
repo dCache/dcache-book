@@ -1,4 +1,4 @@
-Export XML_CATALOG_FILES := software/catalog
+export XML_CATALOG_FILES := software/catalog
 
 ### Configuration
 #
@@ -45,7 +45,7 @@ CVS_BINARY ?= cvs
 # Generates and validates DocBook
 #
 Book.db.xml:	$(SOURCES) xsl/dcb-extensions.xsl xsl/docbook-from-dcb-extensions.xsl
-	XML_CATALOG_FILES=$(XML_CATALOG_FILES) xsltproc --nonet --xinclude -o Book.db.xml xsl/docbook-from-dcb-extensions.xsl Book.xml
+	xsltproc --nonet --xinclude -o Book.db.xml xsl/docbook-from-dcb-extensions.xsl Book.xml
 	xmllint --noout --dtdvalid software/db43xml/docbookx.dtd Book.db.xml
 
 # Generates DocBook and adds the correct DOCTYPE
