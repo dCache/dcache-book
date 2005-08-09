@@ -1,6 +1,4 @@
-export XML_CATALOG_FILES := software/catalog
-
-### Configuration
+######## Configuration
 #
 
 # The souce files. Written in dCache extended DocBook and using XInclude
@@ -28,6 +26,11 @@ STYLESHEETS_SIDEBAR := xsl/html-dcache.org-sidebar.xsl xsl/dcb-dcache.org-custom
 STYLESHEETS_MAIN := xsl/html-dcache.org.xsl xsl/dcb-dcache.org-customizations.xsl \
                     xsl/dcb-docbook-parameters.xsl xsl/dcb-docbook-html-chunk-customizations.xsl
 
+# All stylesheets included by xsl/fo.xsl
+#
+STYLESHEETS_FO := xsl/fo.xsl xsl/dcb-docbook-fo-customizations.xsl \
+                    xsl/dcb-docbook-parameters.xsl
+
 # Default values for output directories
 #
 #   Directory for all regular HTML output, also used as a temporary dir for dcache.org 
@@ -35,9 +38,26 @@ HTML_LOCATION ?= built
 #   Directory for dcache.org SHTML output. Some files from $(HTML_LOCATION) get copied here
 WEB_LOCATION ?= web-output
 
+######### Software Configs
+#
+
 # Default value for CVS binary (assume in the path)
 #
 CVS_BINARY ?= cvs
+
+# Default value for docbook-xml version
+#
+DBXML_VERSION ?= 1.68.1
+
+# xsltproc and so will use env. $XML_CATALOG_FILES
+export XML_CATALOG_FILES := xsl/catalog
+
+# xalan command
+# The xalan script doesnt work, since xalan is in the JRE and will use the Xbootclasspath for
+# dynamically loading org.apache.xml.resolver.tools.CatalogResolver and not classpath
+#
+XALAN := java -Xbootclasspath/p:software/fop/lib/xml-apis.jar:software/fop/lib/xercesImpl-2.2.1.jar:software/fop/lib/xalan-2.4.1.jar:software/fop/lib/resolver.jar:software/fop/lib/batik.jar:software/fop/lib/avalon-framework-cvs-20020806.jar:software/fop/build/fop.jar -Dxml.catalog.files=$(XML_CATALOG_FILES) -Dxml.catalog.prefer=public -Dxml.catalog.verbosity=9 -Dxml.catalog.staticCatalog=yes org.apache.xalan.xslt.Process -UriResolver org.apache.xml.resolver.tools.CatalogResolver
+
 
 ###### Docbook targets. Pure DocBook is generated from the sources first
 #
@@ -51,7 +71,7 @@ Book.db.xml:	$(SOURCES) xsl/dcb-extensions.xsl xsl/docbook-from-dcb-extensions.x
 # Generates DocBook and adds the correct DOCTYPE
 #
 Book.db2.xml:	$(SOURCES) xsl/dcb-extensions.xsl xsl/docbook-from-dcb-extensions.xsl
-	XML_CATALOG_FILES=$(XML_CATALOG_FILES) xsltproc --nonet --xinclude -o Book.db2.xml xsl/docbook-from-dcb-extensions.xsl Book.xml
+	xsltproc --nonet --xinclude -o Book.db2.xml xsl/docbook-from-dcb-extensions.xsl Book.xml
 	echo '<?xml version="1.0" encoding="UTF-8"?>' > tmp.xml
 	echo '<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">' >> tmp.xml
 	grep -v '<?xml' Book.db2.xml >> tmp.xml
@@ -70,7 +90,7 @@ html:		.html.built
 # Plain single HTML
 #
 singlehtml: $(HTML_LOCATON)/Book.html 
-$(HTML_LOCATON)/Book.html: $(STYLESHEETS_HTML) Book.db.xml $(HTML_LOCATION)/dcb.css 
+$(HTML_LOCATON)/Book.html:
 	xsltproc --nonet -o $(HTML_LOCATION)/Book.html xsl/html.xsl Book.db.xml
 
 # Just copying the CSS
@@ -84,9 +104,14 @@ $(HTML_LOCATION)/dcb.css: xsl/dcb.css
 
 # The whole thing
 #
-dcachedotorg: cvs shtml singlehtml pdf
+dcachedotorg: shtml singlehtml pdf
 	cp $(HTML_LOCATION)/Book.html $(WEB_LOCATION)/dCacheBook.html
 	cp Book.pdf $(WEB_LOCATION)/dCacheBook.pdf
+
+# Copy the WEB_LOCATION to the correct spot on www.dcache.org
+#
+ssh-dcache.org: dcachedotorg
+	cd $(WEB_LOCATION)/ && tar cf - * | ssh cvs-dcache 'cd /home/dcache.org/manuals/Book && sh -c "rm -rf *" && tar xf -'
 
 # Titlepage customization for Sidebar
 #
@@ -119,18 +144,21 @@ $(WEB_LOCATION)/dcb.css: xsl/dcb.css
 ###### Printable targets
 #
 
-# XSL Formated Output target
+# XSL Formated Output target (xsltproc doesnt work together with fop)
 #
 fo:		Book.fo
-Book.fo:	Book.db.xml
-#	xsltproc --nonet http://docbook.sourceforge.net/release/xsl/current/fo/docbook.xsl Book.db.xml > Book.fo
-	software/fop/xalan.sh -in Book.db.xml -xsl software/docbook-xsl/fo/docbook.xsl -out Book.fo
+Book.fo:	Book.db.xml $(STYLESHEETS_FO)
+#	xsltproc --nonet xsl/fo.xsl Book.db.xml > Book.fo
+	$(XALAN) -in Book.db.xml -xsl xsl/fo.xsl -out Book.fo
+
+#-ENTITYRESOLVER org.apache.xml.resolver.tools.CatalogResolver -URIRESOLVER org.apache.xml.resolver.tools.CatalogResolver
+
 
 # PDF from XSL-FO
 #
 pdf:		Book.pdf
 Book.pdf:	Book.fo
-	software/fop/fop.sh Book.fo Book.pdf || true
+	software/fop/fop.sh Book.fo Book.pdf 
 #	pdfxmltex Book.fo
 
 # PDF directly via xmlto (still broken)
@@ -148,7 +176,7 @@ cvs:
 
 # Install DTD, XSL stylesheet, and FOP (xsltproc, xmllint, 
 #
-install-software:	software/db43xml/docbookx.dtd software/docbook-xsl/README software/fop/fop.sh software/catalog
+install-software:	software/db43xml/docbookx.dtd software/docbook-xsl/README software/fop/fop.sh software/fop/lib/resolver.jar
 
 software/db43xml/docbook-xml-4.3.zip: 
 	mkdir -p software/db43xml/
@@ -156,25 +184,37 @@ software/db43xml/docbook-xml-4.3.zip:
 
 software/db43xml/docbookx.dtd: software/db43xml/docbook-xml-4.3.zip
 	cd software/db43xml/ && unzip docbook-xml-4.3.zip
+	touch software/db43xml/docbookx.dtd
 
-software/docbook-xsl-1.68.1.tar.bz2:
+software/docbook-xsl-$(DBXML_VERSION).tar.bz2:
 	mkdir -p software/
-	cd software/ && wget http://mesh.dl.sourceforge.net/sourceforge/docbook/docbook-xsl-1.68.1.tar.bz2
+	cd software/ && wget http://mesh.dl.sourceforge.net/sourceforge/docbook/docbook-xsl-$(DBXML_VERSION).tar.bz2
 
-software/docbook-xsl/README: software/docbook-xsl-1.68.1.tar.bz2
+software/docbook-xsl/README: software/docbook-xsl-$(DBXML_VERSION).tar.bz2
 	cd software/ && \
-	bzcat docbook-xsl-1.68.1.tar.bz2 | tar xf - && ln -s docbook-xsl-1.68.1 docbook-xsl
+	bzcat docbook-xsl-$(DBXML_VERSION).tar.bz2 | tar xf - && ln -ns docbook-xsl-$(DBXML_VERSION) docbook-xsl
+	touch software/docbook-xsl/README
 
 software/fop-current-bin.tar.gz:
 	mkdir -p software/
 	cd software/ && wget http://ftp.uni-erlangen.de/pub/mirrors/apache/xml/fop/fop-current-bin.tar.gz
 
 software/fop/fop.sh: software/fop-current-bin.tar.gz
-	cd software/ && gunzip -c fop-current-bin.tar.gz | tar xf - && ln -s fop-0* fop
+	cd software/ && gunzip -c fop-current-bin.tar.gz | tar xf - && ln -ns fop-0* fop
+	touch software/fop/fop.sh
 
-software/catalog: xsl/catalog
+software/xml-commons-resolver-latest.tar.gz:
 	mkdir -p software/
-	cp -f xsl/catalog software/catalog
+	cd software/ && wget http://www.apache.org/dist/xml/commons/xml-commons-resolver-latest.tar.gz
+	touch software/xml-commons-resolver-latest.tar.gz
 
-.PHONY:	singlehtml html pdf fo install-software cvs dcachedotorg
+software/xml-commons-resolver/resolver.jar: software/xml-commons-resolver-latest.tar.gz
+	cd software && gunzip -c xml-commons-resolver-latest.tar.gz | tar xf - && \
+	  ln -ns `gunzip -c xml-commons-resolver-latest.tar.gz | tar tf - | head -1` xml-commons-resolver
+	touch software/xml-commons-resolver/resolver.jar
+
+software/fop/lib/resolver.jar: software/xml-commons-resolver/resolver.jar software/fop/fop.sh
+	cp software/xml-commons-resolver/resolver.jar software/fop/lib/resolver.jar
+
+.PHONY:	singlehtml html pdf fo install-software cvs dcachedotorg ssh-dcache.org
 
