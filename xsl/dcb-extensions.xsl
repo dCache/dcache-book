@@ -15,7 +15,17 @@
     <xsl:apply-templates/>
   </xsl:template>
   
+
+  <xsl:template match="unfinished"/>
   
+  <xsl:template match="dcache">
+    <productname>dCache</productname>
+  </xsl:template>
+
+  <xsl:template match="pnfs">
+    <productname><literal>pnfs</literal></productname>
+  </xsl:template>
+
   <xsl:template match="dcpoolprompt">
     <prompt>(<replaceable>poolname</replaceable>) admin &gt; </prompt>
   </xsl:template>

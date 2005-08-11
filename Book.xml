@@ -14,8 +14,7 @@
 	  <para>
 	    The dCache Book is the guide for administratos of dCache
 	    systems. The first part describes the installation of a simple
-	    single-host dCache instance up to a large, topologically
-	    complex, and heterogenous system. The second part describes
+	    single-host dCache instance. The second part describes
 	    the components of dCache and in what ways they can be
 	    configured. This is the place for finding information about
 	    the role and functionality of components in dCache as needed
@@ -25,40 +24,31 @@
 	    glossary and a parameter and command reference. 
 	  </para>
 	</abstract>
-	<!--
-	<date>2004-10-14</date>
+	<date>2005-09-30</date>
 	
 	<corpauthor>DESY Hamburg, Germany</corpauthor>
 	
-	<authorgroup>
 	<author>
-        <firstname>Patrick</firstname><surname>Fuhrmann</surname>
-      </author>
-	<author>
-        <firstname>Judit</firstname><surname>Novak</surname>
-      </author>
-	<author>
-        <firstname>Tigran</firstname><surname>Mkrtchyan</surname>
-      </author>
-	<author>
-        <firstname>Mathias</firstname><surname>de Riese</surname>
-      </author>
-      </authorgroup>
-	-->
+	  <honorific>Dr</honorific>
+	  <firstname>Mathias</firstname>
+	  <surname>de Riese</surname>
+	</author>
+
       </bookinfo>
       
       <toc></toc>
+
+      <xi:include href="intro.xml"/>
       
+      <xi:include href="install.xml"/>
       
-      <xi:include href="install.xml"></xi:include>
+      <xi:include href="config.xml"/>
       
-      <xi:include href="config.xml"></xi:include>
+      <xi:include href="cookbook.xml"/>
       
-      <xi:include href="cookbook.xml"></xi:include>
+      <xi:include href="glossary.xml"/>
       
-      <xi:include href="glossary.xml"></xi:include>
-      
-      <xi:include href="reference.xml"></xi:include>
+      <xi:include href="reference.xml"/>
       
     </book>
   </namespacewrapper>

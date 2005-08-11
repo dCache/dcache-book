@@ -3,7 +3,7 @@
 
 # The souce files. Written in dCache extended DocBook and using XInclude
 #
-SOURCES := Book.xml config-PoolManager.xml  config.xml  cookbook.xml  glossary.xml  install.xml  reference.xml  rf-dvl.xml
+SOURCES := Book.xml config-pnfs.xml config-PoolManager.xml  config.xml  cookbook.xml  glossary.xml  install.xml  reference.xml  rf-dvl.xml
 
 # All stylesheets included by xsl/html-chunk.xsl
 #
@@ -62,13 +62,15 @@ XALAN := java -Xbootclasspath/p:software/fop/lib/xml-apis.jar:software/fop/lib/x
 ###### Docbook targets. Pure DocBook is generated from the sources first
 #
 
-# Generates and validates DocBook
+# Generates and validates DocBook and checks for xinclude error of xsltproc -- other procs probably dont need that
 #
 Book.db.xml:	$(SOURCES) xsl/dcb-extensions.xsl xsl/docbook-from-dcb-extensions.xsl
-	xsltproc --nonet --xinclude -o Book.db.xml xsl/docbook-from-dcb-extensions.xsl Book.xml
+	xsltproc --nonet --xinclude -o Book.db.xml xsl/docbook-from-dcb-extensions.xsl Book.xml 2> xsltproc.output
+	cat xsltproc.output
+	if grep error xsltproc.output >/dev/null ; then echo "Error in xi:include statement" ; rm Book.db.xml ; exit 1 ; fi
 	xmllint --noout --dtdvalid software/db43xml/docbookx.dtd Book.db.xml
 
-# Generates DocBook and adds the correct DOCTYPE
+# Generates DocBook and adds the correct DOCTYPE (not needed at the moment and should be added differently)
 #
 Book.db2.xml:	$(SOURCES) xsl/dcb-extensions.xsl xsl/docbook-from-dcb-extensions.xsl
 	xsltproc --nonet --xinclude -o Book.db2.xml xsl/docbook-from-dcb-extensions.xsl Book.xml
@@ -76,6 +78,14 @@ Book.db2.xml:	$(SOURCES) xsl/dcb-extensions.xsl xsl/docbook-from-dcb-extensions.
 	echo '<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">' >> tmp.xml
 	grep -v '<?xml' Book.db2.xml >> tmp.xml
 	mv -f tmp.xml Book.db2.xml
+
+# Generates and validates DocBook including the unfinished parts and todo entries
+#
+Book.draft.xml:	$(SOURCES) xsl/dcb-extensions.xsl xsl/docbook-draft-from-dcb-extensions.xsl
+	xsltproc --nonet --xinclude -o Book.draft.xml xsl/docbook-draft-from-dcb-extensions.xsl Book.xml 2> xsltproc.output
+	cat xsltproc.output
+	if grep error xsltproc.output >/dev/null ; then echo "Error in xi:include statement" ; rm Book.draft.xml ; exit 1 ; fi
+	xmllint --noout --dtdvalid software/db43xml/docbookx.dtd Book.draft.xml
 
 ###### HTML targets
 #
@@ -89,9 +99,15 @@ html:		.html.built
 
 # Plain single HTML
 #
-singlehtml: $(HTML_LOCATON)/Book.html 
-$(HTML_LOCATON)/Book.html:
+singlehtml: $(HTML_LOCATION)/Book.html 
+$(HTML_LOCATION)/Book.html: $(STYLESHEETS_HTML) Book.db.xml $(HTML_LOCATION)/dcb.css
 	xsltproc --nonet -o $(HTML_LOCATION)/Book.html xsl/html.xsl Book.db.xml
+
+# Plain single HTML with unfinished and todos
+#
+draft: $(HTML_LOCATION)/Book.draft.html 
+$(HTML_LOCATION)/Book.draft.html: $(STYLESHEETS_HTML) Book.draft.xml $(HTML_LOCATION)/dcb.css
+	xsltproc --nonet -o $(HTML_LOCATION)/Book.draft.html xsl/html.xsl Book.draft.xml
 
 # Just copying the CSS
 #
@@ -104,14 +120,18 @@ $(HTML_LOCATION)/dcb.css: xsl/dcb.css
 
 # The whole thing
 #
-dcachedotorg: shtml singlehtml pdf
+dcache.org: $(WEB_LOCATION)/dCacheBook.html $(WEB_LOCATION)/dCacheBook.pdf shtml
+$(WEB_LOCATION)/dCacheBook.html: $(HTML_LOCATION)/Book.html
 	cp $(HTML_LOCATION)/Book.html $(WEB_LOCATION)/dCacheBook.html
+$(WEB_LOCATION)/dCacheBook.pdf: Book.pdf
 	cp Book.pdf $(WEB_LOCATION)/dCacheBook.pdf
 
 # Copy the WEB_LOCATION to the correct spot on www.dcache.org
 #
-ssh-dcache.org: dcachedotorg
+ssh-dcache.org: .ssh-dcache.org-copied dcache.org
+.ssh-dcache.org-copied: 
 	cd $(WEB_LOCATION)/ && tar cf - * | ssh cvs-dcache 'cd /home/dcache.org/manuals/Book && sh -c "rm -rf *" && tar xf -'
+	touch .ssh-dcache.org-copied
 
 # Titlepage customization for Sidebar
 #
@@ -216,5 +236,5 @@ software/xml-commons-resolver/resolver.jar: software/xml-commons-resolver-latest
 software/fop/lib/resolver.jar: software/xml-commons-resolver/resolver.jar software/fop/fop.sh
 	cp software/xml-commons-resolver/resolver.jar software/fop/lib/resolver.jar
 
-.PHONY:	singlehtml html pdf fo install-software cvs dcachedotorg ssh-dcache.org
+.PHONY:	singlehtml html pdf fo install-software cvs dcache.org ssh-dcache.org
 
