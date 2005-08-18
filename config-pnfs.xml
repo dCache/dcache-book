@@ -2,50 +2,160 @@
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
 
 <chapter id="cf-pnfs">
-  <title>Configuring in PNFS</title>
+  <title>Configuration in PNFS</title>
   
   <para>
-    <dcache/> uses <ulink
-    url="http://www-pnfs.desy.de/"><pnfs/></ulink> as a filesystem and
-    for storing meta-data. <pnfs/> is a filesystem not designed for
-    storage of actual files. Instead, <pnfs/> manages the filesystem
-    hierarchy and standard meta-data of a UNIX filesystem. In
-    addition, other applications (as for example <dcache/>) can use it
-    to store their meta-data. The complete information is kept by
-    <pnfs/>in a database.
+    This chapter gives background information about <pnfs/>, the
+    filesystem, <dcache/> is based on. It is useful for many
+    administrative tasks within <dcache/> and it will be frequently
+    referenced to below. Only the aspects of <pnfs/> relevant to
+    <dcache/> will be explained here. For a complete documentation,
+    refer to the <ulink url="http://www-pnfs.desy.de/"><pnfs/>
+    homepage</ulink>.
   </para>
 
-  <para>
-    <pnfs/> implements an NFS server. All the meta-data can be
-    accessed with a standard NFS client, like the one in the Linux
-    kernel. After mounting, normal filesystem operations work
-    fine. However, IO operations on the actual files in the <pnfs/>
-    will result in an error. Many configuration parameters of <pnfs/>
-    and the application-specific meta-data is accessed by reading or
-    writing files of the form
-    <filename>.(<replaceable>command</replaceable>)(<replaceable>para</replaceable>)</filename>. For
-    example, the following prints the <pnfs/>-ID of the file
-    <filename>/pnfs/site.de/some/dir/file.dat</filename>:
+  <section>
+    <title>The Use of <pnfs/> in <dcache/></title>
 
-    <screen><prompt/>cat '/pnfs/site.de/some/dir/.(id)(file.dat)' 
+    <para>
+      <dcache/> uses <pnfs/> as a filesystem and for storing
+      meta-data. <pnfs/> is a filesystem not designed for storage of
+      actual files. Instead, <pnfs/> manages the filesystem hierarchy
+      and standard meta-data of a UNIX filesystem. In addition, other
+      applications (as for example <dcache/>) can use it to store
+      their meta-data. <pnfs/> keeps the complete information in a
+      database.
+    </para>
+
+    <para>
+      <pnfs/> implements an NFS server. All the meta-data can be
+      accessed with a standard NFS client, like the one in the Linux
+      kernel. After mounting, normal filesystem operations work
+      fine. However, IO operations on the actual files in the <pnfs/>
+      will normally result in an error. 
+    </para>
+
+    <para>
+      As a minimum, the <pnfs/> filesystem needs to be mounted only by
+      the server running the <dcache/> core services. In fact, the
+      <pnfs/> server has to run on the same system. For details see
+      <xref linkend="cf-pnfs-access"/>. 
+    </para>
+      
+    <para>
+      The <pnfs/> filesystem may also be mounted by clients. This
+      should be done by
+
+<screen><rootprompt/>mount -o intr,hard,rw <replaceable>pnfs-server</replaceable>:/pnfs /pnfs/<replaceable>site.de</replaceable></screen>
+
+      (assuming the system is configured as described in the
+      installation instructions).  Users may then access the meta-data
+      with regular filesystem operations, like <command>ls
+      -l</command>, and by the <pnfs/>-specific operations described
+      in the following sections. The files themselves may then be
+      accessed with the <dcap/> protocol (see <xref
+      linkend="dCacheBook"/> Client Access and Protocols). 
+    </para>
+
+    <para>
+      Mounting the <pnfs/> filesystem is not necessary for client
+      access to the <dcache/> system if URLs are used to refer to
+      files.  In the grid context this is the preferred usage. 
+    </para>
+
+  </section>
+
+  <section>
+    <title>Communicating with the <pnfs/> Server</title>
+
+    <para>
+      Many configuration parameters of <pnfs/> and the
+      application-specific meta-data is accessed by reading, writing,
+      or creating files of the form
+      <filename>.(<replaceable>command</replaceable>)(<replaceable>para</replaceable>)</filename>.
+      For example, the following prints the <pnfs/>-ID of the file
+      <filename>/pnfs/site.de/some/dir/file.dat</filename>:
+
+      <screen><prompt/>cat /pnfs/site.de/some/dir/'.(id)(file.dat)' 
 00030000000000000028E3F8
 <prompt/></screen> 
 
-    The quotes in this command are important, because the shell would
-    try to interpret the parentheses. Some of these commands have a
-    second parameter in a third pair of parentheses. Note, that files
-    of the form
-    <filename>.(<replaceable>command</replaceable>)(<replaceable>para</replaceable>)</filename>
-    are not really files. The IO operation on such a non-existent file
-    is used to pass commands to the <pnfs/> server via the NFS
-    protocol.  Therefore, files of this form will never show, when
-    listing directories.
-  </para>
+      From the point of view of the NFS protocol, the file
+      <filename>.(id)(file.dat)</filename> in the directory <filename
+      class="directory">/pnfs/site.de/some/dir/</filename> is
+      read. However, <pnfs/> interprets it as the command
+      <literal>id</literal> with the parameter
+      <literal>file.dat</literal> executed in the directory
+      <filename>/pnfs/site.de/some/dir/</filename>. The quotes are
+      important, because the shell would otherwise try to interpret
+      the parentheses.
+    </para>
+
+    <para>
+      Some of these commands have a second parameter in a third pair
+      of parentheses. Note, that files of the form
+      <filename>.(<replaceable>command</replaceable>)(<replaceable>para</replaceable>)</filename>
+      are not really files. They are not shown when listing
+      directories. Only a subset of file operations are allowed on
+      these special command-files. Any other operation will result in
+      an appropriate error. Beware, that files with names of this form
+      might accidentally be created by performing wrong file
+      operations.  Then, they will be shown when listing the
+      directory.
+    </para>
+
+  </section>
+
+  <section>
+    <title><pnfs/>-IDs</title>
+
+    <para>
+      Each file in <pnfs/> has a unique 12 byte long <pnfs/>-ID. This
+      is comparable to the inode number in other filesystems. The
+      <pnfs/>-ID used for a file will never be reused, even if the
+      file is deleted. <dcache/> uses the <pnfs/>-ID for all internal
+      references to a file. 
+    </para>
+    
+    <para>
+      The <pnfs/>-ID of the file
+      <filename><replaceable>filename</replaceable></filename> can be
+      obtained by reading the command-file
+      <filename>.(id)(<replaceable>filename</replaceable>)</filename>
+      in the directory of the file.
+    </para>
+    
+    <para>
+      A file in <pnfs/> can be referred to by <pnfs/>-ID for most
+      operations. For example, the name of a file can be obtained from
+      the <pnfs/>-ID with the command <literal>nameof</literal> as follows:
+
+<screen><prompt/>cd /pnfs/site.de/any/sub/directory/
+<prompt/>cat '.(nameof)(00030000000000000028E3F8)'
+file.dat</screen>
+
+      And the <pnfs/>-ID of the directory it resides in is obtained by:
+
+<screen><prompt/>cat '.(parent)((00030000000000000028E3F8)'
+0003000000000000000318E0
+</screen>
+
+      This way, the complete path of a file may be obtained starting
+      from the <pnfs/>-ID. Precisely this is done by the tool
+      <command>pathfinder</command>:
+
+<screen><prompt/>. /usr/etc/pnfsSetup
+<prompt/>PATH=$PATH:$pnfs/tools
+<prompt/>pathfinder ........</screen>
+    </para>
+
+    <para>
+      .(get)(cursor)
+    </para>
+
+  </section>
 
   <unfinished>
-  <para>
-    <pnfs/>-ID
-  </para>
 
   <section>
     <title>Directory Tags</title>
@@ -81,5 +191,18 @@
 	  </listitem>
 	</itemizedlist></para>
     </section>
-    </unfinished>
-  </chapter>
+
+    <section id="cf-pnfs-details" userlevel="details">
+      <title>Details</title>
+
+      <section id="cf-pnfs-access">
+	<title>Access of the <dcache/> Server to <pnfs/></title>
+
+	<para>TODO</para>
+
+      </section>
+
+    </section>
+
+  </unfinished>
+</chapter>

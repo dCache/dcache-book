@@ -68,7 +68,7 @@ Book.db.xml:	$(SOURCES) xsl/dcb-extensions.xsl xsl/docbook-from-dcb-extensions.x
 	xsltproc --nonet --xinclude -o Book.db.xml xsl/docbook-from-dcb-extensions.xsl Book.xml 2> xsltproc.output
 	cat xsltproc.output
 	if grep error xsltproc.output >/dev/null ; then echo "Error in xi:include statement" ; rm Book.db.xml ; exit 1 ; fi
-	xmllint --noout --dtdvalid software/db43xml/docbookx.dtd Book.db.xml
+	if ! xmllint --noout --dtdvalid software/db43xml/docbookx.dtd Book.db.xml ; then rm Book.db.xml ; exit 1 ; fi
 
 # Generates DocBook and adds the correct DOCTYPE (not needed at the moment and should be added differently)
 #

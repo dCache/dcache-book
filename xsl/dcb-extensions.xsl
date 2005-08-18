@@ -22,6 +22,10 @@
     <productname>dCache</productname>
   </xsl:template>
 
+  <xsl:template match="dcap">
+    <productname>dCap</productname>
+  </xsl:template>
+
   <xsl:template match="pnfs">
     <productname><literal>pnfs</literal></productname>
   </xsl:template>
@@ -160,7 +164,7 @@
   <xsl:template match="cellopt">
     <row class="cellopt{@choice}">
       <entry>
-        <xsl:if test='not(@id = "")'>
+        <xsl:if test='@id'>
           <xsl:attribute name="id">
             <xsl:value-of select="@id"/>
           </xsl:attribute>
