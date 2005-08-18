@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">
+
+<chapter id="intro" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <!-- <?dbhtml dir="intro"?> -->
+  <title>Introduction to dCache</title>
+  
+  <para>
+    Short description, features, overview of structure
+  </para>
+  
+  <para>
+    Filesystem - PNFS (Database), Data on Pools/Tape, Protocols, SRM (Database)
+  </para>
+
+  <para>
+    Distributed server system, domains, cells, messages
+  </para>
+  
+  <para>
+    (Important) cells in a dCache system.
+  </para>
+
+</chapter>

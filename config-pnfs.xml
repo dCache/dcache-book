@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
+
+<chapter id="cf-pnfs">
+  <title>Configuring in PNFS</title>
+  
+  <para>
+    <dcache/> uses <ulink
+    url="http://www-pnfs.desy.de/"><pnfs/></ulink> as a filesystem and
+    for storing meta-data. <pnfs/> is a filesystem not designed for
+    storage of actual files. Instead, <pnfs/> manages the filesystem
+    hierarchy and standard meta-data of a UNIX filesystem. In
+    addition, other applications (as for example <dcache/>) can use it
+    to store their meta-data. The complete information is kept by
+    <pnfs/>in a database.
+  </para>
+
+  <para>
+    <pnfs/> implements an NFS server. All the meta-data can be
+    accessed with a standard NFS client, like the one in the Linux
+    kernel. After mounting, normal filesystem operations work
+    fine. However, IO operations on the actual files in the <pnfs/>
+    will result in an error. Many configuration parameters of <pnfs/>
+    and the application-specific meta-data is accessed by reading or
+    writing files of the form
+    <filename>.(<replaceable>command</replaceable>)(<replaceable>para</replaceable>)</filename>. For
+    example, the following prints the <pnfs/>-ID of the file
+    <filename>/pnfs/site.de/some/dir/file.dat</filename>:
+
+    <screen><prompt/>cat '/pnfs/site.de/some/dir/.(id)(file.dat)' 
+00030000000000000028E3F8
+<prompt/></screen> 
+
+    The quotes in this command are important, because the shell would
+    try to interpret the parentheses. Some of these commands have a
+    second parameter in a third pair of parentheses. Note, that files
+    of the form
+    <filename>.(<replaceable>command</replaceable>)(<replaceable>para</replaceable>)</filename>
+    are not really files. The IO operation on such a non-existent file
+    is used to pass commands to the <pnfs/> server via the NFS
+    protocol.  Therefore, files of this form will never show, when
+    listing directories.
+  </para>
+
+  <unfinished>
+  <para>
+    <pnfs/>-ID
+  </para>
+
+  <section>
+    <title>Directory Tags</title>
+    
+    <para>
+      
+      <screen><rootprompt/><userinput><command>cd</command> <filename>/pnfs/domain/data/exp-a/</filename></userinput>
+<rootprompt/><userinput><command>grep</command> -e '.*' `cat ".(tags)()"`</userinput>
+.(tag)(OSMTemplate):StoreName myStore
+.(tag)(sGroup):STRING
+<prompt>  [admin] # </prompt></screen>
+	
+      The file
+      <filename>/pnfs/fs/admin/etc/exports/<replaceable>hostIP</replaceable></filename>
+      contains one line per NFS mount point which contain the
+      following four fields:
+	<itemizedlist>
+	  <listitem>
+	    <para>Mount point for NFS (the part after the colon in
+	      e.g.  host:/mountpoint)</para>
+	  </listitem>
+	  
+	  <listitem>
+	    <para>The virtual PNFS path which is mounted</para>
+	  </listitem>
+	  
+	  <listitem>
+	    <para>A number: 0: all permissions 30: restricted</para>
+	  </listitem>
+	  
+	  <listitem>
+	    <para>Options (usually: nooptions)</para>
+	  </listitem>
+	</itemizedlist></para>
+    </section>
+    </unfinished>
+  </chapter>
