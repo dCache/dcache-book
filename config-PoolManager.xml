@@ -627,7 +627,13 @@ STRING</screen>This is the setup after a fresh installation and it will lead
 
 	<simpleequation>
 	  <informaltable frame="none">
-	    <tgroup cols="6">
+	    <tgroup cols="6" colsep="none" rowsep="none" align="left">
+	      <colspec colnum="1" colname="if" colwidth="20"/>
+	      <colspec colnum="2" colname="formula" colwidth="100"/>
+	      <colspec colnum="3" colname="and" colwidth="25"/>
+	      <colspec colnum="4" colname="formula" colwidth="60"/>
+	      <colspec colnum="5" colname="then" colwidth="30"/>
+	      <colspec colnum="6" colname="formula"/>
 	      <tbody>
 		<row>
 		  <entry>If </entry>

@@ -58,6 +58,9 @@ export XML_CATALOG_FILES := xsl/catalog
 #
 XALAN := java -Xbootclasspath/p:software/fop/lib/xml-apis.jar:software/fop/lib/xercesImpl-2.2.1.jar:software/fop/lib/xalan-2.4.1.jar:software/fop/lib/resolver.jar:software/fop/lib/batik.jar:software/fop/lib/avalon-framework-cvs-20020806.jar:software/fop/build/fop.jar -Dxml.catalog.files=$(XML_CATALOG_FILES) -Dxml.catalog.prefer=public -Dxml.catalog.verbosity=9 -Dxml.catalog.staticCatalog=yes org.apache.xalan.xslt.Process -UriResolver org.apache.xml.resolver.tools.CatalogResolver
 
+# FOP command
+#
+FOP := java -classpath software/fop/lib/xml-apis.jar:software/fop/lib/xercesImpl-2.2.1.jar:software/fop/lib/xalan-2.4.1.jar:software/fop/lib/resolver.jar:software/fop/lib/batik.jar:software/fop/lib/avalon-framework-cvs-20020806.jar:software/fop/build/fop.jar: org.apache.fop.apps.Fop
 
 ###### Docbook targets. Pure DocBook is generated from the sources first
 #
@@ -178,7 +181,7 @@ Book.fo:	Book.db.xml $(STYLESHEETS_FO)
 #
 pdf:		Book.pdf
 Book.pdf:	Book.fo
-	software/fop/fop.sh Book.fo Book.pdf 
+	$(FOP) Book.fo Book.pdf 
 #	pdfxmltex Book.fo
 
 # PDF directly via xmlto (still broken)

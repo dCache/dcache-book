@@ -6,15 +6,13 @@
   
   <para>
     This chapter gives background information about <pnfs/>, the
-    filesystem, <dcache/> is based on. It is useful for many
-    administrative tasks within <dcache/> and it will be frequently
-    referenced to below. Only the aspects of <pnfs/> relevant to
-    <dcache/> will be explained here. For a complete documentation,
-    refer to the <ulink url="http://www-pnfs.desy.de/"><pnfs/>
-    homepage</ulink>.
+    filesystem, <dcache/> is based on. Only the aspects of <pnfs/>
+    relevant to <dcache/> will be explained here. <!-- For a complete
+    documentation, refer to the <ulink
+    url="http://www-pnfs.desy.de/"><pnfs/> homepage</ulink>. -->
   </para>
 
-  <section>
+  <section id="cf-pnfs-use">
     <title>The Use of <pnfs/> in <dcache/></title>
 
     <para>
@@ -65,7 +63,7 @@
 
   </section>
 
-  <section>
+  <section id="cf-pnfs-commands">
     <title>Communicating with the <pnfs/> Server</title>
 
     <para>
@@ -76,8 +74,8 @@
       For example, the following prints the <pnfs/>-ID of the file
       <filename>/pnfs/site.de/some/dir/file.dat</filename>:
 
-      <screen><prompt/>cat /pnfs/site.de/some/dir/'.(id)(file.dat)' 
-00030000000000000028E3F8
+      <screen><prompt/>cat /pnfs/site.de/any/sub/directory/'.(id)(file.dat)' 
+0004000000000000002320B8
 <prompt/></screen> 
 
       From the point of view of the NFS protocol, the file
@@ -92,21 +90,27 @@
     </para>
 
     <para>
-      Some of these commands have a second parameter in a third pair
-      of parentheses. Note, that files of the form
+      Some of these command-files have a second parameter in a third
+      pair of parentheses. Note, that files of the form
       <filename>.(<replaceable>command</replaceable>)(<replaceable>para</replaceable>)</filename>
       are not really files. They are not shown when listing
-      directories. Only a subset of file operations are allowed on
+      directories with <command>ls</command>. However, the
+      command-files are listed when they appear in the argument list
+      of <command>ls</command> as in
+
+<screen><prompt/><command>ls</command> -l '<filename>.(tag)(sGroup)</filename>'
+-rw-r--r--   11 root     root            7 Aug  6  2004 .(tag)(sGroup)</screen>
+
+      Only a subset of file operations are allowed on
       these special command-files. Any other operation will result in
       an appropriate error. Beware, that files with names of this form
-      might accidentally be created by performing wrong file
-      operations.  Then, they will be shown when listing the
-      directory.
+      might accidentally be created by typos.  They will then be shown
+      when listing the directory.
     </para>
 
   </section>
 
-  <section>
+  <section id="cf-pnfs-ids">
     <title><pnfs/>-IDs</title>
 
     <para>
@@ -131,13 +135,13 @@
       the <pnfs/>-ID with the command <literal>nameof</literal> as follows:
 
 <screen><prompt/>cd /pnfs/site.de/any/sub/directory/
-<prompt/>cat '.(nameof)(00030000000000000028E3F8)'
+<prompt/>cat '.(nameof)(0004000000000000002320B8)'
 file.dat</screen>
 
       And the <pnfs/>-ID of the directory it resides in is obtained by:
 
-<screen><prompt/>cat '.(parent)((00030000000000000028E3F8)'
-0003000000000000000318E0
+<screen><prompt/>cat '.(parent)(0004000000000000002320B8)'
+0004000000000000001DC9E8
 </screen>
 
       This way, the complete path of a file may be obtained starting
@@ -146,63 +150,243 @@ file.dat</screen>
 
 <screen><prompt/>. /usr/etc/pnfsSetup
 <prompt/>PATH=$PATH:$pnfs/tools
-<prompt/>pathfinder ........</screen>
+<prompt/>cd /pnfs/site.de/another/dir/
+<prompt/>pathfinder 0004000000000000002320B8
+0004000000000000002320B8 file.dat
+0004000000000000001DC9E8 directory
+000400000000000000001060 sub
+000100000000000000001060 any
+000000000000000000001080 usr
+000000000000000000001040 fs
+000000000000000000001020 root
+000000000000000000001000 -
+000000000000000000000100 -
+000000000000000000000000 -
+/root/fs/usr/any/sub/directory/file.dat</screen>
+
+      The first two lines configure the <pnfs/>-tools correctly. The
+      path obtained by <command>pathfinder</command> does not agree
+      with the local path, since the latter depends on the mountpoint
+      (in the example <filename
+      class="directory">/pnfs/site.de/</filename>). The <pnfs/>-ID
+      corresponding to the mountpoint may be obtained with
+
+<screen><prompt/>cat '.(get)(cursor)'
+dirID=0004000000000000001DC9E8
+dirPerm=0000001400000020
+mountID=000000000000000000001080
+</screen>
+      
+      The <literal>dirID</literal> is the <pnfs/>-ID of the current
+      directory and <literal>mountID</literal> that of the
+      mountpoint. In the example, the <pnfs/> server path <filename
+      class="directory">/root/fs/usr/</filename> is mounted on
+      <filename class="directory">/pnfs/site.de/</filename>.
+    </para>
+  </section>
+
+  <section id="cf-pnfs-tags">
+    <title>Directory Tags</title>
+    
+    <para>
+      In the <pnfs/> filesystem, each directory has a number of
+      tags. The existing tags may be listed with
+
+<screen><prompt/><command>cat</command> '<filename>.(tags)()</filename>'
+.(tag)(OSMTemplate)
+.(tag)(sGroup)</screen>
+
+      and the content of a tag can be read with
+
+<screen><prompt/><command>cat</command> '<filename>.(tag)(OSMTemplate)</filename>'
+StoreName myStore</screen>
+
+      A nice trick to list all tags with their contents is 
+
+      <screen><prompt/><userinput><command>grep</command> "" $(cat ".(tags)()")</userinput>
+.(tag)(OSMTemplate):StoreName myStore
+.(tag)(sGroup):STRING
+</screen>
     </para>
 
     <para>
-      .(get)(cursor)
+      Directory tags may be used within <dcache/> to control which
+      pools are used for storing the files in the directory (see <xref
+      linkend="cf-pm-psu"/>). They might also be used by a
+      <firstterm>tertiary storage system</firstterm> for similar
+      purposes (e.g. controlling the set of tapes used for the files
+      in the directory).
+    </para>
+
+    <para>
+      The following directory tags are useful in a <dcache/> context:
+      <informaltable>
+	<tgroup cols="2">
+	  <colspec colnum="1" colname="tag" colwidth="130" align="left"/>
+	  <colspec colnum="2" colname="describtion" align="justify"/>
+	  <tbody>
+	    <row>
+	      <entry>OSMTemplate</entry>
+	      <entry>
+		  Contains one line of the form <literal>StoreName
+		  <replaceable>storeName</replaceable></literal> and
+		  specifies the <replaceable>storeName</replaceable>
+		  which is used by <dcache/> to construct the
+		  <glossterm linkend="gl-storage_class">storage
+		  Class</glossterm> if the <glossterm linkend="gl-hsm_type">HSM type</glossterm> is <literal>osm</literal>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry>sGroup</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </para>
+
+    <para>
+      When creating or changing directory tags by writing to the
+      command-file as in
+
+<screen><prompt/><command>echo</command> '<replaceable>content</replaceable>' > '<filename>.(tag)(<replaceable>tagName</replaceable>)</filename>'</screen>
+
+      one has to take care not to treat the command-files in the
+      same way as regular files, because tags are different from files
+      in the following aspects:
+      <orderedlist>
+	<listitem>
+	  <para>
+	    The <replaceable>tagName</replaceable> is limited to 62
+	    characters and the <replaceable>content</replaceable> to
+	    512 bytes. Writing more to the command-file, will be
+	    silently ignored.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    If a tag which does not exist in a directory is created by
+	    writing to it, it is called a <emphasis>primary</emphasis>
+	    tag.  
+	  </para>
+	  <para>
+	    Removing a primary tag invalidates this tag. An
+	    invalidated tag behaves as if it does not exist. All
+	    filesystem IO operations on that tag produce an
+	    <quote>File not found</quote> error. However, a lookup
+	    operation ( e.g. ls) will show this tag with a 0 byte
+	    size. Each write operation on an invalidated tag will
+	    revalidate this tag.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    Tags are <emphasis>inherited</emphasis> from the parent
+	    directory by a newly created directory. Changing a primary
+	    tag in one directory will change the tags inherited from
+	    it in the same way, even if it is invalidated or
+	    revalidated. Creating a new primary tag in a directory
+	    will not create a inherited tag in its subdirectories.
+	  </para>
+	  <para>
+	    Moving a directory within the <pnfs/> filesystem will not
+	    change the inheritance. Therefore, a directory does not
+	    necessarily inherit tags from its parent
+	    directory. Removing an inherited tag does not have any
+	    effect.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    Writing to an inherited tag in the subdirectory will break
+	    the inheritance-link. A
+	    <emphasis>pseudo-primary</emphasis> tag will be created.
+	    The directories which inherited the old (inherited) tag
+	    will inherit the pseudo-primary tag.  A pseudo-primary tag
+	    behaves exactly like a primary tag, except that the
+	    original inherited tag will be restored if the
+	    pseude-primary tag is removed.
+	  </para>
+	</listitem>
+      </orderedlist>
+    </para>
+
+    <para>
+      As a result, it is a good idea to plan the directory structure
+      in advance, thereby considering the necessary tags and how they
+      should be set up. Moving directories should be done with great
+      care or even not at all.
     </para>
 
   </section>
 
-  <unfinished>
+  <section id="cf-pnfs-wormholes">
+    <title>Global Configuration Information via Wormholes</title>
 
-  <section>
-    <title>Directory Tags</title>
+    <para>
+      todo
+    </para>
+
+  </section>
+  
+  <section id="cf-pnfs-metadata">
+    <title>Meta Data in <pnfs/></title>
+
+    <para>
+      all other command-files: fset set use puse
+    </para>
+
+  </section>
+  
+  <section id="cf-pnfs-access">
+    <title>Access Control</title>
     
     <para>
-      
-      <screen><rootprompt/><userinput><command>cd</command> <filename>/pnfs/domain/data/exp-a/</filename></userinput>
-<rootprompt/><userinput><command>grep</command> -e '.*' `cat ".(tags)()"`</userinput>
-.(tag)(OSMTemplate):StoreName myStore
-.(tag)(sGroup):STRING
-<prompt>  [admin] # </prompt></screen>
-	
+      How to restrict access to <pnfs/> on a host basis.
+
+    <para>
       The file
       <filename>/pnfs/fs/admin/etc/exports/<replaceable>hostIP</replaceable></filename>
       contains one line per NFS mount point which contain the
       following four fields:
-	<itemizedlist>
-	  <listitem>
-	    <para>Mount point for NFS (the part after the colon in
-	      e.g.  host:/mountpoint)</para>
-	  </listitem>
-	  
-	  <listitem>
-	    <para>The virtual PNFS path which is mounted</para>
-	  </listitem>
-	  
-	  <listitem>
-	    <para>A number: 0: all permissions 30: restricted</para>
-	  </listitem>
-	  
-	  <listitem>
-	    <para>Options (usually: nooptions)</para>
-	  </listitem>
-	</itemizedlist></para>
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    Mount point for NFS (the part after the colon in e.g.
+	    host:/mountpoint)
+	  </para>
+	</listitem>
+x	
+	<listitem>
+	  <para>
+	    The virtual PNFS path which is mounted
+	  </para>
+	</listitem>
+	
+	<listitem>
+	  <para>
+	    A number: 0: all permissions 30: restricted
+	  </para>
+	</listitem>
+	
+	<listitem>
+	  <para>
+	    Options (usually: nooptions)
+	  </para>
+	</listitem>
+      </itemizedlist>
+    </para>
+
+  </section>
+  
+  <section id="cf-pnfs-details" userlevel="details">
+    <title>Details</title>
+    
+    <section id="cf-pnfs-access">
+      <title>Access of the <dcache/> Server to <pnfs/></title>
+      
+      <para>TODO: Which cells access PNFS how?</para>
+      
     </section>
-
-    <section id="cf-pnfs-details" userlevel="details">
-      <title>Details</title>
-
-      <section id="cf-pnfs-access">
-	<title>Access of the <dcache/> Server to <pnfs/></title>
-
-	<para>TODO</para>
-
-      </section>
-
-    </section>
-
-  </unfinished>
+    
+  </section>
 </chapter>
