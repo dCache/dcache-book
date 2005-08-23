@@ -15,27 +15,6 @@
 
   <xi:include href="config-pnfs.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
 
-<!--
-  <chapter id="cf-admindoor">
-    <title>Administration Interface</title>
-    <screen>
-Please create an rsa dcache  admin keypair :
-
-ssh-keygen -b 1024 -t rsa1 -f  dcache-admin-key -N ""
-
-and add the public part to the :
-
-/opt/d-cache/config/authorized_keys
-
-file. Allow up to a minute before the key is
-automatically activated. 
-
-The <quote>comment</quote> at the end of the public key line has to be
-changed to <quote>admin</quote>.
-    </screen>
-  </chapter>
--->
-
   <chapter id="cf-cell-startup">
     <title>Cell Package Start-Up Framework</title>
 
@@ -179,6 +158,39 @@ create dmg.cells.services.login.LoginManager GFTP \
       structure. Each domain will contain at least one cell in
       addition to them.
     </para>
+
+    <unfinished>
+
+      <para>
+	Correct above: standard batch are good. RPM update might
+	overwrite modifications. Therefore, make a copy to a different
+	name if modifications are necessary. The domain will have a
+	different name then.
+      </para>
+      
+      <para>
+	Put backgroundinfo at end
+      </para>
+
+      <para>
+	<screen>
+Please create an rsa dcache  admin keypair :
+
+ssh-keygen -b 1024 -t rsa1 -f  dcache-admin-key -N ""
+
+and add the public part to the :
+
+/opt/d-cache/config/authorized_keys
+
+file. Allow up to a minute before the key is
+automatically activated. 
+
+The <quote>comment</quote> at the end of the public key line has to be
+changed to <quote>admin</quote>.
+	</screen>
+      </para>
+    </unfinished>
+
 
   </chapter>
   

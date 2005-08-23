@@ -31,4 +31,26 @@
     </para>
   </unfinished>
   
+  <unfinished>
+    <para>
+      Todo somewhere:
+    </para>
+    
+    <para>
+      HSM -- see dominik bernhard
+    </para>
+
+    <para>
+      unbalanced movers (CM?)
+    </para>
+
+    <para>
+      If a domain does not appear
+    </para>
+
+    <para>
+      ssh authorized_keys for scripting (tr -d '\r')
+    </para>
+  </unfinished>
+
 </chapter>

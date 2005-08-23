@@ -15,9 +15,122 @@
   
   <para>
     The starting point is a fresh installation according to the
-    installation instructions shipped with your distribution of
-    <dcache/>. 
+    installation instructions shipped with any distribution of
+    <dcache/>. All components (<pnfs/>, <dcache/>-core,
+    <dcache/>-pool, and <dcache/>-opt) are started on the same
+    host. Additional pools on other hosts may also run.
   </para>
+
+  <section>
+    <title>Checking the Functionality</title>
+
+    <para>
+      First, we will get used to the client tools. On the <dcache/>
+      admin host, change into the <pnfs/> directory, where the users
+      are going to store their data:
+
+<screen><userprompt/><command>cd</command> <filename class="directory">/pnfs/<replaceable>site.de</replaceable>/data/</filename>
+<userprompt/>
+</screen>
+
+      Note that on the <dcache/> admin node this directory is a link
+      to <filename class="directory">/pnfs/fs/usr/</filename> and the
+      NFS export <literal>localhost:/fs</literal> is mounted to
+      <filename class="directory">/pnfs/fs</filename>. The NFS server
+      running on the <dcache/> admin node is part of the <pnfs/> system
+      which is not part of <dcache/> but heavily used by it.
+    </para>
+
+    <para>
+      The <pnfs/> filesystem is not intended for reading or writing
+      actual data with regular file operations via the NFS
+      protocol. However, <literal>localhost:/fs</literal> is a
+      special, privileged NFS export that allows reading and writing
+      for administrative tasks. It should only be mounted by the admin
+      node.
+    </para>
+
+    <para>
+      Reading and writing data to and from a <dcache/> instance can be
+      done with a number of protocols. After a standard installation,
+      these protocols are <productname>dCap</productname>,
+      <productname>gsiDCap</productname>, and
+      <productname>GridFTP</productname>. In addition <dcache/> comes
+      with an implementation of the <productname>SRM</productname>
+      which negotiates the actual data transfer protocol.
+    </para>
+
+    <para>
+      We will first try <productname>dCap</productname> with the
+      <command>dccp</command> command:
+
+<screen><userprompt/>PATH=/opt/d-cache/dcap/bin/:$PATH
+<userprompt/><command>dccp</command> /bin/sh my-test-file
+541096 bytes in 0 seconds
+</screen>
+
+      This command succeeds if the user <literal>user</literal> has
+      the unix rights to write to the current directory <filename
+      class="directory">/pnfs/<replaceable>site.de</replaceable>/data/</filename>.
+      The <productname>dCap</productname> protocol also hat a URL syntax:
+
+<screen><userprompt/><command>chmod</command> o-r my-test-file
+<userprompt/><command>cd</command> /tmp/
+<userprompt/><command>dccp</command> dcap://localhost/pnfs/<replaceable>site.de</replaceable>/data/my-test-file test.tmp
+541096 bytes in 0 seconds
+</screen>
+
+      This command did not succeed, because the dcap protocol is
+      unauthenticated and the user is mapped to a non-existent user in
+      order to determine the access rights. The following will be successful:
+
+<screen><userprompt/><command>chmod</command> o+r /pnfs/<replaceable>site.de</replaceable>/data/my-test-file
+<userprompt/><command>dccp</command> dcap://localhost/pnfs/<replaceable>site.de</replaceable>/data/my-test-file test.tmp
+</screen>
+    </para>
+
+    <para>
+      If you have a valid grid proxy on a LCG UI host with a
+      certificate subject which is properly mapped in the
+      configuration file
+      <filename>/opt/d-cache/etc/dcache.kpwd</filename> you can also
+      try grid-authenticated access via
+      <productname>SRM</productname>:
+
+<screen><userprompt/><command>lcg-cp</command> -v --vo dteam \
+srm://<replaceable>dCacheAdminFQN</replaceable>/pnfs/<replaceable>site.de</replaceable>/data/my-test-file \
+file:///tmp/test-file
+Source URL: srm://<replaceable>dCacheAdminFQN</replaceable>/pnfs/<replaceable>site.de</replaceable>/data/my-test-file
+File size: 541096
+Source URL for copy: gsiftp://<replaceable>dCacheAdminFQN</replaceable>:2811//pnfs/site.de/data/my-test-file
+Destination URL: file:///tmp/test-file
+# streams: 1
+Transfer took 770 ms</screen>
+
+      Authenticated <productname>dCap</productname> can also be used:
+
+<screen><userprompt/><command>dccp</command> gsidcap://<replaceable>dCacheAdminFQN</replaceable>:22128/pnfs/<replaceable>site.de</replaceable>/data/my-test-file \
+/tmp/test-file2
+541096 bytes in 0 seconds</screen>
+
+      and it can be deleted with the help of the <productname>SRM</productname>:
+
+<screen><userprompt/>PATH=/opt/d-cache/srm/bin/:$PATH
+      <userprompt/>srm-advisory-delete srm://<replaceable>dCacheAdminFQN</replaceable>:8443/pnfs/<replaceable>site.de</replaceable>/data/my-test-file
+</screen>
+
+      This only works if the grid certificate subject is mapped to a
+      user which has permissions to delete the file.  If the grid
+      functionality is not required the file can be deleted with the
+      <pnfs/> filesystem (e.g. on the <dcache/> admin host):
+
+<screen><userprompt/><command>cd</command> <filename class="directory">/pnfs/<replaceable>site.de</replaceable>/data/</filename>
+<userprompt/><command>rm</command> <filename>my-test-file</filename>
+</screen>
+
+    </para>
+
+  </section>
 
   <unfinished>
     <para>
@@ -25,21 +138,22 @@
     </para>
     
     <para>
+      See in cookbook.
       webinterface Bug: gridftp offline (Change cell names in
       httpd.batch from SRM, GFTP, and DCap-gsi to SRM-hostname,
       GFTP-hostname, and DCap-gsi-hostname, respectively)
     </para>
     
     <para>
-      files (log, config, certificate, ..., change )
+      files (log, config, certificate, ..., chmod 600 srm.batch utility.batch)
     </para>
     
     <para>
-      admin interface, change passwd
+      admin interface, change passwd, info, pinboard, rc ls, rep ls, cm ls -r
     </para>
 
     <para>
-      check wormholes and tags
+      check wormholes and tags, wormholes have to be rewritten after fset io
     </para>
 
     <para>
