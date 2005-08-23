@@ -3,7 +3,7 @@
 
 # The souce files. Written in dCache extended DocBook and using XInclude
 #
-SOURCES := Book.xml config-pnfs.xml config-PoolManager.xml  config.xml  cookbook.xml  glossary.xml  install.xml  reference.xml  rf-dvl.xml
+SOURCES := Book.xml config-pnfs.xml config-PoolManager.xml  config.xml  cookbook.xml  glossary.xml  intro.xml install.xml  reference.xml  rf-dvl.xml intouch.xml
 
 # All stylesheets included by xsl/html-chunk.xsl
 #

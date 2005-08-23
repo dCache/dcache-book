@@ -74,9 +74,9 @@
       For example, the following prints the <pnfs/>-ID of the file
       <filename>/pnfs/site.de/some/dir/file.dat</filename>:
 
-      <screen><prompt/>cat /pnfs/site.de/any/sub/directory/'.(id)(file.dat)' 
+      <screen><userprompt/>cat /pnfs/site.de/any/sub/directory/'.(id)(file.dat)' 
 0004000000000000002320B8
-<prompt/></screen> 
+<userprompt/></screen> 
 
       From the point of view of the NFS protocol, the file
       <filename>.(id)(file.dat)</filename> in the directory <filename
@@ -98,7 +98,7 @@
       command-files are listed when they appear in the argument list
       of <command>ls</command> as in
 
-<screen><prompt/><command>ls</command> -l '<filename>.(tag)(sGroup)</filename>'
+<screen><userprompt/><command>ls</command> -l '<filename>.(tag)(sGroup)</filename>'
 -rw-r--r--   11 root     root            7 Aug  6  2004 .(tag)(sGroup)</screen>
 
       Only a subset of file operations are allowed on
@@ -134,13 +134,13 @@
       operations. For example, the name of a file can be obtained from
       the <pnfs/>-ID with the command <literal>nameof</literal> as follows:
 
-<screen><prompt/>cd /pnfs/site.de/any/sub/directory/
-<prompt/>cat '.(nameof)(0004000000000000002320B8)'
+<screen><userprompt/>cd /pnfs/site.de/any/sub/directory/
+<userprompt/>cat '.(nameof)(0004000000000000002320B8)'
 file.dat</screen>
 
       And the <pnfs/>-ID of the directory it resides in is obtained by:
 
-<screen><prompt/>cat '.(parent)(0004000000000000002320B8)'
+<screen><userprompt/>cat '.(parent)(0004000000000000002320B8)'
 0004000000000000001DC9E8
 </screen>
 
@@ -148,10 +148,10 @@ file.dat</screen>
       from the <pnfs/>-ID. Precisely this is done by the tool
       <command>pathfinder</command>:
 
-<screen><prompt/>. /usr/etc/pnfsSetup
-<prompt/>PATH=$PATH:$pnfs/tools
-<prompt/>cd /pnfs/site.de/another/dir/
-<prompt/>pathfinder 0004000000000000002320B8
+<screen><userprompt/>. /usr/etc/pnfsSetup
+<userprompt/>PATH=$PATH:$pnfs/tools
+<userprompt/>cd /pnfs/site.de/another/dir/
+<userprompt/>pathfinder 0004000000000000002320B8
 0004000000000000002320B8 file.dat
 0004000000000000001DC9E8 directory
 000400000000000000001060 sub
@@ -171,7 +171,7 @@ file.dat</screen>
       class="directory">/pnfs/site.de/</filename>). The <pnfs/>-ID
       corresponding to the mountpoint may be obtained with
 
-<screen><prompt/>cat '.(get)(cursor)'
+<screen><userprompt/>cat '.(get)(cursor)'
 dirID=0004000000000000001DC9E8
 dirPerm=0000001400000020
 mountID=000000000000000000001080
@@ -192,18 +192,18 @@ mountID=000000000000000000001080
       In the <pnfs/> filesystem, each directory has a number of
       tags. The existing tags may be listed with
 
-<screen><prompt/><command>cat</command> '<filename>.(tags)()</filename>'
+<screen><userprompt/><command>cat</command> '<filename>.(tags)()</filename>'
 .(tag)(OSMTemplate)
 .(tag)(sGroup)</screen>
 
       and the content of a tag can be read with
 
-<screen><prompt/><command>cat</command> '<filename>.(tag)(OSMTemplate)</filename>'
+<screen><userprompt/><command>cat</command> '<filename>.(tag)(OSMTemplate)</filename>'
 StoreName myStore</screen>
 
       A nice trick to list all tags with their contents is 
 
-      <screen><prompt/><userinput><command>grep</command> "" $(cat ".(tags)()")</userinput>
+      <screen><userprompt/><userinput><command>grep</command> "" $(cat ".(tags)()")</userinput>
 .(tag)(OSMTemplate):StoreName myStore
 .(tag)(sGroup):STRING
 </screen>
@@ -219,7 +219,22 @@ StoreName myStore</screen>
     </para>
 
     <para>
-      The following directory tags are used in a <dcache/> context:
+      Even if the directory tags are not used to control the bahaviour
+      of <dcache/>, some tags have to be set for the directories where
+      <dcache/> files are stored. The installation procedure takes
+      care of this: In the directory <filename
+      class="directory">/pnfs/<replaceable>site.de</replaceable>/data/</filename>
+      two tags are set to default values:
+
+<screen><userprompt/><userinput><command>cd</command> /pnfs/<replaceable>site.de</replaceable>/data/</userinput>
+<userprompt/><userinput><command>grep</command> "" $(cat ".(tags)()")</userinput>
+.(tag)(OSMTemplate):StoreName myStore
+.(tag)(sGroup):STRING
+</screen>
+    </para>
+
+    <para>
+      The following directory tags appear in the <dcache/> context:
       <informaltable>
 	<tgroup cols="2">
 	  <colspec colnum="1" colname="tag" colwidth="130" align="left"/>
@@ -231,9 +246,9 @@ StoreName myStore</screen>
 		Contains one line of the form
 		<quote><literal>StoreName
 		<replaceable>storeName</replaceable></literal></quote>
-		and specifies the <replaceable>storeName</replaceable>
-		which is used by <dcache/> to construct the <glossterm
-		linkend="gl-storage_class">storage Class</glossterm>
+		and specifies the name of the store which is used by
+		<dcache/> to construct the <glossterm
+		linkend="gl-storage_class">storage class</glossterm>
 		if the <glossterm linkend="gl-hsm_type">HSM
 		type</glossterm> is <literal>osm</literal>.
 	      </entry>
@@ -241,10 +256,45 @@ StoreName myStore</screen>
 	    <row>
 	      <entry>sGroup</entry>
 	      <entry>
-		The storage group is used by <dcache/> to construct the <glossterm
+		The storage group is also used to construct the <glossterm
 		linkend="gl-storage_class">storage Class</glossterm>
 		if the <glossterm linkend="gl-hsm_type">HSM
 		type</glossterm> is <literal>osm</literal>.
+	      </entry>
+	    </row>
+	    <row>
+	      <entry>cacheClass</entry>
+	      <entry>
+		The cache class is only used to control on which pools
+		the files in a directory may be stored, while the
+		storage class (constructed from the two above tags)
+		might also be used by the HSM. The cache class is only
+		needed if the above two tags are already fixed by HSM
+		usage and more flexibility is needed.
+	      </entry>
+	    </row>
+	    <row>
+	      <entry>hsmType</entry>
+	      <entry>
+		The <glossterm linkend="gl-hsm_type">HSM
+		type</glossterm> is normally determined from the other
+		existing tags. E.g. if the tag
+		<literal>OSMTemplate</literal> exists, HSM type
+		<literal>osm</literal> is assumed. With this tag it
+		can be set explicitly. An class implementing that HSM
+		type has to exist. Currently the only implementations
+		are <literal>osm</literal> and
+		<literal>enstore</literal>.
+	      </entry>
+	    </row>
+	    <row>
+	      <entry>hsmInstance</entry>
+	      <entry>
+		If not set, the HSM instance will be the same as the
+		HSM type. Setting this tag will only change the name
+		as used in the <glossterm
+		linkend="gl-storage_class">storage class</glossterm>
+		and in the pool commands.
 	      </entry>
 	    </row>
 	  </tbody>
@@ -253,10 +303,15 @@ StoreName myStore</screen>
     </para>
 
     <para>
+      There are more tags used by <dcache/> if the HSM type
+      <literal>enstore</literal> is used.
+    </para>
+
+    <para>
       When creating or changing directory tags by writing to the
       command-file as in
 
-<screen><prompt/><command>echo</command> '<replaceable>content</replaceable>' > '<filename>.(tag)(<replaceable>tagName</replaceable>)</filename>'</screen>
+<screen><userprompt/><command>echo</command> '<replaceable>content</replaceable>' > '<filename>.(tag)(<replaceable>tagName</replaceable>)</filename>'</screen>
 
       one has to take care not to treat the command-files in the
       same way as regular files, because tags are different from files
@@ -282,8 +337,12 @@ StoreName myStore</screen>
 	    filesystem IO operations on that tag produce an
 	    <quote>File not found</quote> error. However, a lookup
 	    operation ( e.g. ls) will show this tag with a 0 byte
-	    size. Each write operation on an invalidated tag will
-	    revalidate this tag.
+	    size. An invalidated tag can be revalidated with the help
+	    of the tool <command>repairTag.sh</command> in the
+	    <filename class="directory">tools/</filename> directory of
+	    the <pnfs/> distribution. It has to be called in the
+	    directory where the primary tag was with the tag name as
+	    argument.
 	  </para>
 	</listitem>
 	<listitem>
@@ -319,19 +378,25 @@ StoreName myStore</screen>
     </para>
 
     <para>
-      As a result, it is a good idea to plan the directory structure
-      in advance, thereby considering the necessary tags and how they
-      should be set up. Moving directories should be done with great
-      care or even not at all.
+      If directory tags are used to control the behaviour of <dcache/>
+      and/or a tertiary storage system, it is a good idea to plan the
+      directory structure in advance, thereby considering the
+      necessary tags and how they should be set up. Moving directories
+      should be done with great care or even not at all. Inherited
+      tags can only be created by creating a new directory.
     </para>
 
   </section>
 
   <section id="cf-pnfs-wormholes">
-    <title>Global Configuration Information via Wormholes</title>
+    <title>Global Configuration with <glossterm linkend="gl-wormhole">Wormholes</glossterm></title>
 
     <para>
-      todo
+      <pnfs/> provides a way to distribute configuration information
+      to all directories in the <pnfs/> filesystem. It can be accessed
+      in a subdirectory <filename
+      class="directory">.(config)()</filename> of any
+      <pnfs/>-directory. It behaves similar to a hardlink. 
     </para>
 
   </section>
@@ -350,6 +415,8 @@ StoreName myStore</screen>
     
     <para>
       How to restrict access to <pnfs/> on a host basis.
+      
+      TODO: somewhere: Passwort in batch file for SRM, Pin, ... (chmod 600)
     </para>
 
     <para>
@@ -387,6 +454,15 @@ StoreName myStore</screen>
 
   </section>
   
+  <section>
+    <title>The Databases of <pnfs/></title>
+
+    <para>
+      TODO
+    </para>
+
+  </section>
+
   <section id="cf-pnfs-details" userlevel="details">
     <title>Details</title>
     
@@ -396,6 +472,10 @@ StoreName myStore</screen>
       <para>TODO: Which cells access PNFS how?</para>
       
     </section>
-    
+
+    <unfinished>
+      <para><literal>.(showid)(<replaceable>pnfs-ID</replaceable>)</literal></para>
+    </unfinished>
+      
   </section>
 </chapter>

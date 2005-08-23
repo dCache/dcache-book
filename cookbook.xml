@@ -16,6 +16,18 @@
   <chapter id="cb-general">
     <title>General Problems</title>
 
+      <unfinished>
+	<para>
+	  Security issues: Passwort in batch file for SRM, Pin, ... (chmod 600)
+	</para>
+      </unfinished>
+
+      <unfinished>
+	<para>
+	  Deferred flush to HSM: <command>define</command> in pools.
+	</para>
+      </unfinished>
+
     <section id="cb-general-opteron">
       <title>Installing dCache on Opteron Machines</title>
 

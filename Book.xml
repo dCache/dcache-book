@@ -1,59 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">
 
-<namespacewrapper xmlns:xi="http://www.w3.org/2001/XInclude">
-  <book id="dCacheBook">
-    <!-- <?dbhtml dir="dCacheBook" ?> -->
-    
-    
-    <title>dCache Book</title>
-    <titleabbrev>dCache Book</titleabbrev>
-    
-    <bookinfo>
-      <abstract>
-	<para>
-	  The dCache Book is the guide for administratos of dCache
-	  systems. The first part describes the installation of a
-	  simple single-host dCache instance. The second part
-	  describes the components of dCache and in what ways they can
-	  be configured. This is the place for finding information
-	  about the role and functionality of components in dCache as
-	  needed by an administrator. The third part contains
-	  solutions for several problems and tasks which might occur
-	  during operating of a dCache system. Finally, the last two
-	  parts contain a glossary and a parameter and command
-	  reference.
-	</para>
-	
-	
-	  
-      </abstract>
-      <date>2005-09-30</date>
+<!-- <namespacewrapper xmlns:xi="http://www.w3.org/2001/XInclude"> -->
+<book id="dCacheBook">
+  <!-- <?dbhtml dir="dCacheBook" ?> -->
+  
+  
+  <title>dCache Book</title>
+  <titleabbrev>dCache Book</titleabbrev>
+  
+  <bookinfo>
+    <abstract>
+      <para>
+	The dCache Book is the guide for administratos of dCache
+	systems. The first part describes the installation of a
+	simple single-host dCache instance. The second part
+	describes the components of dCache and in what ways they can
+	be configured. This is the place for finding information
+	about the role and functionality of components in dCache as
+	needed by an administrator. The third part contains
+	solutions for several problems and tasks which might occur
+	during operating of a dCache system. Finally, the last two
+	parts contain a glossary and a parameter and command
+	reference.
+      </para>
       
-      <corpauthor>DESY Hamburg, Germany</corpauthor>
       
-      <author>
-	<honorific>Dr</honorific>
-	<firstname>Mathias</firstname>
-	<surname>de Riese</surname>
-      </author>
       
-    </bookinfo>
+    </abstract>
+    <date>2005-09-30</date>
     
+    <corpauthor>DESY Hamburg, Germany</corpauthor>
     
-    <toc></toc>
-    <xi:include href="intro.xml"/>
+    <author>
+      <honorific>Dr</honorific>
+      <firstname>Mathias</firstname>
+      <surname>de Riese</surname>
+    </author>
+    
+    <author>
+      <honorific>Dr</honorific>
+      <firstname>Patrick</firstname>
+      <surname>Fuhrmann</surname>
+    </author>
+    
+  </bookinfo>
   
-    <xi:include href="install.xml"/>
   
-    <xi:include href="config.xml"/>
+  <toc></toc>
+  <xi:include href="intro.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
   
-    <xi:include href="cookbook.xml"/>
+  <!-- <xi:include href="install.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/> -->
   
-    <xi:include href="glossary.xml"/>
+  <xi:include href="intouch.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
   
-    <xi:include href="reference.xml"/>
+  <xi:include href="config.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
   
-  </book>
-</namespacewrapper>
+  <xi:include href="cookbook.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+  
+  <xi:include href="glossary.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+  
+  <xi:include href="reference.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+  
+</book>
+<!-- </namespacewrapper> -->
   

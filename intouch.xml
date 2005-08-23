@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">
+
+<chapter id="intouch">
+  <!-- <?dbhtml dir="intouch"?> -->
+  <title>Getting in Touch with dCache</title>
+  
+  <para>
+    This section is a guide for exploring a newly installed <dcache/>
+    system. The confidence obtained by this exploration will prove
+    very helpful when encountering problems in the running
+    system. This forms the basis for the more detailed stuff in the
+    later parts of this book.
+  </para>
+  
+  <para>
+    The starting point is a fresh installation according to the
+    installation instructions shipped with your distribution of
+    <dcache/>. 
+  </para>
+
+  <unfinished>
+    <para>
+      dccp
+    </para>
+    
+    <para>
+      webinterface Bug: gridftp offline (Change cell names in
+      httpd.batch from SRM, GFTP, and DCap-gsi to SRM-hostname,
+      GFTP-hostname, and DCap-gsi-hostname, respectively)
+    </para>
+    
+    <para>
+      files (log, config, certificate, ..., change )
+    </para>
+    
+    <para>
+      admin interface, change passwd
+    </para>
+
+    <para>
+      check wormholes and tags
+    </para>
+
+    <para>
+      Check pnfs mount permissions and restrict to localhost.
+    </para>
+  </unfinished>
+  
+</chapter>
