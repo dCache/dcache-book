@@ -219,7 +219,7 @@ StoreName myStore</screen>
     </para>
 
     <para>
-      The following directory tags are useful in a <dcache/> context:
+      The following directory tags are used in a <dcache/> context:
       <informaltable>
 	<tgroup cols="2">
 	  <colspec colnum="1" colname="tag" colwidth="130" align="left"/>
@@ -228,16 +228,24 @@ StoreName myStore</screen>
 	    <row>
 	      <entry>OSMTemplate</entry>
 	      <entry>
-		  Contains one line of the form <literal>StoreName
-		  <replaceable>storeName</replaceable></literal> and
-		  specifies the <replaceable>storeName</replaceable>
-		  which is used by <dcache/> to construct the
-		  <glossterm linkend="gl-storage_class">storage
-		  Class</glossterm> if the <glossterm linkend="gl-hsm_type">HSM type</glossterm> is <literal>osm</literal>
+		Contains one line of the form
+		<quote><literal>StoreName
+		<replaceable>storeName</replaceable></literal></quote>
+		and specifies the <replaceable>storeName</replaceable>
+		which is used by <dcache/> to construct the <glossterm
+		linkend="gl-storage_class">storage Class</glossterm>
+		if the <glossterm linkend="gl-hsm_type">HSM
+		type</glossterm> is <literal>osm</literal>.
 	      </entry>
 	    </row>
 	    <row>
 	      <entry>sGroup</entry>
+	      <entry>
+		The storage group is used by <dcache/> to construct the <glossterm
+		linkend="gl-storage_class">storage Class</glossterm>
+		if the <glossterm linkend="gl-hsm_type">HSM
+		type</glossterm> is <literal>osm</literal>.
+	      </entry>
 	    </row>
 	  </tbody>
 	</tgroup>
@@ -337,11 +345,12 @@ StoreName myStore</screen>
 
   </section>
   
-  <section id="cf-pnfs-access">
+  <section id="cf-pnfs-ac">
     <title>Access Control</title>
     
     <para>
       How to restrict access to <pnfs/> on a host basis.
+    </para>
 
     <para>
       The file
@@ -355,7 +364,7 @@ StoreName myStore</screen>
 	    host:/mountpoint)
 	  </para>
 	</listitem>
-x	
+
 	<listitem>
 	  <para>
 	    The virtual PNFS path which is mounted

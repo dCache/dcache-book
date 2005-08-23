@@ -38,8 +38,12 @@
     <prompt>(PoolManager) admin &gt; </prompt>
   </xsl:template>
   
+  <xsl:template match="userprompt">
+    <prompt>[user] $ </prompt>
+  </xsl:template>
+
   <xsl:template match="rootprompt">
-    <prompt>[root@machine ~ ] # </prompt>
+    <prompt>[root] # </prompt>
   </xsl:template>
 
   <xsl:template match="simpleequation">

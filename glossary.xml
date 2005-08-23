@@ -56,6 +56,21 @@
       </glossentry>
       
       <glossentry>
+	<glossterm id="gl-hsm_type">HSM type</glossterm>
+	<glossdef>
+	  <para>
+	    The type of HSM which is connected to <dcache/> as a
+	    <glossterm linkend="gl-tss">tertiary storage
+	    system</glossterm>. The choice of the HSM type influences
+	    the communication between <dcache/> and the HSM. Currently
+	    there are <literal>osm</literal> and
+	    <literal>enstore</literal>. <literal>osm</literal> is used
+	    for most HSMs (TSM, HPSS, ...).
+	  </para>
+	</glossdef>
+      </glossentry>
+      
+      <glossentry>
 	<glossterm id="gl-lfs">Large File Store (<abbrev>LFS</abbrev>)</glossterm>
 	<abbrev>LFS</abbrev>
 	<glossdef>

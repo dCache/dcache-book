@@ -6,6 +6,26 @@
   <xsl:import href="urn:docbook:xsl:current:fo/docbook.xsl"/>
   
   <xsl:include href="dcb-docbook-parameters.xsl"/>
+
+  <xsl:param name="generate.toc">
+    appendix  toc,title
+    article/appendix  nop
+    article   toc,title
+    book      toc,title
+    chapter   nop
+    part      nop
+    preface   toc,title
+    qandadiv  toc
+    qandaset  toc
+    reference nop
+    sect1     nop
+    sect2     toc
+    sect3     toc
+    sect4     toc
+    sect5     toc
+    section   nop
+    set       toc,title
+  </xsl:param>
   
   <xsl:include href="dcb-docbook-fo-customizations.xsl"/>
   
