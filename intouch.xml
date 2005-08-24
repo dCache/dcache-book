@@ -114,7 +114,7 @@ System error: Input/output error</screen>
 <screen><userprompt/>PATH=/opt/d-cache/srm/bin/:$PATH
 <userprompt/><command>srmcp</command> srm://<replaceable>adminNode</replaceable>:8443/pnfs/desy.de/data/my-test-file file:////tmp/test4.tmp
 configuration file not found, configuring srmcp
-created configuration file in /root/.srmconfig/config.xml</screen>
+created configuration file in ~/.srmconfig/config.xml</screen>
 
       If the <dcache/> instance is registered as a storage element in
       the LCG/EGEE grid and the LCG user interface software is
@@ -123,7 +123,7 @@ created configuration file in /root/.srmconfig/config.xml</screen>
 
 <screen><userprompt/><command>lcg-cp</command> -v --vo <replaceable>yourVO</replaceable> \
 srm://<replaceable>dCacheAdminFQN</replaceable>/pnfs/<replaceable>site.de</replaceable>/data/my-test-file \
-file:///tmp/test-file
+file:///tmp/test5.tmp
 Source URL: srm://<replaceable>dCacheAdminFQN</replaceable>/pnfs/<replaceable>site.de</replaceable>/data/my-test-file
 File size: 541096
 Source URL for copy: gsiftp://<replaceable>dCacheAdminFQN</replaceable>:2811//pnfs/site.de/data/my-test-file
@@ -227,20 +227,22 @@ create diskCacheV111.cells.WebCollectorV3 collector \
     </para>
 
     <para>
-      The page <quote>Pool Request Queues</quote> (or <quote>Pool Transfer Queues</quote>)...
+      The page <quote>Pool Request Queues</quote> (or <quote>Pool
+      Transfer Queues</quote>) gives information about the number
+      current requests handled by each pool. <quote>Actions
+      Log</quote> keeps track of all the transfers performed by the
+      pools up to now.
     </para>
 
     <para>
-      The page <quote>Actions Log</quote> ... history
-    </para>
-
-    <para>
-      The page <quote>Pools</quote> (or <quote>Pool Attraction
-      Configuration</quote>) ... PSU
-    </para>
-
-    <para>
-      Other with HSM
+      The remaining pages are only relevant with more advanced
+      configurations: The page <quote>Pools</quote> (or <quote>Pool
+      Attraction Configuration</quote>) can be used to analyze the
+      current configuration of the <glossterm
+      linkend="gl-pm-comp-psu">pool selection unit</glossterm> in the
+      pool manager. The remaining pages are relevant only if a
+      <glossterm linkend="gl-tss">tertiary storage system (HSM)</glossterm>
+      is connected to the <dcache/> instance.
     </para>
 
   </section>
@@ -249,12 +251,55 @@ create diskCacheV111.cells.WebCollectorV3 collector \
     <title>Files</title>
 
     <para>
+      In this section we will have a look at the configuration and log
+      files of <pnfs/> and <dcache/>. 
+    </para>
+
+    <para>
+      The primary configuration file for <pnfs/> is
+      <filename>/usr/etc/pnfsSetup</filename>. For administrative
+      tasks in <pnfs/> it has to be sourced and the path to the
+      admninistration tools should be added to <varname>$PATH</varname>:
+
+<screen><rootprompt/>. /usr/etc/pnfsSetup
+<rootprompt/>PATH=$PATH:$pnfs/tools
+</screen>
+    </para>
+
+    <para>
+      restart, PNFS databases, logfile
+    </para>
+
+    <para>
+      The <dcache/> software is installed in one directory, normally
+      <filename class="directory">/opt/d-cache/</filename>.  All
+      configuration and log files can be found here. In the following
+      filenames will always be relative to this directory.
+    </para>
+    
+    <para>
+      startup -> log/<replaceable>domainName</replaceable>.log, jobs/<replaceable>domainName</replaceable>,
+      config/<replaceable>domainName</replaceable>.batch,
+      config/<replaceable>domainName</replaceable>Setup, links
+    </para>
+
+    <para>
       The restart will take some time as will all restarts of
-      domains. However, the domains rarely need to be restarted. Also,
-      the
+      domains. However, the domains rarely need to be restarted. The 
+      <filename>jobs/<replaceable>domainName</replaceable></filename>
       <filename><replaceable>domainName</replaceable>.batch</filename>
       files normally should not be changed. Beware that changes will
       be lost when updating to a newer release.
+    </para>
+    
+    <para>
+      <filename>PoolManager.config</filename>
+      <filename>.poollist</filename>
+      <filename><replaceable>poolDirectory</replaceable>/pool/Setup</filename>
+      <filename>trash</filename>
+      <filename>certificate</filename>
+      <filename>CAs</filename>
+      <filename>kpwd</filename>
     </para>
 
   </section>
@@ -262,27 +307,11 @@ create diskCacheV111.cells.WebCollectorV3 collector \
 
   <unfinished>
     <para>
-      See in cookbook.
-      webinterface Bug: gridftp offline (Change cell names in
-      httpd.batch from SRM, GFTP, and DCap-gsi to SRM-hostname,
-      GFTP-hostname, and DCap-gsi-hostname, respectively)
-    </para>
-    
-    <para>
       files (log, config, certificate, ..., chmod 600 srm.batch utility.batch)
-
-      (configurable in
-	<filename>config/dCacheSetup</filename><footnote>
-	  <para>
-	    Filenames will always be relative to the dCache
-	    installation directory, which defaults to
-	    <filename>/opt/d-cache/</filename>.
-	  </para>
-	</footnote>)
     </para>
     
     <para>
-      admin interface, change passwd, info, pinboard, rc ls, rep ls, cm ls -r
+      admin interface, change passwd, info, pinboard, rc ls, rep ls, cm ls -r, unwatch, watch
     </para>
 
     <para>
