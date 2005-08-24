@@ -89,10 +89,11 @@
 
   </chapter>
 
+<!-- Moved to intouch
   <chapter id="cb-mon-op">
     <title>Monitoring and Operation of a dCache System</title>
 
-    <!-- <para>Maybe this should go into the configuration part.</para> -->
+      <para>Maybe this should go into the configuration part.</para>
 
     <para>
       This chapter describes the various methods to monitor a running
@@ -140,6 +141,8 @@
     </section>
 
   </chapter>
+
+-->
   
   <chapter id="cb-pool">
     <title>Pool Operations</title>
@@ -600,7 +603,7 @@ create dmg.cells.services.login.LoginManager GFTP \
 
     <para>
       The dCache web interface (described in <xref
-      linkend="cb-mon-op-web"/>) contains under the menue point
+      linkend="intouch-web"/>) contains under the menue point
       <quote>Actions Log</quote> summary information extracted from
       the information in the <filename>billing</filename>-directory.
     </para>

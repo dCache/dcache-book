@@ -168,6 +168,22 @@
       </glossentry>
 
       <glossentry>
+	<glossterm id="gl-cell">Cell</glossterm>
+	<glossdef>
+	  <para>
+	  </para>
+	</glossdef>
+      </glossentry>
+
+      <glossentry>
+	<glossterm id="gl-domain">Domain</glossterm>
+	<glossdef>
+	  <para>
+	  </para>
+	</glossdef>
+      </glossentry>
+
+      <glossentry>
 	<glossterm id="gl-well-known-cell">Well Known Cell</glossterm>
 	<glossdef>
 	  <para>
@@ -251,6 +267,22 @@
 
       <glossentry>
 	<glossterm id="gl-wormhole">Wormhole</glossterm>
+	<glossdef>
+	  <para>
+	  </para>
+	</glossdef>
+      </glossentry>
+
+      <glossentry>
+	<glossterm id="gl-precious_file">Precious File</glossterm>
+	<glossdef>
+	  <para>
+	  </para>
+	</glossdef>
+      </glossentry>
+
+      <glossentry>
+	<glossterm id="gl-cached_file">Cached File</glossterm>
 	<glossdef>
 	  <para>
 	  </para>

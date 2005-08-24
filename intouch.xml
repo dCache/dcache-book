@@ -21,7 +21,7 @@
     host. Additional pools on other hosts may also run.
   </para>
 
-  <section>
+  <section id="intouch-client">
     <title>Checking the Functionality</title>
 
     <para>
@@ -66,77 +66,201 @@
 
 <screen><userprompt/>PATH=/opt/d-cache/dcap/bin/:$PATH
 <userprompt/><command>dccp</command> /bin/sh my-test-file
-541096 bytes in 0 seconds
-</screen>
+541096 bytes in 0 seconds</screen>
 
       This command succeeds if the user <literal>user</literal> has
       the unix rights to write to the current directory <filename
       class="directory">/pnfs/<replaceable>site.de</replaceable>/data/</filename>.
       The <productname>dCap</productname> protocol also hat a URL syntax:
 
+<screen><userprompt/><command>dccp</command> dcap://<replaceable>adminNode</replaceable>/pnfs/<replaceable>site.de</replaceable>/data/my-test-file /tmp/test.tmp
+541096 bytes in 0 seconds</screen>
+
+      However, this command only succeeded because the file is world
+      readable:
+
 <screen><userprompt/><command>chmod</command> o-r my-test-file
-<userprompt/><command>cd</command> /tmp/
-<userprompt/><command>dccp</command> dcap://localhost/pnfs/<replaceable>site.de</replaceable>/data/my-test-file test.tmp
-541096 bytes in 0 seconds
-</screen>
+<userprompt/><command>dccp</command> dcap://<replaceable>adminNode</replaceable>/pnfs/<replaceable>site.de</replaceable>/data/my-test-file /tmp/test2.tmp
+Command failed!
+Server error message for [1]: "Permission denied" (errno 2).
+Failed open file in the dCache.
+Can't open source file : "Permission denied"
+System error: Input/output error</screen>
 
       This command did not succeed, because the dcap protocol is
       unauthenticated and the user is mapped to a non-existent user in
-      order to determine the access rights. The following will be successful:
+      order to determine the access rights. However, you should be
+      able to access the file with the NFS mount:
 
-<screen><userprompt/><command>chmod</command> o+r /pnfs/<replaceable>site.de</replaceable>/data/my-test-file
-<userprompt/><command>dccp</command> dcap://localhost/pnfs/<replaceable>site.de</replaceable>/data/my-test-file test.tmp
-</screen>
+<screen><userprompt/><command>dccp</command> my-test-file /tmp/test2.tmp
+541096 bytes in 0 seconds</screen>
     </para>
 
     <para>
-      If you have a valid grid proxy on a LCG UI host with a
-      certificate subject which is properly mapped in the
-      configuration file
+      If you have a valid grid proxy with a certificate subject which
+      is properly mapped in the configuration file
       <filename>/opt/d-cache/etc/dcache.kpwd</filename> you can also
-      try grid-authenticated access via
+      try grid-authenticated access via GSI authenticated
+      <productname>dCap</productname>:
+
+<screen><userprompt/><command>chgrp</command> <replaceable>yourVO</replaceable> my-test-file
+<userprompt/>LD_LIBRARY_PATH=/opt/d-cache/dcap/lib/:$LD_LIBRARY_PATH
+<userprompt/><command>dccp</command> gsidcap://<replaceable>adminNode</replaceable>:22128/pnfs/<replaceable>site.de</replaceable>/data/my-test-file /tmp/test3.tmp
+541096 bytes in 0 seconds</screen>
+
+      Or we let the <productname>SRM</productname> negotiate the
+      protocol:
+
+<screen><userprompt/>PATH=/opt/d-cache/srm/bin/:$PATH
+<userprompt/><command>srmcp</command> srm://<replaceable>adminNode</replaceable>:8443/pnfs/desy.de/data/my-test-file file:////tmp/test4.tmp
+configuration file not found, configuring srmcp
+created configuration file in /root/.srmconfig/config.xml</screen>
+
+      If the <dcache/> instance is registered as a storage element in
+      the LCG/EGEE grid and the LCG user interface software is
+      available the file can be accessed via
       <productname>SRM</productname>:
 
-<screen><userprompt/><command>lcg-cp</command> -v --vo dteam \
+<screen><userprompt/><command>lcg-cp</command> -v --vo <replaceable>yourVO</replaceable> \
 srm://<replaceable>dCacheAdminFQN</replaceable>/pnfs/<replaceable>site.de</replaceable>/data/my-test-file \
 file:///tmp/test-file
 Source URL: srm://<replaceable>dCacheAdminFQN</replaceable>/pnfs/<replaceable>site.de</replaceable>/data/my-test-file
 File size: 541096
 Source URL for copy: gsiftp://<replaceable>dCacheAdminFQN</replaceable>:2811//pnfs/site.de/data/my-test-file
-Destination URL: file:///tmp/test-file
+Destination URL: file:///tmp/test5.tmp
 # streams: 1
 Transfer took 770 ms</screen>
 
-      Authenticated <productname>dCap</productname> can also be used:
-
-<screen><userprompt/><command>dccp</command> gsidcap://<replaceable>dCacheAdminFQN</replaceable>:22128/pnfs/<replaceable>site.de</replaceable>/data/my-test-file \
-/tmp/test-file2
-541096 bytes in 0 seconds</screen>
-
       and it can be deleted with the help of the <productname>SRM</productname>:
 
-<screen><userprompt/>PATH=/opt/d-cache/srm/bin/:$PATH
-      <userprompt/>srm-advisory-delete srm://<replaceable>dCacheAdminFQN</replaceable>:8443/pnfs/<replaceable>site.de</replaceable>/data/my-test-file
+<screen><userprompt/><command>srm-advisory-delete</command> srm://<replaceable>dCacheAdminFQN</replaceable>:8443/pnfs/<replaceable>site.de</replaceable>/data/my-test-file
+ srmcp error :  advisoryDelete(User [name=...],pnfs/<replaceable>site.de</replaceable>/data/my-test-file) 
+Error user User [name=...] has no permission to delete 000100000000000000BAF0C0</screen>
+
+      This works only if the grid certificate subject is mapped to a
+      user which has permissions to delete the file:
+
+<screen><userprompt/><command>chown</command> <replaceable>yourVO</replaceable>001 my-test-file
+<userprompt/><command>srm-advisory-delete</command> srm://<replaceable>dCacheAdminFQN</replaceable>:8443/pnfs/<replaceable>site.de</replaceable>/data/my-test-file
 </screen>
+    </para>
 
-      This only works if the grid certificate subject is mapped to a
-      user which has permissions to delete the file.  If the grid
-      functionality is not required the file can be deleted with the
-      <pnfs/> filesystem (e.g. on the <dcache/> admin host):
+    <para>
+      If the grid functionality is not required the file can be
+      deleted with the NFS mount of the <pnfs/> filesystem:
 
-<screen><userprompt/><command>cd</command> <filename class="directory">/pnfs/<replaceable>site.de</replaceable>/data/</filename>
-<userprompt/><command>rm</command> <filename>my-test-file</filename>
+<screen><userprompt/><command>rm</command> <filename>my-test-file</filename>
 </screen>
-
     </para>
 
   </section>
 
-  <unfinished>
+  <section id="intouch-web">
+    <title>The Web Interface for Monitoring <dcache/></title>
+
     <para>
-      dccp
+      In the standard configuration the dCache web interface is
+      started on the admin node and can be reached via port
+      <literal>2288</literal>. Point a web browser to <ulink
+      url="http://adminNode:2288/">http://<replaceable>adminNode</replaceable>:2288/</ulink>
+      to get to the main menue of the dCache web interface.  The
+      contents of the web interface are self-explanatory and are the
+      primary source for most monitoring and trouble-shooting tasks.
     </para>
-    
+
+    <para>
+      The <quote>Cell Services</quote> page displays the status of
+      some important <glossterm linkend="gl-cell">cells</glossterm> of
+      the <dcache/> instance. You might observe that some cells are
+      marked <quote>OFFLINE</quote> even though you know that they are
+      running and fine. These might be the cells <quote>SRM</quote>,
+      <quote>GFTP</quote>, and <quote>DCap-gsi</quote>. The reason is
+      that the names of the cells monitored by the web interface are
+      explicitly configured in the file
+      <filename>/opt/d-cache/config/httpd.batch</filename>. However,
+      the cells have other names. If you change the following section
+      near the end of the file
+
+<programlisting>#
+create diskCacheV111.cells.WebCollectorV3 collector \
+    "PnfsManager \
+     PoolManager \
+     GFTP \
+     SRM \
+     DCap-gsi \
+     -replyObject"
+#</programlisting>
+
+      such that it reads
+
+<programlisting>#
+create diskCacheV111.cells.WebCollectorV3 collector \
+    "PnfsManager \
+     PoolManager \
+     GFTP-<replaceable>adminNode</replaceable> \
+     SRM-<replaceable>adminNode</replaceable> \
+     DCap-gsi-<replaceable>adminNode</replaceable> \
+     -replyObject"
+#</programlisting>
+
+      and restart the <literal>httpd</literal> <glossterm
+      linkend="gl-domain">domain</glossterm> by executing
+
+<screen><rootprompt/><command>/opt/d-cache/jobs/httpd</command> stop
+<rootprompt/><command>/opt/d-cache/jobs/httpd</command> -logfile=/opt/d-cache/log/http.log start
+</screen>
+
+      More information about the
+      <filename><replaceable>domainName</replaceable>.batch</filename>
+      will follow in the next section.
+    </para>
+
+    <para>
+      The <quote>Pool Usage</quote> page gives an good overview of the
+      current space usage of the whole <dcache/> instance. In the
+      graphs, free space is marked yellow, space occupied by
+      <glossterm linkend="gl-cached_file">cached files</glossterm>
+      which may be deleted when space is needed is marked green, and
+      space occupied by <glossterm linkend="gl-precious_file">precious
+      files</glossterm> which cannot be deleted. Other states
+      (e.g. files which are currently written) are marked purple.
+    </para>
+
+    <para>
+      The page <quote>Pool Request Queues</quote> (or <quote>Pool Transfer Queues</quote>)...
+    </para>
+
+    <para>
+      The page <quote>Actions Log</quote> ... history
+    </para>
+
+    <para>
+      The page <quote>Pools</quote> (or <quote>Pool Attraction
+      Configuration</quote>) ... PSU
+    </para>
+
+    <para>
+      Other with HSM
+    </para>
+
+  </section>
+
+  <section id="intouch-files">
+    <title>Files</title>
+
+    <para>
+      The restart will take some time as will all restarts of
+      domains. However, the domains rarely need to be restarted. Also,
+      the
+      <filename><replaceable>domainName</replaceable>.batch</filename>
+      files normally should not be changed. Beware that changes will
+      be lost when updating to a newer release.
+    </para>
+
+  </section>
+
+
+  <unfinished>
     <para>
       See in cookbook.
       webinterface Bug: gridftp offline (Change cell names in
@@ -146,6 +270,15 @@ Transfer took 770 ms</screen>
     
     <para>
       files (log, config, certificate, ..., chmod 600 srm.batch utility.batch)
+
+      (configurable in
+	<filename>config/dCacheSetup</filename><footnote>
+	  <para>
+	    Filenames will always be relative to the dCache
+	    installation directory, which defaults to
+	    <filename>/opt/d-cache/</filename>.
+	  </para>
+	</footnote>)
     </para>
     
     <para>
