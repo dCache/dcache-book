@@ -454,7 +454,7 @@ StoreName myStore</screen>
 
   </section>
   
-  <section>
+  <section id="cf-pnfs-db">
     <title>The Databases of <pnfs/></title>
 
     <para>

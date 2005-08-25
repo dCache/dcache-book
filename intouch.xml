@@ -264,10 +264,44 @@ create diskCacheV111.cells.WebCollectorV3 collector \
 <screen><rootprompt/>. /usr/etc/pnfsSetup
 <rootprompt/>PATH=$PATH:$pnfs/tools
 </screen>
+
+      Stopping and starting the <pnfs/> server can now be done with
+
+<screen><rootprompt/><command>pnfs</command> stop
+<rootprompt/><command>pnfs</command> start
+</screen>
+
+      The log files for the three <pnfs/> server daemons are
+      <filename>/var/log/pmountd.log</filename>,
+      <filename>/var/log/dbserver.log</filename>, and
+      <filename>/var/log/pnfsd.log</filename>. The
+      <command>pnfsd</command> is the NFS server implementation. Its
+      log file contains one line for each NFS filesystem
+      operation. The result code of that operation can be found at the
+      end of the line.
     </para>
 
     <para>
-      restart, PNFS databases, logfile
+      The <command>pnfsd</command> daemons communicate with the
+      <command>dbserver</command> daemons via a shared memory
+      area. These perform the actual operations on the database files
+      which can be found in <filename
+      class="directory">/opt/pnfsdb/pnfs/databases/</filename>. The
+      <pnfs/> system finds them via the information in the directory
+      <filename
+      class="directory">/opt/pnfsdb/pnfs/info/</filename>. 
+    </para>
+
+    <para>
+      Each database file is handled by one <command>dbserver</command>
+      daemon and each access will lock the database file. Each file
+      stores the filesystem for one directory sub-tree similar to
+      mount points in the UNIX filesystem. The
+      <literal>admin</literal> database contains the root (the one
+      mounted on <filename class="directory">/pnfs/fs/</filename>) and
+      the <literal>data1</literal> database the subdirectory <filename
+      class="directory">usr/data/</filename>. <xref
+      linkend="cf-pnfs-db"/> describes how to create new databases.
     </para>
 
     <para>
@@ -282,33 +316,84 @@ create diskCacheV111.cells.WebCollectorV3 collector \
       linkend="gl-domain">domain</glossterm> is restarted:
       
 <screen><rootprompt/><command>/opt/d-cache/jobs/<replaceable>domainName</replaceable></command> stop
-<rootprompt/><command>/opt/d-cache/jobs/<replaceable>domainName</replaceable></command> -logfile=/opt/d-cache/log/<replaceable>domainName</replaceable>.log start
+<rootprompt/><command>/opt/d-cache/jobs/<replaceable>domainName</replaceable></command> \
+-logfile=/opt/d-cache/log/<replaceable>domainName</replaceable>.log start
 </screen>
 
-      
-
-      startup -> log/<replaceable>domainName</replaceable>.log, jobs/<replaceable>domainName</replaceable>,
-      config/<replaceable>domainName</replaceable>.batch,
-      config/<replaceable>domainName</replaceable>Setup, links
+      Listing the contents of <filename
+      class="directory">jobs/</filename> you will see that these
+      scripts are all in fact links to
+      <filename>jobs/wrapper2.sh</filename>. This script will
+      determine the domain to start by its basename. From the above
+      commands you can already read of the standard location for the
+      log files.
     </para>
 
     <para>
-      The restart will take some time as will all restarts of
-      domains. However, the domains rarely need to be restarted. The 
-      <filename>jobs/<replaceable>domainName</replaceable></filename>
-      <filename><replaceable>domainName</replaceable>.batch</filename>
-      files normally should not be changed. Beware that changes will
-      be lost when updating to a newer release.
+      The files
+      <filename>config/<replaceable>domainName</replaceable>Setup</filename>
+      will be used by the wrapper script and by the domains at
+      start-up. These files are also links to
+      <filename>config/dCacheSetup</filename>. This is the primary
+      configuration file of the <dcache/> system. The only files which
+      are different for each domain are
+      <filename>config/<replaceable>domainName</replaceable>.batch</filename>.
+      They describe which cells are started in the domains. Normally,
+      changes in these files should not be necessary. Since they will
+      be overwritten when updating to a newer version (e.g. with RPM),
+      you should make a copy of it and modify that. By that you give
+      the domain a new name. The necessary links can be created with
+
+<screen><rootprompt/><command>cd</command> /opt/d-cache/config/
+<rootprompt/><command>../jobs/initPackage.sh</command></screen>
+
+      Then the old domain can be stopped and the new one started:
+
+<screen><rootprompt/><command>/opt/d-cache/jobs/<replaceable>domainName</replaceable></command> stop
+<rootprompt/><command>/opt/d-cache/jobs/<replaceable>newDomainName</replaceable></command> \
+-logfile=/opt/d-cache/log/<replaceable>newDomainName</replaceable>.log start</screen>
     </para>
-    
+
     <para>
-      <filename>PoolManager.config</filename>
-      <filename>.poollist</filename>
-      <filename><replaceable>poolDirectory</replaceable>/pool/Setup</filename>
-      <filename>trash</filename>
-      <filename>certificate</filename>
-      <filename>CAs</filename>
-      <filename>kpwd</filename>
+      The most central component of a <dcache/> instance is the
+      <literal>PoolManager</literal> cell. It reads additional
+      configuration information from the file
+      <filename>config/PoolManager.config</filename> at
+      start-up. However, in contrast to the
+      <filename>config/<replaceable>domainName</replaceable>Setup</filename>
+      files, it is not necessary to restart the domain when changing
+      the file. We will see an example of this below.
+    </para>
+
+    <para>
+      The domains containing the pools are handled a little
+      differently from the other domains. They are started by
+
+<screen><rootprompt/><command>/opt/d-cache/jobs/pool</command> -pool=<replaceable>pool</replaceable> \
+-logfile=log/<replaceable>pool</replaceable>Domain.log start</screen>
+
+      This will start the domain
+      <literal><replaceable>pool</replaceable>Domain</literal> which
+      contains a pool cell for each line in the file
+      <filename>config/<replaceable>pool</replaceable>.poollist</filename>. When
+      only one pool domain is started on a host, it is conventional to
+      use the hostname for <replaceable>pool</replaceable>. A line of
+      the
+      <filename><replaceable>pool</replaceable>.poollist</filename>
+      has the form
+
+<programlisting><replaceable>poolName</replaceable> <replaceable>poolDir</replaceable> <replaceable>options</replaceable></programlisting>
+
+      For the pool names it is conventional to use
+      <literal><replaceable>hostname</replaceable>_<replaceable>n</replaceable></literal>
+      (where <replaceable>n</replaceable> starts at 1).
+    </para>
+
+    <para>
+      Similar to <filename>config/PoolManager.conf</filename>, the
+      pools read their configuration from
+      <filename><replaceable>poolDir</replaceable>/pool/setup</filename>
+      at startup.
     </para>
 
   </section>
@@ -316,20 +401,44 @@ create diskCacheV111.cells.WebCollectorV3 collector \
 
   <unfinished>
     <para>
-      files (log, config, certificate, ..., chmod 600 srm.batch utility.batch)
+      <filename>certificate</filename>
+      <filename>CAs</filename>
+      <filename>kpwd</filename>
+      chmod 600 srm.batch utility.batch
     </para>
     
     <para>
-      admin interface, change passwd, info, pinboard, rc ls, rep ls, cm ls -r, unwatch, watch
+      admin interface, change passwd, info, pinboard, rc ls, rep ls, cm ls -r, unwatch, watch, create pool group, save, restore
     </para>
 
     <para>
-      check wormholes and tags, wormholes have to be rewritten after fset io
+      <pnfs/> IDs,  check wormholes and tags, wormholes have to be rewritten after fset io
     </para>
 
     <para>
       Check pnfs mount permissions and restrict to localhost.
     </para>
+
+    <para>
+      When a file in the <pnfs/> filesystem is deleted the server
+      stores information about is in the subdirectories of <filename
+      class="directory">/opt/pnfsdb/pnfs/trash/</filename>. The
+      <literal>cleaner</literal> cell in the
+      <literal>pnfsDomain</literal> is responsible for deleting the
+      actual files from the pools asyncronously. It uses the files in
+      the directory <filename
+      class="directory">/opt/pnfsdb/pnfs/trash/2/</filename>. It
+      contains a file with the <pnfs/> ID of the deleted file as
+      name. If a pool containing that file is down at the time the
+      cleaner tries to remove it, it will retry for a while. After
+      that the file
+      <filename>/opt/pnfsdb/pnfs/trash/2/current/failed.<replaceable>poolName</replaceable></filename>
+      will contain the <pnfs/> IDs which have not been removed from
+      that pool. The cleaner will still retry the removal with a lower
+      frequency.
+    </para>
+
+
   </unfinished>
   
 </chapter>
