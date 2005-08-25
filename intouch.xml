@@ -278,6 +278,15 @@ create diskCacheV111.cells.WebCollectorV3 collector \
     </para>
     
     <para>
+      In the previous section we have already seen how a <glossterm
+      linkend="gl-domain">domain</glossterm> is restarted:
+      
+<screen><rootprompt/><command>/opt/d-cache/jobs/<replaceable>domainName</replaceable></command> stop
+<rootprompt/><command>/opt/d-cache/jobs/<replaceable>domainName</replaceable></command> -logfile=/opt/d-cache/log/<replaceable>domainName</replaceable>.log start
+</screen>
+
+      
+
       startup -> log/<replaceable>domainName</replaceable>.log, jobs/<replaceable>domainName</replaceable>,
       config/<replaceable>domainName</replaceable>.batch,
       config/<replaceable>domainName</replaceable>Setup, links
