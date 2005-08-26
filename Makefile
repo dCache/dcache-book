@@ -3,7 +3,7 @@
 
 # The souce files. Written in dCache extended DocBook and using XInclude
 #
-SOURCES := Book.xml config-pnfs.xml config-PoolManager.xml  config.xml  cookbook.xml  glossary.xml  intro.xml install.xml  reference.xml  rf-dvl.xml intouch.xml
+SOURCES := Book.xml config-hsm.xml config-pnfs.xml config-PoolManager.xml  config.xml  cookbook.xml  glossary.xml  intro.xml install.xml  reference.xml  rf-dvl.xml intouch.xml
 
 # All stylesheets included by xsl/html-chunk.xsl
 #
@@ -71,7 +71,7 @@ Book.db.xml:	$(SOURCES) xsl/dcb-extensions.xsl xsl/docbook-from-dcb-extensions.x
 	xsltproc --nonet --xinclude -o Book.db.xml xsl/docbook-from-dcb-extensions.xsl Book.xml 2> xsltproc.output
 	cat xsltproc.output
 	if grep error xsltproc.output >/dev/null ; then echo "Error in xi:include statement" ; rm Book.db.xml ; exit 1 ; fi
-	if ! xmllint --noout --dtdvalid software/db43xml/docbookx.dtd Book.db.xml ; then rm Book.db.xml ; exit 1 ; fi
+	if ! xmllint --noout --dtdvalid software/db43xml/docbookx.dtd Book.db.xml ; then mv Book.db.xml Book.broken.xml; exit 1 ; fi
 
 # Generates DocBook and adds the correct DOCTYPE (not needed at the moment and should be added differently)
 #
@@ -88,7 +88,7 @@ Book.draft.xml:	$(SOURCES) xsl/dcb-extensions.xsl xsl/docbook-draft-from-dcb-ext
 	xsltproc --nonet --xinclude -o Book.draft.xml xsl/docbook-draft-from-dcb-extensions.xsl Book.xml 2> xsltproc.output
 	cat xsltproc.output
 	if grep error xsltproc.output >/dev/null ; then echo "Error in xi:include statement" ; rm Book.draft.xml ; exit 1 ; fi
-	xmllint --noout --dtdvalid software/db43xml/docbookx.dtd Book.draft.xml
+	if ! xmllint --noout --dtdvalid software/db43xml/docbookx.dtd Book.draft.xml ; then mv Book.draft.xml Book.broken.xml ; exit 1 ; fi
 
 ###### HTML targets
 #

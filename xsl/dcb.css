@@ -150,3 +150,25 @@ div.glosslist dt {
   background: #EEAAAA;
  }
 
+.table .title { 
+  padding-bottom: 0px;
+  margin-bottom:0px;
+ }
+
+.table table { 
+  background: #FFFFFF;
+  border: solid 1px #888888;
+  padding-top: 0px;
+ }
+
+.table td { 
+  background: #EEEEEE;
+  border: 0;
+ }
+
+.table th { 
+  background: #DDDDDD;
+  border: 0;
+ }
+
+

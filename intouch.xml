@@ -352,6 +352,10 @@ create diskCacheV111.cells.WebCollectorV3 collector \
 <screen><rootprompt/><command>/opt/d-cache/jobs/<replaceable>domainName</replaceable></command> stop
 <rootprompt/><command>/opt/d-cache/jobs/<replaceable>newDomainName</replaceable></command> \
 -logfile=/opt/d-cache/log/<replaceable>newDomainName</replaceable>.log start</screen>
+
+      You might want to do that to set a secure postgresql password in
+      <filename>config/srm.batch</filename>,
+      <filename>config/utility.batch</filename>, and <filename>config/replica.batch</filename>
     </para>
 
     <para>
@@ -409,6 +413,7 @@ create diskCacheV111.cells.WebCollectorV3 collector \
     
     <para>
       admin interface, change passwd, info, pinboard, rc ls, rep ls, cm ls -r, unwatch, watch, create pool group, save, restore
+      ssh authorized_keys for scripting (tr -d '\r')
     </para>
 
     <para>

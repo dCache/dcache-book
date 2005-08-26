@@ -1,0 +1,432 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
+
+<chapter id="cf-hsm">
+  <title>The Interface to a Tertiary Storage System</title>
+
+  <para>
+    dCache installations, used as a frontend to tertiary storage
+    system, need, at some point, to exchange data this such a system
+    in order to store new, precious files and to retrieve files from
+    the HSM if not yet, or no longer, available on one of the dCache
+    pools. Unfortunately there is no well defined interface for such
+    HSM operations. So the dCache overcomes this problem by calling
+    configurable (dCache external) shell scripts or binaries whenever
+    an HSM store or retrieve operation becomes necessary. The local
+    HSM administrator is responsible for providing this procedure and
+    to make it available and known to the dCache.  This small writeup
+    defines the way dCache will call such an external method.
+  </para>
+
+  <para>
+    Note : Most <dcache/> distributions do not expect to run together
+    with an HSM backend system. To make this work, make sure that
+    neither in the pool.batch file, nor in the
+    <filename>config/<replaceable>pool</replaceable>.poollist</filename>
+    files the option <literal>lfs=precious</literal> is specified.
+  </para>
+
+  <section id="cf-hsm-define">
+    <title>Defining the HSM interface.</title>
+
+    <para>
+      Each individual pool, which is expected to exchange data with an
+      HSM, has to define a dCache external method to flush/fetch
+      datasets into/from one or more connected HSM's.  The command
+      decribed below has either to be given in the command line
+      interface of the corresponding pool while the pool is active
+      (don't forget so 'save') or may be added to the pool setup file
+      commands prior to starting the pool.
+    
+  <screen>
+     Syntax : hsm set &lt;hsmName&gt; -command=&lt;fullPathToExternalCommand&gt;
+     
+     Example :
+         
+	     hsm set osm -command=/usr/d-cache/jobs/osm-hsmcp.sh
+	 or
+	     hsm set enstore -command=/usr/d-cache-deployment/jobs/real-enstore.sh
+  </screen>
+
+      The external method, which might be a shell script or a binary,
+      is called by the dCache with a set of positional arguments (see
+      below). In addition, options may be specified which are appended
+      to the regular argument list on calling the external method.
+
+      <screen>
+     Syntax : hsm set &lt;hsmName&gt; -&lt;key&gt;=&lt;value&gt;
+     
+     Example :
+         
+	     hsm set osm -command=/usr/d-cache/jobs/osm-hsmcp.sh
+	     hsm set osm -pnfs=/pnfs/desy.de -somethingElse=true
+  
+      </screen>
+
+      This will result in excuting the following command line whenever
+      a file has to be exchanged with an HSM.
+
+      <screen>
+    /usr/d-cache/jobs/osm-hsmcp.sh put|get &lt;pnfsId&gt; &lt;LocalFilename&gt; \
+        -si=&lt;See Below&gt; \
+        -pnfs=/pnfs/desy.de   \
+        -somethingElse=true
+      </screen>
+
+    </para>
+  </section>
+  <section>
+    <title>Calling sequence</title>
+    
+    <para>
+      The external script or binary is launed with 3 positional
+      arguments and at least one option
+      (<literal>-si=&lt;storageInfo&gt;</literal>).  Additonial
+      options may follow if defined so with the <emphasis>hsm
+      set</emphasis> pool command. Arguments and options are separated
+      by at least on blank character.
+
+      <screen>
+    Syntax :
+    
+        &lt;binary&gt; put|get &lt;pnfsid&gt; &lt;localFileName&gt;   \
+               -si=&lt;storageInfo&gt; [more options]
+      </screen>
+
+      The <emphasis>put|get</emphasis> argument determines the data
+      transfer direction seen from the HSM. <emphasis>put</emphasis>
+      means, that data has to be stored into the HSM while
+      <emphasis>get</emphasis> means it has be fetched out of the HSM.
+    </para>
+
+    <para>
+      The &lt;storageInfo&gt; option is a collection of key value
+      pairs, separated by semicola. All these values are derived from
+      the pnfs database. The possible keys slightly differ, depending
+      on which HSM is addressed. The order of the key value pairs is
+      not determined and may vary between calls. The
+      <literal>-si=</literal> string shouldn't contain blank TAB or
+      newline characters.
+    </para>
+
+    <para>
+      Example : 
+      <screen>
+    -si=size=1048576000;new=true;stored=false;sClass=desy:cms-sc3;cClass=-;hsm=osm;Host=desy;
+      </screen>
+    </para>
+
+    <table>
+      <title>Mandatory StorageInfo keys</title>
+
+      <tgroup cols="2" align="left">
+	<colspec colnum="1" colname="Key" colwidth="50"/>
+	<colspec colnum="2" colname="Meaning"/>
+	<thead>
+	  <row>
+	    <entry>Key</entry>
+	    <entry>Meaning</entry>
+	  </row>
+	</thead>
+	<tbody>
+	  <row>
+	    <entry>size</entry>
+	    <entry>
+	      Size of the file in bytes
+	    </entry>
+	  </row>
+	  <row>
+	    <entry>new</entry>
+	    <entry>
+	      <literal>false</literal> if file already in the dCache
+	    </entry>
+	  </row>
+	  <row>
+	    <entry>stored</entry>
+	    <entry>
+	      <literal>true</literal> if file already stored in the HSM
+	    </entry>
+	  </row>
+	  <row>
+	    <entry>sClass</entry>
+	    <entry>
+	      HSM depended. Used by the PoolManager for pool
+	      attraction
+	    </entry>
+	  </row>
+	  <row>
+	    <entry>cClass</entry>
+	    <entry>
+	      Parent Director tag (<literal>cacheClass</literal>). Used by the
+	      PoolManager for poolattraction. May be '-'
+	    </entry>
+	  </row>
+	  <row>
+	    <entry>hsm</entry>
+	    <entry>
+	      Storage Manager name (enstore/osm). Can be overwritten
+	      by parent directory tag (<literal>hsmType</literal>).
+	    </entry>
+	  </row>
+	</tbody>
+      </tgroup>
+    </table>
+
+    <table>
+      <title>Optional StorageInfo keys but used by all HSM's</title>
+
+      <tgroup cols="2" align="left">
+	<colspec colnum="1" colname="Key" colwidth="50"/>
+	<colspec colnum="2" colname="Meaning"/>
+	<thead>
+	  <row>
+	    <entry>Key</entry>
+	    <entry>Meaning</entry>
+	  </row>
+	</thead>
+	<tbody>
+	  <row><entry>flag-l</entry><entry>Size of the file (if size exceeds 2G)</entry></row>
+	  <row><entry>flag-s</entry><entry><literal>*</literal> if file is defined sticky</entry></row>
+	  <row><entry>flag-c</entry><entry>CRC value (currently <literal>1:&lt;hexAdler32&gt;</literal></entry></row>
+	</tbody>
+      </tgroup>
+    </table>
+
+    <table>
+      <title>Enstore specific</title>
+
+      <tgroup cols="2" align="left">
+	<colspec colnum="1" colname="Key" colwidth="50"/>
+	<colspec colnum="2" colname="Meaning"/>
+	<thead>
+	  <row>
+	    <entry>Key</entry>
+	    <entry>Meaning</entry>
+	  </row>
+	</thead>
+	<tbody>
+	  <row><entry>group</entry><entry>Storage Group (e.g. cdf,cms ...)</entry></row>
+	  <row><entry>family</entry><entry>File family (e.g. sgi2test,h6nxl8, ...)</entry></row>
+	  <row><entry>bfid</entry><entry>Bitfile Id (GET only) (e.g. B0MS105746894100000)</entry></row>
+	  <row><entry>volume</entry><entry>Tape Volume (GET only) (e.g. IA6912)</entry></row>
+	  <row><entry>location</entry><entry>Location on tape (GET only) (e.g. : 0000_000000000_0000117)</entry></row>
+	</tbody>
+      </tgroup>
+    </table>
+    
+    <table>
+      <title>OSM specific</title>
+
+      <tgroup cols="2" align="left">
+	<colspec colnum="1" colname="Key" colwidth="50"/>
+	<colspec colnum="2" colname="Meaning"/>
+	<thead>
+	  <row>
+	    <entry>Key</entry>
+	    <entry>Meaning</entry>
+	  </row>
+	</thead>
+	<tbody>
+	  <row><entry>store</entry><entry>OSM store (e.g. zeus,h1, ...)</entry></row>
+	  <row><entry>group</entry><entry>OSM Storage Group (e.g. h1raw99, ...)</entry></row>
+	  <row><entry>bfid</entry><entry>Bitfile Id (GET only) (e.g. 000451243.2542452542.25424524)</entry></row>
+	</tbody>
+      </tgroup>
+    </table>
+
+    <para>
+      There might be more key values pairs which are used by the dCache internally
+      and which should not affect the behaviour of the hsm copy script.
+    </para>
+
+    <table>
+      <title>Return codes</title>
+
+      <tgroup cols="4" align="left">
+	<colspec colnum="1" colname="ReturnCode" colwidth="70"/>
+	<colspec colnum="2" colname="Meaning" colwidth="130"/>
+	<colspec colnum="3" colname="IntoHSM" colwidth="100"/>
+	<colspec colnum="4" colname="FromHSM"/>
+	<thead>
+	  <row><entry morerows="1">Return Code</entry>
+	    <entry morerows="1">Meaning</entry>
+	    <entry namest="IntoHSM" nameend="FromHSM">Pool Behaviour</entry></row>
+	  <row><entry>Into HSM</entry><entry>From HSM</entry></row>
+	</thead>
+	<tbody>
+	  <row><entry align="center">30 &lt;= rc &lt; 40</entry>
+	    <entry align="center">User defined</entry>
+	    <entry align="center">Deactivates request</entry>
+	    <entry align="center">Reports Problem to PoolManager</entry>
+	  </row>
+	  <row><entry align="center">41</entry>
+	    <entry align="center">No Space Left on device</entry>
+	    <entry align="center" morerows="2"><para>Pool Retries</para></entry>
+	    <entry align="center" morerows="2"><para>Disables Pool</para><para>Reports Problem to PoolManager</para></entry>
+	  </row>
+	  <row><entry align="center">42</entry>
+	    <entry align="center">Disk Read I/O Error</entry>
+	  </row>
+	  <row><entry align="center">43</entry>
+	    <entry align="center">Disk Write I/O Error</entry>
+	  </row>
+	  <row><entry align="center">All other</entry>
+	    <entry>&nbsp;</entry>
+	    <entry align="center">Pool Retries</entry>
+	    <entry align="center">Reports Problem to PoolManager</entry>
+	  </row>
+	</tbody>
+      </tgroup>
+    </table>
+
+    <section>
+      <title>Special Cases and exceptions</title>
+
+      <section>
+	<title>Reading vers. Writing HSM files</title>
+
+	<para>
+	  When fetching a file from an HSM, the command line contains
+	  sufficient information about the location of the dataset
+	  within the HSM to get the file. No additional interaction
+	  with pnfs is needed.  So pnfs doesn't need to be mounted on
+	  read-only pools.
+	</para>
+
+	<para>
+	  This is different for storing files into an HSM. As a return
+	  from the actual HSM put operation, some data has to be
+	  stored in pnfs. Currently this has to be done directly by
+	  the corresponding external HSM script. So, other then for
+	  read pools, write pools still need to have pnfs mounted.
+	</para>
+
+	<para>
+	  A future approache will be to transfer the necessay HSM
+	  information from the HSM copy script into the dCache using
+	  STDOUT. The dCache subsequently performs the necessary pnfs
+	  store operation through the PnfsManager.
+	</para>
+
+      </section>
+
+      <section>
+	<title>Precious files are removed from Pnfs</title>
+
+	<para>
+	  In case a precious file is removed from pnfs BEFORE the
+	  hsmcopy-Script (osmcp.sh or real-encp.sh) is called, the
+	  copy on disk is removed and the hsmcopy-Script is not
+	  called.
+	</para>
+	
+	<para>
+	  If the file is removed while the hsmcopy-Script is active,
+	  the script will encounter an error when writing HSM data
+	  into the various pnfs layers.  In this case it's recommended
+	  to return an error code in the 30-39 range to have the
+	  request deactivated. So manual intervention is needed to get
+	  the situation cleaned up but no attempt is made by the
+	  dCache to get the corresponding dataset stored into the HSM
+	  again.
+	</para>
+
+      </section>
+    </section>
+  </section>
+
+	<!--
+  <pre>
+        The storage info options is a collection of        
+    get 0000000000000000000034F8 
+        /home/patrick/demo/d-cache-1.4.3/databases/pools/elchtop-0/data/0000000000000000000034F8 
+        -si=size=500000;
+	    new=false;
+	    stored=true;
+	    sClass=demo:users;
+	    cClass=-;
+	    hsm=osm;
+	    alloc-size=500000;
+	    onerror=default;
+	    timeout=30;
+	    flag-c=1:a1890001;
+	    uid=500;
+	    store=demo;
+	    group=users;
+	    bfid=bfid.0000000000000000000034F8;
+        -waitTime=300 
+	-hsmBase=/home/patrick/demo/d-cache-1.4.3/databases/pools/hsm 
+	-pnfs=/pnfs/dcache.org 
+	-command=/home/patrick/demo/d-cache-1.4.3/jobs/hsmcp.sh
+
+
+   put 0001000000000000002A3C70  
+       /export/write-pool-1/data/0001000000000000002A3C70 
+       -si=size=836873;
+           new=true;
+           stored=false;
+           sClass=cdf.sgi2test;
+           cClass=-;
+           hsm=enstore;
+           alloc-size=836873;
+           onerror=default;
+           timeout=-1;
+           uid=5744;
+           ;
+           path=<Unknown>;
+           group=cdf;
+           family=sgi2test;
+           bfid=<Unknown>;
+           volume=<unknown>;
+           location=<unknown>;
+        -pnfs=/pnfs/fs 
+        -command=/var/enstore/dcache-deploy/scripts/real-encp.sh
+
+   get 00020000000000000062A7C0  
+       /export/read-pool-1/data/00020000000000000062A7C0 
+       -si=size=436920618;
+           new=false;
+           stored=true;
+           sClass=cdf.h6nxl8;
+           cClass=-;
+           hsm=enstore;
+           uid=8637;
+           location=;
+           ;
+           path=<Unknown>;
+           group=cdf;
+           family=h6nxl8;
+           bfid=B0MS105746894100000;
+           volume=IA6912;
+           location=0000_000000000_0000117;
+       -pnfs=/pnfs/fs 
+       -command=/var/enstore/dcache-deploy/scripts/real-encp.sh
+
+
+    put 000000000000000000001680 
+        /home/patrick/demo/d-cache-1.4.3/databases/pools/elchtop-0/data/000000000000000000001680
+        -si=size=50000;
+           new=true;
+           stored=false;
+           sClass=demo:users;
+           cClass=-;
+           hsm=osm;
+           alloc-size=50000;
+           onerror=default;
+           timeout=-1;
+           StorageGroup=-#0;
+           uid=500;
+           StoreName=demo;
+           store=demo;
+           group=users;
+           bfid=<Unknown>;
+        -hsmBase=/home/patrick/demo/d-cache-1.4.3/databases/pools/hsm 
+        -pnfs=/pnfs/dcache.org 
+        -command=/home/patrick/demo/d-cache-1.4.3/jobs/hsmcp.sh
+
+ 
+  </pre>
+  </blockquote>
+  -->
+  
+</chapter>

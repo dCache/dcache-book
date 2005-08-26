@@ -235,7 +235,8 @@ StoreName myStore</screen>
 
     <para>
       The following directory tags appear in the <dcache/> context:
-      <informaltable>
+      <table>
+	<title>Directory Tags for <dcache/></title>
 	<tgroup cols="2">
 	  <colspec colnum="1" colname="tag" colwidth="130" align="left"/>
 	  <colspec colnum="2" colname="describtion" align="justify"/>
@@ -299,7 +300,7 @@ StoreName myStore</screen>
 	    </row>
 	  </tbody>
 	</tgroup>
-      </informaltable>
+      </table>
     </para>
 
     <para>
