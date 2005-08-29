@@ -64,7 +64,8 @@
       We will first try <productname>dCap</productname> with the
       <command>dccp</command> command:
 
-<screen><userprompt/>PATH=/opt/d-cache/dcap/bin/:$PATH
+<screen><userprompt/><command>cd</command> <filename class="directory">/pnfs/<replaceable>site.de</replaceable>/data/</filename>
+<userprompt/>PATH=/opt/d-cache/dcap/bin/:$PATH
 <userprompt/><command>dccp</command> /bin/sh my-test-file
 541096 bytes in 0 seconds</screen>
 
@@ -294,13 +295,16 @@ create diskCacheV111.cells.WebCollectorV3 collector \
 
     <para>
       Each database file is handled by one <command>dbserver</command>
-      daemon and each access will lock the database file. Each file
-      stores the filesystem for one directory sub-tree similar to
-      mount points in the UNIX filesystem. The
-      <literal>admin</literal> database contains the root (the one
-      mounted on <filename class="directory">/pnfs/fs/</filename>) and
-      the <literal>data1</literal> database the subdirectory <filename
-      class="directory">usr/data/</filename>. <xref
+      daemon and each access will lock the database file. Each
+      database file/server is the container for one directory
+      sub-tree. Similar to mounts in the UNIX filesystem, the
+      filesystem tree is stitched together from several such
+      sub-trees. In the standard configuration the
+      <literal>admin</literal> database contains the root of the
+      filesystem (the one mounted on <filename
+      class="directory">/pnfs/fs/</filename>) and the
+      <literal>data1</literal> database the sub-tree starting at
+      <filename class="directory">/pnfs/fs/usr/data/</filename>. <xref
       linkend="cf-pnfs-db"/> describes how to create new databases.
     </para>
 
@@ -560,7 +564,13 @@ create diskCacheV111.cells.WebCollectorV3 collector \
       by their <pnfs/> IDs:
 
 <screen>000100000000000000001120 &lt;-P---------(0)[0]&gt; 485212 si={myStore:STRING}
-000100000000000000001230 &lt;-P---------(0)[0]&gt; 1222287360 si={myStore:STRING}</screen>
+000100000000000000001230 &lt;C----------(0)[0]&gt; 1222287360 si={myStore:STRING}</screen>
+
+      Each file in a pool has one of the 4 primary states:
+      <quote>cached</quote> (<literal>&lt;C---</literal>),
+      <quote>precious</quote> (<literal>&lt;-P--</literal>),
+      <quote>from client</quote> (<literal>&lt;--C-</literal>), and
+      <quote>from store</quote> (<literal>&lt;---S</literal>).
     </para>
 
     <para>
@@ -599,26 +609,100 @@ create diskCacheV111.cells.WebCollectorV3 collector \
     </para>
 
     <para>
-      The SSH admin interface can be used by scripts. For this it is useful to
-      know that the <dcache/>-internal SSH server uses
+      The SSH admin interface can be used non-interactively by
+      scripts. For this the <dcache/>-internal SSH server uses
+      public/private key pairs.
     </para>
 
+    <para>
+      The file <filename>config/authorized_keys</filename> contains
+      one line per user. The file has the same format as
+      <filename>~/.ssh/authorized_keys</filename> which is used by
+      <command>sshd</command>. The keys in
+      <filename>config/authorized_keys</filename> have to be of type
+      RSA1 as <dcache/> only supports SSH protocol 1. Such a key is generated with
+
+      <screen><userprompt/><command>ssh-keygen</command> -t rsa1 -C 'SSH1 key of <replaceable>user</replaceable>'
+Generating public/private rsa1 key pair.
+Enter file in which to save the key (/home/<replaceable>user</replaceable>/.ssh/identity): 
+Enter passphrase (empty for no passphrase):
+Enter same passphrase again:
+Your identification has been saved in /home/<replaceable>user</replaceable>/.ssh/identity.
+Your public key has been saved in /home/<replaceable>user</replaceable>/.ssh/identity.pub.
+The key fingerprint is:
+c1:95:03:6a:66:21:3c:f3:ee:1b:8d:cb:46:f4:29:6a SSH1 key of <replaceable>user</replaceable></screen>
+
+      The passphrase is used to encrypt the private key (now stored in
+      <filename>/home/<replaceable>user</replaceable>/.ssh/identity</filename>). If
+      you do not want to enter the passphrase every time the private
+      key is used, you can use <command>ssh-add</command> to add it to
+      a running <command>ssh-agent</command>. If no agent is running start it with
+
+<screen><userprompt/>if [ -S $SSH_AUTH_SOCK ] ; then echo "Already running" ; else eval `ssh-agent` ; fi</screen>
+
+      and add the key to it with
+      
+<screen><userprompt/><command>ssh-add</command>
+Enter passphrase for SSH1 key of <replaceable>user</replaceable>:
+Identity added: /home/<replaceable>user</replaceable>/.ssh/identity (SSH1 key of <replaceable>user</replaceable>)</screen>
+
+      Now, insert the public key
+      <filename>~/.ssh/identity.pub</filename> as a separate line into
+      <filename>config/authorized_keys</filename>. The comment field
+      in this line <quote>SSH1 key of
+      <replaceable>user</replaceable></quote> has to be changed to the
+     <dcache/>  user name. An example file is:
+
+<programlisting>1024 35 141939124...15331 admin</programlisting> 
+      
+      The key manager within <dcache/> will read this file every minute.
+    </para>
+
+    <para>
+      Now, the ssh program should not ask for a password anymore. This
+      is still quite secure, since the unencrypted private key is only
+      held in the memory of the <command>ssh-agent</command>. It can
+      be removed from it with
+
+<screen><userprompt/><command>ssh-add</command> -d
+Identity removed: /home/<replaceable>user</replaceable>/.ssh/identity (RSA1 key of <replaceable>user</replaceable>)</screen>
+    </para>
+
+    <para>
+      In scripts, constructs like
+
+<programlisting>ssh -c blowfish -p 22223 admin@<replaceable>adminNode</replaceable> &lt;&lt; EOF
+cd PoolManager
+cm ls -r
+..
+logoff
+EOF</programlisting>
+
+      or
+
+<programlisting>echo -e 'cd <replaceable>pool_1</replaceable>\nrep ls\n..\nlogoff' \
+  | ssh -c blowfish -p 22223 admin@<replaceable>adminNode</replaceable> \
+  | tr -d '\r' &gt; rep_ls.out</programlisting>
+
+      are quite useful. The last example also illustrates how output
+      of the commands should be treated.
+    </para>
+    
   </section>
 
 
   <unfinished>
     
     <para>
-      admin interface, change passwd, help, info, pinboard, rc ls, rep ls, cm ls -r, unwatch, watch, create pool group, save, restore
-      ssh authorized_keys for scripting (tr -d '\r')
+      admin interface, unwatch, watch, create pool group, save, restore - intouch is getting too big
     </para>
 
     <para>
-      <pnfs/> IDs,  check wormholes and tags, wormholes have to be rewritten after fset io
+      <pnfs/> IDs,  check wormholes and tags, wormholes have to be rewritten after fset io - see pnfs
     </para>
 
     <para>
-      Check pnfs mount permissions and restrict to localhost.
+      Check pnfs mount permissions and restrict to localhost - see pnfs
     </para>
 
   </unfinished>
@@ -627,6 +711,10 @@ create diskCacheV111.cells.WebCollectorV3 collector \
   <unfinished>
 
     <para>
+      Trash moved to pnfs
+
+      -
+
       When a file in the <pnfs/> filesystem is deleted the server
       stores information about is in the subdirectories of <filename
       class="directory">/opt/pnfsdb/pnfs/trash/</filename>. The
@@ -650,20 +738,9 @@ create diskCacheV111.cells.WebCollectorV3 collector \
   <unfinished>
 
     <para>
-      Each file in a pool has one of the 4 primary states: "cached",
-      "precious", "from client", "from store". You can find out about
-      it with "rep ls &lt;PNSFID&gt;": &lt;C- - -....&gt; means "cached", &lt;-P- - -...&gt;
-      means "precious", &lt;- -C-...&gt; means from client, and &lt;- - -S...&gt;
-      means from store. "rep set cached" simply sets it to cached. It
-      could cause a file which is only stored on disk to be
-      deleted. That is why it is potentially dangerous. Since your
-      files are on tape, there is no danger.
-    </para>
-    
-    <para>
-      If the stageing hasnt finished before the time-out, the file
-      might not be complete. You should be able to check that with the
-      size and/or checksum: In PoolManager:
+      garbage - not useful
+
+      -
 
 <screen>storageinfoof &lt;PNFSID&gt;</screen>
 

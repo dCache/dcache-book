@@ -397,11 +397,42 @@ StoreName myStore</screen>
       to all directories in the <pnfs/> filesystem. It can be accessed
       in a subdirectory <filename
       class="directory">.(config)()</filename> of any
-      <pnfs/>-directory. It behaves similar to a hardlink. 
+      <pnfs/>-directory. It behaves similar to a hardlink.  In the
+      default configuration this link points to <filename
+      class="directory">/pnfs/fs/admin/etc/config/</filename>. In it
+      are three files: <filename>'.(config)()'/serverId</filename>
+      contains the domain name of the site,
+      <filename>'.(config)()'/serverName</filename> the fully
+      qualified name of the <pnfs/> server, and
+      <filename>'.(config)()'/serverRoot</filename> should contain
+      <quote><literal>000000000000000000001080 .</literal></quote>.
+    </para>
+
+    <para>
+      The <dcache/> specific configuration can be found in
+      <filename>'.(config)()'/dCache/dcache.conf</filename>. This file
+      contains one line of the format
+      <literal><replaceable>hostname</replaceable>:<replaceable>port</replaceable></literal>
+      per <dcap/> door which may be used by <dcap/> clients when not
+      using URLs. The <command>dccp</command> program will choose
+      randomly between the doors listed here.
+    </para>
+
+    <para>
+      Normally, reading from files in <pnfs/> is disabled. Therefore it
+      is necessary to switch on I/O access to the files in
+      <filename>'.(config)()'/</filename> by e.g.:
+
+      <screen><rootprompt/><command>touch</command> '.(config)()/.(fset)(serverRoot)(io)(on)'</screen>
+
+      After that, you will notice that the file is empty. Therefore,
+      take care, to rewrite the information.
     </para>
 
   </section>
   
+  <unfinished>
+
   <section id="cf-pnfs-metadata">
     <title>Meta Data in <pnfs/></title>
 
@@ -411,15 +442,35 @@ StoreName myStore</screen>
 
   </section>
   
+  </unfinished>
+
+  <section id="cf-pnfs-trash">
+    <title>Deleted Files in <pnfs/></title>
+
+    <para>
+      When a file in the <pnfs/> filesystem is deleted the server
+      stores information about is in the subdirectories of <filename
+      class="directory">/opt/pnfsdb/pnfs/trash/</filename>. For <dcache/>, the
+      <literal>cleaner</literal> cell in the
+      <literal>pnfsDomain</literal> is responsible for deleting the
+      actual files from the pools asyncronously. It uses the files in
+      the directory <filename
+      class="directory">/opt/pnfsdb/pnfs/trash/2/</filename>. It
+      contains a file with the <pnfs/> ID of the deleted file as
+      name. If a pool containing that file is down at the time the
+      cleaner tries to remove it, it will retry for a while. After
+      that, the file
+      <filename>/opt/pnfsdb/pnfs/trash/2/current/failed.<replaceable>poolName</replaceable></filename>
+      will contain the <pnfs/> IDs which have not been removed from
+      that pool. The cleaner will still retry the removal with a lower
+      frequency.
+    </para>
+
+  </section>
+  
   <section id="cf-pnfs-ac">
     <title>Access Control</title>
     
-    <para>
-      How to restrict access to <pnfs/> on a host basis.
-      
-      TODO: somewhere: Passwort in batch file for SRM, Pin, ... (chmod 600)
-    </para>
-
     <para>
       The file
       <filename>/pnfs/fs/admin/etc/exports/<replaceable>hostIP</replaceable></filename>

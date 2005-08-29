@@ -10,7 +10,7 @@
     other problems, as well. Intermediate knowledge about dCache is required. Since
     most tasks require changes in the start-up configuration,the background
     information on how to configure the cell start-up, given in <xref
-      linkend="cf-cell-startup"/> will be useful.
+      linkend="cf-cellpackage"/> will be useful.
   </para>
 
   <section id="cb-net-second-if">

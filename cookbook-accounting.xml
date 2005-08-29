@@ -54,7 +54,7 @@
     The accounting information can also be redirected into a
     database. <!-- For this the start-up configuration of the standard
     admin node has to be modified. (See <xref
-    linkend="cf-cell-startup"/> for background information.) The
+    linkend="cf-cellpackage"/> for background information.) The
     billing information is written by the <quote>billing</quote>
     cell, which is started in the <quote>httpd</quote>
     domain. Therefore, the corresponding
