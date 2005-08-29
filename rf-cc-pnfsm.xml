@@ -1,0 +1,477 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
+  
+<section id="rf-cc-pnfsm">
+  <title>PnfsManager Commands</title>
+  
+  <refentry id="cmd-pnfsidof">        
+    <refmeta><refentrytitle><command>pnfsidof</command></refentrytitle></refmeta>
+    <refnamediv><refname><command>pnfsidof</command></refname>
+      <refpurpose>Print the PNFS id of a file given by its global path.</refpurpose>
+    </refnamediv>
+    
+    <refsynopsisdiv>
+      <cmdsynopsis>
+        <command>pnfsidof</command>
+        <arg choice="req">
+          <replaceable>globalPath</replaceable>
+        </arg>
+        <!-- <arg choice="opt" rep="repeat">file</arg> -->
+      </cmdsynopsis>
+    </refsynopsisdiv>
+    
+    <refsection>
+      <title>Description</title>
+      
+      <para>
+        Print the PNFS id of a file given by its global path. The
+        global path always starts with the
+        <quote>VirtualGlobalPath</quote> as given by the
+        <quote><command>info</command></quote>-command.
+      </para>
+      
+    </refsection>
+  </refentry>
+  
+  <refentry id="cmd-flags_remove">        
+    <refmeta><refentrytitle><command>flags remove</command></refentrytitle></refmeta>
+    <refnamediv><refname><command>flags remove</command></refname>
+      <refpurpose>Remove a flag from a file.</refpurpose>
+    </refnamediv>
+    
+    <refsynopsisdiv>
+      <cmdsynopsis>
+        <command>flags remove</command>
+        <arg choice="req">
+          <replaceable>pnfsId</replaceable>
+        </arg>
+        <arg choice="req" rep="repeat">
+          <replaceable>key</replaceable>
+        </arg>
+        <!-- <arg choice="opt" rep="repeat">file</arg> -->
+      </cmdsynopsis>
+      <variablelist>
+        <title>Arguments</title>
+        <varlistentry>
+          <term>pnfsId</term>
+          <listitem>
+            <para>
+              The PNFS id of the file of which a flag will be removed.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>key</term>
+          <listitem>
+            <para>
+              flags which will be removed.
+            </para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+    </refsynopsisdiv>
+    
+    <refsection>
+      <title>Description</title>
+      
+      <para>
+      </para>
+      
+    </refsection>
+  </refentry>
+  
+  
+    
+  <refentry id="cmd-flags_ls">        
+    <refmeta><refentrytitle><command>flags ls</command></refentrytitle></refmeta>
+    <refnamediv><refname><command>flags ls</command></refname>
+      <refpurpose>List the flags of a file.</refpurpose>
+    </refnamediv>
+    
+    <refsynopsisdiv>
+      <cmdsynopsis>
+        <command>flags ls</command>
+        <arg choice="req">
+          <replaceable>pnfsId</replaceable>
+        </arg>
+      </cmdsynopsis>
+      <variablelist>
+        <varlistentry>
+          <term>pnfsId</term>
+          <listitem>
+            <para>
+              The PNFS id of the file of which a flag will be listed.
+            </para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+    </refsynopsisdiv>
+
+    <refsection>
+      <title>Description</title>
+      
+      <para>
+      </para>
+      
+    </refsection>
+  </refentry>
+
+  <refentry id="cmd-flags_set">        
+    <refmeta><refentrytitle><command>flags set</command></refentrytitle></refmeta>
+    <refnamediv><refname><command>flags set</command></refname>
+      <refpurpose>Set a flag for a file.</refpurpose>
+    </refnamediv>
+    
+    <refsynopsisdiv>
+      <cmdsynopsis>
+        <command>flags set</command>
+        <arg choice="req">
+          <replaceable>pnfsId</replaceable>
+        </arg>
+        <arg choice="req" rep="repeat">
+          <replaceable>key</replaceable>=<replaceable>value</replaceable>
+        </arg>
+      </cmdsynopsis>
+      <variablelist>
+        <title>Arguments</title>
+        <varlistentry>
+          <term>pnfsId</term>
+          <listitem>
+            <para>
+              The PNFS id of the file of which flags will be set.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>key</term>
+          <listitem>
+            <para>
+              The flag which will be set.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>value</term>
+          <listitem>
+            <para>
+              The value to which the flag will be set.
+            </para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+    </refsynopsisdiv>
+  
+    <refsection>
+      <title>Description</title>
+      
+      <para>
+      </para>
+      
+    </refsection>
+  </refentry>
+
+<!--
+  <refentry id="cmd-get_stat">        
+    <refmeta><refentrytitle><command>get stat</command></refentrytitle></refmeta>
+    <refnamediv><refname><command>get stat</command></refname>
+      <refpurpose>get method call counter - NOCLUE</refpurpose>
+    </refnamediv>
+    
+    <refsynopsisdiv>
+      <cmdsynopsis>
+        <command>get stat</command>
+      </cmdsynopsis>
+    </refsynopsisdiv>
+    
+    <refsection>
+      <title>Description</title>
+      
+      <para>
+      </para>
+      
+    </refsection>
+  </refentry>
+-->
+  
+  <refentry id="cmd-metadataof">        
+    <refmeta><refentrytitle><command>metadataof</command></refentrytitle></refmeta>
+    <refnamediv><refname><command>metadataof</command></refname>
+      <refpurpose>Print the meta-data of a file.</refpurpose>
+    </refnamediv>
+    
+    <refsynopsisdiv>
+      <cmdsynopsis>
+        <command>metadataof</command>
+        <group choice="req">
+          <arg>
+            <replaceable>pnfsId</replaceable>
+          </arg>
+          <arg>
+            <replaceable>globalPath</replaceable>
+          </arg>
+        </group>
+        <arg choice="opt">-v</arg>
+        <arg choice="opt">-n</arg>
+        <arg choice="opt">-se</arg>
+      </cmdsynopsis>
+      <variablelist>
+        <title>Arguments</title>
+        <varlistentry>
+          <term>pnfsId</term>
+          <listitem><para>The PNFS id of the file.</para></listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>globalPath</term>
+          <listitem><para>The global path of the file.</para></listitem>
+        </varlistentry>
+<!--
+        <varlistentry>
+          <term>-v</term>
+          <listitem><para>NO CLUE</para></listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>-n</term>
+          <listitem><para>NO CLUE</para></listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>-se</term>
+          <listitem><para>NO CLUE</para></listitem>
+        </varlistentry>
+-->
+      </variablelist>
+    </refsynopsisdiv>
+   
+    <refsection>
+      <title>Description</title>
+      
+      <para>
+      </para>
+      
+    </refsection>
+  </refentry>
+
+<!--
+  <refentry id="cmd-g2l">        
+    <refmeta><refentrytitle><command>g2l</command></refentrytitle></refmeta>
+    <refnamediv><refname><command>g2l</command></refname>
+      <refpurpose>NOCLUE</refpurpose>
+    </refnamediv>
+    
+    <refsynopsisdiv>
+      <cmdsynopsis>
+        <command>g2l</command>
+        <arg choice="req">
+          <replaceable>globalPath</replaceable>
+        </arg>
+      </cmdsynopsis>
+      <variablelist>
+        <title>Arguments</title>
+        <varlistentry>
+          <term>globalPath</term>
+          <listitem><para>The global path of the file.</para></listitem>
+        </varlistentry>
+      </variablelist>
+    </refsynopsisdiv>
+    
+    <refsection>
+      <title>Description</title>
+      
+      <para>
+      </para>
+      
+    </refsection>
+  </refentry>
+-->
+
+  <refentry id="cmd-pathfinder">        
+    <refmeta><refentrytitle><command>pathfinder</command></refentrytitle></refmeta>
+    <refnamediv><refname><command>pathfinder</command></refname>
+      <refpurpose>Print the global or local path of a file from its PNFS id.</refpurpose>
+    </refnamediv>
+    
+    <refsynopsisdiv>
+      <cmdsynopsis>
+        <command>pathfinder</command>
+        <arg choice="req">
+          <replaceable>pnfsId</replaceable>
+        </arg>
+        <group>
+          <arg>-global</arg>
+          <arg>-local</arg>
+        </group>
+      </cmdsynopsis>
+      <variablelist>
+        <title>Arguments</title>
+        <varlistentry>
+          <term>pnfsId</term>
+          <listitem><para>The PNFS Id of the file.</para></listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>-global</term>
+          <listitem><para>Print the global path of the file.</para></listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>-local</term>
+          <listitem><para>Print the local path of the file.</para></listitem>
+        </varlistentry>
+      </variablelist>
+    </refsynopsisdiv>
+  
+    <refsection>
+      <title>Description</title>
+      
+      <para>
+      </para>
+      
+    </refsection>
+  </refentry>
+  
+  
+  <refentry id="cmd-set_meta">        
+    <refmeta><refentrytitle><command>set meta</command></refentrytitle></refmeta>
+    <refnamediv><refname><command>set meta</command></refname>
+      <refpurpose>Set the meta-data of a file.</refpurpose>
+    </refnamediv>
+    
+    <refsynopsisdiv>
+      <cmdsynopsis>
+        <command>set meta</command>
+        <group choice="req">
+          <arg><replaceable>pnfsId</replaceable></arg>
+          <arg><replaceable>globalPath</replaceable></arg>
+        </group>
+        <arg choice="req"><replaceable>uid</replaceable></arg>
+        <arg choice="req"><replaceable>gid</replaceable></arg>
+        <arg choice="req"><replaceable>perm</replaceable></arg>
+        <arg choice="req" rep="repeat"><replaceable>levelInfo</replaceable></arg>
+      </cmdsynopsis>
+      <variablelist>
+	  <title>Arguments</title>
+	  <varlistentry>
+	    <term>pnfsId</term>
+	    <listitem><para>The PNFS id of the file.</para></listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>globalPath</term>
+	    <listitem><para>The global path oa the file.</para></listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>uid</term>
+	    <listitem><para>The user id of the new owner of the file.</para></listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>gid</term>
+	    <listitem><para>The new group id of the file.</para></listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>perm</term>
+	    <listitem><para>The new file permitions.</para></listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>levelInfo</term>
+	    <listitem><para>The new level information of the file.</para></listitem>
+	  </varlistentry>
+	</variablelist>
+      </refsynopsisdiv>
+
+      <refsection>
+	<title>Description</title>
+	
+	<para>
+	</para>
+	
+      </refsection>
+  </refentry>
+  
+  
+  <refentry id="cmd-storageinfoof">        
+    <refmeta><refentrytitle><command>storageinfoof</command></refentrytitle></refmeta>
+    <refnamediv><refname><command>storageinfoof</command></refname>
+      <refpurpose>Print the storage info of a file.</refpurpose>
+    </refnamediv>
+    
+    <refsynopsisdiv>
+      <cmdsynopsis>
+        <command>storageinfoof</command>
+        <group choice="req">
+          <arg><replaceable>pnfsId</replaceable></arg>
+          <arg><replaceable>globalPath</replaceable></arg>
+        </group>
+        <arg choice="opt">-v</arg>
+        <arg choice="opt">-n</arg>
+        <arg choice="opt">-se</arg>
+      </cmdsynopsis>
+      <variablelist>
+        <title>Arguments</title>
+        <varlistentry>
+          <term>pnfsId</term>
+          <listitem><para>The PNFS id of the file.</para></listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>globalPath</term>
+          <listitem><para>The global path oa the file.</para></listitem>
+        </varlistentry>
+ <!--
+        <varlistentry>
+          <term>-v</term>
+          <listitem><para>NO CLUE</para></listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>-n</term>
+          <listitem><para>NO CLUE</para></listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>-se</term>
+          <listitem><para>NO CLUE</para></listitem>
+        </varlistentry>
+-->
+      </variablelist>
+    </refsynopsisdiv>
+
+    <refsection>
+      <title>Description</title>
+      
+      <para>
+      </para>
+      
+    </refsection>
+  </refentry>
+ 
+  <refentry id="cmd-cacheinfoof">        
+    <refmeta><refentrytitle><command>cacheinfoof</command></refentrytitle></refmeta>
+    
+    <refnamediv><refname><command>cacheinfoof</command></refname>
+      <refpurpose>Print the cache info of a file.</refpurpose>
+    </refnamediv>
+    
+    <refsynopsisdiv>
+      <cmdsynopsis>
+        <command>cacheinfoof</command>
+        <group choice="req">
+          <arg><replaceable>pnfsId</replaceable></arg>
+          <arg><replaceable>globalPath</replaceable></arg>
+        </group>
+      </cmdsynopsis>
+      <variablelist>
+        <title>Arguments</title>
+        <varlistentry>
+          <term>pnfsId</term>
+          <listitem><para>The PNFS id of the file.</para></listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>globalPath</term>
+          <listitem><para>The global path oa the file.</para></listitem>
+        </varlistentry>
+      </variablelist>
+    </refsynopsisdiv>
+
+    <refsection>
+      <title>Description</title>
+      
+      <para>
+      </para>
+      
+    </refsection>
+  </refentry>
+  
+</section>

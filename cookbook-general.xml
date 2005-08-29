@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
+
+<chapter id="cb-general">
+  <title>General</title>
+  
+  <section id="cb-general-opteron">
+    <title>Installing dCache on Opteron Machines</title>
+    
+    <para>
+      The PNFS server, dCache server, and dCache client software
+      have to be taken care of:
+    </para>
+    
+    <section id="cb-general-opteron-server">
+      <title>The dCache Server</title>
+      
+      <para>
+        The major part of the dCache server softwar is written in
+        Java. Therefore the Java Virtual Machine with 64 bit
+        extension needs to be installed. It either is included in
+        the regular Java distribution or additional packages have to
+        be downloaded.
+      </para>
+      
+    </section>
+    
+    <section id="cb-general-opteron-client">
+      <title>The dCache Client</title>
+      
+      <para>
+        The <glossterm id="gl-dcap-library">dCap library</glossterm>
+        and the command line tool <command>dccp</command> may be
+        downloaded from <ulink
+	  url="http://www.dcache.org/downloads.shtml">
+	  http://www.dcache.org/downloads/</ulink> for several
+        architectures. The source of the client software may also be
+        downloaded from <ulink
+	  url="http://www.dcache.org/downloads/cvs.shtml">
+	  http://www.dcache.org/downloads/cvs.shtml</ulink> and
+        compiled. As of this writing, this has not been tested for
+        the Opteron architecture. Please, contact
+        <email>support@dcache.org</email> when encountering any
+        problems with this.
+      </para>
+      
+    </section>
+    
+    <section id="cb-general-opteron-pnfs">
+      <title>PNFS Server</title>
+      
+      <para>
+        The current version of the PNFS server software is written
+        in C and has never been compiled for any 64-bit
+        architecture. Since a Java implementation is in preparation,
+        there are no plans to do that. Therefore the PNFS server has
+        to be run in compat mode.
+      </para>
+      
+    </section>
+    
+  </section>
+  
+</chapter>

@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
+
+<chapter id="cb-adv">
+  <title>Advanced Tuning</title>
+  
+  <para>
+    The use cases described in this chapter are only relevant for
+    large-scale dCache Instances which require special tuning
+    according to a longer experience with client behaviour.
+  </para>
+  
+  <section id="cb-adv-multi-mover-queues">
+    <title>Multiple Queues for Movers in each Pool</title>
+    
+    
+    <section id="cb-adv-multi-mover-queues-d">
+      <title>Description</title>
+      
+      <para>
+        Client requests to a dCache system may have rather diverse
+        bahaviour. Sometimes it is possible to classify them into
+        several typical usage patterns. An example are the following
+        two usage patterns: 
+
+        <example>
+          <title>To Concurrent Usage Patterns</title>
+
+          <para>
+            Data is copied with a high transfer rate to the dCache
+            system from an external source. This is done via the
+            GridFTP protocol. At the same time batch jobs on a local
+            farm process data. Since they only need a small part of
+            each file, they use the dCap protocol via the dCap
+            library and seek to the position in the file they are
+            interested in, read a few bytes, do a few hours of
+            calculations, and finally read some more data.
+          </para>
+
+        </example>
+
+        As long as the number of active requests do not exceed the
+        maximum number of allowed active requests, the two types of
+        requests are processed concurrently. The GridFTP transfers
+        complete at a high rate while the processing jobs take hours
+        to finish. This maximum number of allowed requests is set
+        with <cellcommandref linkend="cmd-mover_set_max_active"/>
+        and should be tuned according to capabilities of the pool
+        host.
+      </para>
+      
+      <para>
+        However, if requests are queued, the slow processing jobs
+        might clog up the queue and not let the fast GridFTP request
+        through, even though the pool just sits there waiting for
+        the processing jobs to request more data. While this could
+        be temporarily remedied by setting the maximum active
+        requests to a higher value, then in turn GridFTP request
+        would put a very high load on the pool host.
+      </para>
+      
+      <para>
+        The above example is pretty realistic: As a rule of thumb,
+        GridFTP requests are fastest, dCap requests with the
+        <command>dccp</command> program are a little slower and dCap
+        requests with the dCap library are very slow. However, the
+        usage patterns might be different at other sites and also
+        might change over time.
+      </para>
+
+    </section>
+    
+    <section id="cb-adv-multi-mover-queues-s">
+      <title>Solution</title>
+      
+      <para>
+        Use separate queues for the movers, depending on the door
+        initiating them. This easily allows for a separation of
+        requests of separate protocols. Up to 10 mover queues for
+        client transfers are available since dCache version
+        1.6.6. Earlier versions support only one queue. (Transfers
+        from an to a <glossterm linkend="gl-tape_backend">tape
+	  backend</glossterm> and <glossterm
+	  linkend="gl-p2p">pool-to-pool transfers</glossterm> are
+        handled by separate queues, one for each of these transfers.)
+      </para>
+      
+      <para>
+        A finer grained queue selection mechanism based on, e.g. the
+        IP of the client or the file which has been requested, is
+        not possible with this mechanism. However, the <glossterm
+	  linkend="gl-pm-comp-psu">pool selection unit
+	  (PSU)</glossterm> may provide a separation onto separate
+        pools using those criteria.
+      </para>
+      
+      <para>
+        In the above example, two separate queues for fast GridFTP
+        transfers and slow dCap library access would solve the
+        problem. The maximum number of active movers for the GridFTP
+        queue should be set to a lower value compared to the dCap
+        queue since the fast GridFTP transfers will put a high load
+        on the system while the dCap requests will be mostly idle.
+      </para>
+
+    </section>
+    
+    <section id="cb-adv-multi-mover-queues-c">
+      <title>Configuration</title>
+      
+      <para>
+        For a multi mover queue setup, the pools have to be told to
+        start several queues and the doors have to be configured to
+        use one of these. It makes sense to create the same queues
+        on all pools. This is done by the following change to the
+        <filename>config/pool.batch</filename> file:
+        
+        <example>
+          <title>Modified <filename>config/pool.batch</filename> file for
+multiple mover queues</title>
+          
+<programlisting>...
+define context startPools endDefine
+  create diskCacheV111.pools.MultiProtocolPool2 ${0} \
+         "!MoverMap \
+         ${1} \
+         <emphasis>-io-queues=<replaceable>queueName-1</replaceable>[,<replaceable>queueName-2</replaceable>[,...,<replaceable>queueName-10</replaceable>]] \</emphasis>
+         -recover-control=yes \
+         -version=4 \
+         -sticky=allowed \
+         -sendHitInfoMessages=yes \
+         -${2} -${3} -${4} -${5} -${6} -${7} -${8} \
+         "
+endDefine
+...</programlisting>
+
+        </example>
+        
+        The same can be achived by appending
+        <literal>-io-queues=<replaceable>queueName-1</replaceable>,...,<replaceable>queueName-n</replaceable></literal>
+        to each line in the <glossterm
+	  linkend="gl-poollist-file"><literal>poollist</literal>
+	  file</glossterm>. However, this only makes sense if the
+        pools should not all have the same queues.
+      </para>
+      
+      <para>
+        The first in this list of queues
+        (<literal><replaceable>queueName-1</replaceable></literal>)
+        is the <glossterm linkend="gl-default-mover-queue">default
+	  mover queue</glossterm>. Transfers not requesting a
+        particular mover queue or requesting a mover queue not
+        existing on the selected pool, are handled by this default
+        queue.
+      </para>
+      
+      <para>
+        The pool cell commands <cellcommandref
+	  linkend="cmd-mover_ls"/> and <cellcommandref
+	  linkend="cmd-mover_set_max_active"/> have an
+        <option>-queue</option> option to select the mover queue to
+        operate on. Without this option, <cellcommandref
+	  linkend="cmd-mover_set_max_active"/> will act on the default
+        queue while <cellcommandref linkend="cmd-mover_ls"/> will
+        list the requests of all pools for backward compatibility.
+      </para>
+      
+      <para>
+        Each door may be configured to use a particular mover
+        queue. The pool, selected for this request, doesn't depend
+        on the selected mover queue. So a request may go to a pool
+        which doesn't have the particular mover queue configured and
+        will consequently end up in the default mover queue of that
+        pool. 
+      </para>
+      
+      <para>
+        The doors are configured to use a particular mover queue as
+        in the following example:
+
+        <example>
+          <title>Batch file for a GridFTP door using a mover queue</title>
+          
+<programlisting>...
+create dmg.cells.services.login.LoginManager GFTP \
+       "<replaceable>portName</replaceable> \
+       diskCacheV111.doors.GsiFtpDoorV1 \
+       <emphasis>-io-queue=<replaceable>queueName</replaceable> \</emphasis>
+       ... \
+"</programlisting>
+          
+        </example>
+
+        All requests send from this door will ask to be scheduled to
+        the given mover queue. The selection of the pool is not
+        affected.
+      </para>
+
+      <para>
+        For the dCap protocol, the corresponding door may be
+        configured to allow the client to determine the mover queue
+        name. In that case the client may use the extra option
+        facility to specify a mover queue. Whether the the dCap door
+        allows the client to request a particular mover queue or not
+        is configured with the
+        <option>-io-queue={allowed|denied}</option> option as in the
+        following example:
+
+        <example>
+          <title>Batch file for a dCap door for allowing the client to select
+the mover queue</title>
+	    
+<programlisting>...
+create dmg.cells.services.login.LoginManager DCap \
+       "${dCapPort} \
+       diskCacheV111.doors.DCapDoor \
+       -io-queue=<replaceable>queueName</replaceable> \
+       <emphasis>-io-queue-overwrite=allowed \</emphasis>
+       ... \
+"</programlisting>
+
+        </example>
+        
+        With the <command>dccp </command> command the queue can now
+        be specified as follows: 
+        
+<screen>dccp -X-io-queue=queueName <replaceable>source</replaceable> <replaceable>destination</replaceable></screen> 
+        
+        Since <command>dccp</command> requests may be quite
+        different from other requests with the dCap protocol, this
+        feature may be used to use separate queues for
+        <command>dccp</command> requests and other dCap library
+        requests. Therefore, the <command>dccp</command> command may
+        me changed in future releases to request a special
+        <command>dccp</command>-queue by default.
+      </para>
+      
+    </section>
+    
+  </section>
+  
+</chapter>

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
+
+<chapter id="cb-pool">
+  <title>Pool Operations</title>
+  
+  
+  <unfinished>
+
+  <section id="cb-pool-remove">
+    <title>Removing a Pool</title>
+    
+    <section id="cb-pool-remove-precious">
+      <title>Removing a Pool with Precious Files on it</title>
+      
+      <para>
+        TODO
+      </para>
+    </section>
+    
+    <section id="cb-pool-remove-cached">
+      <title>Removing a Pool with only cached Files</title>
+      
+      <para>
+        TODO
+      </para>
+    </section>
+    
+  </section>
+
+  </unfinished>
+  
+  <section id="cb-pool-rename">
+    <title>Renaming a Pool</title>
+    
+    <para>
+      A pool may be renamed with the following procedure,
+      regardless of the type of files stored on it.
+    </para>
+    
+    <para>
+      Disable file transfers from and to the pool with
+      
+<screen><dcpoolprompt></dcpoolprompt><command>pool disable</command> <option>-strict</option></screen>
+      
+      Then make shure, no transfers are being processed anymore.
+      All the following commands should give no output:
+      
+<screen><dcpoolprompt></dcpoolprompt><command>queue ls queue</command>
+<dcpoolprompt></dcpoolprompt><command>mover ls</command>
+<dcpoolprompt></dcpoolprompt><command>p2p ls</command>
+<dcpoolprompt></dcpoolprompt><command>pp ls</command>
+<dcpoolprompt></dcpoolprompt><command>st jobs ls</command>
+<dcpoolprompt></dcpoolprompt><command>rh jobs ls</command></screen>
+
+      Now the files on the pools have to be unregistered on the 
+      PNFS server with
+	
+<screen><dcpoolprompt></dcpoolprompt><command>pnfs unregister</command></screen>
+
+      Even if the pool contains precious files, this is no problem, since
+      we will register them again in a moment. The files might not be available
+      for a short moment, though.
+      Log out of the pool, and stop the service: 
+      
+<screen><rootprompt/>jobs/pool<footnote>
+            <para>
+              Filenames will always be relative to the dCache installation
+              directory, which defaults to
+              <filename>/opt/d-cache/</filename>. 
+            </para>
+      </footnote> -pool=<replaceable>poolDomainName</replaceable> stop</screen>
+
+      Rename the pool in the
+      <filename><replaceable>poolDomain</replaceable>.poollist</filename>-file.
+      Restart the service:
+      
+<screen><rootprompt/>jobs/pool -pool=<replaceable>poolDomainName</replaceable> -logfile=<replaceable>dCacheLocation</replaceable>/log/<replaceable>poolDomainName</replaceable>Domain.log start</screen>
+      
+      Register the files on the pool with
+      <screen><dcpoolprompt/><command>pnfs register</command></screen>
+    </para>
+    
+  </section>
+  
+  <section id="cb-pool-pin">
+    <title>Pinning Files to a Pool</title>
+    
+    <para>
+      You may pin a file locally within the private pool repository:
+      
+<screen><command>rep set sticky</command> <replaceable>pnfsid</replaceable> <option>on|off</option></screen> 
+
+      the 'sticky' mode will stay with the file as long as the file
+      is in the pool.  If the file is removed from the pool and
+      recreated afterwards this information gets lost.  
+    </para>
+    
+    <para>
+      You may use the same mechanism globally:  in the command line
+      interface (local mode) there is the command
+	
+<screen><command>set sticky</command> <replaceable>pnfsid</replaceable></screen>
+
+      This command does: 
+      <orderedlist>
+        <listitem>
+          <para>
+            Flags the file as sticky in the name space database
+            (pnfs). So from now the filename is globally set sticky.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Will go to all pools where it finds the file and will flag
+            it sticky in the pools.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            All new copies of the file will become sticky.
+          </para>
+        </listitem>
+      </orderedlist>
+    </para>
+
+  </section>
+
+</chapter>
+  
+  

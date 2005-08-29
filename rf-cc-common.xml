@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
+
+<section id="rf-cc-common">
+  <title>Common Cell Commands</title>
+  
+  <refentry id="cmd-pin">        
+    <refmeta><refentrytitle><command>pin</command></refentrytitle></refmeta>
+    <refnamediv><refname><command>pin</command></refname>
+      <refpurpose>Adds a comment to the pinboard.</refpurpose>
+    </refnamediv>
+    
+    <refsynopsisdiv>
+      <cmdsynopsis>
+        <command>pin</command>
+        <arg choice="req">
+          <replaceable>comment</replaceable>
+        </arg>
+      </cmdsynopsis>
+      <variablelist>
+        <title>Arguments</title>
+        <varlistentry>
+          <term>comment</term>
+          <listitem>
+            <para>
+              A string which is added to the pinboard.
+            </para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+    </refsynopsisdiv>
+
+    <refsection>
+      <title>Description</title>
+      
+      <para>
+      </para>
+      
+    </refsection>
+  </refentry>
+  
+  
+  <refentry id="cmd-info">        
+    <refmeta><refentrytitle><command>info</command></refentrytitle></refmeta>
+    <refnamediv><refname><command>info</command></refname>
+      <refpurpose>Print info about the cell.</refpurpose>
+    </refnamediv>
+    
+    <refsynopsisdiv>
+      <cmdsynopsis>
+        <command>info</command>
+        <arg>-a</arg>
+        <arg>-l</arg>
+      </cmdsynopsis>
+      <variablelist>
+        <title>Arguments</title>
+        <varlistentry>
+          <term>-a</term>
+          <listitem>
+            <para>
+              Display more information.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>-l</term>
+          <listitem>
+            <para>
+              Display long information.
+            </para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+    </refsynopsisdiv>
+    
+    <refsection>
+      <title>Description</title>
+      
+      <para>
+        The info printed by <command>info</command> depends on the cell class.
+      </para>
+      
+    </refsection>
+  </refentry>
+  
+<!--  
+  <refentry id="cmd-exec_context">        
+    <refmeta><refentrytitle><command>exec context</command></refentrytitle></refmeta>
+    <refnamediv><refname><command>exec context</command></refname>
+      <refpurpose>NOCLUE</refpurpose>
+    </refnamediv>
+    
+    <refsynopsisdiv>
+      <cmdsynopsis>
+        <command>exec context</command>
+        <arg choice="req">
+          <replaceable>arg-0</replaceable>
+        </arg>
+      </cmdsynopsis>
+      <variablelist>
+        <title>Arguments</title>
+        <varlistentry>
+          <term>arg-0</term>
+          <listitem><para>.</para></listitem>
+        </varlistentry>
+      </variablelist>
+    </refsynopsisdiv>
+    
+    <refsection>
+      <title>Description</title>
+      
+      <para>
+      </para>
+      
+    </refsection>
+  </refentry>
+-->  
+  
+  <refentry id="cmd-dump_pinboard">        
+    <refmeta><refentrytitle><command>dump pinboard</command></refentrytitle></refmeta>
+    <refnamediv><refname><command>dump pinboard</command></refname>
+      <refpurpose>Dump the full pinboard of the cell to a file.</refpurpose>
+    </refnamediv>
+    
+    <refsynopsisdiv>
+      <cmdsynopsis>
+        <command>dump pinboard</command>
+        <arg choice="req">
+          <replaceable>filename</replaceable>
+        </arg>
+      </cmdsynopsis>
+      <variablelist>
+        <title>Arguments</title>
+        <varlistentry>
+          <term>filename</term>
+          <listitem><para>The file the current content of the pinboard is stored in.</para></listitem>
+        </varlistentry>
+      </variablelist>
+    </refsynopsisdiv>
+
+    <refsection>
+      <title>Description</title>
+      
+      <para>
+      </para>
+      
+    </refsection>
+  </refentry>
+  
+  <refentry id="cmd-show_pinboard">        
+    <refmeta><refentrytitle><command>show pinboard</command></refentrytitle></refmeta>
+    <refnamediv><refname><command>show pinboard</command></refname>
+      <refpurpose>Print a part of the pinboard of the cell to STDOUT.</refpurpose>
+    </refnamediv>
+    
+    <refsynopsisdiv>
+      <cmdsynopsis>
+        <command>show pinboard</command>
+        <arg choice="opt">
+          <replaceable>lines</replaceable>
+        </arg>
+      </cmdsynopsis>
+      <variablelist>
+        <title>Arguments</title>
+        <varlistentry>
+          <term>lines</term>
+          <listitem><para>The number of lines which are displayed. Default: all.</para></listitem>
+        </varlistentry>
+      </variablelist>
+	</refsynopsisdiv>
+
+    <refsection>
+      <title>Description</title>
+      
+      <para>
+      </para>
+      
+    </refsection>
+  </refentry>
+  
+<!--  
+  <refentry id="cmd-set_printout">        
+    <refmeta><refentrytitle><command>set printout</command></refentrytitle></refmeta>
+    <refnamediv><refname><command>set printout</command></refname>
+      <refpurpose>NOCLUE</refpurpose>
+    </refnamediv>
+    
+    <refsynopsisdiv>
+      <cmdsynopsis>
+        <command>set printout</command>
+        <arg choice="req">
+          <replaceable>arg-0</replaceable>
+        </arg>
+      </cmdsynopsis>
+      <variablelist>
+        <title>Arguments</title>
+        <varlistentry>
+          <term>arg-0</term>
+          <listitem><para></para></listitem>
+        </varlistentry>
+      </variablelist>
+    </refsynopsisdiv>
+    
+    <refsection>
+      <title>Description</title>
+      
+      <para>
+      </para>
+      
+    </refsection>
+  </refentry>
+-->
+  
+<!--
+  <refentry id="cmd-xgetcellinfo">        
+    <refmeta><refentrytitle><command>xgetcellinfo</command></refentrytitle></refmeta>
+    <refnamediv><refname><command>xgetcellinfo</command></refname>
+      <refpurpose>NOCLUE</refpurpose>
+    </refnamediv>
+    
+    <refsynopsisdiv>
+      <cmdsynopsis>
+        <command>xgetcellinfo</command>
+      </cmdsynopsis>
+    </refsynopsisdiv>
+    
+    <refsection>
+      <title>Description</title>
+      
+      <para>
+      </para>
+      
+    </refsection>
+  </refentry>
+-->
+  
+<!--
+  <refentry id="cmd-say">        
+    <refmeta><refentrytitle><command>say</command></refentrytitle></refmeta>
+    <refnamediv><refname><command>say</command></refname>
+      <refpurpose>NOCLUE</refpurpose>
+    </refnamediv>
+    
+    <refsynopsisdiv>
+      <cmdsynopsis>
+        <command>say</command>
+        <arg choice="req">
+          <replaceable>arg-0</replaceable>
+        </arg>
+      </cmdsynopsis>
+      <variablelist>
+        <title>Arguments</title>
+        <varlistentry>
+          <term>arg-0</term>
+          <listitem><para>.</para></listitem>
+        </varlistentry>
+      </variablelist>
+    </refsynopsisdiv>
+    
+    <refsection>
+      <title>Description</title>
+      
+      <para>
+      </para>
+      
+    </refsection>
+  </refentry>
+-->
+
+
+</section>

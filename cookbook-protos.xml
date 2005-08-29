@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
+
+<chapter id="cb-proto">
+  <title>Protocols</title>
+  
+  <section id="cb-proto-dis-dcap">
+    <title>Disableing unauthenticated dCap via SRM</title>
+    
+    <!-- 
+    <para>
+      NOCLUE: Meta-intro? Where to put this? A more general section about
+      protocolls in Configuration?
+    </para> 
+    -->
+
+    <para>
+      In some cases SRM transfers fail because they are tried via
+      the plain dCap protocol (URL starts with
+      <literal>dcap://</literal>). Since plain dCap is
+      unauthenticated, the dCache server will have no information
+      about the user trying to access the system. While the transfer
+      will succeed if the UNIX file permissions allow access to
+      anybody (e.g. mode 777), it will fail otherwise. 
+    </para>
+    
+    <para>
+      Usually all doors are registered in SRM as potential access
+      points for dCache. During a protocol negotiation the SRM
+      chooses one of the available doors. You can force srmcp to use
+      the gsidcap protocol (<option>-protocol=gsidcap</option>) or
+      you can unregister plain, unauthenticated dCap from known
+      protocols: From the file
+      <filename>config/door.batch</filename> remove
+      <option>-loginBroker=LoginBroker</option> and restart dcap
+      door with
+      
+<screen><rootprompt/>jobs/door stop
+<rootprompt/>jobs/door -logfile=<replaceable>dCacheLocation</replaceable>/log/door.log start</screen>
+
+    </para>
+    
+  </section>
+  
+</chapter>

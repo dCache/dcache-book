@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
+
+<chapter id="cb-net">
+  <title>Complex Network Topologies</title>
+  
+  <para>
+    This chapter contains solutions for several non-trivial network
+    topologies. Even though not every case is covered, these cases might help solve
+    other problems, as well. Intermediate knowledge about dCache is required. Since
+    most tasks require changes in the start-up configuration,the background
+    information on how to configure the cell start-up, given in <xref
+      linkend="cf-cell-startup"/> will be useful.
+  </para>
+
+  <section id="cb-net-second-if">
+    <title>GridFTP Connections via two or more Network Interfaces</title>
+      
+    <section>
+      <title>Description</title>
+      <para>
+	The host on which the GridFTP door is running has several network
+        interfaces and is supposed to accept client connections via all those
+        interfaces. The interfaces might even belong to separate networks with no
+        routing from one network to the other.
+      </para>
+
+      <para>
+	As long as the data connection is opened by the GridFTP server (active
+        FTP mode), there is no problem with having more than one interface. However,
+        when the client opens the data connection (passive FTP mode), the door (FTP
+        server) has to supply it with the correct interface it should connect to. If
+        this is the wrong interface, the client might not be able to connect to it,
+        because there is no route or the connection might be inefficient.
+      </para>
+
+      <para>
+        Also, since a GridFTP server has to authenticate with an SSL grid
+        certificate and key, there needs to be a separate certificate and key pair for
+        each name of the host. Since each network interface might have a different
+        name, several certificates and keys are needed and the correct one has to be
+        used, when authenticating via each of the interfaces.
+      </para>
+    </section>
+      
+    <section>
+      <title>Solution</title>
+      <para>
+        Start a separate GridFTP server cell on the host for each
+        interface on which connections should be
+        accepted. 
+      </para>
+      
+      <para>
+        The cells may be started in one domain or in separate
+        domains. The cells have to have different names, since they
+        are <glossterm linkend="gl-well-known-cell">well
+	  known</glossterm> cells. Each cell has to be configured,
+        only to listen on the interface it should serve with the
+        <option>-listen</option> option. The locations of the grid
+        host certificate and key files for the interface have to be
+        specified explicitly with the <option>-service-cert</option>
+        and <option>-service-key</option> options.
+      </para>
+      
+      <para>
+        The following example shows a setup for two network
+        interfaces with the hostnames
+        <literal>door-a.grid.domain</literal> (111.111.111.5) and
+        <literal>door-b.other.domain</literal> (222.222.222.5) which are served by two
+        GridFTP door cells in one domain:
+      </para>
+      
+      <example>
+        <title>Batch file for two GridFTP doors serving separate network interfaces</title>
+
+<programlisting>set printout default 2
+set printout CellGlue none
+onerror shutdown
+check -strong setupFile
+copy file:${setupFile} context:setupContext
+import context -c setupContext
+check -strong serviceLocatorPort serviceLocatorHost
+check -strong sshPort ftpPort
+create dmg.cells.services.RoutingManager  RoutingMgr
+create dmg.cells.services.LocationManager lm \
+       "${serviceLocatorHost} ${serviceLocatorPort}"
+
+create dmg.cells.services.login.LoginManager <emphasis>GFTP-door-a</emphasis> \
+            "2811 \
+	     <emphasis>-listen=111.111.111.5 \</emphasis>
+             -export \
+             diskCacheV111.doors.GsiFtpDoorV1 \
+             -prot=raw \
+             <emphasis>-service-cert=/etc/grid-security/door-a.grid.domain-cert.pem \
+             -service-key=/etc/grid-security/door-a.grid.domain-key.pem \</emphasis>
+             -clientDataPortRange=${clientDataPortRange} \
+             -root=${ftpBase} \
+             -kpwd-file=${kpwdFile} \
+             -tlog=/tmp/dcache-ftp-tlog \
+             -maxLogin=100 \
+             -brokerUpdateTime=5 \
+             -protocolFamily=gsiftp \
+             -loginBroker=LoginBroker \
+             -poolManagerTimeout=5400 \
+             -pnfsTimeout=120 \
+             -maxRetries=80 \
+             -maxStreamsPerClient=10 \
+"
+
+create dmg.cells.services.login.LoginManager <emphasis>GFTP-door-b</emphasis> \
+            "2811 \
+             <emphasis>-listen=222.222.222.5 \</emphasis>
+             -export \
+             diskCacheV111.doors.GsiFtpDoorV1 \
+             -prot=raw \
+             <emphasis>-service-cert=/etc/grid-security/door-b.other.domain-cert.pem \
+             -service-key=/etc/grid-security/door-b.other.domain-key.pem \</emphasis>
+             -clientDataPortRange=${clientDataPortRange} \
+            -root=${ftpBase} \
+             -kpwd-file=${kpwdFile} \
+             -tlog=/tmp/dcache-ftp-tlog \
+             -maxLogin=100 \
+             -brokerUpdateTime=5 \
+             -protocolFamily=gsiftp \
+             -loginBroker=LoginBroker \
+             -poolManagerTimeout=5400 \
+             -pnfsTimeout=120 \
+             -maxRetries=80 \
+             -maxStreamsPerClient=10 \
+"</programlisting>
+
+      </example>
+      
+      <para>
+        This batch file is very similar to the batch file for the
+        GridFTP door in the standard setup. (Comments have been left
+        out.) It only contains an additional create command for the
+        second cell and the emphasized changes within the two create
+        commands: The cell names, the <option>-listen</option>
+        option with the IP address of the corresponding interface
+        and the <option>-service-cert</option> and
+        <option>-service-key</option> options with the host
+        certificate and key files.
+      </para>
+    </section>
+    
+  </section> 
+  
+  <section id="cb-net-pool-priv">
+    <title>GridFTP with Pools in a Private Subnet</title>
+    
+    <section>
+      <title>Description</title>
+      <para>
+        If pool nodes of a dCache instance are connected to a
+        <glossterm linkend="gl-secondary-interface">secondary
+	  interface</glossterm> of the GridFTP door, e.g. because they
+        are in a private subnet, the GridFTP door will still tell
+        the pool to connect to its primary interface, which might be
+        unreachable. 
+      </para>
+      
+      <para>
+        The reason for this is that the control communication
+        between the door and the pool is done via the network of TCP
+        connections which have been established at start-up. In the
+        standard setup this communication is routed via the dCache
+        domain. However, for the data transfer, the pool connects to
+        the GridFTP door. The IP address it connects to is sent by
+        the GridFTP door to the pool via the control
+        connection. Since the GridFTP door cannot find out which of
+        its interfaces the pool should use, it normally sends the IP
+        address of the <glossterm
+	  linkend="gl-primary-interface">primary
+	  interface</glossterm>.
+      </para>
+    </section>
+    
+    <section>
+      <title>Solution</title>
+      <para>
+        Tell the GridFTP door explicitly which IP it should send to
+        the pool for the data connection with the
+        <option>-ftp-adapter-internal-interface</option>
+        option. E.g. if the pools should connect to the secondary
+        interface of the GridFTP door host which has the IP address
+        <literal>10.0.1.1</literal>, the following batch file would
+        be appropriate:
+      </para>
+      
+      <example>
+        <title>Batch file for two GridFTP doors serving separate network interfaces</title>
+
+<programlisting>set printout default 2
+set printout CellGlue none
+onerror shutdown
+check -strong setupFile
+copy file:${setupFile} context:setupContext
+import context -c setupContext
+check -strong serviceLocatorPort serviceLocatorHost
+check -strong sshPort ftpPort
+create dmg.cells.services.RoutingManager  RoutingMgr
+create dmg.cells.services.LocationManager lm \
+       "${serviceLocatorHost} ${serviceLocatorPort}"
+
+create dmg.cells.services.login.LoginManager GFTP \
+            "2811 \
+             -export \
+             diskCacheV111.doors.GsiFtpDoorV1 \
+             -prot=raw \
+             -clientDataPortRange=${clientDataPortRange} \
+            -root=${ftpBase} \
+             -kpwd-file=${kpwdFile} \
+             -tlog=/tmp/dcache-ftp-tlog \
+             -maxLogin=100 \
+             -brokerUpdateTime=5 \
+             -protocolFamily=gsiftp \
+             -loginBroker=LoginBroker \
+             -poolManagerTimeout=5400 \
+             -pnfsTimeout=120 \
+             -maxRetries=80 \
+             -maxStreamsPerClient=10 \
+	    <emphasis>-ftp-adapter-internal-interface=10.0.1.1 \</emphasis>
+"</programlisting>
+
+      </example>
+
+      <para>
+        This batch file is very similar to the batch file for the
+        GridFTP door in the standard setup. (Comments have been left
+        out.) The emphasized last line has the desired effect.
+      </para>
+      
+    </section>
+    
+  </section>
+  
+  <section id="cb-net-dmz">
+    <title>Doors in the DMZ</title>
+    
+    <section>
+      <title>Description</title>
+      <para>
+        Some doors - e.g. for grid access - are located in the DMZ
+        while the rest of the dCache instance is in the
+        intranet. The firewall is configured in such a way that the
+        doors cannot reach the location manager (usually on the
+        admin node together with the pool manager) via port 11111 
+        (or as configured in the variable 
+        <varname>serviceLocatorPort</varname> in 
+        <filename>config/lmSetup</filename>).
+      </para>
+    </section>
+    
+    <section>
+      <title>Solution</title>
+      <para>
+        Please contact <email>support@dcache.org</email> if you need
+        a solution for this problem.
+      </para>
+    </section>
+    
+  </section>
+  
+</chapter>
