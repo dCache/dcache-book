@@ -472,15 +472,19 @@ StoreName myStore</screen>
     <title>Access Control</title>
     
     <para>
-      The file
+      The files
       <filename>/pnfs/fs/admin/etc/exports/<replaceable>hostIP</replaceable></filename>
-      contains one line per NFS mount point which contain the
-      following four fields:
+      and
+      <filename>/pnfs/fs/admin/etc/exports/<replaceable>netMask</replaceable>..<replaceable>netPart</replaceable></filename>
+      are used to control the host-based access to the <pnfs/>
+      filesystem via mount points. They have to 
+      contain one line per NFS mount point. The lines are made of the  following
+      four space-separated fields fields:
       <itemizedlist>
 	<listitem>
 	  <para>
 	    Mount point for NFS (the part after the colon in e.g.
-	    host:/mountpoint)
+	    <literal>host:/mountpoint</literal>)
 	  </para>
 	</listitem>
 
@@ -492,16 +496,47 @@ StoreName myStore</screen>
 	
 	<listitem>
 	  <para>
-	    A number: 0: all permissions 30: restricted
+	    Permission: 0 means all permissions and 30 means disabled I/O.
 	  </para>
 	</listitem>
 	
 	<listitem>
 	  <para>
-	    Options (usually: nooptions)
+	    Options (should always be nooptions)
 	  </para>
 	</listitem>
       </itemizedlist>
+      In the initial configuration there is one file <filename>/pnfs/fs/admin/etc/exports/0.0.0.0..0.0.0.0</filename> containing
+
+<programlisting>/pnfs /0/root/fs/usr/ 30 nooptions</programlisting>
+
+      thereby allowing all hosts to mount the part of the <pnfs/>
+      filesystem containing the user data. There also is a file
+      <filename>/pnfs/fs/admin/etc/exports/127.0.0.1</filename>
+      containing
+
+<programlisting>/fs /0/root/fs 0 nooptions
+/admin /0/root/fs/admin 0 nooptions</programlisting>
+
+      The first line is the mountpoint used by the admin node. If the
+      <pnfs/> mount is not needed for client operations (e.g. in the
+      grid context) and if no <glossterm linkend="gl-tss">tertiary
+      storage system (HSM)</glossterm> is connected, the file
+      <filename>/pnfs/fs/admin/etc/exports/0.0.0.0..0.0.0.0</filename>
+      may be deleted. With an HSM, the pools which write files into
+      the HSM have to mount the <pnfs/> filesystem and suitable export
+      files have to be created.
+    </para>
+
+    <para>
+      In general, the user ID 0 of the <literal>root</literal> user on
+      a client mounting the <pnfs/> filesystem will be mapped to
+      nobody (not to the user <literal>nobody</literal>). For the
+      hosts whose IP addresses are the file names in the directory
+      <filename
+      class="directory">/pnfs/fs/admin/etc/exports/trusted/</filename>
+      this is not the case. The files have to contain only the number
+      <literal>15</literal>.
     </para>
 
   </section>
