@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
+
+<section id="rf-cc-pool">
+  <title>Pool Commands</title>
+  
+  <refentry id="cmd-rep_ls">
+    <refmeta>
+      <refentrytitle><command>rep ls</command></refentrytitle>
+    </refmeta>
+    <refnamediv>
+      <refname><command>rep ls</command></refname>
+      <refpurpose>List the files currently in the repository of the pool.</refpurpose>
+    </refnamediv>
+    
+    <refsynopsisdiv>
+      <cmdsynopsis>
+	<command>rep ls</command>
+	<group choice="plain">
+	  <arg rep="repeat">pnfsId</arg>
+	  <!-- <sbr/> -->
+	  <arg choice="plain">
+	    <arg>-l=<group choice="plain" rep="repeat">
+		<arg choice="plain">s</arg>
+		<arg choice="plain">p</arg>
+		<arg choice="plain">l</arg>
+		<arg choice="plain">u</arg>
+		<arg choice="plain">nc</arg>
+		<arg choice="plain">e</arg>
+	      </group>
+	    </arg>
+	    <arg>-s=<group choice="plain">
+		<arg choice="plain">k</arg>
+		<arg choice="plain">m</arg>
+		<arg choice="plain">g</arg>
+		<arg choice="plain">t</arg>
+	      </group>
+	    </arg>
+	  </arg>
+	</group>
+      </cmdsynopsis>
+      <variablelist>
+	<varlistentry>
+	  <term>pnfsId</term>
+	  <listitem>
+	    <para>
+	      The <pnfs/> ID(s) for which the files in the repository will
+	      be listed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term>-l</term>
+	  <listitem>
+                <para>
+	      List only the files with one of the following properties:
+
+<screen>s      sticky files
+p      precious files
+l      locked files
+u      files in use
+nc     files which are not cached
+e      files with an error condition</screen>
+
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term>-s</term>
+	  <listitem>
+	    <para>
+	      Unit, the filesize is shown:
+
+<screen>k      data amount in KBytes
+m      data amount in MBytes
+g      data amount in GBytes
+t      data amount in TBytes</screen>
+
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </refsynopsisdiv>
+    
+    <refsection>
+      <title>Description</title>
+      <para>
+      </para>
+    </refsection>
+  </refentry>
+  
+  <refentry id="cmd-st_set_max_active">
+    <refmeta>
+      <refentrytitle><command>st set max active</command></refentrytitle>
+    </refmeta>
+    <refnamediv>
+      <refname><command>st set max active</command></refname>
+      <refpurpose>Set the maximum number of active store transfers.</refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+      <cmdsynopsis>
+	<command>st set max active</command>
+	<arg choice="req"><replaceable>maxActiveStoreTransfers</replaceable></arg>
+      </cmdsynopsis>
+      <variablelist>
+	<varlistentry>
+	  <term>maxActiveStoreTransfers</term>
+	  <listitem>
+	    <para>
+	      The maximum number of active store transfers.
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </refsynopsisdiv>
+    <refsection>
+      <title>Description</title>
+      <para>
+	Any further requests will be queued. This value will also be
+	used by the <glossterm linkend="gl-pm-comp-cm">cost
+	  module</glossterm> for calculating the <glossterm
+	  linkend="gl-performance_cost">performance cost</glossterm>.
+      </para>
+    </refsection>
+  </refentry>
+  
+  
+  <refentry id="cmd-rh_set_max_active">
+    <refmeta>
+      <refentrytitle><command>rh set max active</command></refentrytitle>
+    </refmeta>
+    <refnamediv>
+      <refname><command>rh set max active</command></refname>
+      <refpurpose>Set the maximum number of active restore transfers.</refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+      <cmdsynopsis>
+	<command>rh set max active</command>
+	<arg choice="req"><replaceable>maxActiveRetoreTransfers</replaceable></arg>
+      </cmdsynopsis>
+      <variablelist>
+	<varlistentry>
+	  <term>maxActiveRetoreTransfers</term>
+	  <listitem>
+	    <para>
+	      The maximum number of active restore transfers.
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </refsynopsisdiv>
+    <refsection>
+      <title>Description</title>
+      <para>
+	Any further requests will be queued. This value will also be
+	used by the <glossterm linkend="gl-pm-comp-cm">cost
+	  module</glossterm> for calculating the <glossterm
+	  linkend="gl-performance_cost">performance cost</glossterm>.
+      </para>
+    </refsection>
+  </refentry>
+  
+  <refentry id="cmd-mover_set_max_active">
+    <refmeta>
+      <refentrytitle><command>mover set max active</command></refentrytitle>
+    </refmeta>
+    <refnamediv>
+      <refname><command>mover set max active</command></refname>
+      <refpurpose>Set the maximum number of active client transfers.</refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+      <cmdsynopsis>
+	<command>mover set max active</command>
+	<arg choice="req"><replaceable>maxActiveClientTransfers</replaceable></arg>
+	<arg><option>-queue=<replaceable>moverQueueName</replaceable></option></arg>
+      </cmdsynopsis>
+      <variablelist>
+	<varlistentry>
+	  <term>maxActiveClientTransfers</term>
+	  <listitem>
+	      <para>
+	      The maximum number of active client transfers.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term>moverQueueName</term>
+	  <listitem>
+	    <para>
+	      The mover queue for which the maximum number of
+	      active transfers should be set. If this is not
+	      specified, the default queue is assumed, in order to
+	      be compatible with previous versions which did not
+	      support multiple mover queues (before version
+	      1.6.6).
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </refsynopsisdiv>
+    <refsection>
+      <title>Description</title>
+      <para>
+	Any further requests will be queued. This value will also be
+	used by the <glossterm linkend="gl-pm-comp-cm">cost
+	  module</glossterm> for calculating the <glossterm
+	  linkend="gl-performance_cost">performance cost</glossterm>.
+      </para>
+    </refsection>
+  </refentry>
+  
+  <refentry id="cmd-p2p_set_max_active">
+    <refmeta>
+      <refentrytitle><command>p2p set max active</command></refentrytitle>
+    </refmeta>
+    <refnamediv>
+      <refname><command>p2p set max active</command></refname>
+      <refpurpose>Set the maximum number of active pool-to-pool server transfers.</refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+      <cmdsynopsis>
+	<command>p2p set max active</command>
+	<arg choice="req"><replaceable>maxActiveP2PTransfers</replaceable></arg>
+      </cmdsynopsis>
+      <variablelist>
+	<varlistentry>
+	  <term>maxActiveP2PTransfers</term>
+	  <listitem>
+	    <para>
+	      The maximum number of active pool-to-pool server transfers.
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </refsynopsisdiv>
+    <refsection>
+      <title>Description</title>
+      <para>
+	Any further requests will be queued. This value will also be
+	used by the <glossterm linkend="gl-pm-comp-cm">cost
+	  module</glossterm> for calculating the <glossterm
+	  linkend="gl-performance_cost">performance cost</glossterm>.
+      </para>
+    </refsection>
+  </refentry>
+  
+  <refentry id="cmd-pp_set_max_active">
+    <refmeta>
+      <refentrytitle><command>pp set max active</command></refentrytitle>
+    </refmeta>
+    <refnamediv>
+      <refname><command>pp set max active</command></refname> 
+      <refpurpose>
+	Set the value used for scaling the performance cost of
+	pool-to-pool client transfers analogous to the other
+	<literal>set max active</literal>-commands.
+      </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+      <cmdsynopsis>
+	<command>pp set max active</command>
+	<arg choice="req"><replaceable>maxActivePPTransfers</replaceable></arg>
+      </cmdsynopsis>
+      <variablelist>
+	<varlistentry>
+	  <term>maxActivePPTransfers</term>
+	  <listitem>
+	    <para>
+	      The new scaling value for the cost calculation.
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </refsynopsisdiv>
+    <refsection>
+      <title>Description</title>
+      <para>
+	All pool-to-pool client requests will be performed
+	immediately in order to avoid deadlocks.
+	
+	This value will only used by the <glossterm
+	  linkend="gl-pm-comp-cm">cost module</glossterm> for
+	calculating the <glossterm
+	  linkend="gl-performance_cost">performance cost</glossterm>.
+      </para>
+    </refsection>
+  </refentry>
+
+<!--  
+  <refentry id="cmd-flush_set_max_active">
+    <refmeta>
+      <refentrytitle><command>flush set max active</command></refentrytitle>
+      </refmeta>
+    <refnamediv>
+      <refname><command>flush set max active</command></refname>
+      <refpurpose>Set the maximum number of active NOCLUE transfers.</refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+      <cmdsynopsis>
+	<command>flush set max active</command>
+	<arg choice="req"><replaceable>maxActiveNOCLUETransfers</replaceable></arg>
+      </cmdsynopsis>
+      <variablelist>
+	<varlistentry>
+	  <term>maxActiveNOCLUETransfers</term>
+	  <listitem>
+	    <para>
+	      The maximum number of active NOCLUE transfers.
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </refsynopsisdiv>
+    <refsection>
+      <title>Description</title>
+      <para>
+	NOCLUE
+      </para>
+    </refsection>
+  </refentry>
+-->  
+
+  <refentry id="cmd-set_gap">
+    <refmeta>
+      <refentrytitle><command>set gap</command></refentrytitle>
+    </refmeta>
+    <refnamediv>
+      <refname><command>set gap</command></refname>
+      <refpurpose>Set the gap parameter - the size of free space below which it will be assumed that the pool is full within the cost calculations.</refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+      <cmdsynopsis>
+	<command>set gap</command>
+	<arg choice="req"><replaceable>gapPara</replaceable></arg>
+      </cmdsynopsis>
+      <variablelist>
+	<varlistentry>
+	  <term>gapPara</term>
+	  <listitem>
+	    <para>
+	      The size of free space below which it will be
+	      assumed that the pool is full. Default is 4GB.
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </refsynopsisdiv>
+    <refsection>
+      <title>Description</title>
+      <para>
+	The gap parameter is used within the space cost
+	calculation scheme described in <xref
+	  linkend="cf-pm-cm-space"/>. It specifies the size of free
+	space below which it will be assumed that the pool is full
+	and consequently the least recently used file has to be
+	removed if a new file has to be stored on the pool. If, on
+	the other hand, the free space is greater than gapPara, it
+	will be expensive to store a file on the pool which
+	exceeds the free space.
+      </para>
+    </refsection>
+  </refentry>
+  
+  <refentry id="cmd-set_breakeven">
+    <refmeta>
+      <refentrytitle><command>set breakeven</command></refentrytitle>
+    </refmeta>
+    <refnamediv>
+      <refname><command>set breakeven</command></refname>
+      <refpurpose>Set the breakeven parameter - used within the cost calculations.</refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+      <cmdsynopsis>
+	<command>set breakeven</command>
+	<arg choice="req"><replaceable>breakevenPara</replaceable></arg>
+      </cmdsynopsis>
+      <variablelist>
+	<varlistentry>
+	  <term>breakevenPara</term>
+	  <listitem>
+	    <para>
+	      The breakeven parameter has to be a positive number
+	      smaller than 1.0.  It specifies the impact of the
+	      age of the <glossterm linkend="gl-lru">least
+		recently used file</glossterm> on space cost. It the
+	      LRU file is one week old, the space cost will be
+	      equal to <inlineeq>(1 + breakeven)</inlineeq>. Note
+	      that this will not be true, if the breakeven
+	      parameter has been set to a value greater or equal
+	      to 1.
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </refsynopsisdiv>
+    <refsection>
+      <title>Description</title>
+      <para>
+	The breakeven parameter is used within the space cost
+	calculation scheme described in <xref
+	  linkend="cf-pm-cm-space"/>.
+      </para>
+    </refsection>
+  </refentry>
+  
+  <refentry id="cmd-mover_ls">
+    <refmeta>
+      <refentrytitle><command>mover ls</command></refentrytitle>
+    </refmeta>
+    <refnamediv>
+      <refname><command>mover ls</command></refname>
+      <refpurpose>List the active and waiting client transfer requests.</refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+      <cmdsynopsis>
+	<command>mover ls</command>
+	<group>
+	  <arg choice="req">-queue</arg>
+	  <arg choice="req">-queue=<replaceable>queueName</replaceable></arg>
+	</group>
+      </cmdsynopsis>
+      <variablelist>
+	<varlistentry>
+	  <term>queueName</term>
+	  <listitem>
+	    <para>
+	      The name of the mover queue for which the transfers should be listed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </refsynopsisdiv>
+    <refsection>
+      <title>Description</title>
+      <para>
+	Without parameter all transfers are listed. With
+	<option>-queue</option> all requests sorted according to
+	the mover queue are listed. If a queue is explicitly
+	specified, only transfers in that mover queue are listed.
+      </para>
+    </refsection>
+  </refentry>
+  
+</section>
