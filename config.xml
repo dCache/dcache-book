@@ -15,6 +15,10 @@
 
   <xi:include href="config-pnfs.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
 
+  <xi:include href="config-cellpackage.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+
+
+
   <chapter id="cf-cell-startup">
     <title>Cell Package Start-Up Framework</title>
 
@@ -29,11 +33,24 @@
     <para>
       Each domain runs in a separate Java virtual machine and each
       cell is run as a separate thread therein. The domains
-      communicate with each other via network connection which are
+      communicate with each other via TCP connections which are
       established at start-up. In the standard setup all domains
       connect with the <quote>dCacheDomain</quote> which routes all
       messages to the appropriate domains. Note, that actual data
       transfers are not done via these established connections.
+    </para>
+
+    <para>
+      At start-up a domain asks the
+      <literal>serviceLocatorHost</literal> on the
+      <literal>serviceLocatorPort</literal> (as configured in
+      <filename>config/<replaceable>domainName</replaceable>Setup</filename>) for a
+      domain to connect to. This request is handled by the location manager in
+      the <literal>lmDomain</literal> In the standard setup it will tell all other
+      domains to connect to the <literal>dCacheDomain</literal> and will
+      provide the necessary connection information. A TCP connection between
+      the new domain and the <literal>dCacheDomain</literal> will be
+      established.
     </para>
 
     <para>
@@ -67,7 +84,7 @@
 
     <para>
       A domain is started with a shell script
-      <filename>jobs/<replaceable>domainName</replaceable>.sh</filename><footnote>
+      <filename>jobs/<replaceable>domainName</replaceable></filename><footnote>
 	<para>
 	  Filenames will always be relative to the dCache installation
 	  directory, which defaults to

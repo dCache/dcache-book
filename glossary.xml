@@ -15,6 +15,7 @@
       its concepts heavily influence dCache.
     </para>
   </partintro>
+
   
   
   <chapter id="gl-general">
@@ -185,6 +186,14 @@
 
       <glossentry>
 	<glossterm id="gl-well-known-cell">Well Known Cell</glossterm>
+	<glossdef>
+	  <para>
+	  </para>
+	</glossdef>
+      </glossentry>
+
+      <glossentry>
+	<glossterm id="gl-pinboard">Pinboard</glossterm>
 	<glossdef>
 	  <para>
 	  </para>

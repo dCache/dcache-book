@@ -7,6 +7,10 @@
   
   <xsl:include href="dcb-docbook-parameters.xsl"/>
 
+  <xsl:include href="dcb-docbook-fo-customizations.xsl"/>
+  
+  <xsl:include href="dcb-extensions.xsl"/>
+
   <xsl:param name="generate.toc">
     appendix  toc,title
     article/appendix  nop
@@ -27,8 +31,5 @@
     set       toc,title
   </xsl:param>
   
-  <xsl:include href="dcb-docbook-fo-customizations.xsl"/>
-  
-  <xsl:include href="dcb-extensions.xsl"/>
   
 </xsl:stylesheet>

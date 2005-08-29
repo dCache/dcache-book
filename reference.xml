@@ -1,22 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE part PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
 
-<namespacewrapper xmlns:xi="http://www.w3.org/2001/XInclude">
+<!-- <namespacewrapper xmlns:xi="http://www.w3.org/2001/XInclude"> -->
 <part id="rf">
   <!-- <?dbhtml dir="reference" ?> -->
   <title>Reference</title>
-    
+  
+<!--
+
   <chapter id="rf-setup">
     <title>dCache Start-Up Parameters</title>
     
     <para>
       The important variables in the <glossterm
-      linkend="gl-dcachesetup-file">dCacheSetup file</glossterm> and
+        linkend="gl-dcachesetup-file">dCacheSetup file</glossterm> and
       parameters in the <glossterm linkend="gl-batch-file">batch
-      files</glossterm> are described below. 
+        files</glossterm> are described below. 
     </para>
-
+    
   </chapter>
+-->
   
   <chapter id="rf-cc">
     <title>dCache Cell Commands</title>
@@ -33,755 +36,100 @@
       refer to it, whenever a command is mentioned. Secondly, an
       administrator may check here, if he wonders what a command does.
     </para>
-    
-    <section id="rf-cc-common">
-      <title>Common Cell Commands</title>
-      
-      <refentry id="cmd-pin">        
-	<refmeta><refentrytitle><command>pin</command></refentrytitle></refmeta>
-	<refnamediv><refname><command>pin</command></refname>
-	  <refpurpose>Adds a comment to the pinboard.</refpurpose>
-	</refnamediv>
-	
-	<refsynopsisdiv>
-	  <cmdsynopsis>
-	    <command>pin</command>
-	    <arg choice="req">
-	      <replaceable>comment</replaceable>
-	    </arg>
-	  </cmdsynopsis>
-	  <variablelist>
-	    <title>Arguments</title>
-	    <varlistentry>
-	      <term>comment</term>
-	      <listitem>
-		<para>
-		  A string which is added to the pinboard.
-		</para>
-	      </listitem>
-	    </varlistentry>
-	  </variablelist>
-	</refsynopsisdiv>
-	
-	<refsection>
-	  <title>Description</title>
-	  
-	  <para>
-	  </para>
-	  
-	</refsection>
-      </refentry>
-      
-      
-      <refentry id="cmd-info">        
-	<refmeta><refentrytitle><command>info</command></refentrytitle></refmeta>
-	<refnamediv><refname><command>info</command></refname>
-	  <refpurpose>Print info about the cell.</refpurpose>
-	</refnamediv>
-	
-	<refsynopsisdiv>
-	  <cmdsynopsis>
-	    <command>info</command>
-	    <arg>-a</arg>
-	    <arg>-l</arg>
-	  </cmdsynopsis>
-	  <variablelist>
-	    <title>Arguments</title>
-	    <varlistentry>
-	      <term>-a</term>
-	      <listitem>
-		<para>
-		  Display more information.
-		</para>
-	      </listitem>
-	    </varlistentry>
-	    <varlistentry>
-	      <term>-l</term>
-	      <listitem>
-		<para>
-		  Display long information.
-		</para>
-	      </listitem>
-	    </varlistentry>
-	  </variablelist>
-	</refsynopsisdiv>
-	
-	<refsection>
-	  <title>Description</title>
-	  
-	  <para>
-	    The info printed by <command>info</command> depends on the cell class.
-	  </para>
-	  
-	</refsection>
-      </refentry>
-      
-      
-      <refentry id="cmd-exec_context">        
-	<refmeta><refentrytitle><command>exec context</command></refentrytitle></refmeta>
-	<refnamediv><refname><command>exec context</command></refname>
-	  <refpurpose>NOCLUE</refpurpose>
-	</refnamediv>
-	
-	<refsynopsisdiv>
-	  <cmdsynopsis>
-	    <command>exec context</command>
-	    <arg choice="req">
-	      <replaceable>arg-0</replaceable>
-	    </arg>
-	  </cmdsynopsis>
-	  <variablelist>
-	    <title>Arguments</title>
-	    <varlistentry>
-	      <term>arg-0</term>
-	      <listitem><para>.</para></listitem>
-	    </varlistentry>
-	  </variablelist>
-	</refsynopsisdiv>
-	
-	<refsection>
-	  <title>Description</title>
-	  
-	  <para>
-	  </para>
-	  
-	</refsection>
-      </refentry>
-      
-      
-      <refentry id="cmd-dump_pinboard">        
-	<refmeta><refentrytitle><command>dump pinboard</command></refentrytitle></refmeta>
-	<refnamediv><refname><command>dump pinboard</command></refname>
-	  <refpurpose>Dump the full pinboard of the cell to a file.</refpurpose>
-	</refnamediv>
-	
-	<refsynopsisdiv>
-	  <cmdsynopsis>
-	    <command>dump pinboard</command>
-	    <arg choice="req">
-	      <replaceable>filename</replaceable>
-	    </arg>
-	  </cmdsynopsis>
-	  <variablelist>
-	    <title>Arguments</title>
-	    <varlistentry>
-	      <term>filename</term>
-	      <listitem><para>The file the current content of the pinboard is stored in.</para></listitem>
-	    </varlistentry>
-	  </variablelist>
-	</refsynopsisdiv>
-	
-	<refsection>
-	  <title>Description</title>
-	  
-	  <para>
-	  </para>
-	  
-	</refsection>
-      </refentry>
-      
-      
-      <refentry id="cmd-show_pinboard">        
-	<refmeta><refentrytitle><command>show pinboard</command></refentrytitle></refmeta>
-	<refnamediv><refname><command>show pinboard</command></refname>
-	  <refpurpose>Print a part of the pinboard of the cell to STDOUT.</refpurpose>
-	</refnamediv>
-	
-	<refsynopsisdiv>
-	  <cmdsynopsis>
-	    <command>show pinboard</command>
-	    <arg choice="opt">
-	      <replaceable>lines</replaceable>
-	    </arg>
-	  </cmdsynopsis>
-	  <variablelist>
-	    <title>Arguments</title>
-	    <varlistentry>
-	      <term>lines</term>
-	      <listitem><para>The number of lines which are displayed. Default: all.</para></listitem>
-	    </varlistentry>
-	  </variablelist>
-	</refsynopsisdiv>
-	
-	<refsection>
-	  <title>Description</title>
-	  
-	  <para>
-	  </para>
-	  
-	</refsection>
-      </refentry>
-      
-      
-      <refentry id="cmd-set_printout">        
-	<refmeta><refentrytitle><command>set printout</command></refentrytitle></refmeta>
-	<refnamediv><refname><command>set printout</command></refname>
-	  <refpurpose>NOCLUE</refpurpose>
-	</refnamediv>
-	
-	<refsynopsisdiv>
-	  <cmdsynopsis>
-	    <command>set printout</command>
-	    <arg choice="req">
-	      <replaceable>arg-0</replaceable>
-	    </arg>
-	  </cmdsynopsis>
-	  <variablelist>
-	    <title>Arguments</title>
-	    <varlistentry>
-	      <term>arg-0</term>
-	      <listitem><para></para></listitem>
-	    </varlistentry>
-	  </variablelist>
-	</refsynopsisdiv>
-	
-	<refsection>
-	  <title>Description</title>
-	  
-	  <para>
-	  </para>
-	  
-	</refsection>
-      </refentry>
-      
-      <refentry id="cmd-xgetcellinfo">        
-	<refmeta><refentrytitle><command>xgetcellinfo</command></refentrytitle></refmeta>
-	<refnamediv><refname><command>xgetcellinfo</command></refname>
-	  <refpurpose>NOCLUE</refpurpose>
-	</refnamediv>
-	
-	<refsynopsisdiv>
-	  <cmdsynopsis>
-	    <command>xgetcellinfo</command>
-	  </cmdsynopsis>
-	</refsynopsisdiv>
-	
-	<refsection>
-	  <title>Description</title>
-	  
-	  <para>
-	  </para>
-	  
-	</refsection>
-      </refentry>
-      
-      
-      <refentry id="cmd-say">        
-	<refmeta><refentrytitle><command>say</command></refentrytitle></refmeta>
-	<refnamediv><refname><command>say</command></refname>
-	  <refpurpose>NOCLUE</refpurpose>
-	</refnamediv>
-	
-	<refsynopsisdiv>
-	  <cmdsynopsis>
-	    <command>say</command>
-	    <arg choice="req">
-	      <replaceable>arg-0</replaceable>
-	    </arg>
-	  </cmdsynopsis>
-	  <variablelist>
-	    <title>Arguments</title>
-	    <varlistentry>
-	      <term>arg-0</term>
-	      <listitem><para>.</para></listitem>
-	    </varlistentry>
-	    <varlistentry>
-	      <term>key</term>
-	      <listitem><para>The flag which will be removed.</para></listitem>
-	    </varlistentry>
-	    <varlistentry>
-	      <term>...</term>
-	      <listitem><para>NO CLUE</para></listitem>
-	    </varlistentry>
-	  </variablelist>
-	</refsynopsisdiv>
-	
-	<refsection>
-	  <title>Description</title>
-	  
-	  <para>
-	  </para>
-	  
-	</refsection>
-      </refentry>
-      
-      
-    </section>
+
+    <xi:include href="rf-cc-common.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
   
-    <section id="rf-cc-pnfsm">
-      <title>PnfsManager Commands</title>
+    <xi:include href="rf-cc-pnfsm.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+
+    <section id="rf-cc-pool">
+      <title>Pool Commands</title>
       
-      <refentry id="cmd-pnfsidof">        
-	<refmeta><refentrytitle><command>pnfsidof</command></refentrytitle></refmeta>
-	<refnamediv><refname><command>pnfsidof</command></refname>
-	  <refpurpose>Print the PNFS id of a file given by its global path.</refpurpose>
-	</refnamediv>
-	
-	<refsynopsisdiv>
-	  <cmdsynopsis>
-	    <command>pnfsidof</command>
-	    <arg choice="req">
-	      <replaceable>globalPath</replaceable>
-	    </arg>
-	    <!-- <arg choice="opt" rep="repeat">file</arg> -->
-	  </cmdsynopsis>
-	</refsynopsisdiv>
-	
-	<refsection>
-	  <title>Description</title>
-	  
-	  <para>
-	    Print the PNFS id of a file given by its global path. The
-	    global path always starts with the
-	    <quote>VirtualGlobalPath</quote> as given by the
-	    <quote><command>info</command></quote>-command.
-	  </para>
-	  
-	</refsection>
+      <refentry id="cmd-rep_ls">
+        <refmeta>
+          <refentrytitle><command>rep ls</command></refentrytitle>
+        </refmeta>
+        <refnamediv>
+          <refname><command>rep ls</command></refname>
+          <refpurpose>List the files currently in the repository of the pool.</refpurpose>
+        </refnamediv>
+        
+        <refsynopsisdiv>
+          <cmdsynopsis>
+            <command>rep ls</command>
+            <group choice="plain">
+              <arg rep="repeat">pnfsId</arg>
+              <!-- <sbr/> -->
+              <arg choice="plain">
+                <arg>-l=<group choice="plain" rep="repeat">
+                    <arg choice="plain">s</arg>
+                    <arg choice="plain">p</arg>
+                    <arg choice="plain">l</arg>
+                    <arg choice="plain">u</arg>
+                    <arg choice="plain">nc</arg>
+                    <arg choice="plain">e</arg>
+                  </group>
+                </arg>
+                <arg>-s=<group choice="plain">
+                    <arg choice="plain">k</arg>
+                    <arg choice="plain">m</arg>
+                    <arg choice="plain">g</arg>
+                    <arg choice="plain">t</arg>
+                  </group>
+                </arg>
+              </arg>
+            </group>
+          </cmdsynopsis>
+          <variablelist>
+            <varlistentry>
+              <term>pnfsId</term>
+              <listitem>
+                <para>
+                  The <pnfs/> ID(s) for which the files in the repository will
+                  be listed.
+                </para>
+              </listitem>
+            </varlistentry>
+            <varlistentry>
+              <term>-l</term>
+              <listitem>
+                <para>
+                  List only the files with one of the following properties:
+                  <screen>
+s      sticky files
+p      precious files
+l      locked files
+u      files in use
+nc     files which are not cached
+e      files with an error condition
+                  </screen>
+                </para>
+              </listitem>
+            </varlistentry>
+            <varlistentry>
+              <term>-s</term>
+              <listitem>
+                <para>
+                  Unit, the filesize is shown:
+                  <screen>
+k      data amount in KBytes
+m      data amount in MBytes
+g      data amount in GBytes
+t      data amount in TBytes
+                  </screen>
+                </para>
+              </listitem>
+            </varlistentry>
+          </variablelist>
+        </refsynopsisdiv>
+        
+        <refsection>
+          <title>Description</title>
+          <para>
+          </para>
+        </refsection>
       </refentry>
       
-    
-    
-      <refentry id="cmd-flags_remove">        
-	<refmeta><refentrytitle><command>flags remove</command></refentrytitle></refmeta>
-	<refnamediv><refname><command>flags remove</command></refname>
-	  <refpurpose>Remove a flag from a file.</refpurpose>
-	</refnamediv>
-	
-	<refsynopsisdiv>
-	  <cmdsynopsis>
-	    <command>flags remove</command>
-	    <arg choice="req">
-	      <replaceable>pnfsId</replaceable>
-	    </arg>
-	    <arg choice="req">
-	      <replaceable>key</replaceable>
-	    </arg>
-	    <arg choice="opt" rep="repeat">
-	      <replaceable>...</replaceable>
-	    </arg>
-	    <!-- <arg choice="opt" rep="repeat">file</arg> -->
-	  </cmdsynopsis>
-	  <variablelist>
-	    <title>Arguments</title>
-	    <varlistentry>
-	      <term>pnfsId</term>
-	      <listitem><para>The PNFS id of the file of which a flag will be removed.</para></listitem>
-	    </varlistentry>
-	    <varlistentry>
-	      <term>key</term>
-	      <listitem><para>The flag which will be removed.</para></listitem>
-	    </varlistentry>
-	    <varlistentry>
-	      <term>...</term>
-	      <listitem><para>NO CLUE</para></listitem>
-	    </varlistentry>
-	  </variablelist>
-	</refsynopsisdiv>
-	
-	<refsection>
-	  <title>Description</title>
-	  
-	  <para>
-	  </para>
-	  
-	</refsection>
-      </refentry>
-    
-    
-    
-    <refentry id="cmd-flags_ls">        
-      <refmeta><refentrytitle><command>flags ls</command></refentrytitle></refmeta>
-      <refnamediv><refname><command>flags ls</command></refname>
-	<refpurpose>List the flags of a file.</refpurpose>
-      </refnamediv>
-      
-      <refsynopsisdiv>
-	<cmdsynopsis>
-	  <command>flags ls</command>
-	  <arg choice="req">
-	    <replaceable>pnfsId</replaceable>
-	  </arg>
-	</cmdsynopsis>
-	<variablelist>
-	      <varlistentry>
-		<term>pnfsId</term>
-		<listitem><para>The PNFS id of the file of which a flag will be listed.</para></listitem>
-	      </varlistentry>
-	</variablelist>
-      </refsynopsisdiv>
-      
-      <refsection>
-	<title>Description</title>
-	
-	<para>
-	</para>
-	
-      </refsection>
-    </refentry>
-    
-    
-    
-    <refentry id="cmd-flags_set">        
-      <refmeta><refentrytitle><command>flags set</command></refentrytitle></refmeta>
-      <refnamediv><refname><command>flags set</command></refname>
-	<refpurpose>Set a flag for a file.</refpurpose>
-      </refnamediv>
-      
-      <refsynopsisdiv>
-	<cmdsynopsis>
-	  <command>flags set</command>
-	  <arg choice="req">
-	    <replaceable>pnfsId</replaceable>
-	  </arg>
-	  <arg choice="req" rep="repeat">
-	    <replaceable>key</replaceable>=<replaceable>value</replaceable>
-	  </arg>
-	</cmdsynopsis>
-	<variablelist>
-	  <title>Arguments</title>
-	  <varlistentry>
-	    <term>pnfsId</term>
-	    <listitem><para>The PNFS id of the file of which flags will be set.</para></listitem>
-	  </varlistentry>
-	  <varlistentry>
-	    <term>key</term>
-	    <listitem><para>The flag which will be set.</para></listitem>
-	  </varlistentry>
-	  <varlistentry>
-	    <term>value</term>
-	    <listitem><para>The value to which the flag will be set.</para></listitem>
-	  </varlistentry>
-	</variablelist>
-      </refsynopsisdiv>
-      
-      <refsection>
-	<title>Description</title>
-	
-	<para>
-	</para>
-	
-      </refsection>
-    </refentry>
-    
-    
-    
-    <refentry id="cmd-get_stat">        
-      <refmeta><refentrytitle><command>get stat</command></refentrytitle></refmeta>
-      <refnamediv><refname><command>get stat</command></refname>
-	<refpurpose>get method call counter -- NOCLUE</refpurpose>
-      </refnamediv>
-      
-      <refsynopsisdiv>
-	<cmdsynopsis>
-	  <command>get stat</command>
-	</cmdsynopsis>
-      </refsynopsisdiv>
-      
-      <refsection>
-	<title>Description</title>
-	
-	<para>
-	</para>
-	
-      </refsection>
-    </refentry>
-    
-    
-    <refentry id="cmd-metadataof">        
-      <refmeta><refentrytitle><command>metadataof</command></refentrytitle></refmeta>
-      <refnamediv><refname><command>metadataof</command></refname>
-	<refpurpose>Print the meta-data of a file.</refpurpose>
-      </refnamediv>
-      
-      <refsynopsisdiv>
-	<cmdsynopsis>
-	  <command>metadataof</command>
-	  <group choice="req">
-	    <arg>
-	      <replaceable>pnfsId</replaceable>
-	    </arg>
-	    <arg>
-	      <replaceable>globalPath</replaceable>
-	    </arg>
-	  </group>
-	  <arg choice="opt">-v</arg>
-	  <arg choice="opt">-n</arg>
-	  <arg choice="opt">-se</arg>
-	</cmdsynopsis>
-	<variablelist>
-	  <title>Arguments</title>
-	  <varlistentry>
-	    <term>pnfsId</term>
-	    <listitem><para>The PNFS id of the file.</para></listitem>
-	  </varlistentry>
-	  <varlistentry>
-	    <term>globalPath</term>
-	    <listitem><para>The global path of the file.</para></listitem>
-	  </varlistentry>
-	  <varlistentry>
-	    <term>-v</term>
-	    <listitem><para>NO CLUE</para></listitem>
-	  </varlistentry>
-	  <varlistentry>
-	    <term>-n</term>
-	    <listitem><para>NO CLUE</para></listitem>
-	  </varlistentry>
-	  <varlistentry>
-	    <term>-se</term>
-	    <listitem><para>NO CLUE</para></listitem>
-	  </varlistentry>
-	</variablelist>
-      </refsynopsisdiv>
-      
-      <refsection>
-	<title>Description</title>
-	
-	<para>
-	</para>
-	
-      </refsection>
-    </refentry>
-    
-    
-    <refentry id="cmd-g2l">        
-      <refmeta><refentrytitle><command>g2l</command></refentrytitle></refmeta>
-      <refnamediv><refname><command>g2l</command></refname>
-	<refpurpose>NOCLUE</refpurpose>
-      </refnamediv>
-      
-      <refsynopsisdiv>
-	<cmdsynopsis>
-	  <command>g2l</command>
-	  <arg choice="req">
-	    <replaceable>globalPath</replaceable>
-	  </arg>
-	</cmdsynopsis>
-	<variablelist>
-	  <title>Arguments</title>
-	  <varlistentry>
-	    <term>globalPath</term>
-	    <listitem><para>The global path of the file.</para></listitem>
-	  </varlistentry>
-	</variablelist>
-      </refsynopsisdiv>
-      
-      <refsection>
-	<title>Description</title>
-	
-	<para>
-	</para>
-	
-      </refsection>
-    </refentry>
-    
-    
-    <refentry id="cmd-pathfinder">        
-      <refmeta><refentrytitle><command>pathfinder</command></refentrytitle></refmeta>
-      <refnamediv><refname><command>pathfinder</command></refname>
-	<refpurpose>Print the global or local path of a file from its PNFS id.</refpurpose>
-      </refnamediv>
-      
-      <refsynopsisdiv>
-	<cmdsynopsis>
-	  <command>pathfinder</command>
-	  <arg choice="req">
-	    <replaceable>pnfsId</replaceable>
-	  </arg>
-	  <group>
-	    <arg>-global</arg>
-	    <arg>-local</arg>
-	  </group>
-	</cmdsynopsis>
-	<variablelist>
-	  <title>Arguments</title>
-	  <varlistentry>
-	    <term>pnfsId</term>
-	    <listitem><para>The PNFS Id of the file.</para></listitem>
-	  </varlistentry>
-	  <varlistentry>
-	    <term>-global</term>
-	    <listitem><para>Print the global path of the file.</para></listitem>
-	  </varlistentry>
-	  <varlistentry>
-	    <term>-local</term>
-	    <listitem><para>Print the local path of the file.</para></listitem>
-	  </varlistentry>
-	</variablelist>
-      </refsynopsisdiv>
-      
-      <refsection>
-	<title>Description</title>
-	
-	<para>
-	</para>
-	
-      </refsection>
-    </refentry>
-    
-    
-    <refentry id="cmd-set_meta">        
-      <refmeta><refentrytitle><command>set meta</command></refentrytitle></refmeta>
-      <refnamediv><refname><command>set meta</command></refname>
-	<refpurpose>Set the meta-data of a file.</refpurpose>
-      </refnamediv>
-      
-      <refsynopsisdiv>
-	<cmdsynopsis>
-	  <command>set meta</command>
-	  <group choice="req">
-	    <arg><replaceable>pnfsId</replaceable></arg>
-	    <arg><replaceable>globalPath</replaceable></arg>
-	  </group>
-	  <arg choice="req"><replaceable>uid</replaceable></arg>
-	  <arg choice="req"><replaceable>gid</replaceable></arg>
-	  <arg choice="req"><replaceable>perm</replaceable></arg>
-	  <arg choice="req"><replaceable>level1</replaceable></arg>
-	  <arg choice="req"><replaceable>...</replaceable></arg>
-	</cmdsynopsis>
-	<variablelist>
-	  <title>Arguments</title>
-	  <varlistentry>
-	    <term>pnfsId</term>
-	    <listitem><para>The PNFS id of the file.</para></listitem>
-	  </varlistentry>
-	  <varlistentry>
-	    <term>globalPath</term>
-	    <listitem><para>The global path oa the file.</para></listitem>
-	  </varlistentry>
-	  <varlistentry>
-	    <term>uid</term>
-	    <listitem><para>The user id of the new owner of the file.</para></listitem>
-	  </varlistentry>
-	  <varlistentry>
-	    <term>gid</term>
-	    <listitem><para>The new group id of the file.</para></listitem>
-	  </varlistentry>
-	  <varlistentry>
-	    <term>perm</term>
-	    <listitem><para>The new file permitions. NOCLUE</para></listitem>
-	  </varlistentry>
-	  <varlistentry>
-	    <term>level1</term>
-	    <listitem><para>The new level 1 information of the file.</para></listitem>
-	  </varlistentry>
-	  <varlistentry>
-	    <term>...</term>
-	    <listitem><para>NOCLUE</para></listitem>
-	  </varlistentry>
-	</variablelist>
-      </refsynopsisdiv>
-      
-      <refsection>
-	<title>Description</title>
-	
-	<para>
-	</para>
-	
-      </refsection>
-    </refentry>
-    
-    
-    <refentry id="cmd-storageinfoof">        
-      <refmeta><refentrytitle><command>storageinfoof</command></refentrytitle></refmeta>
-      <refnamediv><refname><command>storageinfoof</command></refname>
-	<refpurpose>Print the storage info of a file.</refpurpose>
-      </refnamediv>
-      
-      <refsynopsisdiv>
-	<cmdsynopsis>
-	  <command>storageinfoof</command>
-	  <group choice="req">
-	    <arg><replaceable>pnfsId</replaceable></arg>
-	    <arg><replaceable>globalPath</replaceable></arg>
-	  </group>
-	  <arg choice="opt">-v</arg>
-	  <arg choice="opt">-n</arg>
-	  <arg choice="opt">-se</arg>
-	</cmdsynopsis>
-	<variablelist>
-	  <title>Arguments</title>
-	  <varlistentry>
-	    <term>pnfsId</term>
-	    <listitem><para>The PNFS id of the file.</para></listitem>
-	  </varlistentry>
-	  <varlistentry>
-	    <term>globalPath</term>
-	    <listitem><para>The global path oa the file.</para></listitem>
-	  </varlistentry>
-	  <varlistentry>
-	    <term>-v</term>
-	    <listitem><para>NO CLUE</para></listitem>
-	  </varlistentry>
-	  <varlistentry>
-	    <term>-n</term>
-	    <listitem><para>NO CLUE</para></listitem>
-	  </varlistentry>
-	  <varlistentry>
-	    <term>-se</term>
-	    <listitem><para>NO CLUE</para></listitem>
-	  </varlistentry>
-	</variablelist>
-      </refsynopsisdiv>
-      
-      <refsection>
-	<title>Description</title>
-	
-	<para>
-	</para>
-	
-      </refsection>
-    </refentry>
-    
-    
-    <refentry id="cmd-cacheinfoof">        
-      <refmeta><refentrytitle><command>cacheinfoof</command></refentrytitle></refmeta>
-      
-      <refnamediv><refname><command>cacheinfoof</command></refname>
-	<refpurpose>Print the cache info of a file.</refpurpose>
-      </refnamediv>
-      
-      <refsynopsisdiv>
-	<cmdsynopsis>
-	  <command>cacheinfoof</command>
-	  <group choice="req">
-	    <arg><replaceable>pnfsId</replaceable></arg>
-	    <arg><replaceable>globalPath</replaceable></arg>
-	  </group>
-	</cmdsynopsis>
-	<variablelist>
-	  <title>Arguments</title>
-	  <varlistentry>
-	    <term>pnfsId</term>
-	    <listitem><para>The PNFS id of the file.</para></listitem>
-	  </varlistentry>
-	  <varlistentry>
-	    <term>globalPath</term>
-	    <listitem><para>The global path oa the file.</para></listitem>
-	  </varlistentry>
-	</variablelist>
-      </refsynopsisdiv>
-      
-      <refsection>
-	<title>Description</title>
-	
-	<para>
-	</para>
-	
-      </refsection>
-    </refentry>
-    
-    
-
-	  
-
-
-  </section>
-
-  <section id="rf-cc-pool">
-    <title>Pool Commands</title>
-
-    <refentry id="cmd-st_set_max_active">
+      <refentry id="cmd-st_set_max_active">
       <refmeta>
 	<refentrytitle><command>st set max active</command></refentrytitle>
       </refmeta>
@@ -789,7 +137,7 @@
 	<refname><command>st set max active</command></refname>
 	<refpurpose>Set the maximum number of active store transfers.</refpurpose>
       </refnamediv>
-      <refsynopsisdiv>
+        <refsynopsisdiv>
 	<cmdsynopsis>
 	  <command>st set max active</command>
 	  <arg choice="req"><replaceable>maxActiveStoreTransfers</replaceable></arg>
@@ -1129,91 +477,15 @@
 	    specified, only transfers in that mover queue are listed.
 	</para>
       </refsection>
-    </refentry>
-
-  </section>
-
-  <section id="rf-cc-pm">
-    <title>Pool Manager Commands</title>
-    
-    <section id="rf-cc-pm-cm">
-      <title>Cost Module</title>
-
-      <refentry id="cmd-set_pool_decision">
-
-	<refmeta>
-	  <refentrytitle><command>set pool decision</command></refentrytitle>
-	</refmeta>
-
-	<refnamediv>
-	  <refname><command>set pool decision</command></refname>
-	  <refpurpose>Set the factors for the calculation of the total costs of the pools.</refpurpose>
-	</refnamediv>
-
-	<refsynopsisdiv>
-	  <cmdsynopsis>
-	    <command>set pool decision</command>
-	    <arg>-spacecostfactor=<replaceable>scf</replaceable></arg>
-	    <arg>-cpucostfactor=<replaceable>ccf</replaceable></arg>
-	    <arg>-costcut=<replaceable>cc</replaceable></arg>
-	  </cmdsynopsis>
-	  <variablelist>
-
-	    <varlistentry>
-	      <term>scf</term>
-	      <listitem>
-		<para>
-		  The factor (strength) with which the <glossterm
-		  linkend="gl-space_cost">space cost</glossterm> will
-		  be included in the <glossterm
-		  linkend="gl-cost">total cost</glossterm>.
-		</para>
-	      </listitem>
-	    </varlistentry>
-
-	    <varlistentry>
-	      <term>ccf</term>
-	      <listitem>
-		<para>
-		  The factor (strength) with which the <glossterm
-		  linkend="gl-performance_cost">performance cost</glossterm> will
-		  be included in the <glossterm
-		  linkend="gl-cost">total cost</glossterm>.
-		</para>
-	      </listitem>
-	    </varlistentry>
-
-	    <varlistentry>
-	      <term>cc</term>
-	      <listitem>
-		<para>
-		  NOCLUE
-		</para>
-	      </listitem>
-	    </varlistentry>
-
-	  </variablelist>
-	</refsynopsisdiv>
-
-	<refsection>
-	  <title>Description</title>
-
-	  <para>
-	  </para>
-
-	</refsection>
-	
       </refentry>
-	
-	
-	
-      </section>
       
     </section>
     
+    <xi:include href="rf-cc-pm.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    
   </chapter>
 
-  <xi:include href="rf-dvl.xml" />
+  <xi:include href="rf-dvl.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
 
 </part>
-</namespacewrapper>
+<!-- </namespacewrapper> -->

@@ -32,6 +32,16 @@
     set       toc,title
   </xsl:param>
 
+
+
+  <xsl:param name="refentry.generate.name" select="0"/>
+
+  <xsl:param name="refentry.generate.title" select="1"/>
+
+  <xsl:param name="refentry.xref.manvolnum" select="0"></xsl:param>
+
+
+
   <xsl:param name="paper.type" select="'A4'"/>
   
   <xsl:param name="generate.section.toc.level" select="1"></xsl:param>
@@ -108,11 +118,6 @@
        <xsl:param name="alignment">start</xsl:param>
        -->
        
-  <!-- Shade Verbatim Sections such as programlisting and screen -->
-  
-  <xsl:param name="shade.verbatim" select="0"/>
-  
-  
   <!-- Create bookmarks in .PDF files -->
   
   <xsl:param name="fop.extensions" select="1"/>

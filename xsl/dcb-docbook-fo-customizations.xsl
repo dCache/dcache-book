@@ -1,6 +1,21 @@
 <?xml version='1.0'?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 version='1.0'>
+
+  <xsl:param name="refentry.pagebreak" select="0"/>
+
+  <xsl:param name="body.start.indent" select="'0pc'"/>
+
+  <xsl:param name="body.start.indent" select="'0pc'"/>
+
+  <xsl:param name="page.margin.inner" select="'2.5cm'"/>
+
+  <xsl:param name="page.margin.outer" select="'2.5cm'"/>
+
+  <xsl:param name="body.font.master" select="12"/>
+
+  <xsl:param name="shade.verbatim" select="1"/>
+
 <!--
 
        Customizations of docbook-xsl fo except parameters.

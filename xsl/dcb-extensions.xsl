@@ -38,6 +38,10 @@
     <prompt>(PoolManager) admin &gt; </prompt>
   </xsl:template>
   
+ <xsl:template match="dcprompt">
+   <prompt>(<xsl:value-of select="@select"/><xsl:apply-templates/>) admin &gt; </prompt>
+  </xsl:template>
+  
   <xsl:template match="userprompt">
     <prompt>[user] $ </prompt>
   </xsl:template>

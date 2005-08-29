@@ -335,14 +335,28 @@ create diskCacheV111.cells.WebCollectorV3 collector \
       will be used by the wrapper script and by the domains at
       start-up. These files are also links to
       <filename>config/dCacheSetup</filename>. This is the primary
-      configuration file of the <dcache/> system. The only files which
-      are different for each domain are
+      configuration file of the <dcache/> system. 
+    </para>
+
+    <para>
+      The only files which are different for each domain are
       <filename>config/<replaceable>domainName</replaceable>.batch</filename>.
-      They describe which cells are started in the domains. Normally,
-      changes in these files should not be necessary. Since they will
-      be overwritten when updating to a newer version (e.g. with RPM),
-      you should make a copy of it and modify that. By that you give
-      the domain a new name. The necessary links can be created with
+      They describe which <glossterm linkend="gl-cell">cells</glossterm> are 
+      started in the <glossterm linkend="gl-domain">domains</glossterm>. Normally,
+      changes in these files should not be necessary. However, if you need to
+      change something, consider the following:
+    </para>
+
+    <para>
+      Since the standard
+      <filename>config/<replaceable>domainName</replaceable>.batch</filename>
+      files will be overwritten when updating to a newer version of <dcache/>
+      (e.g. with RPM), it is a good idea to modify only private copies of them.
+      When choosing a name like
+      <filename>config/<replaceable>newDomainName</replaceable>.batch</filename> 
+      you give the domain the name
+      <replaceable>newDomainName</replaceable>. The necessary links can be
+      created with
 
 <screen><rootprompt/><command>cd</command> /opt/d-cache/config/
 <rootprompt/><command>../jobs/initPackage.sh</command></screen>
@@ -353,9 +367,42 @@ create diskCacheV111.cells.WebCollectorV3 collector \
 <rootprompt/><command>/opt/d-cache/jobs/<replaceable>newDomainName</replaceable></command> \
 -logfile=/opt/d-cache/log/<replaceable>newDomainName</replaceable>.log start</screen>
 
-      You might want to do that to set a secure postgresql password in
+    </para>
+
+    <para>
+      Recall, that we did change <filename>config/httpd.batch</filename> in
+      order to adjust the names of the cells which should show up in the
+      <quote>Cell Services</quote> page. Since this was a minor change not
+      influencing the functionality of the <dcache/> instance, it is preferable
+      not to change the name of the domain. This way, changes to
+      <filename>config/http.batch</filename> in the distribution will be
+      included in your <filename>config/httpd.batch</filename>. Such a future
+      change will correct the problem with the <quote>OFFLINE</quote> cells, anyway.
+    </para>
+
+    <para>
+      An example, where you might want to create new
+      <filename>.batch</filename> files is the following:
+    </para>
+
+    <para>
+      Changing the postgresql password in
       <filename>config/srm.batch</filename>,
-      <filename>config/utility.batch</filename>, and <filename>config/replica.batch</filename>
+      <filename>config/utility.batch</filename>, and
+      <filename>config/replica.batch</filename> to a secure one would be done
+      best in copies of these <filename>.batch</filename> files. You should
+      also do e.g.
+
+<screen><rootprompt/><command>chmod</command> 600 <filename>config/mysrm.batch</filename></screen>
+
+      to secure the password further. Note that future versions of <dcache/>
+      will not require a plain text postgresql password in these files
+      anymore. 
+    </para>
+
+    <para>
+      More details about domains and cells can be found in <xref
+        linkend="cf-cellpackage"/>.
     </para>
 
     <para>
@@ -400,19 +447,169 @@ create diskCacheV111.cells.WebCollectorV3 collector \
       at startup.
     </para>
 
+    <unfinished>
+      <para>
+        <filename>certificate</filename>
+        <filename>CAs</filename>
+        <filename>kpwd</filename>
+      </para>
+    </unfinished>
+
+  </section>
+
+  <section id="intouch-admin">
+    <title>The Admin Interface</title>
+
+    <para>
+      <dcache/> has a powerful administration interface. It is accessed with
+      the SSH protocol. The server is part of the <literal>adminDoor</literal>
+      domain, which is started on the admin node. Connect to it with
+
+<screen><userprompt/><command>ssh</command> -c blowfish -p 22223 -l admin <replaceable>adminNode</replaceable></screen>
+
+      The initial password is <quote>dickerelch</quote> (German for <quote>fat
+        elk</quote>) and you will be greeted by the prompt
+
+<screen>
+    dCache Admin (VII) (user=admin)
+
+
+<dcprompt select="local"/></screen>
+
+    </para>
+    
+    <para>
+      The password can now be changed with
+
+<screen><dcprompt>local</dcprompt><command>cd</command> acm
+<dcprompt select="acm"/><command>creat user</command> admin
+<dcprompt select="acm"/><command>set passwd</command> -user=admin <replaceable>newPasswd</replaceable> <replaceable>newPasswd</replaceable>
+<dcprompt>acm</dcprompt><command>..</command>
+<dcprompt>local</dcprompt><command>logoff</command>
+</screen>
+
+      This already illustrates how to navigate within the administration
+      interface: Starting from the local prompt (<dcprompt select="local"/>)
+      the command <command>cd</command> takes you to the specified 
+      <glossterm linkend="gl-cell">cell</glossterm> (here
+      <literal>acm</literal>, the access control manager). There two commands
+      are executed. The escape sequence <command>..</command> takes you back
+      to the local prompt and <command>logoff</command> exits the admin
+      shell. 
+    </para>
+
+    <para>
+      Note that <command>cd</command> only works from the local
+      prompt. If the cell you are trying to access does not exist, the
+      <command>cd</command> command will not recognise this. Trying to execute
+      any command after the <command>cd</command> will then result in an error
+      message <quote>No Route to cell...</quote>.
+    </para>
+
+    <para>
+      All cells know the commands <command>info</command> for general information
+      about the cell and <command>show pinboard</command> for listing the last
+      lines of the <glossterm linkend="gl-pinboard">pinboard</glossterm> of the
+      cell. The output of these commands contains useful information for
+      solving problems. It is a good idea to get aquainted with the normal
+      output in the following cells: <literal>PoolManager</literal>,
+      <literal>PnfsManager</literal>, and the pool cells
+      (e.g. <literal><replaceable>poolHostname</replaceable>_1</literal>).
+    </para>
+
+    <para>
+      There also is the command <command>help</command> for listing all
+      commands the cell knows and their parameters. However, many of the
+      commands are only used for debuging and 
+      development purposes. Only commands described in this documentation
+      should be used for the administration of a <dcache/> system.
+    </para>
+
+    <para>
+      Instead of using <command>ssh</command> to access the admin interface,
+      the <dcache/> graphical user interface can be used. If it is not included
+      in the <dcache/> distribution, it can be downloaded from the <ulink
+        url="http://www.dcache.org/"><dcache/> homepage</ulink>. It is started
+      by 
+
+<screen><userprompt/><command>java</command> -jar org.pcells.jar</screen>
+
+      First, a new session has to be created with
+      <menuchoice>
+        <guimenu>Session</guimenu>
+        <guimenuitem>New...</guimenuitem>
+      </menuchoice>. 
+      After giving the session a name of your choice, a login
+      mask appears. The session is configured with the
+      <guibutton>Setup</guibutton> button. The only thing that needs to be
+      configured is the hostname. After clicking <guibutton>Apply</guibutton>
+      and <guibutton>Quit</guibutton> you are ready to log in. Pressing the
+      right mouse button clicking <guibutton>Login</guibutton> will scan the 
+      <dcache/> instance for domains. Cells can be reached by clicking on their
+      name and the same commands can be entered as in the SSH login. 
+    </para>
+
+    <para>
+      The other tabs of the GUI are very useful for monitoring the <dcache/>
+      system.
+    </para>
+
+    <para>
+      The most useful command of the pool cells is <xref
+        linkend="cmd-rep_ls"/>. It lists the files which are stored in the pool
+      by their <pnfs/> IDs:
+
+<screen>000100000000000000001120 &lt;-P---------(0)[0]&gt; 485212 si={myStore:STRING}
+000100000000000000001230 &lt;-P---------(0)[0]&gt; 1222287360 si={myStore:STRING}</screen>
+    </para>
+
+    <para>
+      Two commands in the pool manager are quite useful: <xref
+        linkend="cmd-rc_ls"/> lists the requests currently handled by the pool
+      manager. A typical line of output for a read request with an error
+      condition is (all in one line):
+    
+<screen>000100000000000000001230@0.0.0.0/0.0.0.0 m=1 r=1 [&lt;unknown&gt;]
+  [Waiting 08.28 19:14:16] 
+  {149,No pool candidates available or configured for 'staging'}</screen>
+
+      As the error message at the end of the line indicates, no pool was found
+      containing the file and no pool could be used for staging the file from a
+      tertiary storage system.
+    </para>
+
+    <para>
+      Finally, <xref linkend="cmd-cm_ls"/> with the option <option>-r</option>
+      gives the information about the pools currently stored in the cost module
+      of the pool manager. A typical output is:
+
+<screen><dcprompt select="PoolManager"/><command>cm ls</command> <option>-r</option>
+<replaceable>poolName1</replaceable>={R={a=0;m=2;q=0};S={a=0;m=2;q=0};M={a=0;m=100;q=0};PS={a=0;m=20;q=0};PC={a=0;m=20;q=0};SP={t=2147483648;f=924711076;p=1222772572;r=0;lru=0;{g=20000000;b=0.5}}}
+<replaceable>poolName1</replaceable>={Tag={{hostname=<replaceable>hostname</replaceable>}};size=0;SC=0.16221282938326134;CC=0.0;}
+<replaceable>poolName2</replaceable>={R={a=0;m=2;q=0};S={a=0;m=2;q=0};M={a=0;m=100;q=0};PS={a=0;m=20;q=0};PC={a=0;m=20;q=0};SP={t=2147483648;f=2147483648;p=0;r=0;lru=0;{g=4294967296;b=250.0}}}
+<replaceable>poolName2</replaceable>microcebus_2={Tag={{hostname=<replaceable>hostname</replaceable>}};size=0;SC=2.7939677238464355E-4;CC=0.0;}
+</screen>
+
+      While the first line for each pool gives the information stored in the
+      cache of the cost module, the second line gives the costs (SC: <glossterm
+        linkend="gl-space_cost">space cost</glossterm>, CC: <glossterm
+        linkend="gl-performance_cost">performance cost</glossterm>) calculated
+      for a (hypothetical) file of zero size. For details on how these are
+      calculated and their meaning, see <xref linkend="cf-pm-cm"/>.
+    </para>
+
+    <para>
+      The SSH admin interface can be used by scripts. For this it is useful to
+      know that the <dcache/>-internal SSH server uses
+    </para>
+
   </section>
 
 
   <unfinished>
-    <para>
-      <filename>certificate</filename>
-      <filename>CAs</filename>
-      <filename>kpwd</filename>
-      chmod 600 srm.batch utility.batch
-    </para>
     
     <para>
-      admin interface, change passwd, info, pinboard, rc ls, rep ls, cm ls -r, unwatch, watch, create pool group, save, restore
+      admin interface, change passwd, help, info, pinboard, rc ls, rep ls, cm ls -r, unwatch, watch, create pool group, save, restore
       ssh authorized_keys for scripting (tr -d '\r')
     </para>
 
@@ -423,6 +620,11 @@ create diskCacheV111.cells.WebCollectorV3 collector \
     <para>
       Check pnfs mount permissions and restrict to localhost.
     </para>
+
+  </unfinished>
+
+
+  <unfinished>
 
     <para>
       When a file in the <pnfs/> filesystem is deleted the server
@@ -443,6 +645,52 @@ create diskCacheV111.cells.WebCollectorV3 collector \
       frequency.
     </para>
 
+  </unfinished>
+
+  <unfinished>
+
+    <para>
+      Each file in a pool has one of the 4 primary states: "cached",
+      "precious", "from client", "from store". You can find out about
+      it with "rep ls &lt;PNSFID&gt;": &lt;C- - -....&gt; means "cached", &lt;-P- - -...&gt;
+      means "precious", &lt;- -C-...&gt; means from client, and &lt;- - -S...&gt;
+      means from store. "rep set cached" simply sets it to cached. It
+      could cause a file which is only stored on disk to be
+      deleted. That is why it is potentially dangerous. Since your
+      files are on tape, there is no danger.
+    </para>
+    
+    <para>
+      If the stageing hasnt finished before the time-out, the file
+      might not be complete. You should be able to check that with the
+      size and/or checksum: In PoolManager:
+
+<screen>storageinfoof &lt;PNFSID&gt;</screen>
+
+      gives the desired size and - maybe, depending on the method the
+      file was written - the ALDER checksum in
+      <quote>flag-c=1:&lt;alder32(hex)&gt;</quote>. You can compare it
+      with the file on disk.
+    </para>
+
+    <para>
+      My guess would be:
+
+      If the state is "from store", the file is not complete and you
+      have to stage it again. If it is complete, you can set it to
+      cached with no harm. It should not be in any other state.
+    </para>
+
+    <para>
+      If "ls rep" does not list it at all: I know that there is a
+      mechanism to register files, which are on disk - including
+      checking the checksums and generating the local control
+      data. Unfortunately, i do not know of a way to trigger it other
+      than to restart the whole pool. It will then do this
+      registration for all files it finds which have incomplete
+      controll information. This might take a while if there are a lot
+      of them.
+    </para>
 
   </unfinished>
   
