@@ -29,6 +29,225 @@
   </section>
 
   </unfinished>
+
+
+  <section id="cb-pool-vacate">
+    <title>Vacating a Pool with the Copy Manager</title>
+
+    <para>
+      The <classname>CopyManager</classname> is a <dcache/> cell type
+      which is capable of copying the content of a pool (one to one)
+      to another pool.  The mode of the files (precious or cached) are
+      retained unchanged.
+    </para>
+
+    <section>
+      <title>Limitations</title>
+
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    Beta version, not yet tested properly.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    The destination pool must have suffient (empty or removable)
+	    space to hold the content of the source pool.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    A single <classname>CoypManager</classname> can only manage a
+	    single source destination pool pair at a time.
+	    But more than one CopyManager can be started to
+	    manage other pool copy pairs.
+	  </para>
+	</listitem>
+      </itemizedlist>
+
+    </section>
+
+    <section>
+      <title>Preparing the copy manager</title>
+
+      <para>
+	The following is only necessary, if a copy manager cell is not
+	already started. This might already be done e.g. in the
+	<literal>utility</literal> Domain.
+      </para>
+
+      <para>
+	Create a batch file with the following content within the
+	<dcache/> config directory (preferrable on the headnode).
+	The file may be called <filename>config/copy.batch</filename>:
+
+<programlisting>#
+set printout default 3
+set printout CellGlue none
+onerror shutdown
+#
+check -strong setupFile
+#
+copy file:${setupFile} context:setupContext
+#
+#  import the variables into our $context.
+#  don't overwrite already existing variables.
+#
+import context -c setupContext
+#
+#   Make sure we got what we need.
+#
+check -strong serviceLocatorHost serviceLocatorPort
+#
+create dmg.cells.services.RoutingManager  RoutingMgr
+#
+#   The LocationManager Part
+#
+create dmg.cells.services.LocationManager lm \
+       "${serviceLocatorHost} ${serviceLocatorPort} "
+#
+#
+#
+create diskCacheV111.replicaManager.CopyManager copy0 \
+       "default -export"
+#</programlisting>
+
+	Change the cwd to <filename class="directory">jobs</filename>
+	and run
+	
+<screen><rootprompt/>cd /opt/d-cache/jobs
+<rootprompt/>./initPackage.sh</screen> 
+	
+	(Ignore possible error message.)
+	Start the <literal>copy</literal> domain with
+
+<screen>/opt/d-cache/jobs/copy start</screen>
+
+      </para>
+      
+      <para>
+	Everything up to here only has to be done once.
+The follow procedure has to be done for
+each full pool copy.
+      </para>
+
+    </section>
+
+    <section>
+      <title>Copy manager commands</title>
+
+      <para>
+	Use the admin interface to do the following commands:
+	Change the pnfs timeout of the destination pool:
+
+<screen><dcprompt select="local"/><command>cd</command> <replaceable>destinationPool</replaceable>
+<dcprompt><replaceable>destinationPool</replaceable></dcprompt><command>pp set pnfs timeout</command> 300
+<dcprompt><replaceable>destinationPool</replaceable></dcprompt><command>save</command></screen>
+
+	define the maximum number of pool-to-pool transfers of the
+	source pool:
+
+<screen><dcprompt><replaceable>destinationPool</replaceable></dcprompt><command>..</command>
+<dcprompt select="local"/><command>cd</command> <replaceable>sourcePool</replaceable>
+<!-- pool disable -strict -->
+<dcprompt><replaceable>sourcePool</replaceable></dcprompt><command>p2p set max active</command> 10</screen>
+
+	make sure, all incoming trafic stopped:
+
+<screen><dcprompt><replaceable>sourcePool</replaceable></dcprompt><command>mover ls</command>
+<dcprompt><replaceable>sourcePool</replaceable></dcprompt><command>pp ls</command></screen>
+
+	change to
+	<literal><replaceable>copyManagerCell</replaceable></literal>
+	and start the transfers:
+
+<screen><dcprompt><replaceable>sourcePool</replaceable></dcprompt><command>..</command>
+<dcprompt select="local"/><command>cd</command> <replaceable>copyManagerCell</replaceable>
+<dcprompt><replaceable>copyManagerCell</replaceable></dcprompt><command>copy</command> <replaceable>sourcePool</replaceable> <replaceable>destinationPool</replaceable> -max=5</screen>
+
+	  check progress with
+
+<screen><dcprompt><replaceable>copyManagerCell</replaceable></dcprompt><command>info</command></screen>
+
+	The <option>-max</option> option allows to specify the maximum
+	number of active transfers at a time. The number in the
+	<command>p2p set max active</command> command must be larger
+	than the <option>-max</option> number.
+      </para>
+
+      <para>
+	Check the progress by using the info command in the copy cell.
+	A progess bar should grow from right to left until the full
+	content has been copied.
+      </para>
+
+      <para>
+	It might happen, that the <command>info</command> command
+	times out when used immediately after the
+	<command>copy</command> had been started.  This is because the
+	copy cell is rather busy while setting up the transfers. After
+	awhile <command>info</command> will become responsive again.
+      </para>
+
+      <para>
+	Using the <option>-precious</option> option restricts the copy process
+	to files which are <glossterm linkend="gl-precious_file">precious</glossterm>:
+
+<screen><dcprompt><replaceable>copyManagerCell</replaceable></dcprompt><command>copy</command> <replaceable>sourcePool</replaceable> <replaceable>destinationPool</replaceable> -max=5 <emphasis>-precious</emphasis></screen>
+      </para>
+
+      <para>
+	One may modify the copy.batch file to start more than one
+	CopyManager. In that case make sure all of them have
+	distingued names. (copy0, coyp1, copy2).
+
+<programlisting>create diskCacheV111.replicaManager.CopyManager <emphasis>copy0</emphasis> \
+       "default -export"
+#
+create diskCacheV111.replicaManager.CopyManager <emphasis>copy1</emphasis> \
+       "default -export"
+#
+create diskCacheV111.replicaManager.CopyManager <emphasis>copy2</emphasis> \
+       "default -export"
+#</programlisting>
+
+      </para>
+
+      <para>
+	If the destionation pool already holds a subset of the content
+	of the source pool, those files are not copied again but are
+	shown in the <command>copy</command> cell
+	<command>info</command> command.
+      </para>
+    </section>
+
+    <section>
+      <title>Precautions and recovery from problems</title>
+
+      <para>
+	Because the software is not yet suffiently tested it would be good to do a
+
+<screen><dcprompt><replaceable>poolName</replaceable></dcprompt><command>rep ls</command> -s</screen>
+
+	on the source and destination pools before the copy process
+	started and the same on the destination pool after the process
+	finished. Make sure the numbers are consistent.
+      </para>
+
+      <para>
+	If for whatever reason, the copy process messes up, its no
+	problem to restart the copy domain with
+
+<screen><rootprompt/><command>/opt/d-cache/jobs/copy</command> stop
+<rootprompt/><command>/opt/d-cache/jobs/copy</command> start</screen>
+
+	One only needs to restart the <command>copy</command> command
+	to proceed.  Files already copied will not be copied again.
+      </para>
+      
+    </section>
+  </section>
   
   <section id="cb-pool-rename">
     <title>Renaming a Pool</title>

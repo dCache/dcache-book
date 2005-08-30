@@ -37,7 +37,7 @@
       As a minimum, the <pnfs/> filesystem needs to be mounted only by
       the server running the <dcache/> core services. In fact, the
       <pnfs/> server has to run on the same system. For details see
-      <xref linkend="cf-pnfs-access"/>. 
+      (has to be written). 
     </para>
       
     <para>
@@ -545,11 +545,115 @@ StoreName myStore</screen>
     <title>The Databases of <pnfs/></title>
 
     <para>
-      TODO
+      <pnfs/> stores all the information in GNU dbm database
+      files. Since each operation will lock the database file used
+      globally and since GNU dbm cannot handle database files larger
+      than 2GB, it is advisable to <quote>split</quote> them sutably
+      to future usage. Each database stores the information of a
+      sub-tree of the <pnfs/> filesystem namespace. Which database is
+      responsible for a directory and subsequent subdirectories is
+      determined at creation time of the directory. The following
+      procedure will create a new database and connect a new
+      subdirectory to it.
     </para>
 
+    <para>
+      Each database is handled by a separate server process. The
+      maximum number of servers is set by the variable
+      <varname>shmservers</varname> in file
+      <filename>/usr/etc/pnfsSetup</filename>. Therefore, take care
+      that this number is always higher than the number of databases
+      that will be used (restart <pnfs/> services, if changed).
+    </para>
+
+    <para>
+      Prepare the environment with
+
+<screen><rootprompt/><command>.</command> /usr/etc/pnfsSetup
+<rootprompt/>PATH=$PATH:${pnfs}/tools</screen>
+
+      To get a list of currently existing databases, issue
+
+<screen><rootprompt/><command>mdb</command> show
+ID Name Type Status Path
+-------------------------------
+0 admin r enabled (r) /opt/pnfsdb/pnfs/databases/admin
+1 data1 r enabled (r) /opt/pnfsdb/pnfs/databases/data1</screen>
+
+      Choose a new database name
+      <replaceable>databaseName</replaceable> and a location for the
+      database file <replaceable>databaseFilePath</replaceable> and
+      create it with
+
+<screen><rootprompt/><command>mdb</command> create <replaceable>databaseName</replaceable> <replaceable>databaseFilePath</replaceable></screen>
+	
+      e.g.
+
+<screen><rootprompt/><command>mdb</command> create data2 /opt/pnfsdb/pnfs/databases/data2</screen>
+
+      In order to refresh database information run
+
+<screen><rootprompt/><command>mdb</command> update
+Starting data2</screen>
+
+      Running command <command>mdb show</command> shows the new database:
+
+<screen><rootprompt/><command>mdb</command> show
+ID Name Type Status Path
+-------------------------------
+0 admin r enabled (r) /opt/pnfsdb/pnfs/databases/admin
+1 data1 r enabled (r) /opt/pnfsdb/pnfs/databases/data1
+2 data2 r enabled (r) /opt/pnfsdb/pnfs/databases/data2</screen>
+
+
+      In the <pnfs/> filesystem tree, create the new directory in the following way
+
+<screen><rootprompt/><command>cd</command> /pnfs/<replaceable>site.de</replaceable>/<replaceable>some/sub/dir</replaceable>/
+<rootprompt/><command>mkdir</command> '.(<replaceable>newDbID</replaceable>)(<replaceable>newDirectory</replaceable>)'</screen>
+
+      where <replaceable>newDbID</replaceable> is the
+      <literal>ID</literal> of the new database as listed in the
+      output of <command>mdb show</command> and
+      <replaceable>newDirectory</replaceable> is the name of the new
+      directory. E.g.
+
+<screen><rootprompt/><command>cd</command> /pnfs/desy.de/data/zeus/
+<rootprompt/><command>mkdir</command> '.(2)(mcdata)'</screen>
+
+      The new database does not know anything about the <link
+      linkend="cf-pnfs-wormholes">wormhole</link>
+      <filename>'.(config)()'</filename>, yet. For this, the <pnfs/>
+      ID of the wormhole directory (<filename
+      class="directory">/pnfs/fs/admin/etc/config/</filename>) has to
+      be specified. It can be found out with
+
+<screen><rootprompt/><command>sclient</command> getroot ${shmkey} 0
+0 000000000000000000001000 <replaceable>wormholePnfsId</replaceable></screen>
+
+      The last <pnfs/> ID is the one of the wormhole directory of the
+      database with ID 0 (already set correctly). Now you can set this ID with
+
+<screen><rootprompt/><command>sclient</command> getroot ${shmkey} <replaceable>newDbID</replaceable> <replaceable>wormholePnfsId</replaceable>
+<replaceable>newDbID</replaceable> 000000000000000000001000 <replaceable>wormholePnfsId</replaceable></screen>
+
+      For example, do the following
+
+<screen><rootprompt/><command>sclient</command> getroot ${shmkey} 0
+0 000000000000000000001000 0000000000000000000010E0
+<rootprompt/><command>sclient</command> getroot ${shmkey} 2 0000000000000000000010E0
+2 000000000000000000001000 0000000000000000000010E0</screen>
+
+      Finally, add directory tags for the new directories. The default tags are added by
+
+<screen><rootprompt/><command>cd</command> /pnfs/<replaceable>site.de</replaceable>/<replaceable>some/sub/dir</replaceable>/<replaceable>newDirectory</replaceable>
+<rootprompt/><command>echo</command> 'StoreName myStore' > '.(tag)(OSMTemplate)'
+<rootprompt/><command>echo</command> 'STRING' > '.(tag)(sGroup)'</screen>
+
+    </para>
+    
   </section>
 
+<unfinished>
   <section id="cf-pnfs-details" userlevel="details">
     <title>Details</title>
     
@@ -565,4 +669,6 @@ StoreName myStore</screen>
     </unfinished>
       
   </section>
+  </unfinished>
+
 </chapter>
