@@ -131,8 +131,8 @@ $(WEB_LOCATION)/dCacheBook.pdf: Book.pdf
 
 # Copy the WEB_LOCATION to the correct spot on www.dcache.org
 #
-ssh-dcache.org: .ssh-dcache.org-copied dcache.org
-.ssh-dcache.org-copied: 
+ssh-dcache.org: .ssh-dcache.org-copied
+.ssh-dcache.org-copied: dcache.org
 	cd $(WEB_LOCATION)/ && tar cf - * | ssh cvs-dcache 'cd /home/dcache.org/manuals/Book && sh -c "rm -rf *" && tar xf -'
 	touch .ssh-dcache.org-copied
 
@@ -199,7 +199,7 @@ cvs:
 
 # Install DTD, XSL stylesheet, and FOP (xsltproc, xmllint, 
 #
-install-software:	software/db43xml/docbookx.dtd software/docbook-xsl/README software/fop/fop.sh software/fop/lib/resolver.jar
+install-software:	software/db43xml/docbookx.dtd software/docbook-xsl/README software/fop/fop.sh software/fop/lib/resolver.jar software/batik/batik-rasterizer.jar
 
 software/db43xml/docbook-xml-4.3.zip: 
 	mkdir -p software/db43xml/
@@ -238,6 +238,16 @@ software/xml-commons-resolver/resolver.jar: software/xml-commons-resolver-latest
 
 software/fop/lib/resolver.jar: software/xml-commons-resolver/resolver.jar software/fop/fop.sh
 	cp software/xml-commons-resolver/resolver.jar software/fop/lib/resolver.jar
+
+software/batik-current.zip:
+	mkdir -p software/
+	cd software/ && wget http://www.apache.de/dist/xml/batik/batik-current.zip
+	touch batik-current.zip
+
+software/batik/batik-rasterizer.jar: software/batik-current.zip
+	cd software/ && unzip batik-current.zip && ln -ns batik-1* batik
+	touch software/batik/batik-rasterizer.jar
+
 
 .PHONY:	singlehtml html pdf fo install-software cvs dcache.org ssh-dcache.org
 

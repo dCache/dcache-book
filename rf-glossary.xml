@@ -1,9 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE glossary PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">
 
-<glossary id="rf-glossary">
+<chapter id="rf-glossary">
   <title><dcache/> Glossary</title>
+
+
+  <mediaobject>
+    <imageobject role="fo">
+      <imagedata fileref="test.svg" format="SVG"/>
+    </imageobject>
+    <imageobject role="html">
+      <imagedata fileref="test.png" format="PNG"/>
+    </imageobject>
+  </mediaobject>
+
       
+  <glosslist>
       <glossentry>
 	<glossterm id="gl-tss">tertiary storage system</glossterm>
 	<glossdef>
@@ -98,7 +110,8 @@
 	  <para>
 	    Any kind of transfer performed by a dCache pool. There are
 	    <glossterm linkend="gl-store">store</glossterm>,
-	    <glossterm linkend="gl-restore">restore</glossterm>, read
+	    <glossterm linkend="gl-restore">restore</glossterm>, pool to pool
+          (client and server), read,
 	    and write transfers. The latter two are client transfers.
 	  </para>
 	  <glossseealso otherterm="gl-mover">mover</glossseealso>
@@ -116,13 +129,20 @@
 	</glossdef>
       </glossentry>
 
-      <glossentry>
-	<glossterm id="gl-dcachesetup-file"><filename>dCacheSetup</filename> File</glossterm>
-	<glossdef>
-	  <para>
-	  </para>
-	</glossdef>
-      </glossentry>
+    <glossentry>
+      <glossterm id="gl-dcachesetup-file"><filename>dCacheSetup</filename> File</glossterm>
+      <glossdef>
+        <para>
+          The primary configuration file of a <dcache/> host is
+          <filename>config/dCacheSetup</filename>. Each domain uses the file
+          <filename>config/<replaceable>domainName</replaceable>Setup</filename>
+          which is
+          in fact a link to <filename>config/dCacheSetup</filename>. The
+          <filename>config/dCacheSetup</filename> file might even be the 
+          same across the hosts of a <dcache/> instance.
+        </para>
+      </glossdef>
+    </glossentry>
 
       <glossentry>
 	<glossterm id="gl-primary-interface">Primary Network Interface</glossterm>
@@ -359,5 +379,5 @@
 
 	  </glossdef>
 	</glossentry>
-
-</glossary>
+  </glosslist>
+</chapter>
