@@ -234,7 +234,7 @@
       </glossentry>
 
       <glossentry>
-	<glossterm id="gl-pnfsid">PNFS Id</glossterm>
+	<glossterm id="gl-pnfsid"><pnfs/> Id</glossterm>
 	<glossdef>
 	  <para>
 	  </para>
@@ -283,8 +283,25 @@
 	</glossdef>
       </glossentry>
 
+    <glossentry>
+      <glossterm id="gl-replica">Replica</glossterm>
+      <glossdef>
+	<para>
+	  One and the same file may be found on several pools of a
+	  <dcache/> instance. While <quote>file</quote> usually
+	  denotes the abstract concept representing the data which
+	  makes up the file, we use the term <quote>replica</quote> to
+	  denote one specific copy on a <dcache/> pool. Within one
+	  <dcache/> instance a file is uniquely described by the
+	  <glossterm linkend="gl-pnfsid"><pnfs/> ID</glossterm>. In
+	  contrast, a replica is uniquely specified by the <pnfs/> ID
+	  <emphasis>and</emphasis> the pool name it is stored on.
+	</para>
+      </glossdef>
+    </glossentry>
+    
       <glossentry>
-	<glossterm id="gl-precious_file">Precious File</glossterm>
+	<glossterm id="gl-precious">Precious Replica</glossterm>
 	<glossdef>
 	  <para>
 	  </para>
@@ -292,7 +309,7 @@
       </glossentry>
 
       <glossentry>
-	<glossterm id="gl-cached_file">Cached File</glossterm>
+	<glossterm id="gl-cached">Cached Replica</glossterm>
 	<glossdef>
 	  <para>
 	  </para>

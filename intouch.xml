@@ -220,9 +220,9 @@ create diskCacheV111.cells.WebCollectorV3 collector \
       The <quote>Pool Usage</quote> page gives an good overview of the
       current space usage of the whole <dcache/> instance. In the
       graphs, free space is marked yellow, space occupied by
-      <glossterm linkend="gl-cached_file">cached files</glossterm>
+      <glossterm linkend="gl-cached">cached files</glossterm>
       which may be deleted when space is needed is marked green, and
-      space occupied by <glossterm linkend="gl-precious_file">precious
+      space occupied by <glossterm linkend="gl-precious">precious
       files</glossterm> which cannot be deleted. Other states
       (e.g. files which are currently written) are marked purple.
     </para>

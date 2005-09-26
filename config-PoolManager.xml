@@ -385,7 +385,7 @@
 
 <command>psu create link</command> <replaceable>exp-b-link</replaceable> <replaceable>allnet-cond</replaceable> <replaceable>exp-b-cond</replaceable>
 <command>psu set link</command> <replaceable>exp-b-link</replaceable> <parameter>-readpref=</parameter><replaceable>10</replaceable> <parameter>-writepref=</parameter><replaceable>10</replaceable> <parameter>-cachepref=</parameter><replaceable>10</replaceable>
-<command>psu add link</command> <replaceable>exp-b-link</replaceable> <replaceable>exp-a-pools</replaceable>
+<command>psu add link</command> <replaceable>exp-b-link</replaceable> <replaceable>exp-b-pools</replaceable>
 
 <command>psu create link</command> <replaceable>exp-b-imp-link</replaceable> <replaceable>allnet-cond</replaceable> <replaceable>exp-b-cond</replaceable> <replaceable>imp-cond</replaceable>
 <command>psu set link</command> <replaceable>exp-b-imp-link</replaceable> <parameter>-readpref=</parameter><replaceable>20</replaceable> <parameter>-writepref=</parameter><replaceable>20</replaceable> <parameter>-cachepref=</parameter><replaceable>20</replaceable>

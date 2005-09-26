@@ -192,7 +192,7 @@ each full pool copy.
 
       <para>
 	Using the <option>-precious</option> option restricts the copy process
-	to files which are <glossterm linkend="gl-precious_file">precious</glossterm>:
+	to files which are <glossterm linkend="gl-precious">precious</glossterm>:
 
 <screen><dcprompt><replaceable>copyManagerCell</replaceable></dcprompt><command>copy</command> <replaceable>sourcePool</replaceable> <replaceable>destinationPool</replaceable> -max=5 <emphasis>-precious</emphasis></screen>
       </para>
