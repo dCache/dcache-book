@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
+
+<chapter id="cf-repman">
+  <title>Resilience with the Replica Manager</title>
+  
+  <authorblurb>
+    <simpara>Alex Kulyavtsev</simpara>
+    <simpara>Mathias de Riese</simpara>
+  </authorblurb>
+
+  <para>
+    If no <glossterm linkend="gl-tss">tertiary storage
+    system</glossterm> is connected to a <dcache/> instance (i.e. it
+    is configured as a <glossterm linkend="gl-lfs">large file
+    store</glossterm>), there might be only one copy of each file on
+    disk. (At least the <glossterm linkend="gl-precious">precious
+    replica</glossterm>.) If a higher security and/or availability is
+    required, the resilience feature of <dcache/> can be used: If
+    running in the default configuration, the replica manager will
+    make shure that the number of <glossterm
+    linkend="gl-replica">replicas</glossterm> of a file will be at
+    least 2 and not more than 3. If only one replica is present it
+    will be copied to another pool by a <glossterm
+    linkend="gl-p2p">pool to pool transfer</glossterm>. If 4 or more
+    replicas exist, some of them will be deleted.
+  </para>
+
+  <section id="cf-repman-start">
+    <title>Starting the Replica Manager</title>
+
+    <para>
+      Beginning with version 1.6.6 of <dcache/> the replica manager
+      can be started as follows:
+    </para>
+
+    <para>
+      The replica manager will use the same postgresql database and
+      database user <literal>srmdcache</literal> as the <srm/>. The
+      standard configuration assumes that the database server is
+      installed on the same machine as the replica manager - usually
+      the admin node of the <dcache/> instance. To create and
+      configure the database <literal>replicas</literal> used by the
+      replica manager in the database server do:
+
+<screen><rootprompt/>su postgres
+<userprompt/>createdb -O srmdcache replicas
+<userprompt/>psql -h localhost -U srmdcache -d replicas -f /opt/d-cache/etc/pd_dump-s-U_enstore.sql
+<userprompt/>exit</screen>
+      
+    </para>
+
+    <para>
+      The start-up script <filename>bin/dcache-core</filename> already
+      contains the correct lines to start and stop the domain
+      containing the replica manager as comments. Just remove the two
+      hash (<quote>#</quote>) signs and restart the <dcache/> instance.
+      The replica manager may also be started separately by 
+
+<screen><rootprompt/>/opt/d-cache/jobs/replica -logfile=/opt/d-cache/log/replica.log start</screen>
+
+      and stopped by
+
+<screen><rootprompt/>/opt/d-cache/jobs/replica stop</screen>
+
+    </para>
+
+    <para>
+      In the default configuration, all pools of the <dcache/>
+      instance will be managed. The replica manager will keep the
+      number of replicas between 2 and 3 (including). At each restart
+      of the replica manager the pool configuration in the database
+      will be recreated.
+    </para>
+
+  </section> 
+
+  <section>
+    <title>Operation</title>
+
+    
+
+  </section>
+
+</chapter>
