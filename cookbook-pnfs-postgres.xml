@@ -5,9 +5,229 @@
   <title>Moving the <pnfs/> Data from GDBM to PostgreSQL</title>
   
   <para>
-    
+    From version 1.6.6 of <dcache/> the distribution contains a version of the
+    <pnfs/> server which uses a postgresql database to store the namespace
+    information instead of gdbm database files. The following guide will aid in
+    updating to this server and converting the data from the gdbm files to the
+    postgresql database.
   </para>
+
+  <section>
+    <title>Preliminaries and Preparations</title>
+
+    <para>
+      Before converting the data and updating the server, a postgresql server
+      should be installed on the machine the <pnfs/> server is running on. In
+      principle it is possible to run it on a separate server, however, this
+      will most likely result in degraded performance and is not supported by
+      this documentation. 
+    </para>
+    
+    
+
+  </section>
+
+  <screen>
+1. Make sure you have Postgres V8.x.x installed and running.
+   You can download the source code from the official web site: http://www.postgresql.org/download and
+   build it following the instruction: http://www.postgresql.org/docs/8.0/static/installation.html
+   Here is a short version from that page:
+
+      ./configure --prefix=/usr/local/pgsql
+      gmake
+      su
+      gmake install
+      adduser postgres
+      mkdir /usr/local/pgsql/data
+      chown postgres /usr/local/pgsql/data
+      su - postgres
+      /usr/local/pgsql/bin/initdb -D /usr/local/pgsql/data
+      /usr/local/pgsql/bin/postmaster -D /usr/local/pgsql/data >logfile 2>&1 &
+      /usr/local/pgsql/bin/createdb test
+      /usr/local/pgsql/bin/psql test
+
 
   
 
+   If there is another Postgres installed on your machine, make sure root's path is 
+   set so that executables, esp. psql, postmaster, and pg_ctl, are called from the
+   V8.x.x Postgres that you intend to use for dCache. (You will be doing most of this
+   as root). Another thing is to make sure that the various libpg.so libraries are 
+   not invoked from the other Postgres distribution. "locate libpg.so" will show which
+   ones are on your system. Set LD_LIBRARY_PATH for root to insure that the "pnfs" 
+   Postgress libs are seen first! 
+
+   Note that for performance reasons it is recommended that only one Postgres 
+   be run on the pnfs server. 
+
+# TYPE  DATABASE    USER        CIDR-ADDRESS          METHOD
+
+# "local" is for Unix domain socket connections only
+local   all         postgres                          ident sameuser
+local   all         pnfsserver                        password
+local   all         all                               md5
+# IPv4 local connections:
+host    all         all         127.0.0.1/32          md5
+# IPv6 local connections:
+host    all         all         ::1/128               md5
+
+
+pg_ctl reload
+
+2. Create postgres user with the name you will be using to run pnfs server.
+   Make sure it has "CREATEDB" privilege.
+
+      psql -U postgres template1 -c "CREATE USER johndoe with CREATEDB"
+
+      dropuser pnfsserver
+
+      createuser --no-adduser --createdb --pwprompt pnfsserver
+
+3. Shutdown the PNFS server.
+
+
+4. Download from dcache.org and unpack postgres version of PNFS software from the tarfile 
+        tar xfz pnfs.3.1.10-f8.tgz
+   Download from dcache.org and unpack the tar file pnfs-conversion-kit.tgz
+       cd pnfs-conversion-kit
+
+5. Get the PNFS database directory out of the way:
+       mv /opt/pnfsdb/pnfs/databases  <replaceable>backupDir</replaceable>/databases
+
+6. Now create the empty files with the original databases file names. These files will be used
+   by pnfs server as the nameholders. Postgres creates a new database for each of the original 
+   database files. If admin, data1, data2, ... dataN are the original database file
+   names, then
+
+        mkdir /opt/pnfsdb/pnfs/databases
+        cd /opt/pnfsdb/pnfs/databases
+	touch admin data1 data2 ... dataN
+
+7. Scan all the databases using script v3_1_10-f4/scan.sh
+        for example:
+        cd v3_1_10-f4
+
+        cp scan.sh /opt/pnfs.3.1.10/pnfs/tools/
+        cd /opt/pnfs.3.1.10/pnfs/tools/
+
+        ./scan.sh <replaceable>backupDir</replaceable>/databases/admin
+        ...............
+
+
+#! /bin/bash
+
+if [ ! -d /tmp/Scan0 ] ; then
+    mkdir /tmp/Scan0
+fi
+
+bn=`basename $1`
+
+echo    "md3tool scan $1 > /tmp/Scan0/${bn}.scan"
+./md3tool scan $1 > /tmp/Scan0/${bn}.scan 2>&1
+grep -v "^ ID" /tmp/Scan0/${bn}.scan
+echo    "md3tool scandir $1 > /tmp/Scan0/${bn}.scandir"
+./md3tool scandir $1 > /tmp/Scan0/${bn}.scandir 2>&1
+grep -v "^Scan" /tmp/Scan0/${bn}.scandir
+echo    "md3tool scandirs $1 > /tmp/Scan0/${bn}.scandirs"
+./md3tool scandirs $1 > /tmp/Scan0/${bn}.scandirs 2>&1
+grep -v "^Dir" /tmp/Scan0/${bn}.scandirs
+
+
+
+
+md3tool scan /opt/pnfs-databases-old/admin > /tmp/Scan0/admin.scan
+ Total Objects : 75
+ Directories
+   inode  : 11
+   data   : 21
+   hash   : 22
+ Files
+   inode  : 8
+   data   : 8
+   hash   : 0
+ Links
+   inode  : 2
+   data   : 2
+   hash   : 0
+ Tags
+   inode  : 0
+   data   : 0
+   hash   : 0
+md3tool scandir /opt/pnfs-databases-old/admin > /tmp/Scan0/admin.scandir
+ Scanning DB id : 0
+   External Reference at 0 : 000100000000000000001060 for data
+md3tool scandirs /opt/pnfs-databases-old/admin > /tmp/Scan0/admin.scandirs
+ Scanning DB id : 0
+
+
+        The script will put the logfiles into /tmp/Scan0 directory. Note that the 
+	scan takes some time. 
+
+  
+
+8. Check if there are any errors in the logfiles
+        *If you see any errors in the scan logs you can not proceed with the conversion!*
+        *You must stop, investigate the problem and fix it first!*
+
+    Various "grep -v" commands are useful for checking the logfiles, which can be fairly
+    large. For example:
+	grep -v "^ ID" /tmp/Scan0/db_name.scan
+	grep -v ^Scan /tmp/Scan0/db_name.scandir
+	grep -v ^Dir /tmp/Scan0/db_name.scandirs
+
+    ...all produce a small amount of output (if no errors!), and also give useful 
+    information, like the number of file records in the original database. 
+
+9. If the scan was successful for *all* databases then run the conversion script for each database:
+
+          export dbConnectString="user=pnfsserver password=test"
+
+        cd ../v3_1_10-f8
+        ./g2psql.sh <replaceable>backupDir</replaceable>/databases/admin
+        ...............
+   By default the program uses username "postgres" to connect to the postgres server. If you plan
+   to use some other account to run the server you have to specify it using the shell environment:
+        export dbConnectString="user=johndoe"
+
+
+   The conversion script also takes a bit of time, but is fairly quick. In fact, you 
+   may exceed Postgres's checkpointing capability, in which case edit the postgresql.conf
+   file and increase the number of checkpoint_segments (for example from 3 to 10).
+
+10. To speed up the conversion the program does not create the database key, so you have to do it
+    in a separate step. For each database created during the conversion run script make-key.sh:
+        ./make-key.sh admin
+        ...............
+
+        psql -U pnfsserver -c 'ALTER TABLE pnfs ADD primary key (pnfsid)' admin
+
+	This also can take a while if the files were large.
+
+11. Scan all converted databases using script v3_1_10-f8/scan.sh
+        for example:
+        cd v3_1_10-f8
+        ./scan.sh /opt/pnfsdb/pnfs/databases/admin
+        ...............
+
+        The script will put the logfiles into /tmp/Scan1 directory
+
+12.  Check if there are any errors in the logfiles
+      *If you see any errors in the scan logs you can not proceed with the conversion!*
+        *You must stop, investigate the problem and fix it first!*
+
+13. Compare the logfiles from the directories  /tmp/Scan0 and /tmp/Scan1
+        They *must* be identical!
+
+
+14. Change the pnfs location in the configuration file /usr/etc/pnfsSetup
+        pnfs=/opt/pnfs.3.1.10/pnfs  to   pnfs=/opt/pnfs.3.1.10-f8/pnfs
+
+15. At that point you have everything ready to start the new server. Make sure that 
+    you have changed the pnfs location name to /opt/pnfs.3.1.10-f8/pnfs in your 
+    startup scripts pnfs/bin/pnfs and $pnfs/tools/pnfs.server, then execute 
+
+	$pnfs/bin/pnfs start
+
+  </screen>
+  
 </chapter>

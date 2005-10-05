@@ -67,6 +67,12 @@
     <xref linkend="{@linkend}"/>
   </xsl:template>
   
+  <xsl:template match="domainname">
+    <classname>
+      <xsl:apply-templates/>
+    </classname>
+  </xsl:template>
+
   <xsl:template match="cellname">
     <classname>
       <xsl:apply-templates/>

@@ -313,22 +313,90 @@
 	<glossdef>
 	  <para>
 	  </para>
-	</glossdef>
+S	</glossdef>
       </glossentry>
 
+    <glossentry>
+      <glossterm id="gl-repman">Replica Manager</glossterm>
+      <glossdef>
+        <para>
+          The replica manager keeps track of the number of <glossterm
+            linkend="gl-replica">replicas</glossterm> of each file within a
+          certain subset of pools and makes shure this number is always within
+          a specified range. This way, the system makes shure that enough
+          versions of each file are present and accessible at all times. This
+          is especially useful to enshure resilience of the <dcache/> system,
+          even if the hardware is not reliable. The replica manager cannot be
+          used when the system is connected to a <glossterm
+            linkend="gl-tss">tertiary storage system</glossterm>. The
+          activation and configuration of the replica manager is described in
+          <xref endterm="cf-repman"/>.
+        </para>
+      </glossdef>
+    </glossentry>
 
+    <glossentry>
+      <glossterm id="gl-srm">Storage Resource Manager (<abbrev>SRM</abbrev>)</glossterm>
+      <glossdef>
+        <para>
+          An SRM provides a standard webservice interface for managing a
+          storage resouce (e.g. a <dcache/> instance). It is possible to
+          reserve space, retrieve or store files, and replicate files to
+          another SRM. The actual transfer of data is not done via the SRM
+          itself but via any protocol supported by both parties of the
+          transfer. Authentication and authorisation is done with the grid
+          security infrastructure. <dcache/> comes with an implementation of an
+          SRM which can turn any <dcache/> instance into a grid storage element.
+        </para>
+      </glossdef>
+    </glossentry>
 
+    <glossentry>
+      <glossterm id="gl-spaceman"><pnfs/>Space Manager(<pnfs/> Companion)</glossterm>
+      <glossdef>
+        <para>
+          The space manager stores the <dcache/> specific information which is
+          normally stored within the <pnfs/> namespace. Because this
+          information is accessed very often by the <glossterm
+            linkend="gl-poolmanager">pool manager</glossterm>, using the space
+          manager greatly improves the performance of the pool manager and the
+          <pnfs/> server.
+        </para>
+      </glossdef>
+    </glossentry>
 
-	<glossentry>
-	  <glossterm id="gl-pm-comp-cm">Cost Module</glossterm>
-	  <glossdef>
-	    <para>
-	      Responsible for determining the cost for copying a file
-	      to a pool. The pool manager will choose the pool with
-	      the least cost.
-	    </para>
-	  </glossdef>
-	</glossentry>
+    <glossentry>
+      <glossterm id="gl-billing">Billing/Accounting</glossterm>
+      <glossdef>
+        <para>
+          Accounting information is either stored in a text file or in a
+          PostgreSQL database by the billing cell usually started in the
+          <domainname>httpd</domainname> domain. This is described in <xref
+            linkend="cb-accounting"/>.
+        </para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry>
+      <glossterm id="gl-poolmanager">Pool Manager</glossterm>
+      <glossdef>
+        <para>
+          The pool manager is the central component of a <dcache/> system. It
+          decides which pool is used for any kind of request...
+        </para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry>
+      <glossterm id="gl-pm-comp-cm">Cost Module</glossterm>
+      <glossdef>
+        <para>
+          Responsible for determining the cost for copying a file
+          to a pool. The pool manager will choose the pool with
+          the least cost.
+        </para>
+      </glossdef>
+    </glossentry>
 
 	<glossentry>
 	  <glossterm id="gl-pm-comp-psu">Pool Selection Unit</glossterm>
