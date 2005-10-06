@@ -4,10 +4,7 @@
 <chapter id="cf-repman">
   <title>Resilience with the Replica Manager</title>
   
-  <authorblurb>
-    <simpara>Alex Kulyavtsev</simpara>
-    <simpara>Mathias de Riese</simpara>
-  </authorblurb>
+  <partauthors>Alex Kulyavtsev, Mathias de Riese</partauthors>
 
   <para>
     If no <glossterm linkend="gl-tss">tertiary storage
@@ -78,7 +75,9 @@
   <section>
     <title>Operation</title>
 
-    
+    <para>
+
+    </para>
 
   </section>
 

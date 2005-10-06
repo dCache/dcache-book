@@ -313,7 +313,7 @@
 	<glossdef>
 	  <para>
 	  </para>
-S	</glossdef>
+	</glossdef>
       </glossentry>
 
     <glossentry>
@@ -330,7 +330,7 @@ S	</glossdef>
           used when the system is connected to a <glossterm
             linkend="gl-tss">tertiary storage system</glossterm>. The
           activation and configuration of the replica manager is described in
-          <xref endterm="cf-repman"/>.
+          <xref linkend="cf-repman"/>.
         </para>
       </glossdef>
     </glossentry>
@@ -413,7 +413,6 @@ S	</glossdef>
 	<glossentry>
 	  <glossterm id="gl-cost">cost</glossterm>
 	  <glossdef>
-
 	    <para>
 	      The pool manager determines the pool used for storing a
 	      file by calculating a cost value for each available
@@ -433,7 +432,6 @@ S	</glossdef>
 	      are configurable with the command <cellcommandref
 	      linkend="cmd-set_pool_decision"/>.
 	    </para>
-
 	  </glossdef>
 	</glossentry>
 
@@ -441,7 +439,6 @@ S	</glossdef>
 	  <glossterm id="gl-performance_cost">performance
 	  cost</glossterm>
 	  <glossdef>
-
 	    <para>
 	      
 	    </para>

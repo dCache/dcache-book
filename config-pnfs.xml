@@ -570,7 +570,7 @@ StoreName myStore</screen>
       Prepare the environment with
 
 <screen><rootprompt/><command>.</command> /usr/etc/pnfsSetup
-<rootprompt/>PATH=$PATH:${pnfs}/tools</screen>
+<rootprompt/>PATH=${pnfs}/tools:$PATH</screen>
 
       To get a list of currently existing databases, issue
 

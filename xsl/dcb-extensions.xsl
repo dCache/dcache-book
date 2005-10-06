@@ -22,6 +22,10 @@
     <productname>dCache</productname>
   </xsl:template>
 
+  <xsl:template match="srm">
+    <productname>SRM</productname>
+  </xsl:template>
+
   <xsl:template match="dcap">
     <productname>dCap</productname>
   </xsl:template>
@@ -50,6 +54,10 @@
     <prompt>[root] # </prompt>
   </xsl:template>
 
+  <xsl:template match="partauthors">
+    <blockquote><para>Authors: <xsl:apply-templates/></para></blockquote>
+  </xsl:template>
+  
   <xsl:template match="simpleequation">
     <informalequation><mediaobject><textobject><para><xsl:apply-templates/></para></textobject></mediaobject></informalequation>
   </xsl:template>

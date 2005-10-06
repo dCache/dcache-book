@@ -5,49 +5,105 @@
   <title>Moving the <pnfs/> Data from GDBM to PostgreSQL</title>
   
   <para>
-    From version 1.6.6 of <dcache/> the distribution contains a version of the
-    <pnfs/> server which uses a postgresql database to store the namespace
-    information instead of gdbm database files. The following guide will aid in
-    updating to this server and converting the data from the gdbm files to the
-    postgresql database.
+    From version 1.6.6 of <dcache/> the distribution contains a
+    version of the <pnfs/> server which uses a PostgreSQL database to
+    store the namespace information instead of gdbm database
+    files. The following guide will aid in updating to this server and
+    converting the data from the gdbm files to the PostgreSQL
+    database.
   </para>
 
   <section>
     <title>Preliminaries and Preparations</title>
 
     <para>
-      Before converting the data and updating the server, a postgresql server
-      should be installed on the machine the <pnfs/> server is running on. In
-      principle it is possible to run it on a separate server, however, this
-      will most likely result in degraded performance and is not supported by
-      this documentation. 
+      Before converting the data and updating the server, a PostgreSQL
+      server should be installed on the machine the <pnfs/> server is
+      running on. In principle it is possible to run it on a separate
+      server, however, this will most likely result in degraded
+      performance and is not supported by this documentation. <pnfs/>
+      might also use the same database server as other components of
+      the <dcache/> instance. For a discussion of the usages of
+      PostgreSQL by <dcache/> and its configuration see <xref
+      linkend="cb-postgres"/>.
     </para>
     
+    <para>
+      Prepare the PostgreSQL server by creating a database user for
+      the <pnfs/> server. It has to have permissions to create
+      databases. We suggest to call it <literal>pnfsserver</literal>:
+
+<screen><rootprompt/>su - postgres
+<userprompt/>createuser --no-adduser --createdb pnfsserver</screen>
+
+      Or use
+
+<screen><rootprompt/>su - postgres
+<userprompt/>createuser --no-adduser --createdb --pwprompt pnfsserver</screen>
+
+      if PostgreSQL is configured more securely as described in <xref
+      linkend="cb-postgres"/>.
+    </para>
     
+    <para>
+      The following procedure requires a downtime of the <pnfs/>
+      server and therefore of the <dcache/> system.
+    </para>
+  </section>
+
+  <section>
+    <title>Saving and Checking the <literal>gdbm</literal> Database Files</title>
+
+    <para>
+      In the following, we will assume that the old <pnfs/> server
+      software is installed below <filename
+      class="directory">/opt/pnfs.3.1.10/pnfs/</filename> and the
+      <pnfs/> databases are stored in <filename
+      class="directory">/opt/pnfsdb/pnfs/databases/</filename>. These
+      are the standard locations. However, they can be freely
+      configured in <filename>/usr/etc/pnfsSetup</filename>.
+      The actual locations of the database files can be found as follows
+
+<screen><rootprompt/>. /usr/etc/pnfsSetup
+<rootprompt/>cat ${database}/D-* | cut -f 5 -d ':'</screen>
+
+    </para>
+
+    <para>
+      Shut down the <pnfs/> server (after shutting down <dcache/>):
+
+<screen><rootprompt/>/opt/pnfs.3.1.10/pnfs/bin/pnfs stop</screen>
+
+      Move the <pnfs/> databases to a secure backup directory
+      <replaceable>backupDir</replaceable>:
+
+<screen><rootprompt/>mv /opt/pnfsdb/pnfs/databases  <replaceable>backupDir</replaceable>/databases</screen>
+
+      A second copy or backup would be a good idea. Now test the
+      integrity of these gdbm database files with
+
+<screen><rootprompt/>. /usr/etc/pnfsSetup
+<rootprompt/>cat ${database}/D-* | cut -f 5 -d ':'</screen>
+    </para>
+
+    <para>
+      Now create the empty files with the names of the original
+      database files. Only the names of these files will be used by
+      the <pnfs/> server.  The conversion preformed below will create
+      a new database in the PostgreSQL server for each of the original
+      database files. If <filename>admin</filename>,
+      <filename>data1</filename>, ... , <filename>dataN</filename> are
+      the original database file names, then do
+
+<screen><rootprompt/>mkdir /opt/pnfsdb/pnfs/databases
+<rootprompt/>cd /opt/pnfsdb/pnfs/databases
+<rootprompt/>touch admin data1 data2 ... dataN</screen>
+
+    </para>
 
   </section>
 
   <screen>
-1. Make sure you have Postgres V8.x.x installed and running.
-   You can download the source code from the official web site: http://www.postgresql.org/download and
-   build it following the instruction: http://www.postgresql.org/docs/8.0/static/installation.html
-   Here is a short version from that page:
-
-      ./configure --prefix=/usr/local/pgsql
-      gmake
-      su
-      gmake install
-      adduser postgres
-      mkdir /usr/local/pgsql/data
-      chown postgres /usr/local/pgsql/data
-      su - postgres
-      /usr/local/pgsql/bin/initdb -D /usr/local/pgsql/data
-      /usr/local/pgsql/bin/postmaster -D /usr/local/pgsql/data >logfile 2>&1 &
-      /usr/local/pgsql/bin/createdb test
-      /usr/local/pgsql/bin/psql test
-
-
-  
 
    If there is another Postgres installed on your machine, make sure root's path is 
    set so that executables, esp. psql, postmaster, and pg_ctl, are called from the

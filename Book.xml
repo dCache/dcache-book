@@ -33,16 +33,28 @@
     <corpauthor>DESY Hamburg, Germany</corpauthor>
     
     <author>
-      <honorific>Dr</honorific>
+<!--      <honorific>Dr</honorific> -->
       <firstname>Mathias</firstname>
       <surname>de Riese</surname>
     </author>
     
     <author>
-      <honorific>Dr</honorific>
+<!--      <honorific>Dr</honorific> -->
       <firstname>Patrick</firstname>
       <surname>Fuhrmann</surname>
     </author>
+    
+    <author>
+      <firstname>Alex</firstname>
+      <surname>Kulyavtsev</surname>
+    </author>
+
+    <author>
+      <firstname>Vladimir</firstname>
+      <surname>Podstavkov</surname>
+    </author>
+
+    
     
   </bookinfo>
   
