@@ -190,6 +190,34 @@ export dbConnectString="user=pnfsserver password=<replaceable>yourPassword</repl
       createuser --no-adduser --createdb --pwprompt pnfsserver
 
 
+PostgreSQL in <dcache/>:
+
+component  |    Database Host               | Database Name | Database User / Pw
+--------------------------------------------------------------------------------
+SRM        | ${srmDatabaseHost}             | dcache        | srmdcache
+           |   or if not set: ${srmDbHost}  |               | srmdcache
+           |     or if not set: localhost   |               |
+--------------------------------------------------------------------------------
+pin manag. | ${pinManagerDatabaseHost}      | dcache        | srmdcache
+           |   or if not set: ${srmDbHost}  |               | srmdcache
+           |     or if not set: localhost   |               |
+--------------------------------------------------------------------------------
+space man. | ${spaceManagerDatabaseHost}    | dcache        | srmdcache
+           |   or if not set: ${srmDbHost}  |               | srmdcache
+           |     or if not set: localhost   |               |
+--------------------------------------------------------------------------------
+companion  | ${companionDatabaseHost}       | companion     | srmdcache
+           |   or if not set: localhost     |               | srmdcache
+--------------------------------------------------------------------------------
+replica m. | ${replicaManagerDatabaseHost}  | replicas      | srmdcache
+           |   or if not set: localhost     |               | srmdcache
+--------------------------------------------------------------------------------
+pnfs server| localhost                      | admin, data1, | pnfsserver
+           |                                | exp0, ...     | --free--
+
+
+
+
     </screen>
 
   </unfinished>
