@@ -30,6 +30,10 @@
   
   <xi:include  href="cookbook-pool.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
   
+  <xi:include  href="cookbook-pnfs-postgres.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+
+  <xi:include  href="cookbook-postgres.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+
   <xi:include  href="cookbook-net.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
 
   <xi:include  href="cookbook-accounting.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>

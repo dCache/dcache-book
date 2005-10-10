@@ -3,6 +3,8 @@
     
 <chapter id="cb-pnfs-postgres">
   <title>Moving the <pnfs/> Data from GDBM to PostgreSQL</title>
+
+  
   
   <para>
     From version 1.6.6 of <dcache/> the distribution contains a
@@ -98,16 +100,16 @@
       class="directory">/opt/pnfsdb/pnfs/databases/</filename> (or
       whereever you found them as described above):
 
-<screen><rootprompt/><command>md3tool</command> scan /opt/pnfsdb/pnfs/databases/<replaceable>dbName</replaceable> > <replaceable>tempDirOld<replaceable/>/<replaceable>dbName</replaceable>.scan 2>&1
-<rootprompt/><command>md3tool</command> scandir /opt/pnfsdb/pnfs/databases/<replaceable>dbName</replaceable> > <replaceable>tempDirOld<replaceable/>/<replaceable>dbName</replaceable>.scandir 2>&1
-<rootprompt/><command>md3tool</command> scandirs /opt/pnfsdb/pnfs/databases/<replaceable>dbName</replaceable> > <replaceable>tempDirOld<replaceable/>/<replaceable>dbName</replaceable>.scandirs 2>&1</screen>
+<screen><rootprompt/><command>md3tool</command> scan /opt/pnfsdb/pnfs/databases/<replaceable>dbName</replaceable> &gt; <replaceable>tempDirOld</replaceable>/<replaceable>dbName</replaceable>.scan 2&gt;&amp;1
+<rootprompt/><command>md3tool</command> scandir /opt/pnfsdb/pnfs/databases/<replaceable>dbName</replaceable> &gt; <replaceable>tempDirOld</replaceable>/<replaceable>dbName</replaceable>.scandir 2&gt;&amp;1
+<rootprompt/><command>md3tool</command> scandirs /opt/pnfsdb/pnfs/databases/<replaceable>dbName</replaceable> &gt; <replaceable>tempDirOld</replaceable>/<replaceable>dbName</replaceable>.scandirs 2&gt;&amp;1</screen>
 
       Have a look at the output. It should contain no error
       messages. You can do that with
 
-<screen><rootprompt/><command>grep</command> -v "^ ID" <replaceable>tempDirOld<replaceable/>/<replaceable>dbName</replaceable>.scan
-<rootprompt/><command>grep</command> -v "^Scan" <replaceable>tempDirOld<replaceable/>/<replaceable>dbName</replaceable>.scandir
-<rootprompt/><command>grep</command> -v "^Dir" <replaceable>tempDirOld<replaceable/>/<replaceable>dbName</replaceable>.scandirs</screen>
+<screen><rootprompt/><command>grep</command> -v "^ ID" <replaceable>tempDirOld</replaceable>/<replaceable>dbName</replaceable>.scan
+<rootprompt/><command>grep</command> -v "^Scan" <replaceable>tempDirOld</replaceable>/<replaceable>dbName</replaceable>.scandir
+<rootprompt/><command>grep</command> -v "^Dir" <replaceable>tempDirOld</replaceable>/<replaceable>dbName</replaceable>.scandirs</screen>
 
       The output of these three commands should look like 
 
@@ -178,13 +180,15 @@
       It is also a good idea to backup the central configuration file
       <filename>/usr/etc/pnfsSetup</filename>:
 
-<screen<rootprompt/><command>cp</command> /usr/etc/pnfsSetup <replaceable>backupDir</replaceable>/pnfsSetup</screen>
+<screen><rootprompt/><command>cp</command> /usr/etc/pnfsSetup <replaceable>backupDir</replaceable>/pnfsSetup</screen>
+
     </para>
 
     <para>
       Remove the old version of the <pnfs/> software:
 
 <screen><rootprompt/><command>rpm</command> -e pnfs</screen>
+
     </para>
 
     <para>
@@ -247,11 +251,27 @@
     <title>Conversion of the Databases</title>
 
     <para>
-        ./g2psql.sh <replaceable>backupDir</replaceable>/databases/admin
-        ...............
-   By default the program uses username "postgres" to connect to the postgres server. If you plan
-   to use some other account to run the server you have to specify it using the shell environment:
-        export dbConnectString="user=johndoe"
+      Prepare the environment for the <pnfs/> tools as usual:
+
+<screen><rootprompt/>. /usr/etc/pnfsSetup
+<rootprompt/>PATH=${pnfs}/tools:$PATH</screen> 
+
+      Note that you have to do this now even if you did it before because the
+      content of <filename>/usr/etc/pnfsSetup</filename> changed.
+    </para>
+
+    <para>
+      The conversion of the GDBM file
+      <filename><replaceable>backupDir</replaceable>/databases/<replaceable>gdbmFile</replaceable></filename> 
+      is done with the following command:
+
+<screen><rootprompt/><command>gdbm2psql</command> -r -o -i <replaceable>backupDir</replaceable>/databases/<replaceable>gdbmFile</replaceable></screen>
+
+      It is necessary to use the full path to the file. A new database in the
+      PostgreSQL server will be created and the data from the GDBM file will be
+      written into it. The typical output is
+
+      <programlisting></programlisting>
 
 
    The conversion script also takes a bit of time, but is fairly quick. In fact, you 
@@ -372,20 +392,20 @@ fi
 
 bn=`basename $1`
 
-echo    "md3tool scan $1 > /tmp/Scan0/${bn}.scan"
-./md3tool scan $1 > /tmp/Scan0/${bn}.scan 2>&1
+echo    "md3tool scan $1 &gt; /tmp/Scan0/${bn}.scan"
+./md3tool scan $1 &gt; /tmp/Scan0/${bn}.scan 2&gt;&amp;1
 grep -v "^ ID" /tmp/Scan0/${bn}.scan
-echo    "md3tool scandir $1 > /tmp/Scan0/${bn}.scandir"
-./md3tool scandir $1 > /tmp/Scan0/${bn}.scandir 2>&1
+echo    "md3tool scandir $1 &gt; /tmp/Scan0/${bn}.scandir"
+./md3tool scandir $1 &gt; /tmp/Scan0/${bn}.scandir 2&gt;&amp;1
 grep -v "^Scan" /tmp/Scan0/${bn}.scandir
-echo    "md3tool scandirs $1 > /tmp/Scan0/${bn}.scandirs"
-./md3tool scandirs $1 > /tmp/Scan0/${bn}.scandirs 2>&1
+echo    "md3tool scandirs $1 &gt; /tmp/Scan0/${bn}.scandirs"
+./md3tool scandirs $1 &gt; /tmp/Scan0/${bn}.scandirs 2&gt;&amp;1
 grep -v "^Dir" /tmp/Scan0/${bn}.scandirs
 
 
 
 
-md3tool scan /opt/pnfs-databases-old/admin > /tmp/Scan0/admin.scan
+md3tool scan /opt/pnfs-databases-old/admin &gt; /tmp/Scan0/admin.scan
  Total Objects : 75
  Directories
    inode  : 11
@@ -403,10 +423,10 @@ md3tool scan /opt/pnfs-databases-old/admin > /tmp/Scan0/admin.scan
    inode  : 0
    data   : 0
    hash   : 0
-md3tool scandir /opt/pnfs-databases-old/admin > /tmp/Scan0/admin.scandir
+md3tool scandir /opt/pnfs-databases-old/admin &gt; /tmp/Scan0/admin.scandir
  Scanning DB id : 0
    External Reference at 0 : 000100000000000000001060 for data
-md3tool scandirs /opt/pnfs-databases-old/admin > /tmp/Scan0/admin.scandirs
+md3tool scandirs /opt/pnfs-databases-old/admin &gt; /tmp/Scan0/admin.scandirs
  Scanning DB id : 0
 
 

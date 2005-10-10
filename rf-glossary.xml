@@ -352,15 +352,15 @@
     </glossentry>
 
     <glossentry>
-      <glossterm id="gl-spaceman"><pnfs/>Space Manager(<pnfs/> Companion)</glossterm>
+      <glossterm id="gl-pnfs_companion"><pnfs/> Companion</glossterm>
       <glossdef>
         <para>
-          The space manager stores the <dcache/> specific information which is
-          normally stored within the <pnfs/> namespace. Because this
-          information is accessed very often by the <glossterm
-            linkend="gl-poolmanager">pool manager</glossterm>, using the space
-          manager greatly improves the performance of the pool manager and the
-          <pnfs/> server.
+          The <pnfs/> companion is a database which stores the <dcache/>
+          specific information (cache info) which is normally stored within the
+          <pnfs/> namespace. Because this information is accessed very often by
+          the <glossterm linkend="gl-poolmanager">pool manager</glossterm>,
+          using the companion greatly improves the performance of 
+          the pool manager and the <pnfs/> server.
         </para>
       </glossdef>
     </glossentry>
@@ -398,17 +398,37 @@
       </glossdef>
     </glossentry>
 
-	<glossentry>
-	  <glossterm id="gl-pm-comp-psu">Pool Selection Unit</glossterm>
-	  <glossdef>
-	    <para>
-	      Responsible for determining all pools allowable for a
-	      specific transaction. A detailed account of its
-	      configuration and behaviour is given in <xref
-	      linkend="cf-pm-psu"/>.
-	    </para>
-	  </glossdef>
-	</glossentry>
+    <glossentry>
+      <glossterm id="gl-pm-comp-psu">Pool Selection Unit</glossterm>
+      <glossdef>
+        <para>
+          Responsible for determining all pools allowable for a
+          specific transaction. A detailed account of its
+          configuration and behaviour is given in <xref
+            linkend="cf-pm-psu"/>.
+        </para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry>
+      <glossterm id="gl-pinmanager">Pin Manager</glossterm>
+      <glossdef>
+        <para>
+          A central service which can <quote>pin</quote> files to a pool for a
+          certain time. It is used by the <srm/> to satisfy prestage requests.
+        </para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry>
+      <glossterm id="gl-spacemanager">Space Manager</glossterm>
+      <glossdef>
+        <para>
+          A central service which can reserve space on pools for a
+          certain time. It is used by the <srm/> to satisfy space reservation requests.
+        </para>
+      </glossdef>
+    </glossentry>
 
 	<glossentry>
 	  <glossterm id="gl-cost">cost</glossterm>
