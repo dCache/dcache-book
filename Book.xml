@@ -62,7 +62,7 @@
   <toc></toc>
   <xi:include href="intro.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
   
-  <!-- <xi:include href="install.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/> -->
+  <xi:include href="install.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
   
   <xi:include href="intouch.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
   

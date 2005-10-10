@@ -118,6 +118,21 @@ $(HTML_LOCATION)/dcb.css: xsl/dcb.css
 	mkdir -p $(HTML_LOCATION)
 	cp -f xsl/dcb.css $(HTML_LOCATION)
 
+###### Text only
+
+HTML_TO_TXT := /usr/bin/w3m -T text/html -dump
+#HTML_TO_TXT := /usr/bin/lynx -force_html -dump -nolist -width=72
+#HTML_TO_TXT : = /usr/bin/links -dump
+
+txt: Book.txt
+Book.txt:	$(HTML_LOCATION)/Book.html
+	$(HTML_TO_TXT) $(HTML_LOCATION)/Book.html > Book.txt
+
+install: dCache-Installation-Instructions.txt
+dCache-Installation-Instructions.txt: install.xml $(STYLESHEETS_HTML)
+	xsltproc --nonet -o dCache-Installation-Instructions.html xsl/html.xsl install.xml
+	$(HTML_TO_TXT) dCache-Installation-Instructions.html > dCache-Installation-Instructions.txt
+
 ###### www.dcache.org SHTML targets
 #
 

@@ -33,16 +33,16 @@
       the <pnfs/> server. It has to have permissions to create
       databases. We suggest to call it <literal>pnfsserver</literal>:
 
-<screen><rootprompt/>su - postgres
-<userprompt/>createuser --no-adduser --createdb pnfsserver</screen>
+<screen><rootprompt/><command>su</command> - postgres
+<userprompt/><command>createuser</command> --no-adduser --createdb pnfsserver</screen>
 
       Or use
 
-<screen><rootprompt/>su - postgres
-<userprompt/>createuser --no-adduser --createdb --pwprompt pnfsserver</screen>
+<screen><rootprompt/><command>su</command> - postgres
+<userprompt/><command>createuser</command> --no-adduser --createdb --pwprompt pnfsserver</screen>
 
-      if PostgreSQL is configured more securely as described in <xref
-      linkend="cb-postgres"/>.
+      to set a password if PostgreSQL is configured more securely 
+      as described in <xref linkend="cb-postgres"/>.
     </para>
     
     <para>
@@ -52,7 +52,7 @@
   </section>
 
   <section>
-    <title>Checking and Saving the <literal>gdbm</literal> Database Files</title>
+    <title>Checking the <literal>gdbm</literal> Database Files</title>
 
     <para>
       In the following, we will assume that the old <pnfs/> server
@@ -65,14 +65,14 @@
       The actual locations of the database files can be found as follows
 
 <screen><rootprompt/>. /usr/etc/pnfsSetup
-<rootprompt/>cat ${database}/D-* | cut -f 5 -d ':'</screen>
+<rootprompt/><command>cat</command> ${database}/D-* | cut -f 5 -d ':'</screen>
 
     </para>
 
     <para>
       Shut down the <pnfs/> server (after shutting down <dcache/>):
 
-<screen><rootprompt/>/opt/pnfs.3.1.10/pnfs/bin/pnfs stop</screen>
+<screen><rootprompt/><command>/opt/pnfs.3.1.10/pnfs/bin/pnfs</command> stop</screen>
 
       This would be a good time to perform a backup of the database
       files in <filename
@@ -88,7 +88,11 @@
 
       Choose a suitable temporary directory <filename
       class="directory"><replaceable>tempDirOld</replaceable></filename>
-      where the output of the scan commands is stored. Perform the
+      where the output of the scan commands is stored and create it
+
+<screen><rootprompt/><command>mkdir</command> <replaceable>tempDirOld</replaceable>/</screen>
+
+      Perform the
       following three commands for each of the database files in
       <filename
       class="directory">/opt/pnfsdb/pnfs/databases/</filename> (or
@@ -101,9 +105,9 @@
       Have a look at the output. It should contain no error
       messages. You can do that with
 
-<screen><rootprompt/>grep -v "^ ID" <replaceable>tempDirOld<replaceable/>/<replaceable>dbName</replaceable>.scan
-<rootprompt/>grep -v "^Scan" <replaceable>tempDirOld<replaceable/>/<replaceable>dbName</replaceable>.scandir
-<rootprompt/>grep -v "^Dir" <replaceable>tempDirOld<replaceable/>/<replaceable>dbName</replaceable>.scandirs</screen>
+<screen><rootprompt/><command>grep</command> -v "^ ID" <replaceable>tempDirOld<replaceable/>/<replaceable>dbName</replaceable>.scan
+<rootprompt/><command>grep</command> -v "^Scan" <replaceable>tempDirOld<replaceable/>/<replaceable>dbName</replaceable>.scandir
+<rootprompt/><command>grep</command> -v "^Dir" <replaceable>tempDirOld<replaceable/>/<replaceable>dbName</replaceable>.scandirs</screen>
 
       The output of these three commands should look like 
 
@@ -151,40 +155,148 @@
       errors the conversion will most likely result in loss of
       data. In this case, stay with the old version of the <pnfs/>
       server. Even though some parts of the database files are broken
-      - as the scan reveals - the system will probably continue to run
+      - as the scan reveals - the system will continue to run
       fine. Restart the server with
 
-<screen><rootprompt/>/opt/pnfs.3.1.10/pnfs/bin/pnfs start</screen>
+<screen><rootprompt/><command>/opt/pnfs.3.1.10/pnfs/bin/pnfs</command> start</screen>
 
-      Contact <email>support@dcache.org</email> for guidance in
-      converting to PostgreSQL.
+      since the conversion as described below will not work porperly.  In this
+      case contact <email>support@dcache.org</email> for guidance in converting to
+      PostgreSQL and remember to attach the output of the grep commands given above.
     </para>
+  </section>
+
+  <section>
+    <title>Updating the <pnfs/> Software</title>
 
     <para>
       Move the <pnfs/> databases to a secure backup directory
       <replaceable>backupDir</replaceable>:
 
-<screen><rootprompt/>mv /opt/pnfsdb/pnfs/databases  <replaceable>backupDir</replaceable>/databases</screen>
+<screen><rootprompt/><command>mv</command> /opt/pnfsdb/pnfs/databases  <replaceable>backupDir</replaceable>/databases</screen>
 
+      It is also a good idea to backup the central configuration file
+      <filename>/usr/etc/pnfsSetup</filename>:
+
+<screen<rootprompt/><command>cp</command> /usr/etc/pnfsSetup <replaceable>backupDir</replaceable>/pnfsSetup</screen>
+    </para>
+
+    <para>
+      Remove the old version of the <pnfs/> software:
+
+<screen><rootprompt/><command>rpm</command> -e pnfs</screen>
     </para>
 
     <para>
       Now create the empty files with the names of the original
       database files. Only the names of these files will be used by
-      the <pnfs/> server.  The conversion preformed below will create
+      the new <pnfs/> server.  The conversion preformed below will create
       a new database in the PostgreSQL server for each of the original
       database files. If <filename>admin</filename>,
       <filename>data1</filename>, ... , <filename>dataN</filename> are
       the original database file names, then do
 
-<screen><rootprompt/>mkdir /opt/pnfsdb/pnfs/databases
-<rootprompt/>cd /opt/pnfsdb/pnfs/databases
-<rootprompt/>touch admin data1 data2 ... dataN</screen>
+<screen><rootprompt/><command>mkdir</command> /opt/pnfsdb/pnfs/databases
+<rootprompt/><command>cd</command> /opt/pnfsdb/pnfs/databases
+<rootprompt/><command>touch</command> admin data1 data2 ... dataN</screen>
+    </para>
+
+    <para>
+      Adjust the central configuration file
+      <filename>/usr/etc/pnfsSetup</filename>: Change the location of the
+      <pnfs/> software in the line
+
+<programlisting>pnfs=/opt/pnfs.3.1.10/pnfs</programlisting>
+
+      to   
+
+<programlisting>pnfs=/opt/pnfs</programlisting>
+
+      and add a line reading 
+
+<programlisting>export dbConnectString="user=pnfsserver"</programlisting>
+
+      and change the PostgreSQL username if you did not use our suggestion 
+      <literal>pnfsserver</literal>. If you have set a password when creating
+      the user above, use
+
+<programlisting>export dbConnectString="user=pnfsserver password=<replaceable>yourPassword</replaceable>"</programlisting>
+
+    </para>
+
+    <note>
+      <para>
+        Starting with the PostgreSQL version of <pnfs/> the software directory
+        will not depend on the version anymore since RPM makes shure that only
+        one version of <pnfs/> is installed.
+      </para>
+    </note>
+
+    <para>
+      Install the PostgreSQL version of <pnfs/> with something like
+
+<screen><rootprompt/><command>rpm</command> -ivh pnfs-postgresql-3.1.10-1.i386.rpm</screen>
+
+      it contains everything necessary for the conversion as described in the
+      next section
+    </para>
+
+  </section>
+
+  <section>
+    <title>Conversion of the Databases</title>
+
+    <para>
+        ./g2psql.sh <replaceable>backupDir</replaceable>/databases/admin
+        ...............
+   By default the program uses username "postgres" to connect to the postgres server. If you plan
+   to use some other account to run the server you have to specify it using the shell environment:
+        export dbConnectString="user=johndoe"
+
+
+   The conversion script also takes a bit of time, but is fairly quick. In fact, you 
+   may exceed Postgres's checkpointing capability, in which case edit the postgresql.conf
+   file and increase the number of checkpoint_segments (for example from 3 to 10).
+
+10. To speed up the conversion the program does not create the database key, so you have to do it
+    in a separate step. For each database created during the conversion run script make-key.sh:
+        ./make-key.sh admin
+        ...............
+
+        psql -U pnfsserver -c 'ALTER TABLE pnfs ADD primary key (pnfsid)' admin
+
+	This also can take a while if the files were large.
+
+11. Scan all converted databases using script v3_1_10-f8/scan.sh
+        for example:
+        cd v3_1_10-f8
+        ./scan.sh /opt/pnfsdb/pnfs/databases/admin
+        ...............
+
+        The script will put the logfiles into /tmp/Scan1 directory
+
+12.  Check if there are any errors in the logfiles
+      *If you see any errors in the scan logs you can not proceed with the conversion!*
+        *You must stop, investigate the problem and fix it first!*
+
+13. Compare the logfiles from the directories  /tmp/Scan0 and /tmp/Scan1
+        They *must* be identical!
+
+
+14. Change the pnfs location in the configuration file /usr/etc/pnfsSetup
+        pnfs=/opt/pnfs.3.1.10/pnfs  to   pnfs=/opt/pnfs.3.1.10-f8/pnfs
+
+15. At that point you have everything ready to start the new server. Make sure that 
+    you have changed the pnfs location name to /opt/pnfs.3.1.10-f8/pnfs in your 
+    startup scripts pnfs/bin/pnfs and $pnfs/tools/pnfs.server, then execute 
+
+	$pnfs/bin/pnfs start
 
     </para>
 
   </section>
 
+  <unfinished>
   <screen>
 
    If there is another Postgres installed on your machine, make sure root's path is 
@@ -412,7 +524,7 @@ create index pnfs_inx on cacheinfo (pnfsid);
 #      cacheInfo=companion
 #            ==>  cacheInfoProvider=diskCacheV111.namespace.provider.SQLCacheLocationProviderFactory
 #  else if
-#      cacheInfo=<other> or missing
+#      cacheInfo=<replaceable>other or missing</replaceable>
 #            ==>  cacheInfoProvider=diskCacheV111.namespace.provider.BasicNameSpaceProviderFactory
 #  -p.
 #
@@ -449,6 +561,7 @@ create diskCacheV111.namespace.PnfsManagerV3 PnfsManager \
 
 
 
-  </screen>
+    </screen>
+  </unfinished>
   
 </chapter>

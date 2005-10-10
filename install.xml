@@ -6,21 +6,911 @@
   <!-- <?dbhtml dir="install"?> -->
   <title>Installation of dCache Components</title>
 
-  <partintro>
+<!--  <partintro>
     <para>
       This part should some day contain the guide for RPM-based
       installation as well as a completely manual installation.
     </para>
-  </partintro>
+  </partintro> -->
 
   <chapter id="in-rpm">
      <title>RPM-based Installation</title>
 
-    <para>This chapter will contain a description of the RPM-based installation of dCache.</para>
+<screen>
+The latest release of the dCache distribution is version 1-6-5.
+Release notes describing new features and bug fixes can be found at
+
+http://www.dcache.org/manuals/experts_docs/rel-dcache-1-6-5.html 
+
+Note for SRM users
+------------------
+ - The latest SRM client (used with srmcp) has an extended set of
+   parameters. Therefore it is necessary to renew the config file
+   that is typically located in the home directory of the user running
+   the client command (~/.srmconfig/config.xml). Simply remove the
+   file config.xml, it will be re-generated following the new format 
+   when running srmcp again.
+ - The SRM client code in release 1-6-5 provides compatibility with 
+   CERN's CASTOR SRM implementation. Therefore all users that are
+   interested in SRM based data transfer between CASTOR and their
+   dCache instance should upgrade to the client RPM that is part of
+   the 1-6-5 distribution.
+=======================================================================
+
+Note: From version 1.2.2-6 on it is required to have a Postgres database
+      installed and activated on the node that is running the SRM server.
+
+      Note: If you have installed version 1.2.2-6(-1) or a later version 
+      you need to drop the postgres tables. This is required because of 
+      a db schema change.
+
+Perform the following steps to remove the tables:
+1. locate configuration file  srm.batch for dcache srm and find values of  
+parameters jdbcUrl, jdbcUser and jdbcPass the last element of the jdbc url 
+is your database name, for example if the 
+value of jdbcUrl is dbc:postgresql://host/dcache then the name of the 
+database is dcache.
+
+2. Use these parameters and the "psql" postgress client to connect to the 
+sql server:
+
+$psql -U <replaceable>user</replaceable> -h <replaceable>host</replaceable> <replaceable>database name</replaceable>
+
+Once psql connects to the server the command prompt will appear:
+
+dbname=&gt;
+
+3. Execute the following commands (you can just cut-and-paste the following text
+into the psql):
+
+DROP TABLE  copyfilerequests ;
+DROP TABLE  copyfilerequests_b ;
+DROP TABLE  copyrequests ;
+DROP TABLE  copyrequests_b ;
+DROP TABLE  getrequests_protocols ;
+DROP TABLE  getrequests_protocols_b ;
+DROP TABLE  getfilerequests ;
+DROP TABLE  getfilerequests_b ;
+DROP TABLE  getrequests ;
+DROP TABLE  getrequests_b ;
+DROP TABLE  pins ;
+DROP TABLE  pinrequests ;
+DROP TABLE  srmnextrequestid ;
+DROP TABLE  putrequests_protocols ;
+DROP TABLE  putrequests_protocols_b ;
+DROP TABLE  putfilerequests ;
+DROP TABLE  putfilerequests_b ;
+DROP TABLE  putrequests ;
+DROP TABLE  putrequests_b ;
+DROP TABLE  srmrequestcredentials ;
+
+4. Make sure all tables have been dropped, type at the prompt to list all remaining tables
+   \dt;
+   Drop eventually remaining tables as described above.
+ 
+You are done.
+
+
+
+      The database is used to maintain state information about ongoing
+      transfers in order to make them persistent to allow a restart of
+      transfers in case of an interrupt (e.g. server failure/maintenance,
+      network disconnect etc.). 
+
+      Though there is no specific version required we recommend using a
+      recent version that is usually part of the Linux distribution
+      running on your system.
+      Hints concerning the PostgreSQL configuration are provided below.
+------------------------------------------------------------------------
+Note: From version 1.2.2-7 on doors (GridFTP, SRM, gsidcap) can be 
+      installed and configured on a selective basis, and, if required, on
+      a node other than the admin node.
+      Find the details below.
+
+------------------------------------------------------------------------
+       How to update a standard stand-alone dCache installation
+------------------------------------------------------------------------
+Because of the new SRM there are quite a few changes in the configura-
+tion files. An old installation which has not been customized very much
+is therefore updated most easily by doing a reinstall following these
+rules: (The data in the pools will be preserved.)
+-- Save copies of your old config files in /opt/d-cache/etc/ and
+   /opt/d-cache/config/. Remove the old packages with 'rpm -e' or just
+   by removing the whole directory /opt/d-cache/.
+-- Install the d-cache packages according to the guide below with the
+   following additions:
+   - The PNFS system should stay as it is.
+   - Use your old "etc/pool_path", but set the last column
+      to "No". Otherwise the data in your pools would be deleted!
+   - Use the old "etc/node_config" and "etc/dcache.kpwd" if needed
+   - Create a new "config/dCacheSetup" starting from
+     "etc/dCacheSetup.template" as described or with the aid of the old
+     file.
+     (Try: diff old-etc/dCacheSetup.template old-config/dCacheSetup)
+
+For a customized installation it might be better to use the existing
+configuration directories /opt/d-cache/etc/ and /opt/d-cache/config/ and
+adjust them to the new version of the SRM. Especially the file
+"config/srm.batch" has to be adjusted. A detailed description of the
+parameters in this file is given at the end of these instructions.
+------------------------------------------------------------------------
+
+Find a set of rpms (as of 01/23/2005) to install a dCache based Disk Pool
+Management system (no HSM support) at
+
+ http://www.dcache.org/downloads/dcache-v1.2.2-7-j14.tgz
+
+
+Get the tarball
+
+ wget http://www.dcache.org/downloads/dcache-v1.2.2-7-j14.tgz
+
+Unzip the tarball
+
+ tar xvzf dcache-v1.2.2-7-j14.tgz
+
+You should find the following files
+
+Release.notes	
+d-cache-core-1.5.2-xx.i386.rpm
+dCache-installation-instructions.txt       
+d-cache-client-1.0-xx.i386.rpm	
+d-cache-opt-1.5.3-xx.i386.rpm
+dcache-user-instructions.txt  
+pnfs-3.1.10-xx.i386.rpm
+
+
+The tar file contains 4 rpms:
+ - pnfs manager
+ - dCache core (admin/pool node)
+ - dCache optional components for admin node 
+   (srm/gridftp servers and the gsidcapdoor)
+ - client (32 and 64 bit support for dcap access combined in a single lib
+   (/opt/d-cache/dcap/lib/libdcap.so), e.g dc_lseek, dc_lseek64)
+           
+
+To set up a dCache instance that allows to access it via the dCap protocol
+the following components need to be installed
+ - pnfs        The namespace manager (appears as a filesystem to the user)
+ - admin node  Provides all functionalities to manage a distributed disk pool
+               (can also hold a pool)
+ - pool node   A node that provides storage capacity the dCache instance which
+               is managed by the PoolManager running on the admin node
+To extend accessibility through GridFTP and SRM optional software components can 
+be installed in addition to the core RPM. It is sufficient to just install the
+RPM. No additional step is required.
+
+Note: With the installation of the dCache core some configuration parameters 
+      are stored in pnfs. Therefore the pnfs manager needs to be installed
+      first.
+      Though the pnfs manager and the dCache core (admin node) by design can
+      be installed on different nodes this version of the installation package
+      assumes that both are installed on the same physical machine. 
+
+
+Prerequisites
+-------------
+
+I.   The dCache software is written in Java and requires a recent version of either
+     the JAVA developer kit (jdk) or the runtime environment (jre) to be installed.
+
+II.  In case the dCache is going to be accessed via GridFTP and/or SRM a host
+     certificate is required. Contact the CA responsible for your community for
+     details. The certificate is expected to be installed in
+     /etc/grid-security.
+
+
+III. PostgreSQL needs to be installed on the node running the cntral dCache
+     services (i.e. the admin node). The db is used by the SRM server, SRM Pin Manager
+     and the Resilience Manager. In case these services are not running on the node
+     the db is installed on make sure it is allowed to connect to the db. Add
+     a "host" entry to the table as described below.
+     Get a recent version from the Linux distribution that is running on your system.
+     Alternatively, RPMs can be found at
+
+     http://www.postgresql.org/mirroros-ftp.html
+     A version that is suitable for current versions of RH SL3 can be found at
+
+     ftp://ftp.de.postgresql.org/mirror/postgresql/binary/v7.4.6/rpms/redhat/rhel-3/
+     
+     Client, Server and JDBC support is needed.
+
+     The following instructions shall be used to configure and initialize the
+     databases. They need to be executed only following the installation of
+     the database. An upgrade of the dCache code does not require the 
+     commands to be executed again. All commands shall be carried out by
+     user 'postgres'
+
+     su postgres
+     # Create directory the db will live in
+     mkdir <replaceable>database_directory_name</replaceable>/data
+
+     # Command to initialize DB
+     initdb -D <replaceable>database_directory_name</replaceable>/data
+     
+     # Enable network access in postgres config file (default port 5432 is used)
+     <replaceable>database_directory_name</replaceable>/data/postgresql.conf
+     #
+     tcpip_socket = true
+
+     # Edit <replaceable>database_directory_name</replaceable>/data/pg_hba.conf to allow hosts to connect
+     # to the DB (records at the bottom of the file)
+     # TYPE  DATABASE    USER        IP-ADDRESS        IP-MASK           METHOD
+
+     local   all         all                                             trust
+     host    all         all         127.0.0.1         255.255.255.255   trust
+     host    all         all         <replaceable>IP of DB host</replaceable>   255.255.255.255   trust
+     host    all         all         <replaceable>IP of SRM host</replaceable>  255.255.255.255   trust (if SRM host != DB host)
+     #
+     # Command to start the DBMS, make sure the log file exists and
+     # user 'postgres' has write permission
+     postmaster -i -D <replaceable>database_directory_name</replaceable>/data >logfile 2>&amp;1 &amp;
+     [Note: You may want to create an rc-script under /etc/init.d 
+            to automatically start the DB upon start of the system]
+
+     # Command to create the DB for the SRM
+     createdb dcache
+     
+     # Command to connect to the DB
+     psql -U postgres dcache
+
+     # Create DB user 'srmdcache'
+     create user srmdcache password 'srmdcache';
+     # Disconnect from dcache db
+     \q
+
+     # All tables required for SRM operation will be created by the SRM
+     # server
+
+     # Command to create the DB for the Resilience Manager
+     createdb -O srmdcache replicas
+
+     # Initialize db tables for the Resilience Manager
+     # This step requires the dcache-core RPM (v 1.5.2-80 or higher) to be installed
+     psql -d replicas -U srmdcache -f /opt/d-cache/etc/pd_dump-s-U_enstore.sql     
+
+     # Just for completeness: Command to stop the DBMS (as user 'postgres')
+     # pg_ctl stop -D <replaceable>database_directory_name</replaceable>/data
+
+To install the pnfs manager follow the instructions below
+-------------------------------------------------------
+
+ 1. install the pnfs rpm
+
+ 2. copy the template /opt/pnfs.3.1.10/pnfs/etc/pnfs_config.template =&gt;
+                      /opt/pnfs.3.1.10/pnfs/etc/pnfs_config
+    and customize pnfs_config according to your needs
+
+    The pnfs config file contains
+
+PNFS_INSTALL_DIR = /opt/pnfs.3.1.10/pnfs
+PNFS_ROOT = /pnfs
+PNFS_DB = /opt/pnfsdb
+PNFS_LOG = /var/log/pnfsd.log
+PNFS_OVERWRITE = no
+    - don't overwrite pnfsdb if one exists in the place specified above
+
+ 3. run the install script at
+    /opt/pnfs.3.1.10/pnfs/install/pnfs-install.sh
+    - It generates the file "pnfsSetup" in /usr/etc/
+
+ 4. Start/Stop pnfs
+    /opt/pnfs.3.1.10/pnfs/bin/pnfs start|stop
+    - starts pnfs and mounts it at /pnfs/fs
+
+ 5. Security
+    In order to minimize the administrative overhead the pnfs filesystem (/pnfs
+    and /fs) is exported world-wide by default. /pnfs is required by local clients 
+    utilizing the dcap protocol, while /fs is needed by dCache doors (SRM, GridFTP,
+    gsidcap) that are not running on the host the pnfs filesystem is installed on.
+    
+    The ability to mount these filesystems can be limited by applying a kind of 
+    "network mask" as a file name.
+    The installation of pnfs installs a file called 0.0.0.0..0.0.0.0 in
+    /pnfs/fs/admin/etc/exports. Suppose the ability to mount /pnfs (/fs) should be 
+    limited to local hosts living in network 123.111. Therefore  the file would have 
+    to be renamed to 255.255.0.0..123.111.0.0 or 255.255.255.0..123.111.1.0 for a 
+    class C network. This can further be limited to individual hosts and particular
+    pnfs subtrees, e.g. the host with IP address 123.111.1.1 is allowed to mount 
+    /pnfs/theorie
+    - create a file named 123.111.1.1
+    - content of the file is (one line)
+      /theorie   /0/root/fs/usr/data/theorie  30 rw,soft
+    The mechanism as it is implemented will first look for the host IP address and will
+    apply the rule if the file exists. If it doesn't it will select the one with the
+    "mask" and will apply the rule therein respectively.
+    
+
+To install the admin node and or pool node(s) follow the instructions below
+---------------------------------------------------------------------------
+
+ 1. Install the dCache core rpm. In case you want to install optional
+    components, like the srm/gridftp servers and/or the client 
+    components, it's a good time to install the "d-cache-opt" rpm(s) as well. 
+    (Can also be done later.)
+    NOTE: In case of the intent to access data using SRM based transfers 
+          (srmcp) with an installation with multiple pool nodes the 
+          d-cache-opt rpm need to be installed on every pool node. In
+          addition to the software components each pool node needs a 
+          host certificate and full access to the public Internet for
+          TCP connections in the port range from port 20000 - 50000. 
+
+    From dcache-core RPM rev 1.5.2-80 on the Resilience Manager is included.
+    Please find more information about its functionality and configuration at
+    http://cmsdcam.fnal.gov/dcache/resilient/Resilient_dCache_v1_0.html.
+
+    The Resilience Manager is preconfigured but not automatically started
+    with the core services. The dCache core start-up script contains the
+    instructions required to start/stop the replica domain, but they are
+    commented out. Remove the "#" at the beginning of the related lines.
+
+
+ 2. configure the installation by using the following template files
+    in /opt/d-cache/etc. The arrow indicates the name of the customized file
+    - node_config.template  --&gt; /opt/d-cache/etc/node_config
+    - dcache.kpwd.template  --&gt; /opt/d-cache/etc/dcache.kpwd
+    - dCacheSetup.template  --&gt; /opt/d-cache/config/dCacheSetup
+    - pool_path.template    --&gt; /opt/d-cache/etc/pool_path
+    - door_config.template  --&gt; /opt/d-cache/etc/door_config   (!!! NEW !!!)
+    
+    In case of a virgin machine (not an upgrade of an existing dCache
+    installation) copy the .template file to its base name (e.g.
+    cp node_config.template node_config) and customize the latter
+    according to your requirements.
+    Note: the final place of the dCacheSetup file is 
+          /opt/d-cache/config/dCacheSetup. You need to copy it
+          manually from /opt/d-cache/etc to the config directory.
+
+ 2.1. etc/node_config
+    There is no dedicated rpm for the installation of a pool-node any
+    longer. Selection of admin vs. pool node is done via the NODE_TYPE
+    parameter in the node_config file. The admin node can also contain
+    pools.
+
+NODE_TYPE = dummy # either admin or pool
+DCACHE_BASE_DIR = /opt/d-cache
+PNFS_ROOT = /pnfs
+PNFS_INSTALL_DIR = /opt/pnfs.3.1.10/pnfs
+PNFS_START = yes               (start pnfs in case it's not running)
+PNFS_OVERWRITE = no            (in case dCache config exists in pnfs)
+POOL_PATH = /opt/d-cache/etc   (in case pools are to be configured on
+                                admin node; for details see pool instr.)
+NUMBER_OF_MOVERS = 100
+      
+      Copy the template to its base name, if required, and edit the resulting
+      file as desired.
+
+ 2.2. etc/dcache.kpwd
+
+      The dcache.kpwd authentication file.
+      The template needs to be customized and is expected as
+      /opt/d-cache/etc/dcache.kpwd
+
+      In case there is an existing dcache.kpwd it will not be overwritten
+      See the release notes for further information on the format.
+
+ 2.3. config/dCacheSetup
+
+      Important note: If an existing dCacheSetup file is going to be re-used
+                      make sure the Java classpath setting is uptodate. The 
+                      setting that is required by this version of the software
+                      can be found in /opt/d-cache/etc/dCacheSetup.template
+
+                      From version 1.2.2-7 on there is a new parameter to
+                      support remote db connections for the SRM server
+                      "srmDbHost=<replaceable>your.dbHost.org</replaceable>"
+
+      this is the primary configuration file for the dCache core and
+      optional components, i.e. srm/gridftp
+      Things that need attention (anything else has reasonable defaults)
+      - java path
+      - serviceLocatorHost
+        - use the host name of the node that is running pnfs as it is
+          defined in your DNS, replace string "SERVER" by the host name
+      - pnfsSrmPath (default is /)
+      - srmDbHost=<replaceable>your.dbHost.org</replaceable> to let the SRM server know about the db host
+      - The following parameters should be set to "true" if the dCache
+        installation is going to be used as a LCG Storage Element
+        - RecursiveDirectoryCreation=true
+        - AdvisoryDelete=true
+      If dCache was previously not running on this machine or if there is no
+      dCacheSetup file in the config directory copy the dCacheSetup.template
+      file to /opt/d-cache/config and customize it according to your needs.
+
+ 2.4. etc/pool_path
+
+      The template contains pool parameters (path, size, etc)
+
+      The format of the pool_path file is (3 columns)
+
+      /path/to/pool  size[GB]  "overwrite if exists (yes/no)"
+   
+      [Note: GB means 1024^3; space for inodes etc. is not accounted for]
+      Copy the template to its base name, if required, and edit the resulting file
+      as desired. Use an empty file if no pools are wanted (e.g. on a pure admin node).
+
+ 2.5. Install and configure the doors (GridFTP, SRM, gsidcap) -
+      etc/door_config
+ 
+      A "door" node (neither an "admin" nor a "pool" node) requires the core
+      and the opt RPMs to be installed. However, only the following
+      installation script needs be executed
+
+      /opt/d-cache/install/install_doors.sh 
+      (DON'T run /opt/d-cache/install/install.sh)
+
+      Make sure the template (/opt/d-cache/etc/door_config.template was copied
+      to /opt/d-cache/etc/door_config and customized before running the install_doors.sh
+      script.
+
+      The format of the door_config file is (2 columns)
+
+      ADMIN_NODE      <replaceable>name of admin node running pnfs</replaceable>
+
+      door          active   (default is all active)   
+      --------------------
+      GSIDCAP         yes    (or "no")
+      GRIDFTP         yes    (or "no")
+      SRM             yes    (or "no")
+
+      Also the dCacheSetup.template file needs to be copied to
+      /opt/d-cache/config/dCacheSetup and customized accordingly.
+
+      If a door or multiple different doors are to be added to an "admin"
+      and/or a "pool" node
+
+      - Install the dcache-opt RPM on each node
+      - Make sure the template (/opt/d-cache/etc/door_config.template was
+        copied to /opt/d-cache/etc/door_config and customized before running
+        the install_doors.sh
+      - On a "pool" node, copy the dcache authentication file (../etc/dcache.kpwd) 
+        from the admin node to /opt/d-cache/etc on the "pool" node(s)
+
+ 3. To install an "admin" or a "pool" node run the install script at
+
+    - /opt/d-cache/install/install.sh
+
+      For an "admin" node this will do all dCache specific preparations in pnfs, etc. 
+      If there is a pool location configured in pool_path it will also install a pool
+      (in case the file is empty it will not install/configure any pool related
+      stuff).
+
+    - /opt/d-cache/install/install_doors.sh
+
+      in case one or multiple different of the following doors are supposed to 
+      be installeda on the admin and/or the pool nodeB
+      - GridFTP
+      - SRM
+      - gsidcap
+      This will update the ../bin/dcache-opt script accordingly.         
+      Note: "door" nodes need to mount the pnfs fs. Make sure NFS related
+            communication is enabled between the "admin" and the "door" node(s).
+            For pnfs installations prior to the one which is part of the 1.2.2-7
+            distribution do the following
+            
+            - Make sure pnfs is running
+            - cp /pnfs/fs/admin/etc/exports/127.0.0.1 \
+              /pnfs/fs/admin/etc/exports/0.0.0.0..0.0.0.0
+              (overwrite existing file)
+
+    - Monitoring of the door domains via the Web page
+      In the recent setup, the srm and the gridftp door(s) have changed their
+      name(s) so that the web page is asking the wrong cell whether or not it's alive.
+      The srm/gridftp name changed from SRM/GFTP to SRM/GFTP-<replaceable>HOSTNAME</replaceable> (where HOSTNAME is
+      the host, the SRM/GFTP door is running on). To properly update the status page you 
+      have to manually modify the config/httpd.batch on the headnode (or the node were the 
+      http service is running).
+      At the end of the httpd.batch file you will find a list of 'cells'. The ones you
+      need to change are called SRM and GFTP. Please change them to SRM-<replaceable>HOSTNAME</replaceable> and
+      GFTP-<replaceable>HOSTNAME</replaceable> respectively. In case multiple gridftp doors are configured you need 
+      to add as many lines as there are gridftp doors.
+      You need to restart the httpd service to activate the changes.
+      In case you don't want to restart the services you may
+      as well make the changes in the batch file (for future
+      restarts ) and use the ssh interface to make temp.
+      changes :
+
+      (local) admin  cd collector@httpdDomain
+      >>(collector@httpdDomain) admin > unwatch SRM
+      > >>>(collector@httpdDomain) admin > unwatch GFTP
+      > >>>(collector@httpdDomain) admin > unwatch DCap-gsi
+      > >>>(collector@httpdDomain) admin > 
+      > >>>(collector@httpdDomain) admin > watch SRM-<replaceable>HOSTNAME</replaceable>
+      > >>>(collector@httpdDomain) admin > watch GFTP-<replaceable>HOSTNAME</replaceable>
+      > >>>(collector@httpdDomain) admin > watch DCap-gsi-<replaceable>HOSTNAME</replaceable>
+            
+ 4. Start/stop the dCache services
+
+    Make sure pnfs is running and the pnfs filesystem is mounted
+    - To start/stop pnfs 
+     /opt/pnfs.3.1.10/pnfs/bin/pnfs start|stop
+     Starting pnfs will also mount the fs, stopping it will unmount pnfs.
+
+    Start the core services
+    /opt/d-cache/bin/dcache-core start|stop
+
+    [in case dCache optional components (srm/gridftp/gsidcapdoor) are
+    installed on an "admin", a "pool" or a "door" node they are
+    started/stopped with
+     /opt/d-cache/bin/dcache-opt start|stop ]
+
+    To start|stop a pool use
+    /opt/d-cache/bin/dcache-pool start|stop
+
+
+ 5. Client installation
+    Client components are installed under /opt/d-cache.
+
+    The libraries (32 and 64-bit versions) can be found under
+     /opt/d-cache/dcap/lib. libdcap.so and libpdcap.so
+    are symbolic links pointing to the 64-bit version.
+    Also the gsidcap tunnel lib (libgsiTunnel.so) is
+    installed here. In case the 32 bit version is supposed to be
+    the default the links can be customized accordingly.
+
+    Besides the libraries header files (/opt/d-cache/dcap/include)
+    and the dccp binary (/opt/d-cache/dcap/bin) are installed with
+    the Client RPM).    
+    It is sufficient to install the Client RPM. No further installation
+    step is required to make the client functions operational.
+
+ 6. Log files
+
+    Common location for all dCache related log files is
+    /opt/d-cache/log
+    The default location for the PNFS log file is
+    /var/log/pnfsd.log
+
+The default is all pools register automatically with the default
+pgroup.
+
+dCache SRM installation and configuration instructions
+======================================================
+
+Requirements on the srm and pool nodes
+
+   1. The nodes on which srm server (srm cell) and pool 
+      nodes are installed need to have the grid host certificate 
+      installed. Please refer to the instructions from your Certification 
+      Authority on how to obtain a grid host certificate. 
+   2. There should be a postgres database server running on a 
+      machine accessible by the srm server, and there should be a 
+      postgres user account created, capable of creating new 
+      tables.
+      Instructions on the installation are provided in section
+      "Prerequisites", top III
+
+Non-standard DCache Services that srm relies upon
+[Note: The configuration options as they are described below are
+       already part of the srm.batch file as it is coming with
+       this package. Ususally no modifications are necessary.
+       Only when an existing installation is upgraded _AND_ the
+       admin is going to reuse the old srm.batch file the "pin
+       manager" config entries need to be added. The standard 
+       RPM upgrade mechanism overwrites that file.] 
+
+   1. Pin Manager.
+      Pin Manager is used by srm to perform the so 
+      called file "pin in cache" operation. When a file is in pinned 
+      state, it will not be deleted from the cache to make room for 
+      other incoming files. The Pin Manager cell can be started by 
+      adding the following lines to one of the dcache domain 
+      configuration "batch" files (e.g. srm.batch):
+    
+    #
+    #pin manager
+    #
+    create diskCacheV111.services.PinManager PinManager \
+    " default -export  \
+     -jdbcUrl=jdbc:postgresql://localhost/dcache \
+     -jdbcDriver=org.postgresql.Driver \
+     -dbUser=<replaceable>user</replaceable> \
+     -dbPass=<replaceable>password</replaceable>"
+
+     [Note: defaults for <replaceable>user</replaceable>=srmdcache, <replaceable>password</replaceable>=srmdcache]
+
+     The configurable parameters are the folowing:
+    -jdbcUrl url is pointing to the type and the location of the 
+	database, which will be used by the pin manager. For example, 
+	if the database is running on a host "hosta" on a nonstandard 
+        port "12345", and the database name is "name1", this option 
+        value would be "jdbc:postgresql://hosta:12345/name1".
+     -jdbcDriver specifies the class name for the driver. Should 
+        remain the same for the postgres database.
+     -dbUser a name of the database user
+     -dbPass a password for the database user, could be an arbitrary 
+	string if the host on which the pin manager is running is 
+	included in the postgres list of the trusted hosts.
+     The two optional parameters are the 
+     -poolManager and -pnfsManager, which allow the specification 
+       of alternative names for the PoolManager and PnfsManager cells.
+    2. GsiftpTransferManager
+       This service is used by srm to perform the transfers 
+       from a remote server to the dcache via the gsiftp protocol.
+       The GsiftpTransferManager cell is started by the folowing 
+       "batch" command:
+
+      #
+      # RemoteGsiftpTransferManager
+      #
+      create diskCacheV111.services.GsiftpTransferManager
+      RemoteGsiftpTransferManager
+      \
+        "default -export \
+        -pool_manager_timeout=60 \
+        -pnfs_manager_timeout=60 \
+        -pool_timeout=300 \
+        -mover_timeout=86400 \
+        -max_transfers=30 \
+      "
+      The configurable parameters are the folowing:
+
+      -pool_manager_timeout is the timeout in seconds for PoolManager 
+       message exchanges.
+
+      -pnfs_manager_timeout is the timeout in seconds for PnfsManager 
+       message exchanges.
+
+      -pool_timeout is the timeout in seconds before the first pool 
+       message, confirming the the creation of the mover
+
+      -mover_timeout is the time before the transfer manager will 
+       stop waiting for the completion of the started transfer. If
+       expired it will try to kill the mover, and report the error 
+       back to the caller (srm).
+
+      -max_transfers is the maximum number of simultaneous transfers.
+       If more transfers are scheduled, the transfer manager will fail 
+       them.
+      
+      3. Copy Manager, 
+	This service is used by the srm when the source and the destination
+        files in the srm copy request are both local to the storage.
+        Its configuration parameters are mostly the same as of the
+        GsiftpTransferManager. The example startup command follows:
+        
+	create diskCacheV111.doors.CopyManager CopyManager \
+	"default -export \
+	-pool_manager_timeout=60 \
+	-pool_timeout=300 \
+	-mover_timeout=86400 \
+	-max_transfers=30 \
+        "
+
+SRM Configuration Guide
+-----------------------
+Note: The package is coming with a set of suitable parameters. We expect that
+      modifications are necessary in rare cases only.
+  
+      We provide deep technical information for those who are interested in
+      the details. Those details are not required to operate the SRM/dCache. 
+
+
+	In order to start the srm server, the instance of the cell
+	diskCacheV111.srm.dcache.Storage needs to be created. Here is 
+ 	the example of a dcache batch file command starting the srm cell, 
+	illustrating most of the configurable parameters:
+
+	create diskCacheV111.srm.dcache.Storage  SRM \
+            "default -srmport=${srmPort1} \
+            -export \
+            -kpwd-file=${config}/dcache.kpwd \
+            -pnfs-srm-path=/ \
+            -buffer_size=1048576 \
+            -tcp_buffer_size=1048576 \
+            -parallel_streams=10 \
+            -debug=true \
+            -get-lifetime=86400000 \
+            -put-lifetime=86400000 \
+            -copy-lifetime=86400000 \
+            -get-req-thread-queue-size=1000 \
+            -get-req-thread-pool-size=30 \
+            -get-req-max-waiting-requests=1000 \
+            -get-req-ready-queue-size=1000 \
+            -get-req-max-ready-requests=30 \
+            -get-req-max-number-of-retries=10 \
+            -get-req-retry-timeout=60000 \
+            -get-req-max-num-of-running-by-same-owner=10 \
+            -put-req-thread-queue-size=1000 \
+            -put-req-thread-pool-size=30 \
+            -put-req-max-waiting-requests=1000 \
+            -put-req-ready-queue-size=1000 \
+            -put-req-max-ready-requests=30 \
+            -put-req-max-number-of-retries=10\
+            -put-req-retry-timeout=60000 \
+            -put-req-max-num-of-running-by-same-owner=10 \
+            -copy-req-thread-queue-size=1000 \
+            -copy-req-thread-pool-size=8 \
+            -copy-req-max-waiting-requests=1000 \
+            -copy-req-max-number-of-retries=30\
+            -copy-req-retry-timeout=6000 \
+            -copy-req-max-num-of-running-by-same-owner=10 \
+            -recursive-dirs-creation=true \
+            -jdbcUrl=jdbc:postgresql://localhost/dcache \
+            -jdbcDriver=org.postgresql.Driver \
+            -dbUser=srmdcache \
+            -dbPass=srmdcache \
+            "    
+       
+	The available configuration options are:
+
+        -kpwd-file specifies the location of the dcache authorization 
+	"database" file.
+
+        -pnfs-srm-path specifies the root of the srm within the pnfs
+	namespace. Essentially this means that the value of this option 
+	will be prepended to all the local storage paths given to the srm 
+        server.
+
+        -buffer_size and -tcp_buffer_size specify the size of memory, in
+	bytes, and socket buffer size, in bytes, to be used with the embedded 
+	gsiftp clients, when performing transfers between the storage and 
+	a gsiftp server.
+
+        -parallel_streams specifies the max. number of parallel streams to be
+	used by the embedded gsiftp client.
+
+        -debug tells if extra debug info should be logged. Most of the debug 
+        logging can be turned off by setting the printout domain variable to
+	error (2). Usually this is done in the first line of the dcache batch
+	file.
+
+        -recursive-dirs-creation turnes on and off the automatic creation
+	 of unexsistent directories, in case of put/copy requests.
+
+        -jdbcUrl, -jdbcDriver, -dbUser, -dbPass: these options have exactly
+	 same meaning as the same options of the PinManager.
+         -jdbcUrl url is pointing to the type and the location of the
+          database, which will be used by the pin manager. For example,
+          if the database is running on a host "hosta" on a nonstandard
+          port "12345", and the database name is "name1", this option
+          value would be "jdbc:postgresql://hosta:12345/name1".
+         -jdbcDriver specifies the class name for the driver. Should  
+          remain the same for the postgres database.
+
+        -get-lifetime, -put-lifetime, -copy-lifetime specify the lifetimes, in 
+        milliseconds, of the srm get, put and copy requests respectively.
+
+        In order to develop a better understanding of the rest of the 
+        parameters we will first describe how the request scheduler works.
+        Please note that the following explanation is a simplification.
+        The SRM Scheduler executes the instances of the SRM Job classes. For
+	the scheduler, execution of the job is the execution of the job's run
+	method in one of the threads. Jobs are initially in the Pending state. 
+	Once the scheduler receives the job, it puts it in the TQueued state and 
+	transfers it into the Thread Queue.
+	The Scheduler takes the java threads from the pool and will actually execute 
+	the jobs' "run" methods. Once a thread in the pool becomes available,
+	the first job from the Thread Queue is removed, and this job's state is
+	changed to running. The thread starts the execution of the job's run method.
+        Once the run method returns, the state of the job can still remain
+	"Running", or it might have changed to  "Done" or "AsyncWait". 
+
+        If the state is still "Running", it will be placed on the ready queue.
+	Once the job execution is completed, it now waits to be put to the "Ready"
+	state by the scheduler.
+	If it is "AsyncWait" this means that the job is partially completed, and
+	it now waits for the internal event to continue execution; if it is "Done", 
+	the job needs no further processing.
+        
+        To limit the number of simultaneous transfers by the srm client/user (in
+	cases when the srm server does not perform the transfer itself, i.e.
+	"get" and "put" requests) the number of jobs that are "Ready" can be
+	limited according to the number set in the configuration. The rest of the 
+        requests, which are prepared to be "Ready" are put on the "Ready" queue. 
+        Once the clients finish the transfers, they notify the system by changing 
+        the state of the put or get file requests to "Done". If users/clients never 
+        perform this state change, the request changes its state automatically 
+        upon the expiration of the request's lifetime. If "Ready" spots become 
+        available, corresponding requests are removed from the Ready queue and 
+        their state changes to "ready".
+        
+        In the dcache srm there are three instances of the scheduler, one for
+	each possible type of srm requests: copy, get and put.
+
+        The following options are described as follows:
+         
+        -[type]-req-thread-queue-size - maximum number of requests in the
+	thread queue
+
+        -[type]-req-thread-pool-size - maximum number of threads in the thread 
+	 pool. This parameter is especially important for copy requests,
+	 since the copy operation for each file is performed in a separate thread. 
+         The number for copy requests should be less than the -max_transfers 
+         parameter of the transfer managers.
+
+        -[type]-req-max-waiting-requests - maximum number of requests in
+         the async wait jobs
+         
+        -[type]-req-ready-queue-size - maximum number of requests in the 
+	 ready queue. This and the following parameters are not important 
+         for the copy scheduler.
+
+        -[type]-req-max-ready-requests
+	 this parameter is important for put and get requests, and it is 
+         equivalent to the number of transfer urls given out to the clients,
+         which are actively transferring (or intend to transfer).
+
+        -[type]-req-max-number-of-retries
+         number of times the job is allowed to fail and to be retried
+	 before SRM should give up and return an error to the user.
+
+        -[type]-req-max-num-of-running-by-same-owner
+         The job owner is roughly equivalent to the user account in the kpwd
+	 file.
+         When the jobs are removed from the Thread and Ready Queue, their
+	 "owner" is taken in consideration. If the number of jobs submitted by 
+         the user exceeds the number in the configuration, jobs of this particular 
+         user will not be removed from the queue, even if they are first. 
+         If there are jobs belonging to another user, for whom this number was not 
+	 reached yet, these will be executed first. This will not lead to 
+         underutilization of the system. If only one owner is running jobs 
+         they all will get scheduled to occupy all available scheduler threads 
+         or ready spots.
+
+	Other available options are (these are not recommended to be used so
+	they are not explained here) :
+        -poolManager, 
+	-pnfsManager, 
+        -proxies-directory
+        -url-copy-command
+        -timeout-command
+        -usekftp
+        -globus-url-copy
+        -use-urlcopy-script
+        -use-dcap-for-srm-copy
+        -use-gsiftp-for-srm-copy
+        -use-http-for-srm-copy
+        -use-ftp-for-srm-copy
+        -save-memory
+
+        For more information refer to the dCache web site at http://www.dcache.org and the 
+        FNAL SRM web site at http://www-isd.fnal.gov/srm.
+
+System Monitoring
+=================
+
+http://admin.node.org:2288
+
+ - allows monitoring of services only
+
+Admin Interface
+===============
+
+The admin interface offers a very rich set of commands (to
+be described elsewhere) allowing to alter system configuration
+while the system is running and to solve eventual problems.
+
+Since the distribution comes with an initial password it is
+important to login right after the installation in order to
+customize it.
+Note: The following is supported in version 1.2.2-1 for the
+      first time and will be supported in future releases.
+
+   Assuming you are logged in on the admin node log in to the
+   admin interface to set the password
+
+    ssh -l admin -c blowfish -p 22223 localhost
+    (passwd : dickerelch)
+
+    (local) admin > cd acm
+    (acm) admin > create user admin
+    (acm) admin > set passwd <replaceable>newPasswd</replaceable> <replaceable>newPasswd</replaceable>
+    (acm) admin > ..
+    (local) admin > logoff
+
+  From now on login as user admin will only be successful if
+  newPasswd is presented.
+
+  Note: When setting the password string in the shell one can
+        disable the echo by typing "ctrl I" following "set
+        password".
+
+</screen>
     
 <!--
   <section id="in-rpm-deinstall">
-    <title>Deinstallation (for New Install on Testsystems)</title>
+    <title>Deinstallation (for New Install on Testsystems)<replaceable/title>
 
     <section id="in-rpm-deinstall-pnfs">
       <title>Deinstallation of PNFS</title>
