@@ -171,4 +171,6 @@ div.glosslist dt {
   border: 0;
  }
 
-
+code.filename { 
+  font-weight: bold;
+ }

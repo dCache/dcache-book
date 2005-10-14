@@ -53,8 +53,8 @@
     </para>
   </section>
 
-  <section>
-    <title>Checking the <literal>gdbm</literal> Database Files</title>
+  <section id="cb-pnfs-postgres-check1">
+    <title>Checking the GDBM Database Files</title>
 
     <para>
       In the following, we will assume that the old <pnfs/> server
@@ -82,7 +82,7 @@
     </para>
 
     <para>
-      Check the integrity of these gdbm database files as follows.
+      Check the integrity of these GDBM database files as follows.
       First prepare the environment for the <pnfs/> tools as usual:
 
 <screen><rootprompt/>. /usr/etc/pnfsSetup
@@ -267,55 +267,91 @@
 
 <screen><rootprompt/><command>gdbm2psql</command> -r -o -i <replaceable>backupDir</replaceable>/databases/<replaceable>gdbmFile</replaceable></screen>
 
-      It is necessary to use the full path to the file. A new database in the
-      PostgreSQL server will be created and the data from the GDBM file will be
-      written into it. The typical output is
+      It is necessary to use the full path to the file. A new database
+      in the PostgreSQL server will be created and the data from the
+      GDBM file will be written into it. A typical output is
 
-      <programlisting></programlisting>
-
-
-   The conversion script also takes a bit of time, but is fairly quick. In fact, you 
-   may exceed Postgres's checkpointing capability, in which case edit the postgresql.conf
-   file and increase the number of checkpoint_segments (for example from 3 to 10).
-
-10. To speed up the conversion the program does not create the database key, so you have to do it
-    in a separate step. For each database created during the conversion run script make-key.sh:
-        ./make-key.sh admin
-        ...............
-
-        psql -U pnfsserver -c 'ALTER TABLE pnfs ADD primary key (pnfsid)' admin
-
-	This also can take a while if the files were large.
-
-11. Scan all converted databases using script v3_1_10-f8/scan.sh
-        for example:
-        cd v3_1_10-f8
-        ./scan.sh /opt/pnfsdb/pnfs/databases/admin
-        ...............
-
-        The script will put the logfiles into /tmp/Scan1 directory
-
-12.  Check if there are any errors in the logfiles
-      *If you see any errors in the scan logs you can not proceed with the conversion!*
-        *You must stop, investigate the problem and fix it first!*
-
-13. Compare the logfiles from the directories  /tmp/Scan0 and /tmp/Scan1
-        They *must* be identical!
+<programlisting>Connection string: dbname=template1 user=pnfsserver
+Connection string: dbname=admin user=pnfsserver
+WARNING:  there is no transaction in progress
+Put record #1 into the database...time=0
+key 000000000000xxxxxxxxxxxx is found at 1310
+There are 3671 records in the database.</programlisting>
 
 
-14. Change the pnfs location in the configuration file /usr/etc/pnfsSetup
-        pnfs=/opt/pnfs.3.1.10/pnfs  to   pnfs=/opt/pnfs.3.1.10-f8/pnfs
+      The conversion script also takes a bit of time, but is fairly
+      quick. In fact, you may exceed PostgreSQL's checkpointing
+      capability, in which case edit the
+      <filename><replaceable>database_directory_name</replaceable>/data/postgresql.conf</filename>
+      file and increase the number of
+      <literal>checkpoint_segments</literal> (for example from 3 to
+      10).
+    </para>
+      
+    <para>
+      To speed up the conversion the program does not create the
+      database key, so you have to do it in a separate step. For each
+      database created during the conversion run
 
-15. At that point you have everything ready to start the new server. Make sure that 
-    you have changed the pnfs location name to /opt/pnfs.3.1.10-f8/pnfs in your 
-    startup scripts pnfs/bin/pnfs and $pnfs/tools/pnfs.server, then execute 
+<screen><rootprompt/><command>psql</command> -U pnfsserver -c 'ALTER TABLE pnfs ADD primary key (pnfsid)' <replaceable>dbName</replaceable></screen>
 
-	$pnfs/bin/pnfs start
-
+      (or use the script
+      <filename>${pnfs}/tools/make-key.sh</filename>).  This also can
+      take a while if the files were large.
     </para>
 
   </section>
 
+  <section>
+    <title>Testing the Converted Databases</title>
+
+    <para>
+      Testing the converted databases before starting the new <pnfs/>
+      server is very essential. If any discrepancies are detected the
+      system should be reverted to the old version of <pnfs/> using
+      the old database files. The testing is performed by repeating
+      the procedure described in <xref
+      linkend="cb-pnfs-postgres-check1"/> for the new databases and
+      comparing the results with those of the old tests. For smaller
+      installations this is done with
+
+<screen><rootprompt/><command>conversion-scan.sh</command> <replaceable>oldPnfsDatabaseDir</replaceable> <replaceable>newPnfsDatabaseDir</replaceable></screen>
+
+      e.g.
+
+<screen><rootprompt/><command>conversion-scan.sh</command> <replaceable>backupDir</replaceable>/databases /opt/pnfsdb/pnfs/databases</screen>
+
+      The output of the scans performed by this script can be found in
+      <filename>/tmp/pnfs-conversion-scan-<replaceable>PID</replaceable>/old/</filename>
+      and
+      <filename>/tmp/pnfs-conversion-scan-<replaceable>PID</replaceable>/new/</filename>. 
+    </para>
+
+    <para>
+      For larger installations it is probably better to perform the
+      tests by hand as described in <xref
+      linkend="cb-pnfs-postgres-check1"/>. The old version of the
+      <command>md3tool</command> command is provided in the
+      <literal>pnfs-postgresql</literal> package for convenience
+      (called <command>md3tool_gdbm</command>.)
+    </para>
+
+    <para>
+      If all the tests succeeded, the <pnfs/> server may be started
+      as usual:
+
+<screen><rootprompt/><command>${pnfs}/bin/pnfs</command> start</screen>
+
+      Make shure that the PostgreSQL server is always started before
+      the <pnfs/> server - especially at system start-up. You also
+      might have to change the path to the <pnfs/> software from
+      <filename class="directory">/opt/pnfs.3.1.10/pnfs/</filename> to
+      <filename class="directory">/opt/pnfs/</filename> in a start-up
+      script.
+    </para>
+
+  </section>
+  
   <unfinished>
   <screen>
 

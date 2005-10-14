@@ -208,10 +208,10 @@ III. PostgreSQL needs to be installed on the node running the cntral dCache
      Get a recent version from the Linux distribution that is running on your system.
      Alternatively, RPMs can be found at
 
-     http://www.postgresql.org/mirroros-ftp.html
-     A version that is suitable for current versions of RH SL3 can be found at
+     http://www.postgresql.org/ftp/
 
-     ftp://ftp.de.postgresql.org/mirror/postgresql/binary/v7.4.6/rpms/redhat/rhel-3/
+     A version that is suitable for current versions of RH SL3 can be found at
+     http://www.postgresql.org/ftp/binary/v8.0.4/linux/rpms/redhat/rhel-es-3.0/
      
      Client, Server and JDBC support is needed.
 
@@ -220,6 +220,28 @@ III. PostgreSQL needs to be installed on the node running the cntral dCache
      the database. An upgrade of the dCache code does not require the 
      commands to be executed again. All commands shall be carried out by
      user 'postgres'
+
+     ---------- on SL3: --------------
+     # chkconfig postgresql on
+     # service postgresql start
+     # vi /var/lib/pgsql/data/postgresql.conf
+      tcpip_socket = true
+     # vi /var/lib/pgsql/data/pg_hba.conf
+      local   all         all                        trust
+      host    all         all         127.0.0.1/32   trust
+      host    all         all         ::1/128        trust
+     # service postgresql restart
+     ---------------------------------   bush, carter are at this point (postgresql v7.4.6)
+     # su - postgres
+     > createuser --no-adduser --createdb --pwprompt pnfsserver
+     > createuser --no-adduser --createdb --pwprompt srmdcache
+     > createdb -O srmdcache dcache
+     > createdb -O srmdcache companion
+     > createdb -O srmdcache replicas
+     > exit
+     # psql -d replicas -U srmdcache -f /opt/d-cache/etc/psql_install_replicas.sql
+     # psql -d companion -U srmdcache -f /opt/d-cache/etc/psql_install_companion.sql
+     ---------------------------------
 
      su postgres
      # Create directory the db will live in
