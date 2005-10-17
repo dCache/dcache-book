@@ -6,13 +6,13 @@
   <!-- <?dbhtml dir="dCacheBook" ?> -->
   
   
-  <title>dCache Book</title>
+  <title><dcache/>, the Book</title>
   <titleabbrev>dCache Book</titleabbrev>
   
   <bookinfo>
     <abstract>
       <para>
-	The dCache Book is the guide for administratos of dCache
+	The <dcache/> Book is the guide for administratos of dCache
 	systems. The first part describes the installation of a
 	simple single-host dCache instance. The second part
 	describes the components of dCache and in what ways they can
@@ -44,6 +44,11 @@
       <surname>Fuhrmann</surname>
     </author>
     
+    <author>
+      <firstname>Michael</firstname>
+      <surname>Ernst</surname>
+    </author>
+
     <author>
       <firstname>Alex</firstname>
       <surname>Kulyavtsev</surname>

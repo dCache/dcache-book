@@ -317,7 +317,7 @@
       </glossentry>
 
     <glossentry>
-      <glossterm id="gl-repman">Replica Manager</glossterm>
+      <glossterm id="gl-replicamanager">Replica Manager</glossterm>
       <glossdef>
         <para>
           The replica manager keeps track of the number of <glossterm
@@ -352,7 +352,7 @@
     </glossentry>
 
     <glossentry>
-      <glossterm id="gl-pnfs_companion"><pnfs/> Companion</glossterm>
+      <glossterm id="gl-pnfscompanion"><pnfs/> Companion</glossterm>
       <glossdef>
         <para>
           The <pnfs/> companion is a database which stores the <dcache/>
@@ -426,6 +426,19 @@
         <para>
           A central service which can reserve space on pools for a
           certain time. It is used by the <srm/> to satisfy space reservation requests.
+        </para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry>
+      <glossterm id="gl-pool">Pool</glossterm>
+      <glossdef>
+        <para>
+          A pool in a <dcache/> instance is responsible for storing data on
+disk. It is a <glossterm linkend="gl-cell">cell</glossterm> which manages the
+space available in a subdirectory (specified in the <glossterm
+linkend="gl-poollist-file"><filename>poollist</filename> File</glossterm>) which is
+localizes on the host on which the pool cell is running.
         </para>
       </glossdef>
     </glossentry>

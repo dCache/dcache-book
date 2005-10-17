@@ -4,8 +4,8 @@
 <chapter id="cb-pnfs-postgres">
   <title>Moving the <pnfs/> Data from GDBM to PostgreSQL</title>
 
-  
-  
+  <partauthors>Vladimir Podstavkov, Mathias de Riese</partauthors>
+ 
   <para>
     From version 1.6.6 of <dcache/> the distribution contains a
     version of the <pnfs/> server which uses a PostgreSQL database to

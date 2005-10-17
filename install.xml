@@ -1,20 +1,174 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE part PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">
 
-<!-- <namespacewrapper xmlns:xi="http://www.w3.org/2001/XInclude"> -->
-<part id="in">
+<chapter id="in">
   <!-- <?dbhtml dir="install"?> -->
-  <title>Installation of dCache Components</title>
+  <title>Installation Manual</title>
+  
+  <partauthors>Michael Ernst, Mathias de Riese</partauthors>
+  
+  <para>
+    The first section describes the installation of a fresh <dcache/>
+    instance using RPM files downloaded from <ulink
+      url="http://www.dcache.org">the <dcache/> homepage</ulink>. It follows a
+    guide to update an existing installation. In both cases we assume standard
+    requirements of a small to medium sized <dcache/> instance without an attached
+    <glossterm linkend="gl-tss">tertiary storage system</glossterm>.
+  </para>
+  
+  <section id="in-install">
+    <title>Installation of a Basic <dcache/> Instance</title>
 
-<!--  <partintro>
     <para>
-      This part should some day contain the guide for RPM-based
-      installation as well as a completely manual installation.
+      In the following the installation of a central admin node of a <dcache/>
+      instance and of an arbitrary number of <dcache/> nodes will be
+      described. These nodes may each contain several 
+      <glossterm linkend="gl-pool"><dcache/> pools</glossterm> and optionally one <srm/>, one
+      GridFTP door, and/or one GSIdCap door. On the admin node, a <pnfs/> server and
+      several central <dcache/> components are installed. The <pnfs/> server,
+      some central components, and each <srm/> need an PostgreSQL server
+      installed locally on the node. The first section describes the
+      configuration of a PostgreSQL server. After that the installation of the
+      <pnfs/> server and of the <dcache/> components will follow.
     </para>
-  </partintro> -->
 
-  <chapter id="in-rpm">
-     <title>RPM-based Installation</title>
+    <section>
+      <title>Preparation of PostgreSQL Servers</title>
+      
+      <para>
+        Install the PostgreSQL server, client and JDBC support (version 8 or
+        higher) with the tools of the operating system. For example, use
+
+<screen><rootprompt/><command>apt-get</command> install postgresql postgresql-server postgresql-jdbc</screen>
+
+        or download a suitable package from <ulink
+          url="http://www.postgresql.org/ftp/">http://www.postgresql.org/ftp/</ulink>. A
+        version that is suitable for current versions of Scientific Linux 3 can be
+        found at <ulink
+          url="http://www.postgresql.org/ftp/binary/v8.0.4/linux/rpms/redhat/rhel-es-3.0/">http://www.postgresql.org/ftp/binary/v8.0.4/linux/rpms/redhat/rhel-es-3.0/</ulink>.
+      </para>
+
+      <para>
+        Initialize the database directory (usually 
+        <filename class="directory">/var/lib/pgsql/data/</filename>, 
+        start the database server, and make shure that it is started 
+        at system start-up. This may be done with
+
+<screen><rootprompt/><command>/etc/init.d/postgresql</command> start
+<rootprompt/><command>chkconfig</command> postgresql on</screen>
+
+        If the start-up script does not perform the initialization
+        automatically, it might have to be done with
+
+<screen><rootprompt/><command>initdb</command> -D <filename class="directory">/var/lib/pgsql/data/</filename></screen>
+
+        and the server is started manually with
+
+<screen><rootprompt/><command>postmaster</command> -i -D <filename class="directory">/var/lib/pgsql/data/</filename> >logfile 2>&amp;1 &amp;</screen>
+      </para>
+
+      <para>
+        The server has to be configured to admit TCP/IP connections
+        from <literal>localhost</literal>: Make shure
+        <filename>/var/lib/pgsql/data/postgresql.conf</filename> contains 
+
+<programlisting>...
+tcpip_socket = true
+...</programlisting>
+
+        and <filename>/var/lib/pgsql/data/postgresql.conf</filename> contains 
+
+<programlisting>...
+local   all         all                        trust
+host    all         all         127.0.0.1/32   trust
+host    all         all         ::1/128        trust</programlisting>
+
+        and restart the server, e.g. with
+
+<screen><rootprompt/><command>/etc/init.d/postgresql</command> restart</screen>
+
+        The configuration of the access rights in
+        <filename>/var/lib/pgsql/data/postgresql.conf</filename> is rather
+        liberal: Any user on the local machine may connect to the PostgreSQL
+        server as any database user without specifying a password. I case of
+        problems below, you can therefore be shure that it will not be due to
+        wrong access rights or passwords. See <xref linkend="cb-postgres"/>
+        of the <dcache/> book for more advice on configuring PostgreSQL.
+      </para>
+
+      <para>
+        Finally prepare the PostgreSQL users and databases as they are needed
+        for the components of <dcache/> and/or the <pnfs/> server: The <pnfs/>
+        server only needs a database user. We suggest to call it
+        <quote>pnfsserver</quote>. Create it with
+
+<screen><rootprompt/><command>createuser</command> -U postgres --no-adduser --createdb --pwprompt pnfsserver</screen>
+
+        Several databases will be created by this user. At initial installation,
+        as described below, two databases will be created:
+        <quote>admin</quote> and <quote>data1</quote>. These databases
+        will contain the information about the namespace of the <pnfs/>
+        filesystem. If the information in these databases is lost, the whole
+        data in the <dcache/> instance is not accessible anymore. Therefore,
+        make shure these databases are backed up regularly and also stored on
+        appropriately reliable hardware. Further advice may be found in <xref
+          linkend="cb-postgres"/> of the <dcache/> book.
+      </para>
+
+      <para>
+        The <dcache/> components will access the database server with the user
+        <quote>srmdcache</quote>:
+
+<screen><rootprompt/><command>createuser</command> -U postgres --no-adduser --createdb --pwprompt srmdcache</screen>
+
+        Several central components running on the admin node as well as each
+        <srm/> will use the database <quote>dcache</quote> for state
+        information:
+
+<screen><rootprompt/><command>createdb</command> -U srmdcache dcache</screen>
+
+        There might be several of these on several hosts. Each is used by the
+        <dcache/> components running on the respective host.
+      </para>
+
+      <para>
+        The <pnfs/> companion uses the database <quote>companion</quote> to
+        store the pools each file is located on. On the admin node create and 
+        initialize it with
+
+<screen><rootprompt/><command>createdb</command> -U srmdcache companion
+<rootprompt/><command>psql</command> -U srmdcache companion -f /opt/d-cache/etc/psql_install_companion.sql</screen>
+
+        (It has to be located on the same host as the <pnfs/> server.)
+      </para>
+
+      <para>
+        If the resilience feature provided by the <glossterm
+          linkend="gl-replicamanager">replica manager</glossterm> is used, the
+        database <quote>replicas</quote> has to be prepared on the admin node
+
+<screen><rootprompt/><command>createdb</command> -U srmdcache replicas
+<rootprompt/><command>psql</command> -U srmdcache replicas -f /opt/d-cache/etc/psql_install_replicas.sql</screen>
+        
+        Note that the disk space will at least be cut in half if the replica
+        manager is used.
+      </para>
+
+    </section>
+
+    <section>
+      <title>Installing the <pnfs/> Server</title>
+
+      <para>
+
+      </para>
+
+    </section>
+    
+  </section>
+  
+  <section id="in-rpm">
+    <title>Old Installation Manual</title>
 
 <screen>
 The latest release of the dCache distribution is version 1-6-5.
@@ -220,28 +374,6 @@ III. PostgreSQL needs to be installed on the node running the cntral dCache
      the database. An upgrade of the dCache code does not require the 
      commands to be executed again. All commands shall be carried out by
      user 'postgres'
-
-     ---------- on SL3: --------------
-     # chkconfig postgresql on
-     # service postgresql start
-     # vi /var/lib/pgsql/data/postgresql.conf
-      tcpip_socket = true
-     # vi /var/lib/pgsql/data/pg_hba.conf
-      local   all         all                        trust
-      host    all         all         127.0.0.1/32   trust
-      host    all         all         ::1/128        trust
-     # service postgresql restart
-     ---------------------------------   bush, carter are at this point (postgresql v7.4.6)
-     # su - postgres
-     > createuser --no-adduser --createdb --pwprompt pnfsserver
-     > createuser --no-adduser --createdb --pwprompt srmdcache
-     > createdb -O srmdcache dcache
-     > createdb -O srmdcache companion
-     > createdb -O srmdcache replicas
-     > exit
-     # psql -d replicas -U srmdcache -f /opt/d-cache/etc/psql_install_replicas.sql
-     # psql -d companion -U srmdcache -f /opt/d-cache/etc/psql_install_companion.sql
-     ---------------------------------
 
      su postgres
      # Create directory the db will live in
@@ -1016,7 +1148,6 @@ Note: The following is supported in version 1.2.2-1 for the
     </orderedlist>
   </section>
 -->
-  </chapter>
-
-</part>
-<!-- </namespacewrapper> -->
+  </section>
+  
+</chapter>

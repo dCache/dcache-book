@@ -1,4 +1,4 @@
-2<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
     
 <chapter id="cb-postgres">
@@ -11,8 +11,8 @@
     <glossterm linkend="gl-srm">SRM</glossterm>, the <glossterm
     linkend="gl-pinmanager">pin manager</glossterm>, the <glossterm
     linkend="gl-spacemanager">space manager</glossterm>, the
-    <glossterm linkend="gl-repman">replica manager</glossterm>, the
-    <glossterm linkend="gl-pnfs_companion"><pnfs/>
+    <glossterm linkend="gl-replicamanager">replica manager</glossterm>, the
+    <glossterm linkend="gl-pnfscompanion"><pnfs/>
     companion</glossterm>, the <glossterm linkend="gl-billing">billing
     cell</glossterm>, and the <pnfs/> server might make use of one or
     more databases in a single or several separate PostgreSQL servers.
@@ -210,6 +210,9 @@ replica m. | ${replicaManagerDatabaseHost}  | replicas      | srmdcache
 --------------------------------------------------------------------------------
 pnfs server| localhost                      | admin, data1, | pnfsserver
            |                                | exp0, ...     | --free--
+--------------------------------------------------------------------------------
+billing    | ${billingDatabaseHost}         | billing       | srmdcache
+           |   or if not set: localhost     |               | srmdcache
 
 
 
