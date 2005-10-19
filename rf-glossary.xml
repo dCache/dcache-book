@@ -16,8 +16,8 @@
 
       
   <glosslist>
-      <glossentry>
-	<glossterm id="gl-tss">tertiary storage system</glossterm>
+      <glossentry id="gl-tss">
+	<glosterm>tertiary storage system</glossterm>
 	<glossdef>
 	  <para>
 	    A mass storage system which stores data and is connected
@@ -33,8 +33,8 @@
       </glossentry>
 
 
-      <glossentry>
-	<glossterm id="gl-tape_backend">tape backend</glossterm>
+      <glossentry id="gl-tape_backend">
+	<glosterm>tape backend</glossterm>
 	<glossdef>
 	  <para>
 	    A <glossterm linkend="gl-tss">tertiary storage
@@ -43,14 +43,14 @@
 	</glossdef>
       </glossentry>
 
-      <glossentry>
-	<glossterm id="gl-hsm">Hierachical Storage Manager (<abbrev>HSM</abbrev>)</glossterm>
+      <glossentry id="gl-hsm">
+	<glosterm>Hierachical Storage Manager (<abbrev>HSM</abbrev>)</glossterm>
 	<abbrev>HSM</abbrev>
 	<glosssee otherterm="gl-tss">tertiary storage system</glosssee>
       </glossentry>
       
-      <glossentry>
-	<glossterm id="gl-hsm_type">HSM type</glossterm>
+      <glossentry id="gl-hsm_type">
+	<glosterm>HSM type</glossterm>
 	<glossdef>
 	  <para>
 	    The type of HSM which is connected to <dcache/> as a
@@ -64,8 +64,8 @@
 	</glossdef>
       </glossentry>
       
-      <glossentry>
-	<glossterm id="gl-lfs">Large File Store (<abbrev>LFS</abbrev>)</glossterm>
+      <glossentry id="gl-lfs">
+	<glosterm>Large File Store (<abbrev>LFS</abbrev>)</glossterm>
 	<abbrev>LFS</abbrev>
 	<glossdef>
 	  <para>
@@ -78,8 +78,8 @@
 	</glossdef>
       </glossentry>
       
-      <glossentry>
-	<glossterm id="gl-store">to store</glossterm>
+      <glossentry id="gl-store">
+	<glosterm>to store</glossterm>
 	<glossdef>
 	  <para>
 	    Copying a file from a dCache pool to the <glossterm
@@ -88,8 +88,8 @@
 	</glossdef>
       </glossentry>
       
-      <glossentry>
-	<glossterm id="gl-restore">to restore</glossterm>
+      <glossentry id="gl-restore">
+	<glosterm>to restore</glossterm>
 	<glossdef>
 	  <para>
 	    Copying a file from the <glossterm
@@ -99,13 +99,13 @@
 	</glossdef>
       </glossentry>
       
-      <glossentry>
-	<glossterm id="gl-stage">to stage</glossterm>
+      <glossentry id="gl-stage">
+	<glosterm>to stage</glossterm>
 	<glosssee otherterm="gl-restore">to restore</glosssee>
       </glossentry>
 
-      <glossentry>
-	<glossterm id="gl-transfer">transfer</glossterm>
+      <glossentry id="gl-transfer">
+	<glosterm>transfer</glossterm>
 	<glossdef>
 	  <para>
 	    Any kind of transfer performed by a dCache pool. There are
@@ -118,8 +118,8 @@
 	</glossdef>
       </glossentry>
 
-      <glossentry>
-	<glossterm id="gl-mover">mover</glossterm>
+      <glossentry id="gl-mover">
+	<glosterm>mover</glossterm>
 	<glossdef>
 	  <para>
 	    The process/thread within a pool which performs a
@@ -129,8 +129,8 @@
 	</glossdef>
       </glossentry>
 
-    <glossentry>
-      <glossterm id="gl-dcachesetup-file"><filename>dCacheSetup</filename> File</glossterm>
+    <glossentry id="gl-dcachesetup-file">
+      <glosterm><filename>dCacheSetup</filename> File</glossterm>
       <glossdef>
         <para>
           The primary configuration file of a <dcache/> host is
@@ -144,16 +144,16 @@
       </glossdef>
     </glossentry>
 
-      <glossentry>
-	<glossterm id="gl-primary-interface">Primary Network Interface</glossterm>
+      <glossentry id="gl-primary-interface">
+	<glosterm>Primary Network Interface</glossterm>
 	<glossdef>
 	  <para>
 	  </para>
 	</glossdef>
       </glossentry>
 
-      <glossentry>
-	<glossterm id="gl-poollist-file"><literal>.poollist</literal> File</glossterm>
+      <glossentry id="gl-poollist-file">
+	<glosterm><literal>.poollist</literal> File</glossterm>
 	<glossdef>
 	  <para>
 	    <filename><replaceable>PoolDomainName</replaceable>.poollist</filename> File
@@ -161,88 +161,88 @@
 	</glossdef>
       </glossentry>
 
-      <glossentry>
-	<glossterm id="gl-location-manager">Location Manager</glossterm>
+      <glossentry id="gl-location-manager">
+	<glosterm>Location Manager</glossterm>
 	<glossdef>
 	  <para>
 	  </para>
 	</glossdef>
       </glossentry>
 
-      <glossentry>
-	<glossterm id="gl-cell">Cell</glossterm>
+      <glossentry id="gl-cell">
+	<glosterm>Cell</glossterm>
 	<glossdef>
 	  <para>
 	  </para>
 	</glossdef>
       </glossentry>
 
-      <glossentry>
-	<glossterm id="gl-domain">Domain</glossterm>
+      <glossentry id="gl-domain">
+	<glosterm>Domain</glossterm>
 	<glossdef>
 	  <para>
 	  </para>
 	</glossdef>
       </glossentry>
 
-      <glossentry>
-	<glossterm id="gl-well-known-cell">Well Known Cell</glossterm>
+      <glossentry id="gl-well-known-cell">
+	<glosterm>Well Known Cell</glossterm>
 	<glossdef>
 	  <para>
 	  </para>
 	</glossdef>
       </glossentry>
 
-      <glossentry>
-	<glossterm id="gl-pinboard">Pinboard</glossterm>
+      <glossentry id="gl-pinboard">
+	<glosterm>Pinboard</glossterm>
 	<glossdef>
 	  <para>
 	  </para>
 	</glossdef>
       </glossentry>
 
-      <glossentry>
-	<glossterm id="gl-breakeven">Breakeven Parameter</glossterm>
+      <glossentry id="gl-breakeven">
+	<glosterm>Breakeven Parameter</glossterm>
 	<glossdef>
 	  <para>
 	  </para>
 	</glossdef>
       </glossentry>
 
-      <glossentry>
-	<glossterm id="gl-secondary-interface">Secondary Network Interface</glossterm>
+      <glossentry id="gl-secondary-interface">
+	<glosterm>Secondary Network Interface</glossterm>
 	<glossdef>
 	  <para>
 	  </para>
 	</glossdef>
       </glossentry>
 
-      <glossentry>
-	<glossterm id="gl-lru">least recently used (LRU) File</glossterm>
+      <glossentry id="gl-lru">
+	<glosterm>least recently used (LRU) File</glossterm>
 	<glossdef>
 	  <para>
 	  </para>
 	</glossdef>
       </glossentry>
 
-      <glossentry>
-	<glossterm id="gl-default-mover-queue">Default Mover Queue</glossterm>
+      <glossentry id="gl-default-mover-queue">
+	<glosterm>Default Mover Queue</glossterm>
 	<glossdef>
 	  <para>
 	  </para>
 	</glossdef>
       </glossentry>
 
-      <glossentry>
-	<glossterm id="gl-pnfsid"><pnfs/> Id</glossterm>
+      <glossentry id="gl-pnfsid">
+	<glosterm><pnfs/> Id</glossterm>
 	<glossdef>
 	  <para>
 	  </para>
 	</glossdef>
       </glossentry>
 
-      <glossentry>
-	<glossterm id="gl-p2p">Pool to Pool Transfer</glossterm>
+      <glossentry id="gl-p2p">
+	<glosterm>Pool to Pool Transfer</glossterm>
 	<glossdef>
 	  <para>
 	    (PP or P2P)
@@ -250,16 +250,16 @@
 	</glossdef>
       </glossentry>
 
-      <glossentry>
-	<glossterm id="gl-storage_class">Storage Class</glossterm>
+      <glossentry id="gl-storage_class">
+	<glosterm>Storage Class</glossterm>
 	<glossdef>
 	  <para>
 	  </para>
 	</glossdef>
       </glossentry>
 
-      <glossentry>
-	    <glossterm id="gl-batch-file"><filename>.batch</filename> File</glossterm>
+      <glossentry id="gl-batch-file">
+	    <glosterm><filename>.batch</filename> File</glossterm>
 	<glossdef>
 	  <para>
 	    <filename><replaceable>DomainName</replaceable>.batch</filename> File
@@ -267,24 +267,24 @@
 	</glossdef>
       </glossentry>
 
-      <glossentry>
-	<glossterm id="gl-context">Context</glossterm>
+      <glossentry id="gl-context">
+	<glosterm>Context</glossterm>
 	<glossdef>
 	  <para>
 	  </para>
 	</glossdef>
       </glossentry>
 
-      <glossentry>
-	<glossterm id="gl-wormhole">Wormhole</glossterm>
+      <glossentry id="gl-wormhole">
+	<glosterm>Wormhole</glossterm>
 	<glossdef>
 	  <para>
 	  </para>
 	</glossdef>
       </glossentry>
 
-    <glossentry>
-      <glossterm id="gl-replica">Replica</glossterm>
+    <glossentry id="gl-replica">
+      <glosterm>Replica</glossterm>
       <glossdef>
 	<para>
 	  One and the same file may be found on several pools of a
@@ -300,24 +300,24 @@
       </glossdef>
     </glossentry>
     
-      <glossentry>
-	<glossterm id="gl-precious">Precious Replica</glossterm>
+      <glossentry id="gl-precious">
+	<glosterm>Precious Replica</glossterm>
 	<glossdef>
 	  <para>
 	  </para>
 	</glossdef>
       </glossentry>
 
-      <glossentry>
-	<glossterm id="gl-cached">Cached Replica</glossterm>
+      <glossentry id="gl-cached">
+	<glosterm>Cached Replica</glossterm>
 	<glossdef>
 	  <para>
 	  </para>
 	</glossdef>
       </glossentry>
 
-    <glossentry>
-      <glossterm id="gl-replicamanager">Replica Manager</glossterm>
+    <glossentry id="gl-replicamanager">
+      <glosterm>Replica Manager</glossterm>
       <glossdef>
         <para>
           The replica manager keeps track of the number of <glossterm
@@ -335,8 +335,8 @@
       </glossdef>
     </glossentry>
 
-    <glossentry>
-      <glossterm id="gl-srm">Storage Resource Manager (<abbrev>SRM</abbrev>)</glossterm>
+    <glossentry id="gl-srm">
+      <glosterm>Storage Resource Manager (<abbrev>SRM</abbrev>)</glossterm>
       <glossdef>
         <para>
           An SRM provides a standard webservice interface for managing a
@@ -351,8 +351,8 @@
       </glossdef>
     </glossentry>
 
-    <glossentry>
-      <glossterm id="gl-pnfscompanion"><pnfs/> Companion</glossterm>
+    <glossentry id="gl-pnfscompanion">
+      <glosterm><pnfs/> Companion</glossterm>
       <glossdef>
         <para>
           The <pnfs/> companion is a database which stores the <dcache/>
@@ -365,8 +365,8 @@
       </glossdef>
     </glossentry>
 
-    <glossentry>
-      <glossterm id="gl-billing">Billing/Accounting</glossterm>
+    <glossentry id="gl-billing">
+      <glosterm>Billing/Accounting</glossterm>
       <glossdef>
         <para>
           Accounting information is either stored in a text file or in a
@@ -377,8 +377,8 @@
       </glossdef>
     </glossentry>
 
-    <glossentry>
-      <glossterm id="gl-poolmanager">Pool Manager</glossterm>
+    <glossentry id="gl-poolmanager">
+      <glosterm>Pool Manager</glossterm>
       <glossdef>
         <para>
           The pool manager is the central component of a <dcache/> system. It
@@ -387,8 +387,8 @@
       </glossdef>
     </glossentry>
 
-    <glossentry>
-      <glossterm id="gl-pm-comp-cm">Cost Module</glossterm>
+    <glossentry id="gl-pm-comp-cm">
+      <glosterm>Cost Module</glossterm>
       <glossdef>
         <para>
           Responsible for determining the cost for copying a file
@@ -398,8 +398,8 @@
       </glossdef>
     </glossentry>
 
-    <glossentry>
-      <glossterm id="gl-pm-comp-psu">Pool Selection Unit</glossterm>
+    <glossentry id="gl-pm-comp-psu">
+      <glosterm>Pool Selection Unit</glossterm>
       <glossdef>
         <para>
           Responsible for determining all pools allowable for a
@@ -410,8 +410,8 @@
       </glossdef>
     </glossentry>
 
-    <glossentry>
-      <glossterm id="gl-pinmanager">Pin Manager</glossterm>
+    <glossentry id="gl-pinmanager">
+      <glosterm>Pin Manager</glossterm>
       <glossdef>
         <para>
           A central service which can <quote>pin</quote> files to a pool for a
@@ -420,8 +420,8 @@
       </glossdef>
     </glossentry>
 
-    <glossentry>
-      <glossterm id="gl-spacemanager">Space Manager</glossterm>
+    <glossentry id="gl-spacemanager">
+      <glosterm>Space Manager</glossterm>
       <glossdef>
         <para>
           A central service which can reserve space on pools for a
@@ -430,8 +430,8 @@
       </glossdef>
     </glossentry>
 
-    <glossentry>
-      <glossterm id="gl-pool">Pool</glossterm>
+    <glossentry id="gl-pool">
+      <glosterm>Pool</glossterm>
       <glossdef>
         <para>
           A pool in a <dcache/> instance is responsible for storing data on
@@ -443,8 +443,8 @@ localizes on the host on which the pool cell is running.
       </glossdef>
     </glossentry>
 
-	<glossentry>
-	  <glossterm id="gl-cost">cost</glossterm>
+	<glossentry id="gl-cost">
+	  <glosterm>cost</glossterm>
 	  <glossdef>
 	    <para>
 	      The pool manager determines the pool used for storing a
@@ -468,8 +468,8 @@ localizes on the host on which the pool cell is running.
 	  </glossdef>
 	</glossentry>
 
-	<glossentry>
-	  <glossterm id="gl-performance_cost">performance
+	<glossentry id="gl-performance_cost">
+	  <glosterm>performance
 	  cost</glossterm>
 	  <glossdef>
 	    <para>
@@ -481,8 +481,8 @@ localizes on the host on which the pool cell is running.
 	  </glossdef>
 	</glossentry>
 
-	<glossentry>
-	  <glossterm id="gl-space_cost">space
+	<glossentry id="gl-space_cost">
+	  <glosterm>space
 	  cost</glossterm>
 	  <glossdef>
 

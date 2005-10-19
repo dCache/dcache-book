@@ -151,6 +151,13 @@ ssh-dcache.org: .ssh-dcache.org-copied
 	cd $(WEB_LOCATION)/ && tar cf - * | ssh cvs-dcache 'cd /home/dcache.org/manuals/Book && sh -c "rm -rf *" && tar xf -'
 	touch .ssh-dcache.org-copied
 
+# Copy the WEB_LOCATION to the correct spot on www.dcache.org DRAFT
+#
+ssh-draft: .ssh-draft-copied
+.ssh-draft-copied: dcache.org
+	cd $(WEB_LOCATION)/ && tar cf - * | ssh cvs-dcache 'cd /home/dcache.org/manuals/Book-draft && sh -c "rm -rf *" && tar xf -'
+	touch .ssh-draft-copied
+
 # Titlepage customization for Sidebar
 #
 xsl/dcb-dcache.org-sidebar-title.xsl: xsl/dcb-dcache.org-sidebar-title-tpl.xml

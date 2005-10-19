@@ -32,6 +32,19 @@
       <pnfs/> server and of the <dcache/> components will follow.
     </para>
 
+    <para>
+      The RPM packages may be installed right away on each node:
+
+<screen><rootprompt/><command>rpm</command> -ivh dcache-core-<replaceable>version</replaceable>-<replaceable>release</replaceable>-i386.rpm
+<rootprompt/><command>rpm</command> -ivh dcache-client-<replaceable>version</replaceable>-<replaceable>release</replaceable>-i386.rpm
+<rootprompt/><command>rpm</command> -ivh dcache-opt-<replaceable>version</replaceable>-<replaceable>release</replaceable>-i386.rpm</screen>
+
+      and the <pnfs/> server software on the admin node:
+
+<screen><rootprompt/><command>rpm</command> -ivh pnfs-postgresql-<replaceable>version</replaceable>-<replaceable>release</replaceable>-i386.rpm</screen>
+
+    </para>
+
     <section>
       <title>Preparation of PostgreSQL Servers</title>
       
@@ -76,7 +89,7 @@
 tcpip_socket = true
 ...</programlisting>
 
-        and <filename>/var/lib/pgsql/data/postgresql.conf</filename> contains 
+        and <filename>/var/lib/pgsql/data/pg_hba.conf</filename> contains 
 
 <programlisting>...
 local   all         all                        trust
@@ -154,12 +167,157 @@ host    all         all         ::1/128        trust</programlisting>
         manager is used.
       </para>
 
+      <para>
+        If the billing information should also be stored in a database (in addition to files)
+	the
+        database <quote>billing</quote> has to be created:
+
+<screen><rootprompt/><command>createdb</command> -U srmdcache billing</screen>
+        
+	However, we strongly advise against using the same database
+	server for the <pnfs/> server and the billing information.
+	For how to configure the billing cell see <xref linkend="cb-accounting"/>.
+      </para>
+
     </section>
 
     <section>
       <title>Installing the <pnfs/> Server</title>
 
       <para>
+	The <pnfs/> server software is installed in the directory
+	<filename class="directory">/opt/pnfs/</filename>. For the
+	installation copy the file
+	<filename>/opt/pnfs/etc/pnfs_config.template</filename> to
+	<filename>/opt/pnfs/etc/pnfs_config</filename>. It contains
+
+<programlisting>PNFS_INSTALL_DIR = /opt/pnfs
+PNFS_ROOT = /pnfs
+PNFS_DB = /opt/pnfsdb
+PNFS_LOG = /var/log
+PNFS_OVERWRITE = no
+PNFS_PSQL_USER = pnfsserver</programlisting>
+
+	and should be suitable for most installations. Next, run
+
+<screen><rootprompt/><command>/opt/pnfs/install/pnfs-install.sh</command></screen>
+
+	This will write the central configuration file
+	<filename>/usr/etc/pnfsSetup</filename> and initialize the
+	databases in the PostgreSQL server as well as configuration
+	information below <filename
+	class="directory">/opt/pnfsdb/</filename> (as configured by
+	<varname>PNFS_DB</varname> in
+	<filename>/opt/pnfs/etc/pnfs_config</filename>.)
+      </para>
+
+      <para>
+	The <pnfs/> server may now be started with
+
+<screen><rootprompt/><command>/opt/pnfs/bin/pnfs</command> start</screen>
+
+	This script may be copied to <filename
+	class="directory">/etc/init.d/</filename> and the <pnfs/> may be
+	configured to start at boot time with
+
+<screen><rootprompt/><command>chkconfig</command> pnfs on</screen>
+
+      </para>
+
+    </section>
+
+    <section>
+      <title>Installing <dcache/> Components</title>
+
+      <para>
+	Quick <dcache/> installation:
+      </para>
+
+      <para>
+	Use the templates of the configuration files found in
+	<filename class="directory">/opt/d-cache/etc/</filename> to
+	create the following files.
+      </para>
+
+      <para>
+	The central configuration file of a <dcache/> instance is
+	<filename>/opt/d-cache/config/dCacheSetup</filename>. For most
+	installation it is only necessary to set the variable
+	<varname>java</varname> to the binary of the java VM and the
+	variable <varname>serviceLocatorHost</varname> to the hostname
+	of the admin node. Note that the file has to go into the
+	subdirectory <filename class="directory">config/</filename>
+	even though the template is found in <filename
+	class="directory">etc/</filename>.
+      </para>
+
+      <para>
+	The installation and start-up scripts use the information in
+	<filename>/opt/d-cache/etc/node_config</filename>. The
+	variable <varname>NODE_TYPE</varname> controls whether the
+	admin node should be installed or just pools and/or
+	doors. Accordingly set it to <quote>admin</quote> or
+	<quote>pool</quote> (for doors, as well). All other variables
+	may be left at their default value.
+      </para>
+
+      <para>
+	Whether and how many pools should be installed on the current
+	node is configured by
+	<filename>/opt/d-cache/etc/pool_path</filename>. Each line in
+	this file describes one pool. The format is as follows:
+
+<programlisting><replaceable>poolDataDirectory</replaceable> <replaceable>poolSizeInGB</replaceable> <replaceable>reinstallPoolYesNo</replaceable></programlisting>
+
+	where <replaceable>poolDataDirectory</replaceable> is the full
+	path to the directory which will contain the data files as
+	well as some of the configuration of the pool,
+	<replaceable>poolSizeInGB</replaceable> is the size of the
+	pool. Make shure that there is always enough space under
+	<replaceable>poolDataDirectory</replaceable>. Be aware that
+	only pure data content is counted by <dcache/>. Leave enough
+	room for configuration files and filesystem overhead.
+     </para>
+
+      <para>
+	Which doors (<srm/>, GridFTP, and GSIdCap) are configured and
+	started on the current node is configured in
+	<filename>/opt/d-cache/etc/door_config</filename>.
+      </para>
+
+      <para>
+	For authorization of grid users the file
+	<filename>/opt/d-cache/etc/dcache.kpwd</filename> is
+	needed. Note that it may be generated from the standard
+	<filename>/etc/grid-security/grid-mapfile</filename> with the
+	tool <filename>grid-mapfile2dcache-kpwd</filename> which is
+	distributed with the LCG software.
+      </para>
+
+      <para>
+	When all configuration files are prepared configure the system with
+
+<screen><rootprompt/><command>/opt/d-cache/install/install.sh</command></screen>
+
+	and start the central components (only on the admin node) with
+
+<screen><rootprompt/><command>/opt/d-cache/bin/dcache-core</command> start</screen>
+
+	the configured pools are started with
+
+<screen><rootprompt/><command>/opt/d-cache/bin/dcache-pool</command> start</screen>
+
+	and the doors with
+
+<screen><rootprompt/><command>/opt/d-cache/bin/dcache-opt</command> start</screen>
+
+	Thes scripts may be copied to <filename
+	class="directory">/etc/init.d/</filename> and <dcache/> is
+	configured to start at boot-time with 
+
+<screen><rootprompt/><command>chkconfig</command> dcache-core on
+<rootprompt/><command>chkconfig</command> dcache-opt on
+<rootprompt/><command>chkconfig</command> dcache-pool on</screen>
 
       </para>
 

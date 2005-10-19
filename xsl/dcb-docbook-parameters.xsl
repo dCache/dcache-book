@@ -63,6 +63,9 @@
   <xsl:param name="html.stylesheet.type">text/css</xsl:param>
   
   <xsl:param name="html.stylesheet" select="'dcb.css'"></xsl:param>
+
+  <xsl:param name="glossary.as.blocks" select="1"/>
+
   
   
   <!-- ***************  Pagination and General Styles  *********************  -->

@@ -6,7 +6,7 @@
   <!-- <?dbhtml dir="dCacheBook" ?> -->
   
   
-  <title><dcache/>, the Book</title>
+  <title>dCache, the Book</title>
   <titleabbrev>dCache Book</titleabbrev>
   
   <bookinfo>
@@ -29,8 +29,9 @@
       
     </abstract>
     <date>2005-09-30</date>
-    
-    <corpauthor>DESY Hamburg, Germany</corpauthor>
+
+<!--    
+    <corpauthor>DESY Hamburg, Germany</corpauthor> -->
     
     <author>
 <!--      <honorific>Dr</honorific> -->
