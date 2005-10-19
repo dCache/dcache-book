@@ -50,8 +50,8 @@
 
       <para>
         Initialize the database directory (usually 
-        <filename class="directory">/var/lib/pgsql/data/</filename>, 
-        start the database server, and make shure that it is started 
+        <filename class="directory">/var/lib/pgsql/data/</filename>), 
+        start the database server, and make sure that it is started 
         at system start-up. This may be done with
 
 <screen><rootprompt/><command>/etc/init.d/postgresql</command> start
@@ -69,7 +69,7 @@
 
       <para>
         The server has to be configured to admit TCP/IP connections
-        from <literal>localhost</literal>: Make shure
+        from <literal>localhost</literal>: Make sure, 
         <filename>/var/lib/pgsql/data/postgresql.conf</filename> contains 
 
 <programlisting>...
@@ -91,7 +91,7 @@ host    all         all         ::1/128        trust</programlisting>
         <filename>/var/lib/pgsql/data/postgresql.conf</filename> is rather
         liberal: Any user on the local machine may connect to the PostgreSQL
         server as any database user without specifying a password. I case of
-        problems below, you can therefore be shure that it will not be due to
+        problems below, you can therefore be sure that it will not be due to
         wrong access rights or passwords. See <xref linkend="cb-postgres"/>
         of the <dcache/> book for more advice on configuring PostgreSQL.
       </para>
@@ -110,7 +110,7 @@ host    all         all         ::1/128        trust</programlisting>
         will contain the information about the namespace of the <pnfs/>
         filesystem. If the information in these databases is lost, the whole
         data in the <dcache/> instance is not accessible anymore. Therefore,
-        make shure these databases are backed up regularly and also stored on
+        make sure these databases are backed up regularly and also stored on
         appropriately reliable hardware. Further advice may be found in <xref
           linkend="cb-postgres"/> of the <dcache/> book.
       </para>

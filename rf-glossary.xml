@@ -122,7 +122,7 @@
 	<glossterm id="gl-mover">mover</glossterm>
 	<glossdef>
 	  <para>
-	    The process/tread within a pool which performs a
+	    The process/thread within a pool which performs a
 	    <glossterm linkend="gl-transfer">transfer</glossterm>.
 	  </para>
 	  <glossseealso otherterm="gl-transfer">transfer</glossseealso>
