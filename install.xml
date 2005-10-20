@@ -323,12 +323,6 @@ Starting nfsd : pnfsd
      </para>
 
       <para>
-	Which doors (<srm/>, GridFTP, and GSIdCap) are configured and
-	started on the current node is configured in
-	<filename>/opt/d-cache/etc/door_config</filename>.
-      </para>
-
-      <para>
 	For authorization of grid users the file
 	<filename>/opt/d-cache/etc/dcache.kpwd</filename> is
 	needed. Note that it may be generated from the standard
