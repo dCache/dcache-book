@@ -29,19 +29,18 @@
       some central components, and each <srm/> need an PostgreSQL server
       installed locally on the node. The first section describes the
       configuration of a PostgreSQL server. After that the installation of the
-      <pnfs/> server and of the <dcache/> components will follow.
+      <pnfs/> server and of the <dcache/> components will follow. During the whole installation process root access is required.
     </para>
 
     <para>
       The RPM packages may be installed right away on each node:
 
-<screen><rootprompt/><command>rpm</command> -ivh dcache-core-<replaceable>version</replaceable>-<replaceable>release</replaceable>-i386.rpm
-<rootprompt/><command>rpm</command> -ivh dcache-client-<replaceable>version</replaceable>-<replaceable>release</replaceable>-i386.rpm
-<rootprompt/><command>rpm</command> -ivh dcache-opt-<replaceable>version</replaceable>-<replaceable>release</replaceable>-i386.rpm</screen>
+<screen><rootprompt/><command>rpm</command> -ivh dcache-server-<replaceable>version</replaceable>-<replaceable>release</replaceable>.i386.rpm
+<rootprompt/><command>rpm</command> -ivh dcache-client-<replaceable>version</replaceable>-<replaceable>release</replaceable>.i386.rpm</screen>
 
       and the <pnfs/> server software on the admin node:
 
-<screen><rootprompt/><command>rpm</command> -ivh pnfs-postgresql-<replaceable>version</replaceable>-<replaceable>release</replaceable>-i386.rpm</screen>
+<screen><rootprompt/><command>rpm</command> -ivh pnfs-postgresql-<replaceable>version</replaceable>-<replaceable>release</replaceable>.i386.rpm</screen>
 
     </para>
 
@@ -146,7 +145,7 @@ host    all         all         ::1/128        trust</programlisting>
 
       <para>
         The <pnfs/> companion uses the database <quote>companion</quote> to
-        store the pools each file is located on. On the admin node create and 
+        store the pools all files are located on. On the admin node create and 
         initialize it with
 
 <screen><rootprompt/><command>createdb</command> -U srmdcache companion
@@ -200,7 +199,44 @@ PNFS_PSQL_USER = pnfsserver</programlisting>
 
 	and should be suitable for most installations. Next, run
 
-<screen><rootprompt/><command>/opt/pnfs/install/pnfs-install.sh</command></screen>
+<screen><rootprompt/><command>/opt/pnfs/install/pnfs-install.sh</command>
+PNFS_PSQL_USER = pnfsserver
+ Checking nfs servers : Ok
+      Preparing setup : Ok
+
+ Creating database admin
+ Creating database data1
+
+ Starting pnfs server   ... Ok
+ Trying to talk to dbserver 0 [1122] ... Ok
+ Trying to talk to dbserver 1 [1122] ... Ok
+             Trying to mount &apos;pnfs&apos; : Ok
+        Correcting pnfs permissions : Ok
+ Detecting wormhole target (config) : 0000000000000000000010E0
+                  Digging wormholes :  dig-0-ok dig-1-ok Done
+             Creating database link : Ok
+ Setting mount permissions to world : Ok
+
+ Remarks :
+   ii) Any host may now mount this pnfs server
+         mount -o intr,rw,noac,hard  &lt;thisServerName&gt;:/pnfs /&lt;mountdir&gt;
+
+Installation of PNFS completed - stop PNFS
+ Stopping Heartbeat ....  Ready
+ Killing pnfsd  Done
+ Killing pmountd  Done
+ Killing dbserver . Done
+ Removing 8 Clients  0+ 1+ 2+ 3+ 4+ 5+ 6+ 7+
+ Removing 8 Servers  0+ 1+ 2+ 3+ 4+ 5+ 6+ 7+
+ Removing main switchboard ... O.K.
+[root@bush etc]# /opt/pnfs/bin/pnfs start
+Starting dcache services:  Shmcom : Installed 8 Clients and 8 Servers
+ Starting database server for admin (/opt/pnfsdb/pnfs/databases/admin) ... O.K.
+ Starting database server for data1 (/opt/pnfsdb/pnfs/databases/data1) ... O.K.
+ Waiting for dbservers to register ... Ready
+ Starting Mountd : pmountd
+ Starting nfsd : pnfsd
+</screen>
 
 	This will write the central configuration file
 	<filename>/usr/etc/pnfsSetup</filename> and initialize the
@@ -214,7 +250,14 @@ PNFS_PSQL_USER = pnfsserver</programlisting>
       <para>
 	The <pnfs/> server may now be started with
 
-<screen><rootprompt/><command>/opt/pnfs/bin/pnfs</command> start</screen>
+<screen><rootprompt/><command>/opt/pnfs/bin/pnfs</command> start
+Starting dcache services:  Shmcom : Installed 8 Clients and 8 Servers
+Starting database server for admin (/opt/pnfsdb/pnfs/databases/admin) ... O.K.
+Starting database server for data1 (/opt/pnfsdb/pnfs/databases/data1) ... O.K.
+Waiting for dbservers to register ... Ready
+Starting Mountd : pmountd
+Starting nfsd : pnfsd
+</screen>
 
 	This script may be copied to <filename
 	class="directory">/etc/init.d/</filename> and the <pnfs/> may be
@@ -297,21 +340,50 @@ PNFS_PSQL_USER = pnfsserver</programlisting>
       <para>
 	When all configuration files are prepared configure the system with
 
-<screen><rootprompt/><command>/opt/d-cache/install/install.sh</command></screen>
+<screen><rootprompt/><command>/opt/d-cache/install/install.sh</command>
+Checking existence of node_config file
+Checking on a possibly existing dCache/PNFS configuration
+Creating PNFS mount point (/pnfs/fs) and mounting PNFS
+Generating public/private rsa1 key pair.
+Your identification has been saved in ./server_key.
+Your public key has been saved in ./server_key.pub.
+The key fingerprint is:
+03:79:71:14:d7:4a:4c:58:73:f3:62:79:88:53:8e:59 root@bush
+Creating Pool bush_1
+</screen>
 
 	and start the central components (only on the admin node) with
 
-<screen><rootprompt/><command>/opt/d-cache/bin/dcache-core</command> start</screen>
+<screen><rootprompt/><command>/opt/d-cache/bin/dcache-core</command> start
+Starting dcache services: Starting lmDomain  6 5 4 3 2 1 0 Done (pid=20922)
+Starting dCacheDomain  6 5 4 3 2 1 0 Done (pid=20986)
+/opt/d-cache/bin/dcache-core: line 31: /opt/d-cache/jobs/dir: No such file or directory
+/opt/d-cache/bin/dcache-core: line 36: /opt/d-cache/jobs/utility: No such file or directory
+Starting doorDomain  Starting adminDoorDomain  Starting httpdDomain  Starting pnfsDomain  6 6 6 6 5 5 5 5 4 4 4 4 3 3 3 3 2 2 2 2 1 1 1 1 0 Done (pid=21155)
+0 Done (pid=21170)
+0 Done (pid=21179)
+0 Done (pid=21186)
+</screen>
 
 	the configured pools are started with
 
-<screen><rootprompt/><command>/opt/d-cache/bin/dcache-pool</command> start</screen>
+<screen><rootprompt/><command>/opt/d-cache/bin/dcache-pool</command> start
+
+Starting dcache pool: Starting bushDomain  6 5 4 3 2 1 0 Done (pid=21412)
+</screen>
 
 	and the doors with
 
-<screen><rootprompt/><command>/opt/d-cache/bin/dcache-opt</command> start</screen>
+<screen><rootprompt/><command>/opt/d-cache/bin/dcache-opt</command> start
+Starting dcache services: GRIDFTP         yes
+GSIDCAP         yes
+SRM             yes
+Starting srm-bushDomain  Starting gsidcap-bushDomain  Starting gridftp-bushDomain  6 6 6 5 5 5 4 4 4 3 3 2 3 2 1 2 1 0 Done (pid=21557)
+1 0 Done (pid=21606)
+0 Done (pid=21586)
+</screen>
 
-	Thes scripts may be copied to <filename
+	These scripts may be copied to <filename
 	class="directory">/etc/init.d/</filename> and <dcache/> is
 	configured to start at boot-time with 
 
