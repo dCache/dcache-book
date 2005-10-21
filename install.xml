@@ -366,17 +366,6 @@ Starting doorDomain  Starting adminDoorDomain  Starting httpdDomain  Starting pn
 Starting dcache pool: Starting bushDomain  6 5 4 3 2 1 0 Done (pid=21412)
 </screen>
 
-	and the doors with
-
-<screen><rootprompt/><command>/opt/d-cache/bin/dcache-opt</command> start
-Starting dcache services: GRIDFTP         yes
-GSIDCAP         yes
-SRM             yes
-Starting srm-bushDomain  Starting gsidcap-bushDomain  Starting gridftp-bushDomain  6 6 6 5 5 5 4 4 4 3 3 2 3 2 1 2 1 0 Done (pid=21557)
-1 0 Done (pid=21606)
-0 Done (pid=21586)
-</screen>
-
 	These scripts may be copied to <filename
 	class="directory">/etc/init.d/</filename> and <dcache/> is
 	configured to start at boot-time with 
