@@ -229,13 +229,6 @@ Installation of PNFS completed - stop PNFS
  Removing 8 Clients  0+ 1+ 2+ 3+ 4+ 5+ 6+ 7+
  Removing 8 Servers  0+ 1+ 2+ 3+ 4+ 5+ 6+ 7+
  Removing main switchboard ... O.K.
-[root@bush etc]# /opt/pnfs/bin/pnfs start
-Starting dcache services:  Shmcom : Installed 8 Clients and 8 Servers
- Starting database server for admin (/opt/pnfsdb/pnfs/databases/admin) ... O.K.
- Starting database server for data1 (/opt/pnfsdb/pnfs/databases/data1) ... O.K.
- Waiting for dbservers to register ... Ready
- Starting Mountd : pmountd
- Starting nfsd : pnfsd
 </screen>
 
 	This will write the central configuration file
@@ -305,6 +298,17 @@ Starting nfsd : pnfsd
       </para>
 
       <para>
+        The file <filename>/opt/d-cache/config/PoolManager.conf</filename>
+	has to be created. The template may be found at 
+	<filename>/opt/d-cache/etc/PoolManager.conf.template</filename>
+	and is sufficient in most cases. Note that this file has to go into the
+	subdirectory <filename class="directory">config/</filename>
+	even though the template is found in <filename
+	class="directory">etc/</filename>, just as with <filename>dCacheSetup</filename>.
+	For more information on how and why to change it, see <xref linkend="cf-pm"/>.
+      </para>
+
+      <para>
 	Whether and how many pools should be installed on the current
 	node is configured by
 	<filename>/opt/d-cache/etc/pool_path</filename>. Each line in
@@ -344,6 +348,17 @@ Your public key has been saved in ./server_key.pub.
 The key fingerprint is:
 03:79:71:14:d7:4a:4c:58:73:f3:62:79:88:53:8e:59 root@bush
 Creating Pool bush_1
+
+
+Creating symbolic link /pnfs/desy.de -> /pnfs/fs/usr/
+Checking on a possibly existing dCache/PNFS configuration ...
+Generating public/private rsa1 key pair.
+Your identification has been saved in ./server_key.
+Your public key has been saved in ./server_key.pub.
+The key fingerprint is:
+d2:71:18:3c:2c:f2:8f:57:22:30:6a:ff:e3:7f:9e:d5 root@reagan
+Creating Pool reagan_1
+Creating Pool reagan_2
 </screen>
 
 	and start the central components (only on the admin node) with
