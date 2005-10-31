@@ -397,6 +397,62 @@ Starting dcache pool: Starting clintonDomain  6 5 4 3 2 1 0 Done (pid=7990)
     </section>
     
   </section>
+
+  <section>
+    <title>Upgrading a <dcache/> Instance</title>
+
+    <para>
+      This section describes the upgrade of <dcache/> instances
+      installed with the previous release. (Currently version 1.6.5)
+      Most of it should be applicable to upgrades form earlier
+      releases, as well. The first section will give a quick upgrade
+      guide. It might not be applicable to complex setups.
+    </para>
+
+    <para>
+      Note that the upgrade of <dcache/> is independent of a
+      conversion of the <pnfs/> database from GDBM to PostgreSQL. The
+      conversion and upgrade to the PostgreSQL version of <pnfs/> may
+      be performed any time before or after the upgrade of <dcache/>,
+      even though the <dcache/> release only contains the PostgreSQL
+      version of <pnfs/> (since version 1.6.6). See <xref
+      linkend="cb-pnfs-postgres"/> for a guide to convert and upgrade
+      the <pnfs/> server.
+    </para>
+
+    <section>
+      <title>Quick Upgrade Guide</title>
+
+      <para>
+	Stop the <dcache/> services on all nodes of the
+	instance:
+
+<screen><rootprompt/><command>/opt/d-cache/bin/dcache-pool</command> stop
+<rootprompt/><command>/opt/d-cache/bin/dcache-opt</command> stop
+<rootprompt/><command>/opt/d-cache/bin/dcache-core</command> stop
+</screen>
+
+	Leave the <pnfs/> server running. Upgrade the RPM
+	packages with
+
+<screen><rootprompt/><command>rpm</command> -Uvh dcache-server-1.6.6-1.i386.rpm dcache-client-1.6.6-1.i386.rpm
+</screen>
+
+	and start the server again with
+
+<screen><rootprompt/><command>/opt/d-cache/bin/dcache-core</command> start
+<rootprompt/><command>/opt/d-cache/bin/dcache-pool</command> start</screen>
+
+	Note that the start-up script for the optional components is
+	not needed anymore. Therefore, it is probably best to remove them:
+
+<screen><rootprompt/><command>rm</command> /opt/d-cache/bin/dcache-opt /etc/init.d/dcache-opt
+</screen>
+      </para>
+
+    </section>
+
+  </section>
   
   <section id="in-rpm">
     <title>Old Installation Manual</title>
