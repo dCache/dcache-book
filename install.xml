@@ -364,21 +364,24 @@ Creating Pool reagan_2
 	and start the central components (only on the admin node) with
 
 <screen><rootprompt/><command>/opt/d-cache/bin/dcache-core</command> start
-Starting dcache services: Starting lmDomain  6 5 4 3 2 1 0 Done (pid=20922)
-Starting dCacheDomain  6 5 4 3 2 1 0 Done (pid=20986)
-/opt/d-cache/bin/dcache-core: line 31: /opt/d-cache/jobs/dir: No such file or directory
-/opt/d-cache/bin/dcache-core: line 36: /opt/d-cache/jobs/utility: No such file or directory
-Starting doorDomain  Starting adminDoorDomain  Starting httpdDomain  Starting pnfsDomain  6 6 6 6 5 5 5 5 4 4 4 4 3 3 3 3 2 2 2 2 1 1 1 1 0 Done (pid=21155)
-0 Done (pid=21170)
-0 Done (pid=21179)
-0 Done (pid=21186)
+Starting dcache services:
+Starting lmDomain  6 5 4 3 2 1 0 Done (pid=6802)
+Starting dCacheDomain  6 5 4 3 2 1 0 Done (pid=6875)
+Starting dirDomain  6 5 4 3 2 1 0 Done (pid=6973)
+Starting doorDomain  6 5 4 3 2 1 0 Done (pid=7058)
+Starting adminDoorDomain  6 5 4 3 2 1 0 Done (pid=7144)
+Starting httpdDomain  6 5 4 3 2 1 0 Done (pid=7234)
+Starting utilityDomain  6 5 4 3 2 1 0 Done (pid=7330)
+Starting pnfsDomain  6 5 4 3 2 1 0 Done (pid=7436)
+Starting gridftp-clintonDomain  6 5 4 3 2 1 0 Done (pid=7569)
+Starting gsidcap-clintonDomain  6 5 4 3 2 1 0 Done (pid=7672)
+Starting srm-clintonDomain  6 5 4 3 2 1 0 Done (pid=7777)
 </screen>
 
 	the configured pools are started with
 
 <screen><rootprompt/><command>/opt/d-cache/bin/dcache-pool</command> start
-
-Starting dcache pool: Starting bushDomain  6 5 4 3 2 1 0 Done (pid=21412)
+Starting dcache pool: Starting clintonDomain  6 5 4 3 2 1 0 Done (pid=7990)
 </screen>
 
 	These scripts may be copied to <filename
