@@ -432,13 +432,27 @@ Starting dcache pool: Starting clintonDomain  6 5 4 3 2 1 0 Done (pid=7990)
 <rootprompt/><command>/opt/d-cache/bin/dcache-core</command> stop
 </screen>
 
-	Leave the <pnfs/> server running. Upgrade the RPM
-	packages with
+	Leave the <pnfs/> server running. In LCG installations, there
+	might be a <quote>meta-package</quote> installed which can
+	prevent the update to the current version. It should be
+	deinstalled. The following command will do that and will not
+	harm if the metapackage is not installed. Therefore, go ahead
+	and do it anyway:
+
+<screen><rootprompt/><command>rpm</command> -e lcg-SE_dcache
+</screen>
+
+	Upgrade the <dcache/> RPM packages with
 
 <screen><rootprompt/><command>rpm</command> -Uvh dcache-server-1.6.6-1.i386.rpm dcache-client-1.6.6-1.i386.rpm
 </screen>
 
-	and start the server again with
+	Run the install script:
+
+<screen><rootprompt/><command>/opt/d-cache/install/install.sh</command>
+</screen>
+
+	And start the server again with
 
 <screen><rootprompt/><command>/opt/d-cache/bin/dcache-core</command> start
 <rootprompt/><command>/opt/d-cache/bin/dcache-pool</command> start</screen>
@@ -451,6 +465,66 @@ Starting dcache pool: Starting clintonDomain  6 5 4 3 2 1 0 Done (pid=7990)
       </para>
 
     </section>
+
+    <section>
+      <title>After The Upgrade</title>
+
+      <para>
+	This section gives a few hints for solving problems and
+	fine-tuning after the upgrade.
+      </para>
+
+      <para>
+	Check if the information given in the files
+	<filename>/opt/d-cache/etc/node_config</filename> and
+	<filename>/opt/d-cache/etc/door_config</filename> is correct:
+      </para>
+
+      <para>
+	Check, that a single value is assigned to
+	<varname>NODE_TYPE</varname> in
+	<filename>/opt/d-cache/etc/node_config</filename>.  If the
+	assignment contains several words, the behaviour of some
+	previous versions might be different from the new one.
+      </para>
+
+      <para>
+	Check that the doors which are started in the (now obsolete)
+	<filename>/opt/d-cache/bin/dcache-opt</filename> start-up
+	script are also enabled in
+	<filename>/opt/d-cache/etc/door_config</filename>. The latter
+	file is now evaluated by the start-up script
+	<filename>/opt/d-cache/bin/dcache-core</filename> and not by
+	the install script any more. This might lead to a different
+	behaviour.
+      </para>
+
+      <para>
+	If, prior to the upgrade, you changed anything in a batch file
+	(<filename>config/<replaceable>domainName</replaceable>.batch</filename>)
+	these changes will be moved to files with names
+	<filename>config/<replaceable>domainName</replaceable>.batch.rpmsave</filename>. There
+	have been major changes to the batch files. Therefore it is
+	necessary to reapply your changes. However, keep in mind that
+	the batch files are considered to be part of the software and
+	not configuration files. 
+      </para>
+
+      <para>
+	It should not be necessary to change them in most
+	situations. Try to find a prober configuration variable
+	<filename>config/dCacheSetup</filename>. (See the template in
+	<filename>etc/dCacheSetup.template</filename> for hints.)  If
+	it should still be necessary to change a batch file, contact
+	<email>support@dcache.org</email> and report a <quote>request
+	for enhancement</quote>. (See <xref linkend="cf-cellpackage"/>
+	for background information on the batch files.)
+      </para>
+      
+    </section>
+
+
+
 
   </section>
   
