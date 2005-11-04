@@ -94,16 +94,16 @@ host    all         all         ::1/128        trust</programlisting>
         The configuration of the access rights in
         <filename>/var/lib/pgsql/data/postgresql.conf</filename> is rather
         liberal: Any user on the local machine may connect to the PostgreSQL
-        server as any database user without specifying a password. I case of
+        server as any database user without specifying a password. In case of
         problems below, you can therefore be sure that it will not be due to
-        wrong access rights or passwords. See <xref linkend="cb-postgres"/>
+        wrong access rights or passwords. See <xref linkend="cb-postgres-configure"/>
         of the <dcache/> book for more advice on configuring PostgreSQL.
       </para>
 
 
 
     <para>
-      If a current versinon of PostgreSQL is not available for the
+      If a current version of PostgreSQL is not available for the
       distribution, it can be compiled as follows:
       You can download the source code from the official web site: <ulink
         url="http://www.postgresql.org/download">http://www.postgresql.org/download</ulink> and
@@ -136,7 +136,7 @@ su - postgres
 
   </section>
 
-  <section>
+  <section id="cb-postgres-configure">
     <title>Configuring Access to PostgreSQL</title>
 
     <para>

@@ -590,7 +590,7 @@ Starting dcache pool: Starting clintonDomain  6 5 4 3 2 1 0 Done (pid=7990)
 <title>PostgreSQL</title>
 
 <para>
-	In case you are already using PostgreSQL it is recommended to upgrade to the latest version (8) to benefit from improved backup capabilities.
+In case you are already using PostgreSQL, it is a good idea to upgrade to version 8 now, because prior to dCache Version 1.6.6 no precious data is stored and therefore can be wiped off, allowing a PostgreSQL 8- installation from scratch. DCache versions >= 1.6.6 will utilize PostgreSQL more heavily, making migration a complex task. Another advantage of PostgreSQL 8 is an integrated mechanism for automatic backups.
 </para>
 
 </section>
