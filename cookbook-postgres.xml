@@ -33,13 +33,74 @@
     linkend="cb-pnfs-postgres"/>.
   </para>
 
-  <section>
+  <section id="cb-postgres-install">
     <title>Installing a PostgreSQL Server</title>
 
     <para>
-      It is best to install a PostgreSQL server from the distribution of the
-      operating system. It has to be at least version 8. 
+	The preferred way to set up a PostgreSQL server should be the installation of the version provided by your OS distribution. It is strongly recommended to use version 8 or higher.
     </para>
+
+	<para>
+Install the PostgreSQL server, client and JDBC support with the tools of the operating system. For example, use
+
+<screen><rootprompt/><command>apt-get</command> install postgresql postgresql-server postgresql-jdbc</screen>
+
+        or download a suitable package from <ulink
+          url="http://www.postgresql.org/ftp/">http://www.postgresql.org/ftp/</ulink>. A
+        version that is suitable for current versions of Scientific Linux 3 can be
+        found at <ulink
+          url="http://www.postgresql.org/ftp/binary/v8.0.4/linux/rpms/redhat/rhel-es-3.0/">http://www.postgresql.org/ftp/binary/v8.0.4/linux/rpms/redhat/rhel-es-3.0/</ulink>.
+      </para>
+
+      <para>
+        Initialize the database directory (usually 
+        <filename class="directory">/var/lib/pgsql/data/</filename>), 
+        start the database server, and make sure that it is started 
+        at system start-up. This may be done with
+
+<screen><rootprompt/><command>/etc/init.d/postgresql</command> start
+<rootprompt/><command>chkconfig</command> postgresql on</screen>
+
+        If the start-up script does not perform the initialization
+        automatically, it might have to be done with
+
+<screen><rootprompt/><command>initdb</command> -D <filename class="directory">/var/lib/pgsql/data/</filename></screen>
+
+        and the server is started manually with
+
+<screen><rootprompt/><command>postmaster</command> -i -D <filename class="directory">/var/lib/pgsql/data/</filename> >logfile 2>&amp;1 &amp;</screen>
+      </para>
+
+      <para>
+        The server has to be configured to admit TCP/IP connections
+        from <literal>localhost</literal>: Make sure, 
+        <filename>/var/lib/pgsql/data/postgresql.conf</filename> contains 
+
+<programlisting>...
+tcpip_socket = true
+...</programlisting>
+
+        and <filename>/var/lib/pgsql/data/pg_hba.conf</filename> contains 
+
+<programlisting>...
+local   all         all                        trust
+host    all         all         127.0.0.1/32   trust
+host    all         all         ::1/128        trust</programlisting>
+
+        and restart the server, e.g. with
+
+<screen><rootprompt/><command>/etc/init.d/postgresql</command> restart</screen>
+
+        The configuration of the access rights in
+        <filename>/var/lib/pgsql/data/postgresql.conf</filename> is rather
+        liberal: Any user on the local machine may connect to the PostgreSQL
+        server as any database user without specifying a password. I case of
+        problems below, you can therefore be sure that it will not be due to
+        wrong access rights or passwords. See <xref linkend="cb-postgres"/>
+        of the <dcache/> book for more advice on configuring PostgreSQL.
+      </para>
+
+
 
     <para>
       If a current versinon of PostgreSQL is not available for the

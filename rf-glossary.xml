@@ -322,10 +322,10 @@
         <para>
           The replica manager keeps track of the number of <glossterm
             linkend="gl-replica">replicas</glossterm> of each file within a
-          certain subset of pools and makes shure this number is always within
-          a specified range. This way, the system makes shure that enough
+          certain subset of pools and makes sure this number is always within
+          a specified range. This way, the system makes sure that enough
           versions of each file are present and accessible at all times. This
-          is especially useful to enshure resilience of the <dcache/> system,
+          is especially useful to ensure resilience of the <dcache/> system,
           even if the hardware is not reliable. The replica manager cannot be
           used when the system is connected to a <glossterm
             linkend="gl-tss">tertiary storage system</glossterm>. The

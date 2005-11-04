@@ -231,7 +231,7 @@
     <note>
       <para>
         Starting with the PostgreSQL version of <pnfs/> the software directory
-        will not depend on the version anymore since RPM makes shure that only
+        will not depend on the version anymore since RPM makes sure that only
         one version of <pnfs/> is installed.
       </para>
     </note>
@@ -342,7 +342,7 @@ There are 3671 records in the database.</programlisting>
 
 <screen><rootprompt/><command>${pnfs}/bin/pnfs</command> start</screen>
 
-      Make shure that the PostgreSQL server is always started before
+      Make sure that the PostgreSQL server is always started before
       the <pnfs/> server - especially at system start-up. You also
       might have to change the path to the <pnfs/> software from
       <filename class="directory">/opt/pnfs.3.1.10/pnfs/</filename> to

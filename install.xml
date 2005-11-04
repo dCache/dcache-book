@@ -32,6 +32,37 @@
       <pnfs/> server and of the <dcache/> components will follow. During the whole installation process root access is required.
     </para>
 
+    <section>
+      <title>Prerequisites</title>
+      
+	<para>
+ 	
+	In order to install dCache the following requirements must be met:
+
+	<itemizedlist>
+	<listitem>
+	<para>
+	A RPM-based Linux distribution is required.
+	</para>
+	</listitem>
+	<listitem>
+	<para>
+	Java 1.4.2, either SDK or JRE, needs to be installed.
+	</para>
+	</listitem>
+	<listitem>
+	<para>
+	PostgreSQL must be installed and running. See <xref
+          linkend="cb-postgres-install"/> for more details.
+	</para>
+	</listitem>
+	</itemizedlist>       
+	
+	</para>
+	</section>
+
+<section>
+<title>Installation of the <dcache/> Software</title>
     <para>
       The RPM packages may be installed right away on each node:
 
@@ -43,70 +74,11 @@
 <screen><rootprompt/><command>rpm</command> -ivh pnfs-postgresql-<replaceable>version</replaceable>-<replaceable>release</replaceable>.i386.rpm</screen>
 
     </para>
+</section>
 
-    <section>
-      <title>Preparation of PostgreSQL Servers</title>
-      
-      <para>
-        Install the PostgreSQL server, client and JDBC support (version 8 or
-        higher) with the tools of the operating system. For example, use
 
-<screen><rootprompt/><command>apt-get</command> install postgresql postgresql-server postgresql-jdbc</screen>
-
-        or download a suitable package from <ulink
-          url="http://www.postgresql.org/ftp/">http://www.postgresql.org/ftp/</ulink>. A
-        version that is suitable for current versions of Scientific Linux 3 can be
-        found at <ulink
-          url="http://www.postgresql.org/ftp/binary/v8.0.4/linux/rpms/redhat/rhel-es-3.0/">http://www.postgresql.org/ftp/binary/v8.0.4/linux/rpms/redhat/rhel-es-3.0/</ulink>.
-      </para>
-
-      <para>
-        Initialize the database directory (usually 
-        <filename class="directory">/var/lib/pgsql/data/</filename>), 
-        start the database server, and make sure that it is started 
-        at system start-up. This may be done with
-
-<screen><rootprompt/><command>/etc/init.d/postgresql</command> start
-<rootprompt/><command>chkconfig</command> postgresql on</screen>
-
-        If the start-up script does not perform the initialization
-        automatically, it might have to be done with
-
-<screen><rootprompt/><command>initdb</command> -D <filename class="directory">/var/lib/pgsql/data/</filename></screen>
-
-        and the server is started manually with
-
-<screen><rootprompt/><command>postmaster</command> -i -D <filename class="directory">/var/lib/pgsql/data/</filename> >logfile 2>&amp;1 &amp;</screen>
-      </para>
-
-      <para>
-        The server has to be configured to admit TCP/IP connections
-        from <literal>localhost</literal>: Make sure, 
-        <filename>/var/lib/pgsql/data/postgresql.conf</filename> contains 
-
-<programlisting>...
-tcpip_socket = true
-...</programlisting>
-
-        and <filename>/var/lib/pgsql/data/pg_hba.conf</filename> contains 
-
-<programlisting>...
-local   all         all                        trust
-host    all         all         127.0.0.1/32   trust
-host    all         all         ::1/128        trust</programlisting>
-
-        and restart the server, e.g. with
-
-<screen><rootprompt/><command>/etc/init.d/postgresql</command> restart</screen>
-
-        The configuration of the access rights in
-        <filename>/var/lib/pgsql/data/postgresql.conf</filename> is rather
-        liberal: Any user on the local machine may connect to the PostgreSQL
-        server as any database user without specifying a password. I case of
-        problems below, you can therefore be sure that it will not be due to
-        wrong access rights or passwords. See <xref linkend="cb-postgres"/>
-        of the <dcache/> book for more advice on configuring PostgreSQL.
-      </para>
+<section>
+<title>Configuring the PostgreSQL Server</title>
 
       <para>
         Finally prepare the PostgreSQL users and databases as they are needed
@@ -298,17 +270,6 @@ Starting nfsd : pnfsd
       </para>
 
       <para>
-        The file <filename>/opt/d-cache/config/PoolManager.conf</filename>
-	has to be created. The template may be found at 
-	<filename>/opt/d-cache/etc/PoolManager.conf.template</filename>
-	and is sufficient in most cases. Note that this file has to go into the
-	subdirectory <filename class="directory">config/</filename>
-	even though the template is found in <filename
-	class="directory">etc/</filename>, just as with <filename>dCacheSetup</filename>.
-	For more information on how and why to change it, see <xref linkend="cf-pm"/>.
-      </para>
-
-      <para>
 	Whether and how many pools should be installed on the current
 	node is configured by
 	<filename>/opt/d-cache/etc/pool_path</filename>. Each line in
@@ -468,7 +429,8 @@ Starting dcache pool: Starting clintonDomain  6 5 4 3 2 1 0 Done (pid=7990)
 
 <screen><rootprompt/><command>rm</command> /opt/d-cache/bin/dcache-opt /etc/init.d/dcache-opt
 </screen>
-      </para>
+
+</para>
 
     </section>
 
@@ -544,6 +506,14 @@ Starting dcache pool: Starting clintonDomain  6 5 4 3 2 1 0 Done (pid=7990)
       
     </section>
 
+<section>
+<title>PostgreSQL</title>
+
+<para>
+	In case you are already using PostgreSQL it is recommended to upgrade to the latest version (8) to benefit from improved backup capabilities.
+</para>
+
+</section>
 
 
 

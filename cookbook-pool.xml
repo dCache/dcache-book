@@ -262,7 +262,7 @@ create diskCacheV111.replicaManager.CopyManager <emphasis>copy2</emphasis> \
       
 <screen><dcpoolprompt></dcpoolprompt><command>pool disable</command> <option>-strict</option></screen>
       
-      Then make shure, no transfers are being processed anymore.
+      Then make sure, no transfers are being processed anymore.
       All the following commands should give no output:
       
 <screen><dcpoolprompt></dcpoolprompt><command>queue ls queue</command>

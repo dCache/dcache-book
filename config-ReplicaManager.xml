@@ -15,7 +15,7 @@
     replica</glossterm>.) If a higher security and/or availability is
     required, the resilience feature of <dcache/> can be used: If
     running in the default configuration, the replica manager will
-    make shure that the number of <glossterm
+    make sure that the number of <glossterm
     linkend="gl-replica">replicas</glossterm> of a file will be at
     least 2 and not more than 3. If only one replica is present it
     will be copied to another pool by a <glossterm
