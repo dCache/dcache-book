@@ -582,8 +582,9 @@ ID Name Type Status Path
 
       Choose a new database name
       <replaceable>databaseName</replaceable> and a location for the
-      database file <replaceable>databaseFilePath</replaceable> and
-      create it with
+      database file <replaceable>databaseFilePath</replaceable> (just
+      a placeholder for the PostgreSQL version of <pnfs/>) and create
+      it with
 
 <screen><rootprompt/><command>mdb</command> create <replaceable>databaseName</replaceable> <replaceable>databaseFilePath</replaceable></screen>
 	
@@ -591,6 +592,18 @@ ID Name Type Status Path
 
 <screen><rootprompt/><command>mdb</command> create data2 /opt/pnfsdb/pnfs/databases/data2</screen>
 
+      Make sure the file
+      <filename><replaceable>databaseFilePath</replaceable></filename>
+      exists with
+
+<screen><rootprompt/><command>touch</command> <replaceable>databaseFilePath</replaceable></screen>
+
+      This might seem a little strange. The reason is that the
+      PostgreSQL version of the <pnfs/> server only uses the file as
+      reference and stores the actual data in the PostgreSQL server.
+    </para>
+
+    <para>
       In order to refresh database information run
 
 <screen><rootprompt/><command>mdb</command> update
