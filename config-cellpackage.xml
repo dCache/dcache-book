@@ -72,7 +72,7 @@
     configuration variables in
     <filename>config/<replaceable>domainName</replaceable>Setup</filename>
     (which normally is a link to
-    <filename>config/dCacheDomain</filename>), start the Java
+    <filename>config/dCacheSetup</filename>), start the Java
     virtual machine and execute the cell package commands in
     <filename>config/<replaceable>domainName</replaceable>.batch</filename>.
     The main task of these commands is to start up all the cells

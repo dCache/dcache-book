@@ -49,7 +49,7 @@ Install the PostgreSQL server, client and JDBC support with the tools of the ope
           url="http://www.postgresql.org/ftp/">http://www.postgresql.org/ftp/</ulink>. A
         version that is suitable for current versions of Scientific Linux 3 can be
         found at <ulink
-          url="http://www.postgresql.org/ftp/binary/v8.0.4/linux/rpms/redhat/rhel-es-3.0/">http://www.postgresql.org/ftp/binary/v8.0.4/linux/rpms/redhat/rhel-es-3.0/</ulink>.
+          url="http://www.postgresql.org/ftp/binary/v8.1.0/linux/rpms/redhat/rhel-es-3.0/">http://www.postgresql.org/ftp/binary/v8.0.4/linux/rpms/redhat/rhel-es-3.0/</ulink>.
       </para>
 
       <para>
@@ -69,36 +69,55 @@ Install the PostgreSQL server, client and JDBC support with the tools of the ope
         and the server is started manually with
 
 <screen><rootprompt/><command>postmaster</command> -i -D <filename class="directory">/var/lib/pgsql/data/</filename> >logfile 2>&amp;1 &amp;</screen>
-      </para>
+    </para>
 
-      <para>
-        The server has to be configured to admit TCP/IP connections
-        from <literal>localhost</literal>: Make sure, 
-        <filename>/var/lib/pgsql/data/postgresql.conf</filename> contains 
+    <para>
+      The server has to be configured to admit TCP/IP connections from
+      <literal>localhost</literal>: This is the default for version 8
+      of PostgreSQL. For earlier versions make sure,
+      <filename>/var/lib/pgsql/data/postgresql.conf</filename>
+      contains
 
 <programlisting>...
 tcpip_socket = true
 ...</programlisting>
 
-        and <filename>/var/lib/pgsql/data/pg_hba.conf</filename> contains 
+      (this option is not recognised by version 8).
+    </para>
+
+    <para>
+      The file <filename>/var/lib/pgsql/data/pg_hba.conf</filename>
+      should contain
 
 <programlisting>...
 local   all         all                        trust
 host    all         all         127.0.0.1/32   trust
 host    all         all         ::1/128        trust</programlisting>
 
-        and restart the server, e.g. with
+        for PostgreSQL version 8 and
 
+<programlisting>...
+local   all         all                                                           trust
+host    all         all         127.0.0.1 255.255.255.255                         trust
+host    all         all         ::1/128   ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff trust</programlisting>
+
+      for earlier versions.
+    </para>
+
+    <para>
+      Restart the server, e.g. with
+      
 <screen><rootprompt/><command>/etc/init.d/postgresql</command> restart</screen>
 
-        The configuration of the access rights in
-        <filename>/var/lib/pgsql/data/postgresql.conf</filename> is rather
-        liberal: Any user on the local machine may connect to the PostgreSQL
-        server as any database user without specifying a password. In case of
-        problems below, you can therefore be sure that it will not be due to
-        wrong access rights or passwords. See <xref linkend="cb-postgres-configure"/>
-        of the <dcache/> book for more advice on configuring PostgreSQL.
-      </para>
+      The configuration of the access rights in
+      <filename>/var/lib/pgsql/data/postgresql.conf</filename> is
+      rather liberal: Any user on the local machine may connect to the
+      PostgreSQL server as any database user without specifying a
+      password. In case of problems below, you can therefore be sure
+      that it will not be due to wrong access rights or passwords. See
+      <xref linkend="cb-postgres-configure"/> of the <dcache/> book
+      for more advice on configuring PostgreSQL.
+    </para>
 
 
 

@@ -486,7 +486,7 @@ create diskCacheV111.cells.WebCollectorV3 collector \
       The password can now be changed with
 
 <screen><dcprompt>local</dcprompt><command>cd</command> acm
-<dcprompt select="acm"/><command>creat user</command> admin
+<dcprompt select="acm"/><command>create user</command> admin
 <dcprompt select="acm"/><command>set passwd</command> -user=admin <replaceable>newPasswd</replaceable> <replaceable>newPasswd</replaceable>
 <dcprompt>acm</dcprompt><command>..</command>
 <dcprompt>local</dcprompt><command>logoff</command>

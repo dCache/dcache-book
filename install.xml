@@ -10,26 +10,31 @@
   <para>
     The first section describes the installation of a fresh <dcache/>
     instance using RPM files downloaded from <ulink
-      url="http://www.dcache.org">the <dcache/> homepage</ulink>. It follows a
-    guide to upgrading an existing installation. In both cases we assume standard
-    requirements of a small to medium sized <dcache/> instance without an attached
-    <glossterm linkend="gl-tss">tertiary storage system</glossterm>.
+    url="http://www.dcache.org">the <dcache/> homepage</ulink>. It
+    follows a guide to upgrading an existing installation. In both
+    cases we assume standard requirements of a small to medium sized
+    <dcache/> instance without an attached <glossterm
+    linkend="gl-tss">tertiary storage system</glossterm>. The third
+    section contains some pointers on extended features.
   </para>
   
   <section id="in-install">
     <title>Installation of a Basic <dcache/> Instance</title>
 
     <para>
-      In the following the installation of a central admin node of a <dcache/>
-      instance and of an arbitrary number of <dcache/> nodes will be
-      described. These nodes may each contain several 
-      <glossterm linkend="gl-pool"><dcache/> pools</glossterm> and optionally one <srm/>, one
-      GridFTP door, and/or one GSIdCap door. On the admin node, a <pnfs/> server and
-      several central <dcache/> components are installed. The <pnfs/> server,
-      some central components, and each <srm/> need an PostgreSQL server
+      In the following the installation of a central admin node of a
+      <dcache/> instance and of an arbitrary number of <dcache/> nodes
+      will be described. These nodes may each contain several
+      <glossterm linkend="gl-pool"><dcache/> pools</glossterm> and
+      optionally one <srm/>, one GridFTP door, and/or one GSIdCap
+      door. On the admin node, a <pnfs/> server and several central
+      <dcache/> components are installed. The <pnfs/> server, some
+      central components, and each <srm/> need an PostgreSQL server
       installed locally on the node. The first section describes the
-      configuration of a PostgreSQL server. After that the installation of the
-      <pnfs/> server and of the <dcache/> components will follow. During the whole installation process root access is required.
+      configuration of a PostgreSQL server. After that the
+      installation of the <pnfs/> server and of the <dcache/>
+      components will follow. During the whole installation process
+      root access is required.
     </para>
 
     <section>
@@ -139,15 +144,15 @@
       </para>
 
       <para>
-        If the billing information should also be stored in a database (in addition to files)
-	the
-        database <quote>billing</quote> has to be created:
+        If the billing information should also be stored in a database
+        (in addition to files) the database <quote>billing</quote> has
+        to be created:
 
 <screen><rootprompt/><command>createdb</command> -U srmdcache billing</screen>
         
 	However, we strongly advise against using the same database
 	server for the <pnfs/> server and the billing information.
-	For how to configure the billing cell see <xref linkend="cb-accounting"/>.
+	For how to configure the billing cell to write into this database, see below. <!-- <xref linkend="cb-accounting"/>. -->
       </para>
 
     </section>
@@ -396,11 +401,25 @@ Starting dcache pool: Starting clintonDomain  6 5 4 3 2 1 0 Done (pid=7990)
       Note that the upgrade of <dcache/> is independent of a
       conversion of the <pnfs/> database from GDBM to PostgreSQL. The
       conversion and upgrade to the PostgreSQL version of <pnfs/> may
-      be performed any time before or after the upgrade of <dcache/>,
-      even though the <dcache/> release only contains the PostgreSQL
-      version of <pnfs/> (since version 1.6.6). See <xref
+      be performed any time before or after the upgrade of
+      <dcache/>. Do not perform the <dcache/> upgrade and the <pnfs/>
+      database conversion simultaneously. It is better to do them one
+      after the other, and test the system inbetween. Do not be
+      mislead by the fact the <dcache/> release only contains the
+      PostgreSQL version of <pnfs/> (since version 1.6.6). See <xref
       linkend="cb-pnfs-postgres"/> for a guide to convert and upgrade
       the <pnfs/> server.
+    </para>
+
+    <para>
+      In case you are already using PostgreSQL (e.g. for the <srm/>),
+      it is a good idea to upgrade to version 8 now, because prior to
+      dCache Version 1.6.6 no precious data is stored and therefore
+      can be wiped off, allowing a PostgreSQL 8 installation from
+      scratch. Starting from <dcache/> version 1.6.6 PostgreSQL will
+      be utilized more heavily, making migration a complex
+      task. Another advantage of PostgreSQL 8 is an integrated
+      mechanism for automatic backups.
     </para>
 
     <section>
@@ -574,28 +593,91 @@ Starting dcache pool: Starting clintonDomain  6 5 4 3 2 1 0 Done (pid=7990)
 <screen><command>/opt/d-cache/bin/dcache-core</command> restart</screen>
 
 	Now the <dcache/> system will not be aware of any files stored
-	on the pools. To make it aware again, you have to issue the
-	following command on every pool. Since the execution of this
-	command will take a while and will put a considerable load on
-	the PnfsManager, you should only run in on one pool at a time
-	and you should plan for a downtime:
+	on the pools. To make it aware again, you have to go through
+	the following steps: Since this will take a while and will put
+	a considerable load on the PnfsManager, take care that this is
+	done with one pool at a time. You should also plan for a
+	downtime:
+      </para>
+
+      <para>
+	In the admin interface (see <xref linkend="intouch-admin"/>)
+	go to a pool, e.g.
+
+<screen><dcprompt select="local"/><command>cd</command> <replaceable>hostname</replaceable>_1</screen>
+
+	and issue the command
 
 <screen><dcpoolprompt/><command>pnfs register</command></screen>
 
+	Then go to the pnfs manager:
+
+<screen><dcpoolprompt/><command>..</command>
+<dcprompt select="local"/><command>cd</command> PnfsManager</screen>
+
+	Check the output of the <quote><command>info</command></quote>
+	command repeatedly:
+
+<screen><dcprompt select="PnfsManager"/>info
+...
+Threads (4) Queue
+    [0] 10
+    [1] 12
+    [2] 9
+    [3] 13
+...</screen>
+
+	and wait till the value for all four queues is zero. Then go
+	to the next pool and repeat the process.
       </para>
       
     </section>
 
-<section>
-<title>PostgreSQL</title>
+    
+    
+  </section>
 
-<para>
-In case you are already using PostgreSQL, it is a good idea to upgrade to version 8 now, because prior to dCache Version 1.6.6 no precious data is stored and therefore can be wiped off, allowing a PostgreSQL 8- installation from scratch. DCache versions >= 1.6.6 will utilize PostgreSQL more heavily, making migration a complex task. Another advantage of PostgreSQL 8 is an integrated mechanism for automatic backups.
-</para>
+  <section>
+    <title>Additional Components</title>
 
-</section>
+    <para>
+      Some features of <dcache/> are switched off by default after an
+      installation. The following describes how to put them to use: 
+    </para>
 
+    <section>
+      <title>Accounting/Billing Information in Database</title>
 
+      <para>
+	The billing information which is normally written to <filename
+	class="directory">/opt/d-cache/billing/</filename> on the
+	admin node will also be written to a database if
+	<filename>config/dCacheSetup</filename> contains
+
+<programlisting>billingToDb=yes</programlisting>
+
+	A PostgreSQL server is expected to run on the admin node with
+	a database user <quote><literal>srmdcache</literal></quote>
+	and a database <quote><literal>billing</literal></quote> with
+
+<screen><rootprompt/><command>createuser</command> -U postgres --no-adduser --createdb --pwprompt srmdcache
+<rootprompt/><command>createdb</command> -U srmdcache billing</screen>
+      </para>
+
+    </section>
+
+    <section>
+      <title>Space Reservation</title>
+
+      <para>
+	The space reservation feature between the <srm/> and the
+	GridFTP door may be switched on with
+
+<programlisting>spaceReservation=true</programlisting>
+
+      </para>
+
+    </section>
 
   </section>
   
