@@ -7,6 +7,14 @@
   <section id="cb-proto-firewall">
     <title>Access to SRM and GridFTP server from behind a firewall</title>
 
+    <partauthors>Timur Perelmutov, Mathias de Riese</partauthors>
+
+    <para>
+      This describes firewall issues from the clients
+      perspective. <xref linkend="cb-net-firewall"/> discusses the
+      server side.
+    </para>
+
     <para>
       When files are transfered in gridftp active mode from gridftp
       server to the gridftp client, server establishes data channel(s)
@@ -50,6 +58,17 @@
 	  </listitem>
 	</itemizedlist>
 
+      </para>
+
+      <para>
+	With the latest srmcp release you can use the <option>globus_tcp_port_range</option> option:
+
+<screen><userprompt/><command>srmcp</command> -globus_tcp_port_range=<replaceable>minValue</replaceable>:<replaceable>maxValue</replaceable> ...</screen>
+
+
+	A range of ports open for tcp connections is specified as a
+	pair of positive integers separated by ":". This is not set by
+	default.
       </para>
 
     </section>
@@ -120,5 +139,10 @@
     </para>
     
   </section>
+
+  <unfinished>
+    Maybe, this section should go into some kind of user
+    documentation part of the book.
+  </unfinished>
   
 </chapter>

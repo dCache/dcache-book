@@ -2,16 +2,288 @@
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
 
 <chapter id="cb-net">
-  <title>Complex Network Topologies</title>
+  <title>Complex Network Configuration</title>
   
   <para>
     This chapter contains solutions for several non-trivial network
-    topologies. Even though not every case is covered, these cases might help solve
-    other problems, as well. Intermediate knowledge about dCache is required. Since
-    most tasks require changes in the start-up configuration,the background
-    information on how to configure the cell start-up, given in <xref
-      linkend="cf-cellpackage"/> will be useful.
+    configurations. The first section discusses the interoperation of
+    <dcache/> with firewalls and does not require any background
+    knowledge about <dcache/> other than what is given in the
+    installation guide (<xref linkend="in"/>) and the first steps
+    tutorial (<xref linkend="intouch"/>). The following sections will
+    deal with more complex network topologies, e.g. private subnets.
+    Even though not every case is covered, these cases might help
+    solve other problems, as well. Intermediate knowledge about dCache
+    is required. Since most tasks require changes in the start-up
+    configuration, the background information on how to configure the
+    cell start-up, given in <xref linkend="cf-cellpackage"/> will be
+    useful.
   </para>
+
+  <section id="cb-net-firewall">
+    <title>Firewall Configuration</title>
+
+    <para>
+      The components of a <dcache/> instance may be distributed over
+      several hosts (nodes). Some of these components are accessed
+      from outside and consequently the firewall needs to be aware of
+      that. This section assumes that all nodes are behind a firewall
+      and have full access to each other. More complex setups are
+      described in the following sections. Depending on the access
+      method, certain ports have to be opened to only some of the
+      nodes. We will describe the behaviour of a standard installation
+      using the default values. Since <dcache/> is very flexible, most
+      port numbers may be changed in the configuration. The location
+      (node) of any <dcache/> component might also be changed from this
+      standard.
+    </para>
+
+    <section>
+      <title>The <dcap/> Protocol</title>
+
+      <para>
+	The <dcap/> protocol should be used for local, trusted access
+	only, because it is not authenticated. The traditional method
+	is to mount <pnfs/> locally on the client and use paths to the
+	files on this local mount to address files. For this, the
+	client has to be able to mount the NFS export of the <pnfs/>
+	server. It is also possible to use the <dcap/> protocol with a
+	URL instead of a local path within a <pnfs/> mount. The URL
+	has the form
+
+<programlisting>dcap://<replaceable>dCapDoorHostFQN</replaceable>:<replaceable>dCapDoorPort</replaceable>/<replaceable>fullPnfsPath</replaceable></programlisting>
+
+	If the <replaceable>dCapDoorPort</replaceable> is not
+	specified, 22125 is used to establish a TCP connection to
+	<replaceable>dCapDoorHostFQN</replaceable> (see next
+	paragraph). In this case no NFS mount is needed
+	anymore. However, the access is unauthenticated and therefore
+	access is only granted if the <quote>other</quote> part of the
+	UNIX rights are set accordingly. In other words: The user is
+	mapped to nobody for unauthenticated <dcap/> access.
+      </para>
+
+      <para>
+	In both cases (<pnfs/> mount and URL access) the <dcap/>
+	client (<dcap/> library or <command>dccp</command> command)
+	will connect to the <dcap/> door
+	(<literal>doorDomain</literal>) on the admin node with TCP
+	port 22125 (can be changed in
+	<filename>config/dCacheSetup</filename> with <varname>dCapPort</varname>). After the pool
+	manager selected a pool to be used for the transfer (<xref
+	linkend="cf-pm-psu"/> describes how to configure that
+	selection mechanism.) this pool will establish the data
+	connection to the client on a TCP port which has been selected
+	by the client. The port range to use may be specified on the
+	client side (e.g. by the <option>-p</option> option of the
+	<command>dccp</command> command.)
+      </para>
+
+    </section>
+
+    <section>
+      <title>The <gsidcap/> Protocol</title>
+
+      <para>
+	The <gsidcap/> protocol is the <dcap/> protocol with a GSI
+	authentication wrapper (tunnel). The mechanism is the same as
+	described for the URL-stype <dcap/> protocol in the previous
+	section. The only difference is the default port number: For
+	the <gsidcap/> door the default port number is 22128. It is
+	specified in <filename>config/dCacheSetup</filename> with the
+	parameter <varname>dCapGsiPort</varname>.
+      </para>
+
+      <para>
+	Another difference between the <dcap/> door and <gsidcap/>
+	doors is that the <dcap/> door is started on the admin node
+	and there can only be one in the standard configuration, while
+	there may be several <gsidcap/> doors on separate
+	nodes. Correspondingly, ports have to be opened in a
+	firewall. Note that it should not be necessary to run as many
+	<gsidcap/> doors as <gridftp/> doors (see below), because no
+	data is transfered through the <gsidcap/> door.
+      </para>
+
+    </section>
+    
+    <section>
+      <title>The <gridftp/> Protocol</title>
+
+      <para>
+	A <gridftp/> client connects to one of the <gridftp/> doors on
+	TCP port 2811. The data connections are established
+	independent of the direction of the data transfer. In
+	<quote>active</quote> FTP mode the server connects to the
+	client while in <quote>passive</quote> FTP mode the client
+	connects to the server.
+      </para>
+
+      <para>
+	In <quote>active</quote> FTP mode the pool selected by the
+	pool manager (see <xref linkend="cf-pm-psu"/>) will open one
+	or more data connections to the client on a TCP port in the
+	range between 20000 and 25000. In <quote>passive</quote> FTP
+	mode, the client will establish the data connections to the
+	<gridftp/> door in the same port range. The pool will connect
+	to the door and the door will route the data traffic. It is
+	not possible to establish a direct connection between pool and
+	client in <quote>passive</quote> mode, because the FTP
+	protocol redirection mechanism has to be triggered before the
+	client sends the name of the requested file.
+      </para>
+
+    </section>
+
+
+    <section>
+      <title>The <srm/> Protocol</title>
+
+      <para>
+	An <srm/> is a webservice which uses the https as transport
+	protocol and negotiates data transfers between the client and
+	the server as well as between the server and another
+	server. For the actual data transfer one of the other
+	protocols is negotiated. Usually this is <gridftp/> -
+	especially for wide-area transfers. There are two things to
+	note about <srm/>-initiated <gridftp/> transfers:
+      </para>
+
+      <para>
+	For reading data, only <quote>active</quote> FTP mode will be
+	used, i.e. the pool containing the data will connect to the
+	client or to the server which should receive the data.  For
+	writing, only <quote>passive</quote> FTP mode will be used,
+	i.e. the client or the pool containing the data will connect
+	to the client or to the server which should receive the
+	data.
+      </para>
+
+      <para>
+	Apart from <srm/> put and get operations which always copy
+	data between one <srm/> and the client there is also a true
+	<srm/> copy from one <srm/> to another <srm/>. There are two
+	modes for <srm/> copy: <quote>pull</quote> and
+	<quote>push</quote> mode. If the destination <srm/> is
+	<dcache/> based and <srm/> pull mode (default) is used, the
+	destination pool will play the role of the <gridftp/> client,
+	will contact the <gridftp/> door of the source instance and
+	receive the data directly from the source pool (if the source
+	system is a <dcache/> system). If push mode is used and the
+	source is a <dcache/> based <srm/>, the source pool will be
+	the <gridftp/> client and will send the data to the <gridftp/>
+	door of the destination. All this might have to be considered
+	when designing the system and configuring the firewall.
+      </para>
+
+    </section>
+
+
+    <section>
+      <title>Pool Selection</title>
+
+      <para>
+	Restricting wide-area transfers to a subset of your <dcache/>
+	pools may be done with the <glossterm
+	linkend="gl-pm-comp-psu">pool selection unit</glossterm> in
+	the pool manager. <xref linkend="cf-pm-psu"/> contains a
+	describtion on how to do that. This can be useful to ease
+	firewall configurations, optimize throughput, and improve
+	security.
+      </para>
+
+    </section>
+
+    <section>
+      <title>Protocol Overview</title>
+
+      <para>
+	The following table gives an overview about the default ports
+	used by the client protocols supported by <dcache/>. Note that
+	all of them may be changed in
+	<filename>config/dCacheSetup</filename>.
+      </para>
+
+      <table tabstyle="cellattributes">
+	<title>Protocol Overview</title>
+	
+	<tgroup cols="4" align="left">
+	  <colspec colnum="1" colname="Protocol" colwidth="70"/>
+	  <colspec colnum="2" colname="Ports" colwidth="70"/>
+	  <colspec colnum="3" colname="Direction" colwidth="120"/>
+	  <colspec colnum="4" colname="Nodes"/>
+          <thead>
+            <row>
+              <entry>
+                Protocol
+              </entry>
+              <entry>
+                Port(s)
+              </entry>
+              <entry>
+                Direction
+              </entry>
+              <entry>
+                Nodes
+              </entry>
+            </row>
+          </thead>
+          <tbody>
+	    <row class="firstline">
+	      <entry><dcap/></entry>
+	      <entry>22125</entry>
+	      <entry>incoming</entry>
+	      <entry>doorDomain (admin node)</entry>
+	    </row>
+	    <row class="firstline">
+	      <entry></entry>
+	      <entry>any</entry>
+	      <entry>outgoing</entry>
+	      <entry>pools</entry>
+	    </row>
+	    <row>
+	      <entry><gsidcap/></entry>
+	      <entry>22128</entry>
+	      <entry>incoming</entry>
+	      <entry>gsidcapDomain (where GSIDCAP=yes in node_config)</entry>
+	    </row>
+	    <row>
+	      <entry></entry>
+	      <entry>any</entry>
+	      <entry>outgoing</entry>
+	      <entry>pools</entry>
+	    </row>
+	    <row class="firstline">
+	      <entry><gridftp/></entry>
+	      <entry>2811</entry>
+	      <entry>incoming</entry>
+	      <entry>gridftpDomain (where GRIDFTP=yes in node_config)</entry>
+	    </row>
+	    <row class="firstline">
+	      <entry></entry>
+	      <entry>20000-25000</entry>
+	      <entry>outgoing (active FTP)</entry>
+	      <entry>pools</entry>
+	    </row>
+	    <row class="firstline">
+	      <entry></entry>
+	      <entry>20000-25000</entry>
+	      <entry>incoming (passive FTP)</entry>
+	      <entry>gridftpDomain</entry>
+	    </row>
+	    <row>
+	      <entry><srm/></entry>
+	      <entry>8443</entry>
+	      <entry>incoming</entry>
+	      <entry>srmDomain</entry>
+	    </row>
+          </tbody>
+        </tgroup>
+      </table>
+      
+    </section>
+    
+  </section>
 
   <section id="cb-net-second-if">
     <title>GridFTP Connections via two or more Network Interfaces</title>

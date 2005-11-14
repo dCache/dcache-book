@@ -30,6 +30,14 @@
     <productname>dCap</productname>
   </xsl:template>
 
+  <xsl:template match="gsidcap">
+    <productname>GSIdCap</productname>
+  </xsl:template>
+
+  <xsl:template match="gridftp">
+    <productname>GridFTP</productname>
+  </xsl:template>
+
   <xsl:template match="pnfs">
     <productname><literal>pnfs</literal></productname>
   </xsl:template>

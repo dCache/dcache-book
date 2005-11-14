@@ -174,3 +174,7 @@ div.glosslist dt {
 code.filename { 
   font-weight: bold;
  }
+
+.firstline td{ 
+  background: #EEAAAA;
+ }

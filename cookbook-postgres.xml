@@ -4,7 +4,7 @@
 <chapter id="cb-postgres">
   <title>PostgreSQL and <dcache/></title>
   
-  <partauthors>Vladimir Podstavkov, Mathias de Riese</partauthors>
+  <partauthors>Vladimir Podstavkov, Mathias de Riese, Martin Radicke</partauthors>
 
   <para>
     PostgreSQL is used for various things in a <dcache/> system: The
@@ -37,20 +37,24 @@
     <title>Installing a PostgreSQL Server</title>
 
     <para>
-	The preferred way to set up a PostgreSQL server should be the installation of the version provided by your OS distribution. It is strongly recommended to use version 8 or higher.
+      The preferred way to set up a PostgreSQL server should be the
+      installation of the version provided by your OS
+      distribution. It is strongly recommended to use version 8 or
+      higher.
     </para>
 
-	<para>
-Install the PostgreSQL server, client and JDBC support with the tools of the operating system. For example, use
+    <para>
+      Install the PostgreSQL server, client and JDBC support with the
+      tools of the operating system. For example, use
 
 <screen><rootprompt/><command>apt-get</command> install postgresql postgresql-server postgresql-jdbc</screen>
 
-        or download a suitable package from <ulink
-          url="http://www.postgresql.org/ftp/">http://www.postgresql.org/ftp/</ulink>. A
-        version that is suitable for current versions of Scientific Linux 3 can be
-        found at <ulink
-          url="http://www.postgresql.org/ftp/binary/v8.1.0/linux/rpms/redhat/rhel-es-3.0/">http://www.postgresql.org/ftp/binary/v8.0.4/linux/rpms/redhat/rhel-es-3.0/</ulink>.
-      </para>
+      or download a suitable package from <ulink
+      url="http://www.postgresql.org/ftp/">http://www.postgresql.org/ftp/</ulink>. A
+      version that is suitable for current versions of Scientific
+      Linux 3 can be found at <ulink
+      url="http://www.postgresql.org/ftp/binary/v8.1.0/linux/rpms/redhat/rhel-es-3.0/">http://www.postgresql.org/ftp/binary/v8.1.0/linux/rpms/redhat/rhel-es-3.0/</ulink>.
+    </para>
 
       <para>
         Initialize the database directory (usually 
@@ -73,8 +77,10 @@ Install the PostgreSQL server, client and JDBC support with the tools of the ope
 
     <para>
       The server has to be configured to admit TCP/IP connections from
-      <literal>localhost</literal>: This is the default for version 8
-      of PostgreSQL. For earlier versions make sure,
+      <literal>localhost</literal>. This is the default for version 8
+      of PostgreSQL.
+
+<!--  For earlier versions make sure,
       <filename>/var/lib/pgsql/data/postgresql.conf</filename>
       contains
 
@@ -82,7 +88,8 @@ Install the PostgreSQL server, client and JDBC support with the tools of the ope
 tcpip_socket = true
 ...</programlisting>
 
-      (this option is not recognised by version 8).
+      (this option is not recognised by version 8). -->
+
     </para>
 
     <para>
@@ -94,14 +101,17 @@ local   all         all                        trust
 host    all         all         127.0.0.1/32   trust
 host    all         all         ::1/128        trust</programlisting>
 
-        for PostgreSQL version 8 and
+        for PostgreSQL version 8.
+
+<!-- and
 
 <programlisting>...
 local   all         all                                                           trust
 host    all         all         127.0.0.1 255.255.255.255                         trust
 host    all         all         ::1/128   ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff trust</programlisting>
 
-      for earlier versions.
+      for earlier versions. -->
+
     </para>
 
     <para>

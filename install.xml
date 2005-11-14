@@ -58,7 +58,8 @@
 	<listitem>
 	<para>
 	PostgreSQL must be installed and running. See <xref
-          linkend="cb-postgres-install"/> for more details.
+	linkend="cb-postgres-install"/> for more details. It is
+	strongly recommended to use version 8 or higher.
 	</para>
 	</listitem>
 	</itemizedlist>       
@@ -361,7 +362,6 @@ Starting dcache pool: Starting clintonDomain  6 5 4 3 2 1 0 Done (pid=7990)
 	configured to start at boot-time with 
 
 <screen><rootprompt/><command>chkconfig</command> dcache-core on
-<rootprompt/><command>chkconfig</command> dcache-opt on
 <rootprompt/><command>chkconfig</command> dcache-pool on</screen>
 
       </para>
