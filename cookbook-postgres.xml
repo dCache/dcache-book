@@ -78,7 +78,7 @@
     <para>
       The server has to be configured to admit TCP/IP connections from
       <literal>localhost</literal>. This is the default for version 8
-      of PostgreSQL.
+      of PostgreSQL. 
 
 <!--  For earlier versions make sure,
       <filename>/var/lib/pgsql/data/postgresql.conf</filename>
@@ -93,6 +93,19 @@ tcpip_socket = true
     </para>
 
     <para>
+      For <dcache/> version 1.6.6 release 1, please make sure the file
+      <filename>/var/lib/pgsql/data/postgresql.conf</filename>
+      contains
+
+<programlisting>...
+add_missing_from = on
+...</programlisting>
+
+      This will not be necessary in future versions.
+
+    </para>
+
+    <para>
       The file <filename>/var/lib/pgsql/data/pg_hba.conf</filename>
       should contain
 
@@ -101,7 +114,7 @@ local   all         all                        trust
 host    all         all         127.0.0.1/32   trust
 host    all         all         ::1/128        trust</programlisting>
 
-        for PostgreSQL version 8.
+      <!-- for PostgreSQL version 8. -->
 
 <!-- and
 
