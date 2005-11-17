@@ -86,8 +86,37 @@
 <section>
 <title>Configuring the PostgreSQL Server</title>
 
+      
       <para>
-        Finally prepare the PostgreSQL users and databases as they are needed
+	For <dcache/> version 1.6.6 release 1, please make sure the file
+	<filename>/var/lib/pgsql/data/postgresql.conf</filename>
+	contains
+
+<programlisting>...
+add_missing_from = on
+...</programlisting>
+
+	This will not be necessary in future releases.
+	
+      </para>
+
+      <para>
+	The file <filename>/var/lib/pgsql/data/pg_hba.conf</filename>
+	should contain
+	
+<programlisting>...
+local   all         all                        trust
+host    all         all         127.0.0.1/32   trust
+host    all         all         ::1/128        trust</programlisting>
+
+	For these changes to take effect, restart the server, e.g. with
+      
+<screen><rootprompt/><command>/etc/init.d/postgresql</command> restart</screen>
+	
+      </para>
+      
+      <para>
+        Prepare the PostgreSQL users and databases as they are needed
         for the components of <dcache/> and/or the <pnfs/> server: The <pnfs/>
         server only needs a database user. We suggest to call it
         <quote>pnfsserver</quote>. Create it with
@@ -660,8 +689,7 @@ Threads (4) Queue
 	a database user <quote><literal>srmdcache</literal></quote>
 	and a database <quote><literal>billing</literal></quote> with
 
-<screen><rootprompt/><command>createuser</command> -U postgres --no-superuser --no-createrole --createdb --pwprompt srmdcache<!--
-<rootprompt/><command>createuser</command> -U postgres --no-adduser --createdb --pwprompt srmdcache -->
+<screen><rootprompt/><command>createuser</command> -U postgres --no-superuser --no-createrole --createdb --pwprompt srmdcache
 <rootprompt/><command>createdb</command> -U srmdcache billing</screen>
       </para>
 

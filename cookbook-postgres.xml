@@ -45,11 +45,13 @@
 
     <para>
       Install the PostgreSQL server, client and JDBC support with the
-      tools of the operating system. For example, use
+      tools of the operating system. 
+<!--
+      For example, use
 
 <screen><rootprompt/><command>apt-get</command> install postgresql postgresql-server postgresql-jdbc</screen>
-
-      or download a suitable package from <ulink
+-->
+      You can download a suitable package from <ulink
       url="http://www.postgresql.org/ftp/">http://www.postgresql.org/ftp/</ulink>. A
       version that is suitable for current versions of Scientific
       Linux 3 can be found at <ulink
@@ -101,8 +103,7 @@ tcpip_socket = true
 add_missing_from = on
 ...</programlisting>
 
-      This will not be necessary in future versions.
-
+      This will not be necessary in future releases.
     </para>
 
     <para>
@@ -133,16 +134,14 @@ host    all         all         ::1/128   ffff:ffff:ffff:ffff:ffff:ffff:ffff:fff
 <screen><rootprompt/><command>/etc/init.d/postgresql</command> restart</screen>
 
       The configuration of the access rights in
-      <filename>/var/lib/pgsql/data/postgresql.conf</filename> is
-      rather liberal: Any user on the local machine may connect to the
+      <filename>/var/lib/pgsql/data/pg_hba.conf</filename> is rather
+      liberal: Any user on the local machine may connect to the
       PostgreSQL server as any database user without specifying a
-      password. In case of problems below, you can therefore be sure
-      that it will not be due to wrong access rights or passwords. See
-      <xref linkend="cb-postgres-configure"/> of the <dcache/> book
-      for more advice on configuring PostgreSQL.
+      password. This way, you can be sure that problems will not be
+      due to wrong access rights or passwords. See <xref
+      linkend="cb-postgres-configure"/> of the <dcache/> book for more
+      advice on configuring PostgreSQL.
     </para>
-
-
 
     <para>
       If a current version of PostgreSQL is not available for the
