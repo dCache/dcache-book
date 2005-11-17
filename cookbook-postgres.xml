@@ -98,11 +98,13 @@ tcpip_socket = true
       For <dcache/> version 1.6.6 release 1, please make sure the file
       <filename>/var/lib/pgsql/data/postgresql.conf</filename>
       contains
+    </para>
 
 <programlisting>...
 add_missing_from = on
 ...</programlisting>
 
+    <para>
       This will not be necessary in future releases.
     </para>
 
@@ -130,9 +132,11 @@ host    all         all         ::1/128   ffff:ffff:ffff:ffff:ffff:ffff:ffff:fff
 
     <para>
       Restart the server, e.g. with
+    </para>
       
 <screen><rootprompt/><command>/etc/init.d/postgresql</command> restart</screen>
 
+    <para>
       The configuration of the access rights in
       <filename>/var/lib/pgsql/data/pg_hba.conf</filename> is rather
       liberal: Any user on the local machine may connect to the
