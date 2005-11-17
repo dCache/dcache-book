@@ -92,7 +92,6 @@
         server only needs a database user. We suggest to call it
         <quote>pnfsserver</quote>. Create it with
 
-<!-- <screen><rootprompt/><command>createuser</command> -U postgres --no-adduser --createdb --pwprompt pnfsserver</screen> -->
 <screen><rootprompt/><command>createuser</command> -U postgres --no-superuser --no-createrole --createdb --pwprompt pnfsserver</screen>
 
         Several databases will be created by this user. At initial installation,
@@ -110,7 +109,6 @@
         The <dcache/> components will access the database server with the user
         <quote>srmdcache</quote>:
 
-<!-- <screen><rootprompt/><command>createuser</command> -U postgres --no-adduser --createdb --pwprompt srmdcache</screen> -->
 <screen><rootprompt/><command>createuser</command> -U postgres --no-superuser --no-createrole --createdb --pwprompt srmdcache</screen>
 
         Several central components running on the admin node as well as each
