@@ -263,7 +263,8 @@ Starting nfsd : pnfsd
 	class="directory">/etc/init.d/</filename> and the <pnfs/> may be
 	configured to start at boot time with
 
-<screen><rootprompt/><command>chkconfig</command> pnfs on</screen>
+<screen><rootprompt/><command>chkconfig</command> --add pnfs
+<rootprompt/><command>chkconfig</command> pnfs on</screen>
 
       </para>
 
@@ -390,7 +391,9 @@ Starting dcache pool: Starting clintonDomain  6 5 4 3 2 1 0 Done (pid=7990)
 	class="directory">/etc/init.d/</filename> and <dcache/> is
 	configured to start at boot-time with 
 
-<screen><rootprompt/><command>chkconfig</command> dcache-core on
+<screen><rootprompt/><command>chkconfig</command> --add dcache-core
+<rootprompt/><command>chkconfig</command> --add dcache-pool
+<rootprompt/><command>chkconfig</command> dcache-core on
 <rootprompt/><command>chkconfig</command> dcache-pool on</screen>
 
       </para>
