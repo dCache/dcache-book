@@ -97,7 +97,23 @@
 
 <screen><rootprompt/>ln -s /opt/d-cache/jobs/infoDynamicSE-plugin-dcache /opt/lcg/var/gip/plugin/
 <rootprompt/>ln -s /opt/d-cache/jobs/infoDynamicSE-provider-dcache /opt/lcg/var/gip/provider/</screen>
+    </para>
 
+    <para>
+      The new info provider associates to each VO (as given in the
+      static file) a pool group with the same name. The values for
+      available and used space per VO are determined by the values for
+      these pool groups. To create a pool group
+      <replaceable>voName</replaceable> and add a pool
+      <replaceable>voPool</replaceable> to it, use the admin interface
+      and issue the following commands in the pool manager:
+
+<screen><dcpmprompt/><command>psu create pgroup</command> <replaceable>voName</replaceable>
+<dcpmprompt/><command>psu addto pgroup</command> <replaceable>voName</replaceable> <replaceable>voPool</replaceable></screen>
+
+      The actual usage of the pools might differ according to the
+      configuration of the pool selection unit (see <xref
+      linkend="cp-pm-psu"/> for details on that).
     </para>
 
     <para>
