@@ -1,0 +1,490 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">
+
+<chapter id="rf-changelog">
+  <title>Changelog</title>
+
+  <section>
+    <title>Changes between Version 1.6.6 Release 1 and Release 2</title>
+
+    
+    <itemizedlist>
+      <listitem>
+	<para>
+	  Info Provider for LCG. Compatible with
+	  <filename>lcg-info-generic</filename> version 1.0.22.  <xref
+	  linkend="cb-general-lcg"/> describes how to activate it.
+	</para>
+	
+	<para>
+	  This also made several small changes to the files
+	  <filename>bin/dcache-core</filename>,
+	  <filename>config/srm.batch</filename>,
+	  <filename>config/gridftpdoor.batch</filename>,
+	  <filename>config/gsidcapdoor.batch</filename>, and
+	  <filename>config/door.batch</filename> necessary. The
+	  templates <filename>etc/node_config.template</filename> and
+	  <filename>etc/dCacheSetup.template</filename> also contain
+	  some new comments which describe additional parameters for
+	  controlling the info provider. However, in most cases the
+	  default values work fine and
+	  <filename>config/dCacheSetup</filename> and
+	  <filename>etc/node_config</filename> need not be changed.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  Fix of bug in replica manager which caused it to hang if one
+	  pool is full.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  The OsmInfoExtractor (default module of the PnfsManager) now
+	  respects the <literal>hsmInstance</literal> tag (see <xref
+	  linkend="cf-pnfs-tags"/>).
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  Fix of wrong evaluation of <literal>replicaManager</literal>
+	  parameter in <filename>config/dCacheSetup</filename>. 
+	  (Values: <literal>yes</literal>, <literal>no</literal>)
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  All <command>mount</command> commands now use the option
+	  <literal>nfsvers=2</literal> for compatibility with SL4.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  Sanity check in start-up scripts will allow java version 1.5
+	  in addition to 1.4.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  Improved performance of replica manager by adding an index
+	  to the database. This has to be done manually when upgrading:
+
+<screen><rootprompt/><command>psql</command> -U srmdcache -d replicas -f /opt/d-cache/etc/psql_install_replicas.sql</screen>
+
+	  You can safely ignore the errors produced by this command.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  Fix of bug in <filename>install/install.sh</filename> and
+	  <filename>bin/dcache-core</filename> which prevented the use
+	  of strings that happen to be keys in the values in
+	  <filename>etc/node_config</filename>.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  Added <quote><literal>Provides: </literal></quote> to
+	  RPM. The old package names are now provided by the new
+	  packages.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  Added <quote><literal>Provides:
+	  pnfs-server</literal></quote> to
+	  <filename>pnfs-postgresql</filename> RPM and added new
+	  meta-package <filename>pnfs-gdbm</filename> to protect from
+	  automatic upgrades.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  <command>dccp</command> can now handle local files larger
+	  than 2GB.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  Correct behaviour of <literal>dc_stat</literal> (<dcap/>
+	  client library) in multithreaded environments.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  Fix of memory corruption in <dcap/> client library.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  Added cell command <command>dumpthreadqueues</command> to
+	  the PnfsManager. For debugging only.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  When a pool has finished receiving a file from a client, it
+	  will now set the file to precious before setting the file
+	  size in <pnfs/>. Previously, a timeout in the latter
+	  operation caused the file to stay in <quote>receiving from
+	  client</quote> state, because the filesize was set before
+	  the file was set to precious.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  The SRM now remembers initial errors in the error string in
+	  case of retries.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  The space manager now handles full pools in disk-only <dcache/>
+	  better.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  GridFTP door will clean up properly when the command channel
+	  is dropped.
+	</para>
+      </listitem>
+    </itemizedlist>
+
+<!--
+
+<programlisting>
+srmclient:
+
+2005-11-15 21:28  litvinse
+
+
+	* gov/fnal/srm/util/Version.java (1.7.2.1), bin/srmcp (1.20.2.1):
+	  another try to merge from the head
+Version 1.19 to 1.20 - nothing else
+OK
+</programlisting>
+
+<programlisting>
+dCap:
+
+2005-11-10 17:01  tigran
+
+	* dcap_version.c (1.62): new bug-fix release: fixed memory
+	  corruption fixed incorrect behavior in multithreading appication
+	  + dc_stat
+OK
+???? Should we describe these bugs in the release notes?
+
+2005-11-09 15:48  tigran
+
+	* dcap_poll.c (1.60): mulithreding bug fix:
+
+	  do not use alternative poll for control messages ( AND stat as
+	  well ! )
+OK
+
+2005-11-08 16:15  tigran
+
+	* dcap_stat.c (1.20): fixed memory corruption
+OK
+
+</programlisting>
+
+<programlisting>
+infoProvider:
+
+2005-12-13 13:11  deriese
+
+	* src/: infoDynamicSE/InfoImporter_dcache.java (1.1.1.1.2.1),
+	  org/dcache/services/infoCollector/GlueSchemaV1_2.java
+	  (1.1.1.1.2.1),
+	  org/dcache/services/infoCollector/GlueSchemaV1_2Filler.java
+	  (1.1.1.1.2.1): Current head (working with LCG-2_6_0) into
+	  production-1-6-6
+OK
+
+2005-12-08 16:46  deriese
+
+	* src/org/dcache/services/infoCollector/GlueSchemaV1_2Filler.java
+	  (1.6): Removed explicit 'srm' for control protocol type
+OK
+
+2005-12-02 09:53  deriese
+
+	* src/: infoDynamicSE/InfoImporter_dcache.java (1.3),
+	  org/dcache/services/infoCollector/GlueSchemaV1_2.java (1.2),
+	  org/dcache/services/infoCollector/GlueSchemaV1_2Filler.java
+	  (1.5): Included 'GlueSEAccessProtocolPort' and included
+	  'GlueService' for each SRM
+OK
+
+2005-11-24 15:28  nicolo
+
+	* src/org/dcache/services/infoCollector/GlueSchemaV1_2Filler.java
+	  (1.4):
+	  srm endpoint: "httpg://&lt;host&gt;:&lt;port&gt;/srm/managerv&lt;maj_ver&gt;"
+OK
+
+2005-11-24 14:09  nicolo
+
+	* src/org/dcache/services/infoCollector/GlueSchemaV1_2Filler.java
+	  (1.3):
+	  Fixed srm endpoint and type in Control protocols.  Following last
+	  version of Glue Schema the type is always srm for every version.
+OK
+
+2005-11-24 08:41  nicolo
+
+	* src/org/dcache/services/infoCollector/GlueSchemaV1_2Filler.java
+	  (1.2):
+	  Fixed EndPoint format for Access and Control Protocol.  URI
+	  format: &lt;protocol&gt;:\\&lt;host&gt;:&lt;port&gt;
+OK
+
+2005-11-23 20:13  nicolo
+
+	* src/infoDynamicSE/InfoImporter_dcache.java (1.2):
+	  Fixed executeProvider method from white space at end of output
+	  lines
+OK
+</programlisting>
+
+<programlisting>
+SRM:
+
+2005-12-07 17:55  timur
+
+	* src/org/dcache/srm/scheduler/: Job.java (1.4.8.2), Scheduler.java
+	  (1.4.8.1): remember initial errors in the error string in case of
+	  retries
+OK
+2005-12-06 19:37  litvinse
+
+	* src/org/dcache/srm/SRM.java (1.13.6.3): make SURL immutable for
+	  getFileMetadata request
+????
+
+
+2005-11-18 22:00  timur
+
+	* src/org/dcache/srm/SRM.java (1.13.6.2): use correct param for
+	  copy request lifetime
+OK
+</programlisting>
+
+<programlisting>
+diskCacheV111:
+
+2005-12-12 17:54  kennedy
+
+	* doors/AbstractFtpDoorV1.java (1.57.2.9): Clean up Pnfs entry for
+	  cases where the command channel is dropped in mid-transfer. Fix
+	  ABOR to return 426/226 per RFC 959
+OK
+
+2005-12-08 16:56  deriese
+
+	* jobs/: infoDynamicSE-plugin-dcache (1.1.2.1),
+	  infoDynamicSE-provider-dcache (1.1.2.1): Adding info provider
+	  scripts
+OK
+
+2005-12-08 16:48  deriese
+
+	* config/: door.batch (1.16.12.2), gridftpdoor.batch (1.2.8.11),
+	  gsidcapdoor.batch (1.1.12.2), infoProvider.batch (1.1.2.3),
+	  srm.batch (1.13.12.12): Adjusting protocol families and versions
+	  published to login broker for info provider.
+OK
+
+2005-12-07 16:03  tigran
+
+	* classes/cells.jar (1.1.8.5): added new cells - 2.0.5 + dump in
+	  SyncFifo2
+????
+
+2005-12-07 15:26  tigran
+
+	* namespace/PnfsManagerV3.java (1.17.2.1): added requests queue
+	  dump
+????
+
+2005-12-07 10:09  tigran
+
+	* replicaManager/DCacheCoreControllerV2.java (1.7.12.2),
+	  util/UptimeParser.java (1.2.2.1),
+	  replicaManager/ReplicaManagerV2.java (1.10.2.3): merge from HEAD
+	  work arond space managment problem added UptimeParser - used by
+	  DCacheCoreControllerV2
+OK
+
+2005-12-02 12:03  tigran
+
+	* util/OsmInfoExtractor.java (1.6.14.1): added hsmType overwriting
+	  with hsmInstance tag new behavior added into 1.6.6 while in use
+	  by GridKa
+OK
+
+2005-12-01 18:56  tigran
+
+	* pools/MultiProtocolPool2.java (1.111.2.2): removed new cells
+	  dependency
+????
+
+2005-12-01 14:59  tigran
+
+	* pools/MultiProtocolPool2.java (1.111.2.1): set precios prioen set
+	  size in pnfs 1.6.6 fix
+????
+
+2005-12-01 03:02  bakken
+
+	* scripts/make_fermi_dcache_product (1.48.12.1): more
+NOT
+
+2005-12-01 02:44  timur
+
+	* srm/dcache/Storage.java (1.55.2.5): merging trunk changes to
+	  getInfo into production branch
+????
+
+2005-12-01 01:44  timur
+
+	* srm/dcache/Storage.java (1.55.2.4): meging the
+	  getStorageElementInfo update into the branch
+????
+
+2005-11-23 19:43  deriese
+
+	* config/srm.batch (1.13.12.11): Correcting default value for
+	  protocolVersion from 1.0 to 0.1 (from java code)
+Obsolete
+
+2005-11-17 18:49  timur
+
+	* services/PinManager.java (1.27.2.1): commiting fix from the HEAD
+????
+
+2005-11-17 16:08  deriese
+
+	* config/dCache.batch (1.6.2.4): fixed replicaManager
+OK
+
+</programlisting>
+
+
+<programlisting>
+
+SPEC files still need to be finalized
+
+2005-12-14 16:50  deriese
+
+	* modules/dcache-core/d-cache/: bin/dcache-core (1.14),
+	  etc/node_config.template (1.6): Starting info provider in
+	  dcache-core, controllable by node_config
+OK
+
+2005-12-12 18:49  deriese
+
+	* SPECS/pnfs-postgresql-3.1.10.spec (1.17): 1b4, restart after
+	  minor upgrade.
+NOT
+
+2005-12-12 18:43  deriese
+
+	* SPECS/pnfs-postgresql-3.1.10.spec (1.16): took out 'conflicts'
+	  directive.
+NOT
+
+2005-12-12 18:32  deriese
+
+	* SPECS/pnfs-postgresql-3.1.10.spec (1.15): took out 'conflicts'
+	  directive; pre script for preventing upgrade without conversion.
+NOT (see above)
+
+
+2005-12-12 15:37  deriese
+
+	* modules/dcache-core/d-cache/: bin/dcache-core (1.13),
+	  bin/dcache-pool (1.5), install/install.sh (1.15): Changed
+	  printConfig to correct Greigs Bug. Used perl.
+OK
+
+2005-12-12 12:59  deriese
+
+	* SPECS/: dcache-client-1.6.6.spec (1.13), dcache-server-1.6.6.spec
+	  (1.14), pnfs-postgresql-3.1.10.spec (1.14): Release 1b3
+NOT
+
+2005-12-08 19:10  deriese
+
+	* SPECS/: dcache-client-1.6.6.spec (1.12), dcache-server-1.6.6.spec
+	  (1.13), pnfs-postgresql-3.1.10.spec (1.13): chaning provides to
+	  contain version number
+OK
+
+2005-12-08 18:10  deriese
+
+	* SPECS/: dcache-client-1.6.6.spec (1.11), dcache-server-1.6.6.spec
+	  (1.12), pnfs-postgresql-3.1.10.spec (1.12): now providing
+	  previous package names; adjusting libdcap version in filename
+OK
+
+2005-12-08 18:00  deriese
+
+	* scripts/make-core.sh (1.28): corrected wrong pwd assumption in
+	  copy
+NOT (nothing)
+
+2005-12-08 17:37  deriese
+
+	* modules/dcache-core/d-cache/config/dCacheSetup.temp (1.2),
+	  scripts/make-core.sh (1.27): Makeing sure,
+	  config/dCacheSetup.temp is always current.
+
+NOT (Nobody should use that one. Ist just in case...)
+
+2005-12-08 16:58  deriese
+
+	* SPECS/dcache-client-1.6.6.spec (1.10),
+	  SPECS/dcache-server-1.6.6.spec (1.11),
+	  SPECS/pnfs-postgresql-3.1.10.spec (1.11),
+	  modules/dcache-core/d-cache/etc/dCacheSetup.template (1.22),
+	  scripts/make-core.sh (1.26): Adding info provider to
+	  dCacheSetup.template and make-core.sh and filelist in SPEC file
+OK
+
+2005-12-08 12:19  tigran
+
+	* modules/dcache-core/d-cache/etc/psql_install_replicas.sql (1.2):
+	  added index for faster join
+OK
+
+2005-11-27 18:26  patrick
+
+	* scripts/make-core.sh (1.25): dCache versioning enabled
+NOT (only for core HEAD)
+
+2005-11-14 18:45  deriese
+
+	* modules/dcache-core/d-cache/bin/dcache-core (1.12): Allowing java
+	  1.5 in sanity check.
+OK
+
+2005-11-11 17:54  deriese
+
+	* modules/: dcache-core/d-cache/bin/dcache-core (1.11),
+	  dcache-core/d-cache/etc/dCacheSetup.template (1.21),
+	  dcache-core/d-cache/install/install.sh (1.14),
+	  pnfs-postgresql/bin/pnfs (1.5),
+	  pnfs-postgresql/tools/autoinstall-s.sh (1.5): added nfsvers=2 to
+	  all mounts
+OK
+</programlisting>
+
+-->
+
+  </section>
+
+</chapter>
