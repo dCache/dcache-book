@@ -4,7 +4,7 @@
 <chapter id="rf-changelog">
   <title>Changelog</title>
 
-  <section>
+  <section id="rf-changelog-1661-1663">
     <title>Changes between Version 1.6.6 Release 1 and Release 3</title>
 
     <para>
@@ -155,8 +155,11 @@
       </listitem>
       <listitem>
 	<para>
-	  GridFTP door will clean up properly when the command channel
-	  is dropped.
+	  Introduced <varname>ftpDeleteOnConnectionClosed</varname>
+	  option in <filename>config/dCacheSetup</filename>. If
+	  <literal>true</literal> the GridFTP door will delete the
+	  file when the command channel is dropped. Default is
+	  <literal>false</literal>.
 	</para>
       </listitem>
     </itemizedlist>
