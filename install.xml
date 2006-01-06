@@ -411,6 +411,12 @@ Starting dcache pool: Starting clintonDomain  6 5 4 3 2 1 0 Done (pid=7990)
 	<filename>/pnfs/<replaceable>domainName</replaceable>/data/<replaceable>voName</replaceable>/generated/</filename>.
       </para>
 
+      <para>
+	<xref linkend="cb-general-lcg"/> describes how to activate the
+	new info provider included since version 1.6.6-2 based on an
+	earlier LCG installation.
+      </para>
+
     </section>
     
   </section>
@@ -419,9 +425,20 @@ Starting dcache pool: Starting clintonDomain  6 5 4 3 2 1 0 Done (pid=7990)
     <title>Upgrading a <dcache/> Instance</title>
 
     <para>
+      Upgrading to bugfix releases within one version (e.g. from
+      1.6.6-1 to 1.6.6-3) may be done by shutting down the server and
+      upgrading the packages with
+
+<screen><rootprompt/><command>rpm</command> -Uvh <replaceable>packageName</replaceable></screen>
+
+      For details on the changes, pease refer to the <link
+      linkend="rf-changelog">change log</link>.
+    </para>
+
+    <para>
       This section describes the upgrade of <dcache/> instances
-      installed with the previous release (currently version 1.6.5)
-      and also some earlier releases - notably the one distributed
+      installed with the previous version (currently version 1.6.5)
+      and also some earlier versions - notably the one distributed
       with the previous or current LCG software. The first
       section will give a quick upgrade guide. It might not be
       applicable to complex setups. Not all features of the new version

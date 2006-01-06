@@ -72,6 +72,13 @@
     </para>
 
     <para>
+      We assume that a running Globus MDS system is installed as
+      provided by the generic installation procedure of the LCG
+      software (see <ulink
+      url="http://lcg.web.cern.ch/LCG/Sites/releases.html"></ulink>).
+    </para>
+
+    <para>
       The actual compilation of static and dynamic information and
       publication into the LCG information system is done by the
       generic information provider (GIP). The new <dcache/> info
@@ -113,7 +120,7 @@
 
       The actual usage of the pools might differ according to the
       configuration of the pool selection unit (see <xref
-      linkend="cp-pm-psu"/> for details on that).
+      linkend="cf-pm-psu"/> for details on that).
     </para>
 
     <para>
