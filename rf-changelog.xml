@@ -500,4 +500,64 @@ OK
 
   </section>
 
+  <section id="rf-changelog-1663-1664">
+    <title>Changes between Version 1.6.6 Release 3 and Release 4</title>
+
+    <itemizedlist>
+      <listitem>
+	<para>
+	   Fixed multi-threading bug in (Grid)FTP server which
+	   occasionally caused files to be deleted after successful
+	   transfer with LCG utils and
+	   <varname>ftpDeleteOnConnectionClosed</varname> set to
+	   <literal>true</literal>.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  Removed parameter
+	  <varname>ftpDeleteOnConnectionClosed</varname> because it
+	  was only used as a workaround for the bug fixed by the
+	  previous item. The standard behaviour now is
+	  <literal>true</literal>: Unsuccessfully transfered files are
+	  removed.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  Fixed bug in <cellname>SpaceManager</cellname> which
+	  caused reservations not beeing removed.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  Fixed <dcap/> library to work correctly with a preload
+	  library.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  Introduced parameter <varname>resilientGroupName</varname>
+	  in <filename>config/dCacheSetup</filename>.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  Fixed install script <filename>install/install.sh</filename>
+	  to work properly when the <pnfs/> server and
+	  <cellname>PnfsManager</cellname> are separated from the
+	  admin node: The code which performs the configuring within
+	  <pnfs/> is now only performed where the
+	  <cellname>PnfsManger</cellname> will be running.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  Fixed bugs in sanity checks in the start-up scripts
+	  <filename>bin/dcache-core</filename> and
+	  <filename>bin/dcache-pool</filename>.
+	</para>
+      </listitem>
+
+
 </chapter>
