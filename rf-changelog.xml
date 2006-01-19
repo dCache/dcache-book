@@ -563,4 +563,18 @@ OK
 
   </section>
 
+  <section id="rf-changelog-1664-1665">
+    <title>Changes between Version 1.6.6 Release 4 and Release 5</title>
+
+    <itemizedlist>
+      <listitem>
+	<para>
+	  Fixed bug in SRM client which prevented
+	  <command>srm-get-metadata</command> from running.
+	</para>
+      </listitem>
+    </itemizedlist>
+
+  </section>
+
 </chapter>
