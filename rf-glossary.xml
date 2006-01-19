@@ -5,16 +5,6 @@
   <title><dcache/> Glossary</title>
 
 
-  <mediaobject>
-    <imageobject role="fo">
-      <imagedata fileref="test.svg" format="SVG"/>
-    </imageobject>
-    <imageobject role="html">
-      <imagedata fileref="test.png" format="PNG"/>
-    </imageobject>
-  </mediaobject>
-
-      
   <glosslist>
       <glossentry id="gl-tss">
 	<glossterm>tertiary storage system</glossterm>
