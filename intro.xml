@@ -7,17 +7,28 @@
   
 
   <para>
+    We still need to write this.
   </para>
   
+  <figure id="fig-intro-layer-model">
+    <title>The <dcache/> Layer Model</title>
+    <mediaobject>
+      <imageobject role="fo">
+	<imagedata fileref="images/test.svg" format="SVG" align="center" contentwidth="16cm"/> 
+                            <!-- width="100%" scalefit="1" contentdepth="100%" should scale optimal, but fop doesnt like it -->
+      </imageobject>
+      <imageobject role="html">
+	<imagedata fileref="images/test.png" format="PNG" align="center"/>
+      </imageobject>
+    </mediaobject>
+  </figure>
+
+  <para>
+    The layer model shown in <xref linkend="fig-intro-layer-model"/>
+    gives an overview of the architecture of the <dcache/> system.
+  </para>
+
   <unfinished>
-    <para>
-      Installation / Upgrade Path in install.xml
-    </para>
-
-    <para>
-      finisch cookbook-postgresql
-    </para>
-
     <para>
       companion
     </para>

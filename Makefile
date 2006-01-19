@@ -5,6 +5,11 @@
 #
 SOURCES := Book.xml config-hsm.xml config-pnfs.xml config-PoolManager.xml config-cellpackage.xml config-ReplicaManager.xml config.xml cookbook-accounting.xml  cookbook-advanced.xml  cookbook-general.xml  cookbook-net.xml  cookbook-pool.xml cookbook-pnfs-postgres.xml cookbook-postgres.xml  cookbook-protos.xml cookbook.xml  rf-glossary.xml  intro.xml install.xml  reference.xml  rf-cc-common.xml  rf-cc-pm.xml  rf-cc-pnfsm.xml rf-dvl.xml rf-glossary.xml rf-changelog.xml intouch.xml
 
+# The images. They cannot be compiled from one source but have to be saved as PNG and SVG from e.g. OpenOffice
+# For the dependencies I assume that PNG version has changed when SVG has changed 
+# 
+IMAGES := images/test.svg
+
 # All stylesheets included by xsl/html-chunk.xsl
 #
 STYLESHEETS_CHUNK := xsl/html-chunk.xsl \
@@ -95,20 +100,20 @@ Book.draft.xml:	$(SOURCES) xsl/dcb-extensions.xsl xsl/docbook-draft-from-dcb-ext
 
 #  Plain chunked HTML
 #
-html:		.html.built
+html:		.html.built .html.images.copied
 .html.built:	$(STYLESHEETS_CHUNK) Book.db.xml $(HTML_LOCATION)/dcb.css
 	xsltproc --nonet -o $(HTML_LOCATION)/ xsl/html-chunk.xsl Book.db.xml
 	touch .html.built
 
 # Plain single HTML
 #
-singlehtml: $(HTML_LOCATION)/Book.html 
+singlehtml: $(HTML_LOCATION)/Book.html .html.images.copied
 $(HTML_LOCATION)/Book.html: $(STYLESHEETS_HTML) Book.db.xml $(HTML_LOCATION)/dcb.css
 	xsltproc --nonet -o $(HTML_LOCATION)/Book.html xsl/html.xsl Book.db.xml
 
 # Plain single HTML with unfinished and todos
 #
-draft: $(HTML_LOCATION)/Book.draft.html 
+draft: $(HTML_LOCATION)/Book.draft.html .html.images.copied
 $(HTML_LOCATION)/Book.draft.html: $(STYLESHEETS_HTML) Book.draft.xml $(HTML_LOCATION)/dcb.css
 	xsltproc --nonet -o $(HTML_LOCATION)/Book.draft.html xsl/html.xsl Book.draft.xml
 
@@ -117,6 +122,12 @@ $(HTML_LOCATION)/Book.draft.html: $(STYLESHEETS_HTML) Book.draft.xml $(HTML_LOCA
 $(HTML_LOCATION)/dcb.css: xsl/dcb.css
 	mkdir -p $(HTML_LOCATION)
 	cp -f xsl/dcb.css $(HTML_LOCATION)
+
+# Just copying the images
+#
+.html.images.copied:	$(IMAGES)
+	mkdir -p $(HTML_LOCATION)/images
+	cp -f images/*.png $(HTML_LOCATION)/images/
 
 ###### Text only
 
@@ -139,7 +150,7 @@ dCache-Installation-Instructions.txt: install.xml $(STYLESHEETS_HTML)
 # The whole thing
 #
 dcache.org: $(WEB_LOCATION)/dCacheBook.html $(WEB_LOCATION)/dCacheBook.pdf shtml
-$(WEB_LOCATION)/dCacheBook.html: $(HTML_LOCATION)/Book.html
+$(WEB_LOCATION)/dCacheBook.html: $(HTML_LOCATION)/Book.html .shtml.images.copied
 	cp $(HTML_LOCATION)/Book.html $(WEB_LOCATION)/dCacheBook.html
 $(WEB_LOCATION)/dCacheBook.pdf: Book.pdf
 	cp Book.pdf $(WEB_LOCATION)/dCacheBook.pdf
@@ -175,7 +186,7 @@ $(WEB_LOCATION)/sidebar-index.shtml: $(STYLESHEETS_SIDEBAR) Book.db.xml
 
 # Main part 
 #
-shtml:		.shtml.built
+shtml:		.shtml.built .shtml.images.copied
 .shtml.built:	$(STYLESHEETS_MAIN) Book.db.xml $(WEB_LOCATION)/dcb.css $(WEB_LOCATION)/sidebar-index.shtml
 	xsltproc --nonet -o $(WEB_LOCATION)/ xsl/html-dcache.org.xsl Book.db.xml
 	touch .shtml.built
@@ -185,6 +196,12 @@ shtml:		.shtml.built
 $(WEB_LOCATION)/dcb.css: xsl/dcb.css
 	mkdir -p $(WEB_LOCATION)
 	cp -f xsl/dcb.css $(WEB_LOCATION)
+
+# Just copying the images
+#
+.shtml.images.copied:	$(IMAGES)
+	mkdir -p $(WEB_LOCATION)/images
+	cp -f images/*.png $(WEB_LOCATION)/images/
 
 ###### Printable targets
 #
@@ -202,13 +219,13 @@ Book.fo:	Book.db.xml $(STYLESHEETS_FO)
 # PDF from XSL-FO
 #
 pdf:		Book.pdf
-Book.pdf:	Book.fo
+Book.pdf:	Book.fo $(IMAGES)
 	$(FOP) Book.fo Book.pdf 
 #	pdfxmltex Book.fo
 
 # PDF directly via xmlto (still broken)
 #
-Book.db2.pdf:	Book.db2.xml
+Book.db2.pdf:	Book.db2.xml $(IMAGES)
 	xmlto pdf Book.db2.xml
 
 ###### Utility and install targets

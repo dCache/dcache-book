@@ -32,7 +32,12 @@
     set       toc,title
   </xsl:param>
 
+  <!-- This could be used for txt-only output to trigger the role="txt"
+       in images
 
+  <xsl:param name="preferred.mediaobject.role" select="txt"/>
+
+  -->
 
   <xsl:param name="refentry.generate.name" select="0"/>
 
