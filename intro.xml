@@ -10,6 +10,24 @@
     We still need to write this.
   </para>
   
+  <!--
+  
+  This is how graphics should be included: 
+
+   * Draw it in OpenOffice using the template images/template.sxd 
+     respecting the margin of 2.5cm
+
+   * Take care that is will still be readable when printed b&w. 
+     Fancy shadings won't be handled well, by fop.
+
+   * Select the whole drawing with the selectbox and export to 
+     SVG and PNG.
+
+   * Copy the block below and adjust id, title and filenames.
+
+  -->
+
+
   <figure id="fig-intro-layer-model">
     <title>The <dcache/> Layer Model</title>
     <mediaobject>
