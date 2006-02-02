@@ -159,7 +159,7 @@ $(WEB_LOCATION)/dCacheBook.pdf: Book.pdf
 #
 ssh-dcache.org: .ssh-dcache.org-copied
 .ssh-dcache.org-copied: dcache.org
-	cd $(WEB_LOCATION)/ && tar cf - * | ssh cvs-dcache 'cd /home/dcache.org/manuals/Book && sh -c "rm -rf *" && tar xf -'
+	cd $(WEB_LOCATION)/ && tar cf - * | ssh cvs-dcache.desy.de 'cd /home/dcache.org/manuals/Book && sh -c "rm -rf *" && tar xf -'
 	touch .ssh-dcache.org-copied
 
 # Copy the WEB_LOCATION to the correct spot on www.dcache.org DRAFT

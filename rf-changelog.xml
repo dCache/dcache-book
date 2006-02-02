@@ -610,6 +610,7 @@ OK
         <varname>globus_tcp_port_range</varname> - To enable the user 
 	to specify a range of ports open for tcp connections as a pair 
 	of positive integers separated by ":", not set by default.  
+	
 	This takes care of compute nodes that are behind firewall.
 	
 	Example: globus_tcp_port_range=40000:50000	
