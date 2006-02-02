@@ -583,7 +583,14 @@ OK
     <itemizedlist>
       <listitem>
 	<para>
-	 Released version 2 of srmclient.
+	<command>srmcp</command> now supports performance of srm transfers in both
+	<literal>SRM version 1. protocol </literal>and in<literal> SRM version 2.1.1 protocol </literal>
+	You need to specify <literal>--srm_protocol_version=2</literal>	option 
+	as an argument of srmcp in order to activate version 2.
+
+	srmcp product also contains the following SRM version 2.1.1 clients: 
+	<command>srmls</command>,<command> srmrm</command>, <command>srmmv</command>, <command>srmkdir</command> and <command>srmrmdir</command> 
+	Please run these commands with <literal>--help</literal> to see usage info.
 	</para>
       </listitem>	
       <listitem>
@@ -603,8 +610,6 @@ OK
 	is CN=srm/tam01.fnal.gov, then <varname>gss_expected_name</varname> 
 	should be <literal>srm</literal>.
 	
-	Usage
-	
 	<screen><command>srmcp</command> --gss_expected_name=srm source-url destination-url</screen>
 
         <varname>globus_tcp_port_range</varname> - To enable the user 
@@ -615,8 +620,6 @@ OK
 	
 	Example: globus_tcp_port_range=40000:50000	
 	
-	Usage
-	
 	<screen><command>srmcp</command> --globus_tcp_port_range=min-val:max-val source-url destination-url </screen>
 
 	<varname>streams_num</varname> - To enable the user to specify 
@@ -624,18 +627,14 @@ OK
 	If set to 1, then stream mode is used, otherwise  extended 
 	block mode is used.
 
-        Usage
-	
-	<screen><command>srmcp</command> --streams_num=1 source-url destination-url </screen>
+        <screen><command>srmcp</command> --streams_num=1 source-url destination-url </screen>
 	
 	<varname>server_mode</varname> - To enable the user to set the 
 	(gridftp) server mode for data transfer. Can be <literal>active</literal>
-	or <literal>passive</literal>, passive by default.
+	or <literal>passive</literal>, <literal>passive</literal> by default.
 
         This option will have effect only if transfer is performed in a 
 	stream mode (see <varname>streams_num</varname>) 
-	
-	Usage
 	
 	<screen><command>srmcp</command> --streams_num=1 --server_mode=active source-url destination-url </screen>
 	</para>
@@ -649,9 +648,7 @@ OK
 	right away at user end, but its good to stage them to dcache for faster 
 	access later.
 
-	Usage
-	
-	<screen><command>srmstage</command> source-url</screen>
+	<screen><command>srmstage srm-url [[srm-url] ... ]</command></screen>
 	
 	</para>
       </listitem>
