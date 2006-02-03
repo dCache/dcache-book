@@ -100,21 +100,21 @@ Book.draft.xml:	$(SOURCES) xsl/dcb-extensions.xsl xsl/docbook-draft-from-dcb-ext
 
 #  Plain chunked HTML
 #
-html:		.html.built .html.images.copied
-.html.built:	$(STYLESHEETS_CHUNK) Book.db.xml $(HTML_LOCATION)/dcb.css
+html:		.html.built .html.images.copied $(HTML_LOCATION)/dcb.css
+.html.built:	$(STYLESHEETS_CHUNK) Book.db.xml
 	xsltproc --nonet -o $(HTML_LOCATION)/ xsl/html-chunk.xsl Book.db.xml
 	touch .html.built
 
 # Plain single HTML
 #
-singlehtml: $(HTML_LOCATION)/Book.html .html.images.copied
-$(HTML_LOCATION)/Book.html: $(STYLESHEETS_HTML) Book.db.xml $(HTML_LOCATION)/dcb.css
+singlehtml: $(HTML_LOCATION)/Book.html .html.images.copied $(HTML_LOCATION)/dcb.css
+$(HTML_LOCATION)/Book.html: $(STYLESHEETS_HTML) Book.db.xml
 	xsltproc --nonet -o $(HTML_LOCATION)/Book.html xsl/html.xsl Book.db.xml
 
 # Plain single HTML with unfinished and todos
 #
-draft: $(HTML_LOCATION)/Book.draft.html .html.images.copied
-$(HTML_LOCATION)/Book.draft.html: $(STYLESHEETS_HTML) Book.draft.xml $(HTML_LOCATION)/dcb.css
+draft: $(HTML_LOCATION)/Book.draft.html .html.images.copied $(HTML_LOCATION)/dcb.css
+$(HTML_LOCATION)/Book.draft.html: $(STYLESHEETS_HTML) Book.draft.xml
 	xsltproc --nonet -o $(HTML_LOCATION)/Book.draft.html xsl/html.xsl Book.draft.xml
 
 # Just copying the CSS
@@ -186,8 +186,8 @@ $(WEB_LOCATION)/sidebar-index.shtml: $(STYLESHEETS_SIDEBAR) Book.db.xml
 
 # Main part 
 #
-shtml:		.shtml.built .shtml.images.copied
-.shtml.built:	$(STYLESHEETS_MAIN) Book.db.xml $(WEB_LOCATION)/dcb.css $(WEB_LOCATION)/sidebar-index.shtml
+shtml:		.shtml.built .shtml.images.copied $(WEB_LOCATION)/dcb.css
+.shtml.built:	$(STYLESHEETS_MAIN) Book.db.xml $(WEB_LOCATION)/sidebar-index.shtml
 	xsltproc --nonet -o $(WEB_LOCATION)/ xsl/html-dcache.org.xsl Book.db.xml
 	touch .shtml.built
 
