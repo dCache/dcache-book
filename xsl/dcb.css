@@ -97,7 +97,27 @@ div.example p.title{
 }
 
 div.example p{ 
-    background: #F0E0F0; 
+    background: #F4F4F4; 
+    border: 1px solid gray; 
+    padding: 6px;
+#    padding-left: 30px;
+    margin-top: 5px;
+#    font-weight: bold;
+#    font-size: 14pt;
+}
+
+div.informalexample p.title{ 
+    background: #FFFFFF; 
+    border: none; 
+    padding: 0px;
+    padding-top: 10px;
+    margin-bottom: 0px;
+    font-weight: bold;
+    font-size: 14pt;
+}
+
+div.informalexamplebody{ 
+    background: #F4F4F4; 
     border: 1px solid gray; 
     padding: 6px;
 #    padding-left: 30px;

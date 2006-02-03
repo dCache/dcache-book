@@ -18,6 +18,10 @@
 
   <xsl:template match="unfinished"/>
   
+  <xsl:template match="hsm">
+    <abbrev>HSM</abbrev>
+  </xsl:template>
+
   <xsl:template match="dcache">
     <productname>dCache</productname>
   </xsl:template>

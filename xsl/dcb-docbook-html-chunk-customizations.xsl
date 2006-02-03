@@ -47,7 +47,16 @@
   <i class="{local-name(.)}"><tt>&lt;<xsl:copy-of select="$content"/>&gt;</tt></i>
 </xsl:template>
 
-
+<xsl:template match="informalexample">
+  <div class="informalexample">
+    <xsl:call-template name="anchor"/>
+    <p class="title"><b>Example:</b></p>
+    <div class="informalexamplebody">
+      <xsl:apply-templates/>
+    </div>
+    <xsl:if test="$spacing.paras != 0"><p/></xsl:if>
+  </div>
+</xsl:template>
 
 </xsl:stylesheet>
 
