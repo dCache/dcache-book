@@ -202,6 +202,7 @@ $(WEB_LOCATION)/dcb.css: xsl/dcb.css
 .shtml.images.copied:	$(IMAGES)
 	mkdir -p $(WEB_LOCATION)/images
 	cp -f images/*.png $(WEB_LOCATION)/images/
+	touch .shtml.images.copied
 
 ###### Printable targets
 #
