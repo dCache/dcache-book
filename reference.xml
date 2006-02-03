@@ -5,6 +5,13 @@
 <part id="rf">
   <!-- <?dbhtml dir="reference" ?> -->
   <title>Reference</title>
+
+  <chapter id="rf-clients">
+    <title>dCache Clients</title>
+
+    <xi:include href="rf-clients-srm.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+
+  </chapter>
   
 <!--
 

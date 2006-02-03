@@ -577,92 +577,79 @@ OK
 
   </section>
 
-  <section id="rf-changelog-1665-1666">
-    <title>Changes between Version 1.6.6 Release 5 and Release 6</title>
+  <section id="rf-changelog-1665-1671">
+    <title>Changes between Version 1.6.6 Release 5 and Version 1.6.7</title>
 
+    <para>
+      This release only contains changes to the <srm/> client
+      suite. See <xref linkend="rf-clients-srm"/>.
+    </para>
+    
     <itemizedlist>
       <listitem>
 	<para>
-	<command>srmcp</command> now supports performance of srm transfers in both
-	<literal>SRM version 1. protocol </literal>and in<literal> SRM version 2.1.1 protocol </literal>
-	You need to specify <literal>--srm_protocol_version=2</literal>	option 
-	as an argument of srmcp in order to activate version 2.
-
-	srmcp product also contains the following SRM version 2.1.1 clients: 
-	<command>srmls</command>,<command> srmrm</command>, <command>srmmv</command>, <command>srmkdir</command> and <command>srmrmdir</command> 
-	Please run these commands with <literal>--help</literal> to see usage info.
+	  <xref linkend="cmd-srmcp"/> now supports performance of <srm/>
+	  transfers in both <literal>SRM version 1. protocol</literal>
+	  and in <literal>SRM version 2.1.1 protocol</literal> You
+	  need to specify <option>--srm_protocol_version=2</option>
+	  option as an argument of srmcp in order to activate version
+	  2.
 	</para>
-      </listitem>	
+	  
+	<para>
+	  srmcp product also contains the following SRM version 2.1.1
+	  clients: <command>srmls</command>,<command> srmrm</command>,
+	  <command>srmmv</command>, <command>srmkdir</command> and
+	  <command>srmrmdir</command> Please run these commands with
+	  <literal>--help</literal> to see usage info.
+	</para>
+      </listitem>
+	
       <listitem>
 	<para>
-	Added several new command line options.
-
-	<screen> Example urls:
-		srm-based <command>srm://dmx.lbl.gov:6253//srm/DRM/srmv1?SFN=/tmp/try1</command>
-		file-based <command>file:////tmp/aaa</command></screen>
-
-  	<varname>gss_expected_name</varname> - To enable the user 
-	to specify the gss expected name in the DN (Distinguished Name) 
-	of the srm server. 
-	The default value is <literal>host</literal>. 
-	
-	Example: If the CN of host where srm server is running 
-	is CN=srm/tam01.fnal.gov, then <varname>gss_expected_name</varname> 
-	should be <literal>srm</literal>.
-	
-	<screen><command>srmcp</command> --gss_expected_name=srm source-url destination-url</screen>
-
-        <varname>globus_tcp_port_range</varname> - To enable the user 
-	to specify a range of ports open for tcp connections as a pair 
-	of positive integers separated by ":", not set by default.  
-	
-	This takes care of compute nodes that are behind firewall.
-	
-	Example: globus_tcp_port_range=40000:50000	
-	
-	<screen><command>srmcp</command> --globus_tcp_port_range=min-val:max-val source-url destination-url </screen>
-
-	<varname>streams_num</varname> - To enable the user to specify 
-	the number of streams to be used for data transfer. 
-	If set to 1, then stream mode is used, otherwise  extended 
-	block mode is used.
-
-        <screen><command>srmcp</command> --streams_num=1 source-url destination-url </screen>
-	
-	<varname>server_mode</varname> - To enable the user to set the 
-	(gridftp) server mode for data transfer. Can be <literal>active</literal>
-	or <literal>passive</literal>, <literal>passive</literal> by default.
-
-        This option will have effect only if transfer is performed in a 
-	stream mode (see <varname>streams_num</varname>) 
-	
-	<screen><command>srmcp</command> --streams_num=1 --server_mode=active source-url destination-url </screen>
+	  Added several new command line options:
+	  <option>gss_expected_name</option>,
+	  <option>globus_tcp_port_range</option>,
+	  <option>streams_num</option>, and
+	  <option>server_mode</option>. Please find the details in
+	  <xref linkend="rf-clients-srm"/>.
 	</para>
-
       </listitem>
+
       <listitem>
 	<para>
-	 Added new command <command>srmstage</command>- to provide an option to 
-	the user to stage files from enstore to dcache and not transfer them 
-	to the user right away. This case will be useful if files are not needed 
-	right away at user end, but its good to stage them to dcache for faster 
-	access later.
-
-	<screen><command>srmstage srm-url [[srm-url] ... ]</command></screen>
+	  Added new command <xref linkend="cmd-srmstage"/> to provide an
+	  option to the user to stage files from <hsm/> to <dcache/>
+	  and not transfer them to the user right away. This case will
+	  be useful if files are not needed right away at user end,
+	  but its good to stage them to dcache for faster access
+	  later:
+	  
+	  <cmdsynopsis>
+	    <command>srmstage</command> 
+	    <arg rep="repeat"><replaceable>srmUrl</replaceable></arg>
+	  </cmdsynopsis>
 	
 	</para>
       </listitem>
+      
       <listitem>
-	<para> 
-	Made 'srm' script more robust. In previous versions,it is assumed
-	that 'java' exists and is in the user $PATH . In this current version, script 
-	looks for java in various standard locations and under $JAVA_HOME if defined.
-	In case of multiple java versions found, the most recent version is selected.
+	<para>
+	  Made <command>srmcp</command> script more robust. In
+	  previous versions,it is assumed that the Java binary exists
+	  and is in the user <varname>$PATH</varname>. In this current
+	  version, script looks for java in various standard locations
+	  and under <varname>$JAVA_HOME</varname> if defined.  In case
+	  of multiple Java versions found, the most recent version is
+	  selected.
 	</para>
       </listitem>
+      
       <listitem>
-	<para>Ensure reliable srmcp return codes. The return code is 0 only if 
-	all individual file transfers are successful.In case of any failure, the return code is 1.	
+	<para>
+	  Ensure reliable <command>srmcp</command> return codes. The
+	  return code is 0 only if all individual file transfers are
+	  successful. In case of any failure the return code is 1.
 	</para>
       </listitem>
 
