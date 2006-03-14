@@ -1,0 +1,82 @@
+<!-- $Id: build.xml,v 1.1 2006-03-14 17:17:02 deriese Exp $ -->
+
+<project name="dCacheBook" default="help" basedir=".">
+
+  <!-- Since there is a make-based build system for the Book already
+       this ant-file just calls the targets in the Makefile which are
+       needed for the distribution. There are other interesting targets
+       notably for publishing to www.dcache.org: ssh-dcache.org only
+       in the Makefile. Eventually the Makefile should be translated to
+       ant. Especially since ant has a XSLT task built-in.              -->
+
+
+  <!-- import the common part -->
+
+  <import file="common/common.xml"/>
+
+  <!--
+          Properties  -  the following properties, paths, and selectors
+                         define the locations and files for the book
+  -->
+
+  <!-- Output Files 
+       For each of these jar files there are targets below -->
+
+  <property name="bookDir" location="${distDir}/doc/Book" />
+  <property name="softwareDir" location="software" />
+
+  <!-- this should be in 'common.xml' but that didnt work -->
+  <target name="cleanall" depends="clean,libs.clean" description="Remove everything produced by me." >
+    <delete dir="${distDir}/doc" />
+  </target>
+
+  <!--       =======
+             TARGETS
+             =======          -->
+
+  <!--
+             Call install target
+  -->
+
+  <target name="libs.install" >
+
+    <echo>make install-software</echo>
+    <exec executable="make" failonerror="true" output="${buildDir}/book-install-software.log" append="true">
+      <arg value="install-software" />
+    </exec>
+
+  </target>
+
+  <target name="libs.clean" description="Remove the local copy of external libs and unpacked tars" >
+    
+    <delete dir="${softwareDir}" />
+    
+  </target>
+
+  <!-- 
+             Target for distro of Book
+  -->
+
+  <target name="book" depends="prepare,libs.install" description="Convert Book to chunked html, single-file html, and pdf" >
+  
+    <echo>make html HTML_LOCATION=${bookDir}</echo>
+    <exec executable="make" failonerror="true" output="${buildDir}/book.log" append="true" >
+      <arg value="html" />
+      <arg value="HTML_LOCATION=${bookDir}" />
+    </exec>
+
+    <echo>make singlehtml HTML_LOCATION=${bookDir}</echo>
+    <exec executable="make" failonerror="true" output="${buildDir}/book.log" append="true" >
+      <arg value="singlehtml" />
+      <arg value="HTML_LOCATION=${bookDir}" />
+    </exec>
+
+    <echo>make pdf</echo>
+    <exec executable="make" failonerror="true" output="${buildDir}/book.log" append="true" >
+      <arg value="pdf" />
+    </exec>
+    <copy file="Book.pdf" todir="${bookDir}" />
+
+  </target>
+
+</project>
