@@ -54,6 +54,10 @@ CVS_BINARY ?= cvs
 #
 DBXML_VERSION ?= 1.68.1
 
+# Default value for user for uploads to web server
+#
+WEB_USER ?= 
+
 # xsltproc and so will use env. $XML_CATALOG_FILES
 export XML_CATALOG_FILES := xsl/catalog
 
@@ -159,14 +163,14 @@ $(WEB_LOCATION)/dCacheBook.pdf: Book.pdf
 #
 ssh-dcache.org: .ssh-dcache.org-copied
 .ssh-dcache.org-copied: dcache.org
-	cd $(WEB_LOCATION)/ && tar cf - * | ssh cvs-dcache.desy.de 'cd /home/dcache.org/manuals/Book && sh -c "rm -rf *" && tar xf -'
+	cd $(WEB_LOCATION)/ && tar cf - * | ssh $(WEB_USER)cvs-dcache.desy.de 'cd /home/dcache.org/manuals/Book && sh -c "rm -rf *" && tar xf -'
 	touch .ssh-dcache.org-copied
 
 # Copy the WEB_LOCATION to the correct spot on www.dcache.org DRAFT
 #
 ssh-draft: .ssh-draft-copied
 .ssh-draft-copied: dcache.org
-	cd $(WEB_LOCATION)/ && tar cf - * | ssh cvs-dcache 'cd /home/dcache.org/manuals/Book-draft && sh -c "rm -rf *" && tar xf -'
+	cd $(WEB_LOCATION)/ && tar cf - * | ssh $(WEB_USER)cvs-dcache 'cd /home/dcache.org/manuals/Book-draft && sh -c "rm -rf *" && tar xf -'
 	touch .ssh-draft-copied
 
 # Titlepage customization for Sidebar
