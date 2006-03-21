@@ -29,6 +29,10 @@ make pdf
 #
 make ssh-dcache.org
 
+# Or for a draft version at http://www.dcache.org/manuals/Book-draft/
+#
+make ssh-draft
+
 
 # Update Book on www.dcache.org (Doesnt work, too unfriendly system)
 #
