@@ -42,6 +42,8 @@
 
   <xi:include  href="cookbook-advanced.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
 
+  <xi:include  href="cookbook-stat-module.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+
 
 <!-- Moved to intouch
   <chapter id="cb-mon-op">
