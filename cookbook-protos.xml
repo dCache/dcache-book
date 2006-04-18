@@ -4,6 +4,106 @@
 <chapter id="cb-proto">
   <title>Protocols</title>
 
+  <section id="cb-proto-dcap">
+    <title>dCap options mover and client options</title>
+    <partauthors>Patrick Fuhrmann, Tigran Mkrtchyan</partauthors>
+    <para>
+      dCap is the native random access I/O protocol for files within dCache.
+      In additition to the usual data transfer mechanisms, it supports all necessary
+      file metadata and name space manipulation operations.
+    </para>
+    <para>
+     In order to optimize I/O transferrates and memory consumption dCap allows
+     to configure parameters within the client and the server. e.g:
+	<itemizedlist>
+	  <listitem>
+	    <para>
+	      TCP Socket send and receive buffer sizes.
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      I/O buffers sizes.
+	    </para>
+	  </listitem>
+	</itemizedlist>
+    </para>
+    <section>
+      <title>TCP send/recv buffer sizes from the servers point of view</title>
+      <para>
+         There are two parameters per I/O direction, determining the actual
+         TCP send/recv buffer size used for each transfer. Those values can
+         be set within the <filename>config/pool.batch</filename> file on the pool nodes.
+	<itemizedlist>
+	  <listitem>
+	    <para>
+	      <option>defaultSend/RecvBufferSize</option> : this value is used if the dCap client
+              doesn't try to set this value. The default value for this parameter
+              is 256K Bytes.
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      <option>maxSend/RecvBufferSize</option> : this value is the maximum value,
+              the mover is allowed to use. It's used if either the
+              <option>defaultSend/RecvBufferSize</option> is larger or the client asks
+              for a larger value. The default value for this parameter is 1MBytes.
+	    </para>
+	  </listitem>
+	</itemizedlist>
+      </para>
+      <para>
+        On the server side, the max/defaultSend/RecvBuffer value can either be set in the
+        <filename>config/pool.batch</filename> file or in the <filename>config/*.poollist</filename> files. 
+      </para>
+      <para>
+        Using the batch context :
+        <screen>
+set context dCap3-maxSendBufferSize <option>value in bytes</option>
+set context dCap3-maxRecvBufferSize <option>value in bytes</option>
+set context dCap3-defaultSendBufferSize <option>value in bytes</option>
+set context dCap3-defaultRecvBufferSize <option>value in bytes</option>
+        </screen>
+        Or it may specified in the create ... command line
+        <screen>
+  create diskCacheV111.pools.MultiProtocolPool2 ${0} \
+  "!MoverMap \
+  ${1} \
+  -defaultSendBufferSize=<option>value in bytes</option> \
+  *** \
+  -${2} -${3} -${4} -${5} -${6} -${7} -${8} \
+"
+         </screen>
+         The most appropriate way to specify those values on the server side
+         is certainly to add the corresponding entry in the 
+         <filename>config/...poollist</filename>. The entry would look like
+         <screen>
+dcache30_1  /dcache/pool  sticky=allowed maxSendBufferSize=<option>value in bytes</option> tag.hostname=dcache30 ***
+         </screen>
+      </para>
+      <para>
+      Please note the different ways of using the '=' and the '-' sign in the different
+      alternatives.
+      </para>
+    </section>
+    <section>
+      <title>TCP send/recv buffer sizes from the dCap clients point of view</title>
+      <para>
+      For a full list of dCap library API calls and dccp options, please refer to
+      to <literal>http://www.dcache.org/manuals/libdcap.shtml</literal> and 
+      <literal>http://www.dcache.org/manuals/dccp.shtml</literal> respectively.
+      To set the local and remote TCP buffer send and receive buffers either use
+      the API call <literal>dc_setTCPSend/ReceiveBuffer(int size)</literal> or the
+      <option>-r SIZE -s SIZE</option> dccp options. In both cases the value is
+      transferred to the remote mover which tries to set the corresponding values.
+      Please not the the server protects itself by having a maximum size for those
+      values which it doesn't exceed. Please check the section 'TCP send/recv buffer 
+      sizes from the servers point of view' to learn how to change those values.
+      </para>
+    </section>
+  </section>  
+  
+    
   <section id="cb-proto-firewall">
     <title>Access to SRM and GridFTP server from behind a firewall</title>
 
@@ -16,7 +116,7 @@
     </para>
 
     <para>
-      When files are transfered in gridftp active mode from gridftp
+      When files are transferred in gridftp active mode from gridftp
       server to the gridftp client, server establishes data channel(s)
       by connecting to the client. In this case client creates a tcp
       socket, bound to some particular address on the client host, and
