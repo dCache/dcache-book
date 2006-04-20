@@ -3,7 +3,7 @@
 
 <chapter id="cf-hsm">
   <title>The Interface to a Tertiary Storage System</title>
-
+  <partauthors>Patrick Fuhrmann</partauthors>
   <para>
     dCache installations, used as a frontend to tertiary storage
     system, need, at some point, to exchange data this such a system
@@ -334,7 +334,45 @@
       </section>
     </section>
   </section>
-
+  <section id="cf-hsm-rmfiles">
+    <title>Removing files from an backend HSM, triggered by dCache</title>
+    
+    <para>
+    Whenever a file entry is removed from pnfs (the dCache namespace), dCache takes care
+    that all copies of this file are removed from the various pools. In case, dCache
+    is attached to one or more tertiary storage systems, it provides an interface to
+    allow removing the file from those external systems as well.
+    </para>
+    <para>
+    As soon as a file entry is removed from pnfs, a new file is created within a special,
+    so called, trash directory. (For details, see next paragraph) The name of this newly 
+    created file is identical to
+    its i-node, resp. pnfsId. A pnfsId is an internal unique identifier for each file
+    within the dCache. PnfsIds don't change if files are renamed and pnfsIds 
+    are never reused. The content of the this (new) file is exactly 
+    the information written into <option>level 1</option> during the HSM store prodecure, discussed
+    in the sections above. This information is usually sufficient to get the file 
+    removed from the backend HSM storage system.
+    </para>
+    <para>
+    The <option>trash</option> directory is a local directory residing on the head node, or to 
+    be more precise, on the server node where pnfs/chimera is running. In regular 
+    dCache installations, the directory is <filename>/opt/pnfsdb/pnfs/trash/1</filename>.
+    After the installation of pnfs, only the path section <filename>/opt/pnfsdb/pnfs/trash</filename>
+    exists. In order to activate the signaling on pnfs file removes, a subdirectory
+    named <filename>1</filename> has to be created within <filename>/opt/pnfsdb/pnfs/trash</filename>.
+    From that point in time, this directory is populated with file entries for each
+    file removed from pnfs/chimera. The mechanism, taking this file information and
+    doing the appropriate HSM specific actions, is resposible for removing
+    those entries if no longer needed, resp. if the file has been removed from the
+    backend HSM. 
+    </para>
+    <para>
+    For exotic dCache installations, the entry <option>trash=</option> in 
+    <filename>/usr/etc/pnfsSetup</filename> points to the <option>trash</option> directory
+    within the local filesystem.
+    </para>
+  </section>
 	<!--
   <pre>
         The storage info options is a collection of        
