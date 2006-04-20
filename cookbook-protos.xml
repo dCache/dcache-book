@@ -103,7 +103,56 @@ dcache30_1  /dcache/pool  sticky=allowed maxSendBufferSize=<option>value in byte
     </section>
   </section>  
   
-    
+  <section id="cb-proto-dcap-ext">
+    <title>Using the dCap protocol for strict file checking</title>
+    <partauthors>Patrick Fuhrmann, Tigran Mkrtchyan</partauthors>
+    <para>
+       The dcap protocol allows to check whether a dataset is on tape
+       only or has a copy on a dCache disk. The dCap library API
+       call is <literal> int dc_check(const char *path, const char *location)</literal>
+       and the dccp options are <literal>-t -1 -P</literal>.
+       For a full list of dCap library API calls and dccp options, please refer to
+       to <literal>http://www.dcache.org/manuals/libdcap.shtml</literal> and 
+       <literal>http://www.dcache.org/manuals/dccp.shtml</literal> respectively.
+       Using a standard dCache installation those calls will return a guess
+       on the file location only. It is neither checked
+       whether the file is really on that pool or if the pool is up. To get a strict
+       checking a dCap door has to be started with a special (-check=strict) option.
+<screen>
+#
+#    dCap    D o o r
+#
+create dmg.cells.services.login.LoginManager DCap-strict \
+            "${specialDCapPort} \
+             diskCacheV111.doors.DCapDoor \
+             -check=strict \
+             -export \
+             -prot=telnet -localOk \
+             -maxLogin=1500 \
+             -brokerUpdateTime=120 \
+             -protocolFamily=dcap \
+             -loginBroker=LoginBroker"
+</screen>
+    This door will do a precise checking (-check=strict). To get the dCap lib and
+    dccp to use this door only, the <literal>DCACHE_DOOR</literal>
+    environment variable has to be set to <option>doorHost:specialDCapPort</option>
+    in the shell, dccp is going to be used.
+    In the following example we assume that the <literal>specialDCapPort</literal> has
+    been set to <literal>23126</literal> :
+    <screen>
+   export DCACHE_DOOR=dcachedoorhost:23126
+   dccp -P -t -1 /pnfs/domain.tv/data/cms/users/waste.txt </screen>
+    </para>
+    <para>
+    If <literal>dccp</literal> returns <literal>File is not cached</literal> and this
+    dCache instance is connected to an HSM, the file is no longer on one of the dCache
+    pools but is assumed to have a copy within the HSM. If the dccp returns this message and
+    no HSM is attached, the file is either on a pool which is currently down or the file
+    is lost.
+    </para>
+  </section>
+  
+  
   <section id="cb-proto-firewall">
     <title>Access to SRM and GridFTP server from behind a firewall</title>
 
