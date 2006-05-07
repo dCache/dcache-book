@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
+
+<chapter id="cf-hopping">
+
+  <title>File Hopping</title>
+  <partauthors>Patrick Fuhrmann</partauthors>
+  
+  <para>
+    File hopping is a collective term in dCache, summarizing 
+    the possibilty of having files being transferred
+    between dCache pools triggered by a variety of conditions.
+    Most of the features described here will be available starting
+    with dCache release 1.6.7. The most prominent examples are :
+    <itemizedlist>
+      <listitem>
+        <para>
+        If a file is requested by a client but the file resides on a pool
+        from which this client, by configuration, is not allowed to read data,
+        the dataset is transferred to an 'allowed' pool first.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+        If a dCache pool encounters a steady high load, the system may,
+        if configured, decide to replicate files to other pools to achieve
+        an equal load distribution.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+        HSM restore operations may be split into two steps. The first one reads
+        data from tertiary storage to an 'HSM connected' pool and the second step
+        takes care that the file is replicated to a general read pool. Under some
+        conditions this separation of HSM and non HSM pools might become necessary
+        for performance reasons.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+        If a dataset has been written into dCache it might become necessary
+        to have this file replicated instantly. The reasons can be, to either 
+        have a second, safe copy, or to make sure that clients don't access the file for reading
+        on the write pools. 
+        </para>
+      </listitem>
+    </itemizedlist>
+  </para>
+  <section id="cf-hopping-config">
+  <title>File Hopping by configuration</title>
+    <para>
+       
+    </para>
+  </section>
+  <section id="cf-hopping-hotspot">
+  <title>File Hopping by hot spot detection</title>
+    <para>
+
+    </para>
+  </section>
+  <section id="cf-hopping-hsm-restore">
+  <title>File Hopping after restore from tertiary storage</title>
+    <para>
+
+    </para>
+  </section>
+  <section id="cf-hopping-onarrival">
+  <title>File Hopping after on arrival from outside dCache</title>
+    <para>
+
+    </para>
+  </section>
+ 
+</chapter>
