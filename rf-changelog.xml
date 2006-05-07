@@ -656,5 +656,215 @@ OK
     </itemizedlist>
 
   </section>
+  <section id="rf-changelog-1665-1681">
+    <title>Changes between Version 1.6.6 Release 5 and Version 1.6.8 Release 1</title>
+
+    <para>
+    New Features :
+    </para>
+    <itemizedlist>
+      <listitem>
+	<para>
+	  A JClarence interface has been added to the information provider module. (Details need to be
+          checked with Ted).
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	   Info Provider : works with LCG 2.6.X
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	   Error type <literal>Fatal</literal> added. This allows for advanced actions
+           (e-mail , sms , firealarm) in conjunction with log4j.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	   The key value pair <literal>h=yes</literal> resp. <literal>h=no</literal> added to
+           pnfs level2 depending whether this file is supposed to go to HSM.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  dCap Mover : negative size value sent to the dCap mover by the dCap library
+          no longer causes the mover to loop. 
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  dCap Door : improved permission handling : when checking permission, we now
+             honour the actual file permissions and the permissions of the immediate 
+             parent. (but not further, which would be posix).
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  FTP Door : Commands <command>chmod</command> and <command>rmdir</command> added.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	   Increased performance of the billing cell (mainly database interface).
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	   Cleaner : cleaner can now be chained. In case of two different dCache instances
+           with just one Pnfs file system, the cleaner directories can be chained so that
+           a <command>rm</command> in pnfs removes deleted files from pools of both dCache instances.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	   Cleaner : a pool can (optionally) delete precious files if those files have been removed
+           from pnfs even if there is an HSM attached. For security reasons, the default is 
+           to never remove precious files if there is an HSM attached to a pool.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	   <cellname>PoolManager</cellname> and read only pools : Pools can be declared rdOnly by a command in the
+           PoolManager command set. This disallows all actions with would write data into this
+           particular pool. (write from client, restore from HSM and p2p destination). This
+           pool state is not persistent. (is not saved in the PoolManger.conf file).
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	   cost calcuation for multi I/O queues : fast cost prediction was added for
+           multi I/O queues.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	   Files can be automatically replicated on arrival in the dCache. See chapter 
+           "File Hopping" for more information.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	   Pools can be selected by protocol.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	   Pool to pool transfers pool destinations are treated seperately from 'read' pool selection.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	   A set of important parameters can be now be defined 'per dCache partition'. DCache partitions
+           a assigned to PoolManager links.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	   Introduction of a central HSM flush system.
+	</para>
+      </listitem>
+    </itemizedlist>
+    <para>
+    New Features :
+    </para>
+    <itemizedlist>
+      <listitem>
+	<para>
+	   BUG FIX : It eventually happened that 'precious' files have been removed from write
+           pools while the pool was shut down.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	   BUG FIX : <cellname>PoolManager</cellname> restore handler : a retry in the restore handler, either automatically
+           or manually will now always refetch the <literal>StorageInfo</literal> from the <cellname>PnfsManager</cellname>.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	   BUG FIX : Files are not longer requested from HSM if they are not yet flushe to the HSM.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	   Pnfs proxy : we now support multiple pnfs instances connected to a single dCache instance.
+           (performance improvement).
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	   BUG FIX : dCap library : <command>fstat</command> in preload dCap lib fixed.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  BUG FIX : dCap library : SEGV on more than 65 CA fixed.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	   BUG FIX : cells : In case of ssh kerberos clients, the id string exceeded the
+           maximum defined value in cells. This caused a protocol exception.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	   BUG FIX : dCap : setting/sending file permissions with url-like syntax (on write).
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	   BUG FIX : dCap : large file problem fixed. dCap lib always opens local files with O_LARGEFILE.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	   BUG FIX : FTP door removes file entry if transfer fails.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  BUG FIX : dCap Mover : dCap mover disables pool for all I/O errors.
+	</para>
+      </listitem>
+
+    </itemizedlist>
+    <para>
+    Developer corner :
+    </para>
+    <para>
+    Developer corner :
+    </para>
+    <itemizedlist>
+
+      <listitem>
+	<para>
+	  (DEVELOPER) Dump utility for the <filename>config/SI-*</filename> files in the pools.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  (DEVELOPER) <cellname>PnfsManager</cellname> pnfs manager queue can be dumped to disk.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  (DEVELOPER) Specific Exception introduced for PnfsManger FileNotFound. Makes pool
+          code cleaner.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  (DEVELOPER) <command>isLink()</command> added to <literal>PnfsFile</literal>
+	</para>
+      </listitem>
+
+      
+    </itemizedlist>
+
+  </section>
 
 </chapter>
