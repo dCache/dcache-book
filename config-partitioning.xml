@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
+
+<chapter id="cf-partitioning">
+
+  <title>dCache Partitioning</title>
+  <partauthors>Patrick Fuhrmann</partauthors>
+  
+  <para>
+    There are various parameters in the dCache PoolManager subsystem,
+    determining the system behaviour on particular events. These are
+    e.g. the cost threshold at which the <cellname>PoolManager</cellname> 
+    initiates pool to pool transfers to smooth the overall system cost,
+    or the balance between performance and disk space related costs
+    to optimize request distribution among data pools. In pre 1.7.0 
+    releases, those parameters were applied to the a whole dCache instance.
+    Starting with 1.7.0 a defined set of parameters (see next section)
+    can have different values for different sections of the complete dCache instance.
+    dCache provides a web page, listing section, assigned parameters and
+    inheritance information.
+  </para>
+  <section id="cf-paritioning-sections">
+  <title>Parameters, sections and inheritance</title>
+    <para>
+    Parameters, currently part of the partitioning scheme, are listed
+    within the next paragraph, together with the old and new way of assigning values. 
+    A change in the command set has become necessary to
+    reflect the new schema. Each of those parameters may be set to different
+    values for different, so called <literal>dCache sections</literal>. The
+    only <literal>section</literal>, existing without being created, is the
+    <literal>default section</literal>. With the pre 1.7.0 command set, 
+    only the <literal>default section</literal> can be manipulated.
+    With the new commmand set, all <literal>sections</literal> can be
+    created or modified. If only a subset of parameters of a 
+    <literal>non default section</literal> is defined, the residual 
+    parameters of this section are inherited from the <literal>default
+    section</literal>. So, changing a parameter in the <literal>default
+    section</literal>, will change the same parameter of all other sections
+    for which this particular parameter has  not been overwritten.
+    </para>
+    <para>
+    Commands related to dCache partitioning :
+    <itemizedlist>
+      <listitem>
+      <para>
+      <command>pm set [<replaceable>sectionName</replaceable>] 
+              -<replaceable>parameterName</replaceable>[=<replaceable>value</replaceable>|off]</command>
+         sets a parameter <replaceable>parameterName</replaceable> to a new value. If <replaceable>sectionName</replaceable> is omitted,
+         the <literal>default</literal> section is used. If <replaceable>sectionName</replaceable> doesn't exist yet,
+         it is (silently) created. If a parameter is set to <literal>off</literal> this parameter
+         is no longer overwritten and is inherited from the <literal>default</literal> section.
+         The <literal>off</literal> doesn't make sense for the <literal>default</literal> section.
+      </para>
+      </listitem>
+      <listitem>
+      <para>
+      <command>pm ls [-l] [<replaceable>sectionName</replaceable>]</command> lists a single or all sections. 
+         Except for the <literal>default</literal>, only those parameters are shown
+         which are explicitly set. Parameters, not shown, are inherited from the <literal>default</literal>
+         section.
+      </para>
+      </listitem>
+      <listitem>
+      <para>
+         <command>pm destroy <replaceable>sectionName</replaceable></command> destroys a section.
+      </para>
+      </listitem>
+    </itemizedlist>
+    The top menu of the <cellname>PoolManager</cellname> configuration web pages
+    points to a page summerizing the section status of the system. This is essentially
+    the content of the <command>pm ls -l</command>.
+    </para>
+  </section>
+  <section id="cf-partitioning-parameters">
+  <title>List of partitionable parameters</title>
+    <para>
+    The following list describes which parameters  may be used
+    in conjunction with dCache partitioning. The 'Old command set' is still valid for the
+    default parameter section, while new command set has to used to manipulate 
+    non-default sections.
+    <table>
+      <title>New and old PoolManager parameter names</title>
+      <tgroup cols="2" align="left">
+	<colspec colnum="2" colname="Pre 1.7.0 Command"/>
+	<colspec colnum="3" colname="New Command"/>
+	<colspec colnum="4" colname="Type"/>
+	<thead>
+	  <row>
+	    <entry>Old Command</entry>
+	    <entry>New Command</entry>
+	    <entry>Parameter Type</entry>
+	  </row>
+	</thead>
+	<tbody>
+	  <row>
+	    <entry>set pool decision -spacecostfactor=&lt;value&gt;</entry>
+	    <entry>pm set [&lt;section&gt;] -spacecostfactor=&lt;value&gt;</entry>
+	    <entry>float</entry>
+	  </row>
+	  <row>
+	    <entry>set pool decision -cpucostfactor=&lt;value&gt;</entry>
+	    <entry>pm set [&lt;section&gt;] -cpucostfactor=&lt;value&gt;</entry>
+	    <entry>float</entry>
+	  </row>
+	  <row>
+              <entry>set costcuts -idle=&lt;value&gt;</entry>
+              <entry>pm set [&lt;section&gt;] -idle=&lt;value&gt;</entry>
+              <entry>float</entry>
+          </row>
+	  <row>
+              <entry>set costcuts -p2p=&lt;value&gt;</entry>
+              <entry>pm set [&lt;section&gt;] -p2p=&lt;value&gt;</entry>
+              <entry>float</entry>
+          </row>
+	  <row>
+              <entry>set costcuts -alert=&lt;value&gt;</entry>
+              <entry>pm set [&lt;section&gt;] -alert=&lt;value&gt;</entry>
+              <entry>float</entry>
+          </row>
+	  <row>
+              <entry>set costcuts -halt=&lt;value&gt;</entry>
+              <entry>pm set [&lt;section&gt;] -halt=&lt;value&gt;</entry>
+              <entry>float</entry>
+          </row>
+	  <row>
+              <entry>set costcuts -fallback=&lt;value&gt;</entry>
+              <entry>pm set [&lt;section&gt;] -fallback=&lt;value&gt;</entry>
+              <entry>float</entry>
+          </row>
+	  <row>
+              <entry>rc set slope &lt;value&gt;</entry>
+              <entry>pm set [&lt;section&gt;] -slope=&lt;value&gt;</entry>
+              <entry>float</entry>
+          </row>
+	  <row>
+              <entry>rc set p2p on|off</entry>
+              <entry>pm set [&lt;section&gt;] -p2p-allowed</entry>
+              <entry>boolean</entry>
+          </row>
+	  <row>
+              <entry>rc set p2p oncost</entry>
+              <entry>pm set [&lt;section&gt;] -p2p-oncost</entry>
+              <entry>boolean</entry>
+          </row>
+	  <row>
+              <entry>rc set p2p fortransfer|notfortransfer</entry>
+              <entry>pm set [&lt;section&gt;] -p2p-fortransfer</entry>
+              <entry>boolean</entry>
+          </row>
+	  <row>
+              <entry>rc set stage on|off</entry>
+              <entry>pm set [&lt;section&gt;] -stage-allowed</entry>
+              <entry>boolean</entry>
+          </row>
+	  <row>
+              <entry>rc set stage oncost</entry>
+              <entry>pm set [&lt;section&gt;] -stage-oncost</entry>
+              <entry>boolean</entry>
+          </row>
+	  <row>
+              <entry>rc set max copies &lt;copies&gt;</entry>
+              <entry>pm set [&lt;section&gt;] -max-pnfs-copies=&lt;copies&gt;</entry>
+              <entry>integer</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>       
+    </para>
+
+  </section>
+  <section id="cf-partitioning-links">
+  <title>Assigning sections to real dCache partitions</title>
+    <para>
+    A section, so far, is just a set of parameters which may or may not differ from
+    the default set. To let a section relate to a part of the dCache, links are used.
+    Each link may be assigned to exactly one section. If not set, or the assigned 
+    section doesn't exist, the link defaults to the <literal>default</literal> section.
+    <screen>
+ psu set link <replaceable>linkName</replaceable> -section=<replaceable>sectionName</replaceable> [other link options]</screen>
+    Whenever this link is chosen for pool selection, the assosiated parameters of the
+    assigned section will become active for further processing.
+    </para>
+    <warning>
+      <para>
+    Depending on the way links are setup it may very well happen, that more than just
+    one link it triggered for a particular dCache request. This is not illegal but
+    leads to an ambiguousness in selecting an appropriate dCache section. 
+    If only one of the selected links has a section assigned, this section is chosen.
+    Otherwise, if different links point to different sections, the result is 
+    undeterminable. 
+    This issue is not yet solved and we recommend to clean up the PoolManager configuration 
+    to eliminate links with the same preferences for the same type of requests.
+      </para>
+    </warning>
+  </section>
+  <section id="cf-partitioning-examples">
+     <title>Examples</title>
+     <para>
+     For the subsequent examples we assume a basic <cellname>PoolManager</cellname> setup :
+       <programlisting>
+#
+# define the units
+#
+psu create -protocol   */*
+psu create -protocol   xrootd/*
+psu create -net        0.0.0.0/0.0.0.0
+psu create -net        131.169.0.0/255.255.0.0
+psu create -store      *@*
+#
+#  define unit groups
+#
+psu create ugroup  any-protocol
+psu create ugroup  any-store
+psu create ugroup  world-net
+psu create ugroup  xrootd
+#
+psu addto ugroup any-protocol */*
+psu addto ugroup any-store    *@*
+psu addto ugroup world-net    0.0.0.0/0.0.0.0
+psu addto ugroup desy-net     131.169.0.0/255.255.0.0
+psu addto ugroup xrootd       xrootd/*
+#
+#  define the pools
+#
+psu create pool <replaceable>poolName</replaceable>
+psu create pool <replaceable>...</replaceable>
+#
+#  define the pool groups
+#
+psu create pgroup default-pools
+psu create pgroup special-pools
+#
+psu addto pgroup default-pools <replaceable>poolName</replaceable>
+psu addto pgroup default-pools <replaceable>...</replaceable>
+#
+psu addto pgrou  specail-pools <replaceable>poolName</replaceable>
+psu addto pgroup special-pools <replaceable>...</replaceable>
+       </programlisting>
+       
+     </para>
+     
+     <section>
+        <title>Disallowing pool to pool transfers for special pool groups based on the access protocol</title>
+     
+      <para>
+        For a special set of pools, where we only allow the xrootd protocol, we don't want the
+        datasets to be replicated on high load while for the rest of the pools we allow
+        replication on hot spot detection.
+        <programlisting>
+#
+# 
+pm set default        -p2p=0.4
+pm set xrootd-section -p2p=0.0
+#
+psu create link default-link any-protocol any-store world-net
+psu add    link default-link default-pools
+psu set    link default-link -readpref=10 -cachepref=10 -writepref=0
+#
+psu create link xrootd-link xrootd any-store world-net
+psu add    link xrootd-link special-pools
+psu set    link xrootd-link -readpref=11 -cachepref=11 -writepref=0
+psu set    link xrootd-link -section=xrootd-section
+#
+
+        </programlisting>      
+      </para>    
+     </section>
+     <section>
+        <title>Choosing 'random pool selection' for incoming trafic only</title>
+     
+      <para>
+        For the a set of pools we select pools following the default
+        setting of cpu and space related cost factors. For incoming
+        trafic from outside, though, we select the same pools, 
+        but in a <literal>randomly</literal> distributed fashion. 
+        Please note that
+        this is not really a physical partitioning of the dCache system, but
+        rather a virtual one, applied to the same set of pools.
+        <programlisting>
+#
+# 
+pm set default          -cpucostfactor=0.2 -spacecostfactor=1.0
+pm set incoming-section -cpucostfactor=0.0 -spacecostfactor=0.0
+#
+psu create link default-link any-protocol any-store desy-net
+psu add    link default-link default-pools
+psu set    link default-link -readpref=10 -cachepref=10 -writepref=10
+#
+psu create link default-link any-protocol any-store world-net
+psu add    link default-link default-pools
+psu set    link default-link -readpref=10 -cachepref=10 -writepref=0
+#
+psu create link incoming-link any-protocol any-store world-net
+psu add    link incoming-link default-pools
+psu set    link incoming-link -readpref=10 -cachepref=10 -writepref=10
+psu set    link incoming-link -section=incoming-section
+#
+
+        </programlisting>      
+      </para>    
+     </section>
+  </section>
+  
+ </chapter>

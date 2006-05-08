@@ -25,5 +25,7 @@
 
   <xi:include href="config-hopping.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
 
+  <xi:include href="config-partitioning.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+
 </part>
 
