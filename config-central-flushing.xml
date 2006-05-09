@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
+
+<chapter id="cf-flushing">
+
+  <title>Central Flushing to tertiary storage systems</title>
+  <partauthors>Patrick Fuhrmann</partauthors>
+  
+  <para>
+  This chapter is of interest for dCache instances connected to a tertiary 
+  storage system or making use of the mass storage interface for any other reason.
+    <warning>
+       <para>
+          The central flush control is still in the evaluation phase. 
+          The configuration description within this chapter is mainly for
+          the dCache team to get it running on their test systems. The final
+          prodution version will have most of this stuff already be configured.
+       </para>
+    </warning>
+
+  dCache instances, connected to tertiary storage systems, collect incoming
+  data, sort it by storage class and flush it as soon as certain thresholds
+  are reached. All this is done autonomously by each individual write pool. 
+  Consequently
+  those flush operations are coordinated on the level of a pool but not 
+  globally wrt a set of write pools or even to the whole dCache instance.
+  Experiences during the last years show, that for various purposes a 
+  global flush management would be desirable.
+  </para>
+     <blockquote>
+     <title>Separation of read/write operations on write pools</title>
+     <para>
+       The total thoughput of various disk storage systems tend to drop
+       significantly
+       if extensive read and write operations have to be performed
+       in parallel on dataset exceeding the filesystem caches. To overcome
+       this technical obstacle, it would be good if disk storage systems would 
+       either allow writing into a pool or flushing data out of a pool
+       into the HSM system, but never both at the same time.
+     </para>
+     </blockquote>
+
+     <blockquote>
+     <title>Overcoming HSM limitations and restictions</title>
+     <para>
+        Some HSM systems, mainly those not coming with their own
+        scheduler, apply certain restrictions on the number of
+        requests being accepted simultaniously. For those,
+        a central flush control system would allow for limiting
+        the number of requests or the number of storage classes
+        being flushed at the same time. 
+     </para>
+  
+     </blockquote>
+  <section id="cf-flushing-configuration">
+  <title>Basic configuration (Getting it to run)</title>
+    <para>
+       This section describes how to setup a central flush control
+       manager.      
+       <itemizedlist>
+       <listitem>
+       <para>
+         Whitin the <cellname>PoolManager</cellname>, a pool-group 
+         (<replaceable>flushPoolGroup</replaceable>) has 
+         to be created and populated with
+         pools planned to be controlled by the central flush mechanism.
+         An arbitrary number of flush control managers may run within the
+         same dCache instance as long as each can work on its own
+         pool-group and no pool is member of more than one <replaceable>flushPoolGroup</replaceable>.
+         
+       </para>
+       </listitem>
+       <listitem>
+       <para>
+         To start the flush control system, an corresponding 
+         dCache batch file has to be setup, installed and started.
+         As input parameter, the HsmFlushControl cell needs the name
+         of the <replaceable>flushPoolGroup</replaceable>) and the name of
+         the driver, controlling the flush behaviour. Within the same
+         batch file more than one flush control manager may be started
+         as long as they get different cell-names and different pool-groups
+         assigned.
+       </para>
+       </listitem>
+       <listitem>
+       <para>
+         The flush control web pages  have to be defined in the <filename>httpd.batch</filename>.
+       </para>
+       </listitem>
+       </itemizedlist>
+    </para>
+     <section>
+     <title>Creating the flush pool group</title>
+       <para>
+       Creating <replaceable>flushPoolGroup</replaceable> and adding pools is done within the
+       <filename>config/PoolManager.config</filename> setup file or using
+       the <cellname>PoolManager</cellname> command line 
+       interface. Pools may be member of other pool-groups, as long as those
+       pool-groups are not managed by other flush control managers.
+       <programlisting>
+psu create pool <replaceable>pool-1</replaceable>
+psu create pool <replaceable>...</replaceable>
+#
+psu create pgroup <replaceable>flushPoolGroup</replaceable>
+#
+psu addto pgroup <replaceable>flushPoolGroup</replaceable>  <replaceable>pool-1</replaceable>
+psu addto pgroup <replaceable>flushPoolGroup</replaceable>  <replaceable>...</replaceable>
+#
+       </programlisting>
+       </para>
+     </section>
+     <section>
+     <title>Creating and activating the hsmcontrol batch file</title>
+       <para>
+       <programlisting>
+#
+set printout default errors
+set printout CellGlue none
+#
+onerror shutdown
+#
+check -strong setupFile
+#
+copy file:${setupFile} context:setupContext
+#
+import context -c setupContext
+#
+check -strong serviceLocatorHost serviceLocatorPort
+#
+create dmg.cells.services.RoutingManager  RoutingMgr
+#
+create dmg.cells.services.LocationManager lm \
+     "${serviceLocatorHost} ${serviceLocatorPort}"
+#
+create diskCacheV111.hsmControl.flush.HsmFlushControlManager <replaceable>FlushManagerName</replaceable>  \
+        "<replaceable>flushPoolGroup</replaceable>  \
+         -export   -replyObject \
+         -scheduler=<replaceable>DriverName</replaceable>  \
+         -do-nothing \
+        "
+#
+       </programlisting>
+       </para>
+     </section>
+     <section>
+     <title>Setting up and using the flush control web pages.</title>
+       <para>
+       In order to keep track on the flush activities the flush control
+       web pages need to be activated. Add the following lines somewhere between the
+       <command>define context httpdSetup endDefine</command> and the
+       <command>endDefine</command> command in the <filename>/opt/d-cache/config/httpd.batch</filename>
+       file.
+       
+       <programlisting>
+set alias flushManager class diskCacheV111.hsmControl.flush.HttpHsmFlushMgrEngineV1 mgr=<replaceable>FlushManagerName</replaceable>
+       </programlisting>
+       Additional flush managers may just be added to this command, separated by commas.
+       After restarting the 'httpd' service, the flush control pages are available at
+       <literal>http://<replaceable>headnode</replaceable>:2288/flushManager/mgr/*</literal>.
+       </para>
+       <para>
+       The flush control web page is split into 5 parts. The top part is a switchboard, pointing
+       to the different flush control managers installed (listed in the mgr= option of the
+       <command>set alias flushManager</command> in the <filename>config/httpd.config</filename>).
+       The top menu is followed by a <literal>reload</literal> link. Its important to use this
+       link instead of the 'browsers' reload button. The actual page consists of tree tables.
+       The top one presents common configuration information. Initially this is the name of the
+       flush cell, the name of the driver and whether the flush controller has actually taken over
+       control or not. Two action buttons allow to switch between centrally and locally controlled
+       flushing. The second table lists all pools managed by this controller. Information is provided
+       on the pool mode (readonly vers. readwrite), the number of flushing storage classes, the total 
+       size of the pool and the precious amount of space per pool. Action buttons allow to 
+       toggle individual pools between <literal>ReadOnly</literal> and <literal>ReadWrite</literal> mode.
+       Finally the third table presents all storage classes currently holding data to be flushed.
+       Per storage class and pool, characteristic properties are listed, like total size, precious size,
+       active and pending files. Here as well, an action button allows to flush individual 
+       storage class on individual pools.
+       <warning>
+         <para>
+         The possibilty to interactively interact with the flush manager needs to be supported
+         by the driver choosen. 
+         </para>
+       </warning>  
+       </para>
+     </section>
+  </section>
+  
+  <section id="cf-flushing-examples">
+     <title>Examples</title>
+     
+     <para>
+      
+     </para>
+     
+     <section>
+        <title>xxx</title>
+     
+      <para>
+      </para>    
+     </section>
+     
+     <section>
+        <title>Choosing 'random pool selection' for incoming trafic only</title>
+     
+      <para>
+
+      </para>    
+     </section>
+  </section>
+  
+ </chapter>
