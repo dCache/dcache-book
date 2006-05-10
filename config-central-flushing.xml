@@ -56,7 +56,8 @@
   <title>Basic configuration (Getting it to run)</title>
     <para>
        This section describes how to setup a central flush control
-       manager.      
+       manager. With the production release 1.7.0 most of those
+       steps will become obsolete.
        <itemizedlist>
        <listitem>
        <para>
@@ -169,12 +170,12 @@ set alias flushManager class diskCacheV111.hsmControl.flush.HttpHsmFlushMgrEngin
        control or not. Two action buttons allow to switch between centrally and locally controlled
        flushing. The second table lists all pools managed by this controller. Information is provided
        on the pool mode (readonly vers. readwrite), the number of flushing storage classes, the total 
-       size of the pool and the precious amount of space per pool. Action buttons allow to 
+       size of the pool and the  amount of precious space per pool. Action buttons allow to 
        toggle individual pools between <literal>ReadOnly</literal> and <literal>ReadWrite</literal> mode.
        Finally the third table presents all storage classes currently holding data to be flushed.
        Per storage class and pool, characteristic properties are listed, like total size, precious size,
        active and pending files. Here as well, an action button allows to flush individual 
-       storage class on individual pools.
+       storage classes on individual pools.
        <warning>
          <para>
          The possibilty to interactively interact with the flush manager needs to be supported
