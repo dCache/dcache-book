@@ -861,6 +861,17 @@ OK
 	  (DEVELOPER) <command>isLink()</command> added to <literal>PnfsFile</literal>
 	</para>
       </listitem>
+      <listitem>
+	<para>
+	  (DEVELOPER) Pool Manager query message (file in pool ?) can be suppressed by
+          flag in ProtocolInfo.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  (DEVELOPER) new method in reporitory : contains( PnfsId pnfsid);
+	</para>
+      </listitem>
 
       
     </itemizedlist>
