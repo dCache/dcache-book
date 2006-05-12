@@ -182,12 +182,12 @@
     </para>
     <warning>
       <para>
-    Depending on the way links are setup it may very well happen, that more than just
+    Depending on the way links are setup it may very well happen that more than just
     one link it triggered for a particular dCache request. This is not illegal but
-    leads to an ambiguousness in selecting an appropriate dCache section. 
+    leads to an ambiguity in selecting an appropriate dCache section. 
     If only one of the selected links has a section assigned, this section is chosen.
     Otherwise, if different links point to different sections, the result is 
-    undeterminable. 
+    indeterminate.
     This issue is not yet solved and we recommend to clean up the PoolManager configuration 
     to eliminate links with the same preferences for the same type of requests.
       </para>
@@ -266,7 +266,7 @@ psu set    link xrootd-link -section=xrootd-section
       </para>    
      </section>
      <section>
-        <title>Choosing 'random pool selection' for incoming trafic only</title>
+        <title>Choosing 'random pool selection' for incoming traffic only</title>
      
       <para>
         For the a set of pools we select pools following the default
