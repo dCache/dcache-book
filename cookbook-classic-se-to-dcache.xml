@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">
+
+<chapter id="se-to-dcache">
+
+	<title>Migration of classic SE ( nfs, disk ) to dCache</title>
+
+	<para>
+		This chapter contains a guideline to migrate a classic SE to
+		dCache.
+	</para>
+
+	<para>
+		The convertion of classic SE to dCache is not complicated, but
+		has to be done very carefull to prevent data losses.
+	</para>
+
+	<para>
+		We assume, that dCache is installes and configured.( <xref
+      linkend="in-install"/>). To be on the safe side, we recommend to install a
+      new pool pn different host, while there is no way to go back.      
+	</para>
+
+	<itemizedlist>
+		<listitem>
+			<para>create a new pool.</para>
+		</listitem>
+		<listitem>
+			<para>
+				for each file in classic SE sould be created an entry in
+				pnfs, in the pool control directroy move file into data
+				directory and set file owner, group and size in pnfs. To
+				prevent from misstakes, we rekomnd to use script which
+				delepoled and tested by dCache developers. Run script
+				for each file which should go into dCache:
+			</para>
+
+
+			<screen>
+<rootprompt />find . -type f -exec file2dcache.sh {} <replaceable>/pnfs/desy.de/data/fromSE</replaceable> <replaceable>/pool/pool1</replaceable> \; </screen>
+
+		</listitem>
+
+		<listitem>
+			<para>
+				start the pool. While pool have to re-create the
+				inventory, start up time wil take longer than usually.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				connect to the dCache via admin interface and register
+				new created files:
+
+<programlisting>
+<command>cd pool1</command>
+<command>pnfs register</command>
+<command>..</command>
+<command>logoff</command>
+</programlisting>
+		</para>
+		</listitem>
+	</itemizedlist>
+	<para>The newly migrated files have to be available.</para>
+
+
+</chapter>
