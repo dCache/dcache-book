@@ -102,6 +102,113 @@ dcache30_1  /dcache/pool  sticky=allowed maxSendBufferSize=<option>value in byte
       </para>
     </section>
   </section>  
+  <section id="cb-proto-dcap-open">
+    <title>Specifying dCap open timeouts</title>
+    <partauthors>Patrick Fuhrmann</partauthors>
+    <para>
+      In cases where dccp/dcap requests a file which is still on tertiary storage,
+      the user resp. the administrator might what to limit the time, dccp/dCap
+      waits in the open call until the file has been fetched from backend storage.
+      This, so called <literal>openTimeout</literal>, can be specified on the server
+      or on the client. In all cases the <literal>-keepAlive</literal> must be specified
+      with an appropriate number of seconds on the cell create command in the 
+      door batch files. The following mechanisms are available to specify open timeouts :
+      <table tabstyle="cellattributes">
+        <title>Open Timeout mechanisms</title>
+
+        <tgroup cols="4" align="left">
+          <colspec colnum="1" colname="Precedence" colwidth="70"/>
+          <colspec colnum="2" colname="Mechanism" colwidth="70"/>
+          <colspec colnum="3" colname="Key Name" colwidth="120"/>
+          <colspec colnum="4" colname="Example"/>
+          <thead>
+            <row>
+              <entry>
+                Precedence
+              </entry>
+              <entry>
+                Mechanism
+              </entry>
+              <entry>
+                Key Name
+              </entry>
+              <entry>
+                Example
+              </entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>Lowest</entry>
+              <entry>context</entry>
+              <entry>dCap-openTimeout</entry>
+              <entry>set context dCap-openTimeout 200</entry>
+            </row>
+            <row>
+              <entry>...</entry>
+              <entry>context</entry>
+              <entry>openTimeout</entry>
+              <entry>set context openTimeout 200</entry>
+            </row>
+            <row>
+              <entry>...</entry>
+              <entry>cell create command line</entry>
+              <entry>openTimeout</entry>
+              <entry>-openTimeout=200</entry>
+            </row>
+            <row>
+              <entry>Highest</entry>
+              <entry>dccp command line</entry>
+              <entry>-o</entry>
+              <entry>dccp -o200 SOURCE DESTINATION</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+   
+<screen>
+#
+#    dCap    D o o r (create command line example)
+#
+create dmg.cells.services.login.LoginManager DCap-2 \
+            "${specialDCapPort} \
+             diskCacheV111.doors.DCapDoor \
+             -export \
+             *** \
+             -keepAlive=60 \
+             -openTimeout=300 \
+             *** \
+             -loginBroker=LoginBroker"
+</screen>
+<screen>
+#
+#    dCap    D o o r (context example)
+#
+set context dCap-openTimeout 200
+#
+create dmg.cells.services.login.LoginManager DCap-2 \
+            "${specialDCapPort} \
+             diskCacheV111.doors.DCapDoor \
+             -export \
+             *** \
+             -keepAlive=60 \
+             *** \
+             -loginBroker=LoginBroker"
+</screen>
+<screen>
+#
+dccp -o200 /pnfs/desy.de/data/dteam/private/myfile /dev/null</screen>
+    </para>
+    <para>
+    If the openTimeout expires while a read transfer is already active,
+    this transfer will be interrupted, but it will automatically resume
+    because the client can't destinguish between a network failure and
+    a timeout. So the timeout disturbes the read but it will finally
+    succeed. This is different for write. If a write is interrupted by
+    a timeout in the middle of a transfer, dccp will stuck. (This is not
+    a feature and needs further investigation).
+    </para>
+  </section>
   
   <section id="cb-proto-dcap-ext">
     <title>Using the dCap protocol for strict file checking</title>
