@@ -657,12 +657,41 @@ OK
 
   </section>
   <section id="rf-changelog-1665-1681">
-    <title>Changes between Version 1.6.6 Release 5 and Version 1.6.8 Release 1</title>
+    <title>Changes between Version 1.6.6 Release 5 and Version 1.7.0 Releases</title>
 
     <para>
     New Features :
     </para>
     <itemizedlist>
+      <listitem>
+	<para>
+           The maximum (default) time, a dcap/dccp request should wait for a file 'retrieve from HSM'
+           can now be set in the door as well as in the dccp command line or with the dcap API.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+          GsiFtp and SRM understand extended proxies. gsiDcap will follow last week of August.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+          PUT and GET already supported by newly defined SRM-2.2 definition.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+          dCap (client and server) now supports passive connections. (Client callback to server for
+          data connection). 
+          The server listen port can be restricted to one port per JVM. This allows for
+          CEs behind a NAT or firewall while dCache-SEs are outside. 
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+          xRoot protocol added. (No security yet). Can be configured to allow read only.
+	</para>
+      </listitem>
       <listitem>
 	<para>
 	  A JClarence interface has been added to the information provider module. (Details need to be
@@ -671,7 +700,7 @@ OK
       </listitem>
       <listitem>
 	<para>
-	   Info Provider : works with LCG 2.6.X
+	   Info Provider : works with LCG 2.6.X (GIP)
 	</para>
       </listitem>
       <listitem>
@@ -728,14 +757,14 @@ OK
       <listitem>
 	<para>
 	   <cellname>PoolManager</cellname> and read only pools : Pools can be declared rdOnly by a command in the
-           PoolManager command set. This disallows all actions with would write data into this
+           PoolManager command set. This disallows all actions which would write data into this
            particular pool. (write from client, restore from HSM and p2p destination). This
            pool state is not persistent. (is not saved in the PoolManger.conf file).
 	</para>
       </listitem>
       <listitem>
 	<para>
-	   cost calcuation for multi I/O queues : fast cost prediction was added for
+	   Cost calcuation for multi I/O queues : fast cost prediction was added for
            multi I/O queues.
 	</para>
       </listitem>
@@ -758,7 +787,7 @@ OK
       <listitem>
 	<para>
 	   A set of important parameters can be now be defined 'per dCache partition'. DCache partitions
-           a assigned to PoolManager links.
+           a assigned to PoolManager links. (See chapter 'dCache Partitioning' in the configuration section).
 	</para>
       </listitem>
       <listitem>
@@ -768,7 +797,7 @@ OK
       </listitem>
     </itemizedlist>
     <para>
-    New Features :
+     Bug Fixes :
     </para>
     <itemizedlist>
       <listitem>
@@ -785,7 +814,7 @@ OK
       </listitem>
       <listitem>
 	<para>
-	   BUG FIX : Files are not longer requested from HSM if they are not yet flushe to the HSM.
+	   BUG FIX : Files are not longer requested from HSM if they are not yet flushed to the HSM.
 	</para>
       </listitem>
       <listitem>
@@ -835,9 +864,6 @@ OK
     <para>
     Developer corner :
     </para>
-    <para>
-    Developer corner :
-    </para>
     <itemizedlist>
 
       <listitem>
@@ -869,7 +895,7 @@ OK
       </listitem>
       <listitem>
 	<para>
-	  (DEVELOPER) new method in reporitory : contains( PnfsId pnfsid);
+	  (DEVELOPER) new method in repository : contains( PnfsId pnfsid);
 	</para>
       </listitem>
 
