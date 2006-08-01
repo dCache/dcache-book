@@ -808,6 +808,12 @@ OK
       </listitem>
       <listitem>
 	<para>
+	   BUG FIX : After a 'flush storage class' the corresponding pool does no longer
+           appear dead for awhile.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
 	   BUG FIX : <cellname>PoolManager</cellname> restore handler : a retry in the restore handler, either automatically
            or manually will now always refetch the <literal>StorageInfo</literal> from the <cellname>PnfsManager</cellname>.
 	</para>

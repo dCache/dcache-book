@@ -5,7 +5,9 @@
 
   <title>Central Flushing to tertiary storage systems</title>
   <partauthors>Patrick Fuhrmann</partauthors>
-  
+  <!--
+    I solemly swear that i'm not at all good.
+  -->
   <para>
   This chapter is of interest for dCache instances connected to a tertiary 
   storage system or making use of the mass storage interface for any other reason.
@@ -33,7 +35,7 @@
        The total thoughput of various disk storage systems tend to drop
        significantly
        if extensive read and write operations have to be performed
-       in parallel on dataset exceeding the filesystem caches. To overcome
+       in parallel on datasets exceeding the filesystem caches. To overcome
        this technical obstacle, it would be good if disk storage systems would 
        either allow writing into a pool or flushing data out of a pool
        into the HSM system, but never both at the same time.
@@ -136,12 +138,175 @@ create dmg.cells.services.LocationManager lm \
 create diskCacheV111.hsmControl.flush.HsmFlushControlManager <replaceable>FlushManagerName</replaceable>  \
         "<replaceable>flushPoolGroup</replaceable>  \
          -export   -replyObject \
-         -scheduler=<replaceable>DriverName</replaceable>  \
-         -do-nothing \
+         -scheduler=<replaceable>SchedulerName</replaceable>  \
+         <replaceable>Scheduler specific options</replaceable> \
         "
 #
        </programlisting>
+       Which the following meaning of the variables :
+       <itemizedlist>
+         <listitem>
+            <para>
+               <replaceable>flushPoolGroup</replaceable> needs to be the name of the pool group
+               defined in the PoolManager.conf files.
+            </para>
+         </listitem>
+         <listitem>
+            <para>
+               <replaceable>SchedulerName</replaceable> is the name of a class implementing
+               the <literal>diskCacheV111.hsmControl.flush.HsmFlushSchedulable</literal> interface.
+            </para>
+         </listitem>
+         <listitem>
+            <para>
+               <replaceable>Scheduler specific options</replaceable> may be options specific
+               to the selected scheduler.
+            </para>
+         </listitem>
+       </itemizedlist>
+       Initially there are three schedulers available :
+       <itemizedlist>
+         <listitem>
+           <para>
+             <literal>diskCacheV111.hsmControl.flush.driver.HandlerExample</literal> may be used as
+             an example implementation of the HsmFlushScheduler interface. The functionality is 
+             useless in an production environment but can be useful to check the functionality of
+             the central flush framework. If one allows this drive to take over control it will
+             initiate the flushing of data as soon as it becomes aware of it. One the other hand
+             it supports a mode where is doesn't do anything except preventing the individual 
+             pools from doing the flush autonomously. In that mode, the driver assumes the flushes
+             to be steered manually by the flush web pages decribed in the next paragraph. 
+             The latter mode is enabled by
+             starting the flush driver with the <replaceable>Scheduler specific options</replaceable>
+             set to <literal>-do-nothing</literal>
+           </para>
+         </listitem>
+         <listitem>
+           <para>
+             <literal>diskCacheV111.hsmControl.flush.driver.AlternateFlush</literal> is intended to
+             provide suffient functionality to cope with issues described in the introduction of the
+             paragraph. Still quite some code and knowledge has to go into this driver.
+           </para>
+         </listitem>
+         <listitem>
+           <para>
+             <literal>diskCacheV111.hsmControl.flush.driver.AlternatingFlushSchedulerV1</literal> is certainly
+             the most useful driver. It can be configured to flush all pools on a single machine
+             simultaniously. It is trigger by space consumption, number of files within a pool
+             or the time the oldest file resides on a pool without having been flushed.
+             Please checkout the next section for details on configuration and usage.
+           </para>
+         </listitem>
+       </itemizedlist> 
        </para>
+     </section>
+     <section>
+     <title>The AlternatingFlushSchedulerV1 driver</title>
+       <para>
+       This is an alternating driver as well, which means that it either allows data to flow into
+       a pool, or data going from a pool onto an HSM system  but never both at the same time. 
+       Data transfers from pools to other pools or from pools to clients are not
+       controlled by this driver. In order to minimize the latter one should configure
+       HSM write pools to not allow transfers to clients but doing pool to pool transfers
+       first.
+       </para>
+       <section>
+       <title>Configuration</title>
+       <para>
+       <programlisting>
+#
+create diskCacheV111.hsmControl.flush.HsmFlushControlManager <replaceable>FlushManagerName</replaceable>  \
+        "<replaceable>flushPoolGroup</replaceable>  \
+         -export   -replyObject \
+         -scheduler=diskCacheV111.hsmControl.flush.driver.AlternatingFlushSchedulerV1  \
+         -driver-config-file=${config}/<replaceable>flushDriverConfigFile</replaceable> \
+        "
+#</programlisting>
+        Where <replaceable>flushPoolGroup</replaceable> is a PoolGroup defined in the 
+        <filename>PoolManager.conf</filename> file, containing all pools which are intended to
+        be managed by this FlushManager. <replaceable>flushDriverConfigFile</replaceable>
+        is a file within the dCache <filename>config</filename> directory holding 
+        property values for this driver. The driver reloads the file whenever it changes
+        its modification time. One should allow for a minute of two before new setting
+        are getting activated. The configuration file has to contain key value pairs, separated
+        by the = sign. Keys, not corresponding to a driver property are silently ignored.
+        Properties, not set in the configuration file, are set to some reasonable default value. 
+       </para>
+       </section>       
+       <section>
+       <title>Properties</title>
+       <para>
+         <table>
+          <title>Driver Properties</title>
+          <tgroup cols="3" align="left">
+            <colspec colnum="1" colname="Property Name" colwidth="50"/>
+            <colspec colnum="2" colname="Default Value"/>
+            <colspec colnum="3" colname="Meaning" colwidth="100"/>
+            <thead>
+              <row>
+                <entry>Property Name</entry>
+                <entry>Default Value</entry>
+                <entry>Meaning</entry>
+              </row>
+            </thead>
+            <tbody>
+              <row>
+                <entry>max.files</entry><entry>500</entry>
+                <entry>Collect this number of files per pool, before flushing</entry>
+              </row><row>
+                <entry>max.minutes</entry><entry>120</entry>
+                <entry>Collect data for this amount of minutes before flushing</entry>
+              </row><row>
+                <entry>max.megabytes</entry><entry>500 * 1024</entry>
+                <entry>Collecto this number of megabytes per pool before flushing</entry>
+              </row><row>
+                <entry>max.rdonly.fraction</entry><entry>0.5</entry>
+                <entry>Do not allow more than this percentage of pools to be set read only</entry>
+              </row><row>
+                <entry>flush.atonce</entry><entry>0</entry>
+                <entry>Never flush more than that in one junk</entry>
+              </row><row>
+                <entry>timer</entry><entry>60</entry>
+                <entry>Interval timer (minimum resolution)</entry>
+              </row><row>
+                <entry>print.events</entry><entry>false</entry>
+                <entry>Print events delivered by the FlushManager</entry>
+              </row><row>
+                <entry>print.rules</entry><entry>false</entry>
+                <entry>Print remarks from the rule engine</entry>
+              </row><row>
+                <entry>print.poolset.progress</entry><entry>false</entry>
+                <entry>Print progress messages</entry>
+              </row>
+            </tbody>
+           </tgroup>
+          </table> 
+          </para>
+       </section>
+       <section>
+       <title>The process</title>
+         <para>
+         A pool is becoming a flush candidate if either the 
+         number of files collected exceeds <literal>max.files</literal> or the number of
+         megabytes collected exceeds <literal>max.megabytes</literal> or the oldest file,
+         not flushed yet, is becoming older than <literal>max.minutes</literal>.         
+
+         Pool Candidates are sorted according to a metric, which is essentially the sum of three items.
+         The number of files devided by <literal>max.files</literal>, the number of megabytes devided
+         by <literal>max.megabytes</literal> and the age of the oldest file devided by <literal>max.minutes</literal>.
+
+         The pool with the highest metric is chosen first. The driver determines the hardware unit, this pools
+         resides on. The intention is to flush all pools of this unit simulatationsly. Depending on the
+         configuration, the unit can be either a disk partition or the host. After the hard unit is determined, the
+         driver adds the number of pools on that unit to the number of pools already in rdOnly mode.
+         If the sum exceeds the total number of pools in the flush pool group, multiplied by the
+         <literal>max.rdonly.fraction</literal> property, the pool is NOT selected. The process proceeds
+         until a pool, resp. a hardware unit complies with these contrains.
+         
+         The hardware unit, a pool belongs to, is set by the 'tag.hostname' in the 
+         <filename>config/<replaceable>hostname</replaceable></filename> file.
+         </para>
+     </section>
      </section>
      <section>
      <title>Setting up and using the flush control web pages.</title>
