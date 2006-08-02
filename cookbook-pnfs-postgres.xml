@@ -29,7 +29,14 @@
       PostgreSQL by <dcache/> and its configuration see <xref
       linkend="cb-postgres"/>.
     </para>
-    
+    <para>
+    <warning>
+      <para>
+      Please make sure that while doing the actually conversion as described below,
+      the pnfs service it not active. So, shut it down first.
+      </para>
+    </warning>
+    </para>
     <para>
       Prepare the PostgreSQL server by creating a database user for
       the <pnfs/> server. It has to have permissions to create
