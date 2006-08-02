@@ -665,6 +665,17 @@ OK
     <itemizedlist>
       <listitem>
 	<para>
+           gPlazma authorization added. See 'configuration chapter' for details.
+	</para>
+      </listitem>
+      <listitem>
+      <listitem>
+	<para>
+           Pools prepared to run on Windows XP.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
            The maximum (default) time, a dcap/dccp request should wait for a file 'retrieve from HSM'
            can now be set in the door as well as in the dccp command line or with the dcap API.
 	</para>
@@ -800,6 +811,11 @@ OK
      Bug Fixes :
     </para>
     <itemizedlist>
+      <listitem>
+	<para>
+	   BUG FIX : Pathfinder reported .(access)(pnfsid) (using PnfsManagerV3).
+	</para>
+      </listitem>
       <listitem>
 	<para>
 	   BUG FIX : It eventually happened that 'precious' files have been removed from write
