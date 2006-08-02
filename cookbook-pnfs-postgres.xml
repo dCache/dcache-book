@@ -32,7 +32,7 @@
     <para>
     <warning>
       <para>
-      Please make sure that while doing the actually conversion as described below,
+      Please make sure that while doing the actual conversion as described below,
       the pnfs service it not active. So, shut it down first.
       </para>
     </warning>
