@@ -5,7 +5,7 @@
   <!-- <?dbhtml dir="install"?> -->
   <title>Installation Manual</title>
   
-  <partauthors>Michael Ernst, Mathias de Riese</partauthors>
+  <partauthors>Michael Ernst, Patrick Fuhrmann, Mathias de Riese</partauthors>
   
   <para>
     The first section describes the installation of a fresh <dcache/>
@@ -731,9 +731,8 @@ Threads (4) Queue
   </section>
   
   <section id="in-rpm">
-    <title>Old Installation Manual</title>
-
-<screen>
+  <title>Old Installation Manual</title>
+  <screen>
 The latest release of the dCache distribution is version 1-6-5.
 Release notes describing new features and bug fixes can be found at
 
@@ -1712,5 +1711,23 @@ Note: The following is supported in version 1.2.2-1 for the
   </section>
 -->
   </section>
-  
+<unfinished>
+  <section id="in-other-os">
+  <title>Running dCache on non Linux OS'es</title>
+  <para>
+  Because of the wide spread usage of dCache in the grid word, we provide the dCache binary packages
+  mainly for a certain Linux flavour complaint to the rest of the LCG, gLite or OSG software.
+  The dCache system itself is, except for the filesystem engine (pnfs) and the dCap client, 100% java,
+  so that a port should be easy as long as the OS is coming with a resonably modern java virtual machine. 
+  For now dCache is fine with java 1.4 but very soon we will move to 1.5. This chapter should give an
+  estimate on how much effort is necessary to do the porting to other OS'es.
+  </para>
+  <section>
+  <title>dCache Pools</title>
+  <para>
+  The dCache pool code is certainly the easiest part to port.
+  </para>
+  </section>
+  </section>
+</unfinished>
 </chapter>
