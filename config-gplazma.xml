@@ -194,11 +194,15 @@ This file is used to map the username to a site-specific uid, gid, and rootpath.
 
 Each line contains the string "authorize", followed by the username, read-write permission, uid, gid, and three paths. 
 
-<blockquote>
-<programlisting width="80">
+</para>
+
+<para>
+<emphasis role="bold">
 authorize uscms01 read-write 60076 5063 / /pnfs/fnal.gov/usr/cms/WAX/resilient/uscms01 /pnfs/fnal.gov/usr/cms/WAX/resilient/uscms01
-</programlisting>
-</blockquote>
+</emphasis>
+</para>
+
+<para>
 
 In the storage-authzdb file, there must be a line for each username to be authorized. The use of three paths is for legacy puposes. Make the last two equal to the path under which the user is allowed to access files. It is permissible to simply use a "/" for the last two paths
 
@@ -214,12 +218,15 @@ in which case the user will be authorized for any path (the filesystem permissio
 <para>
 The lines are similar to the "login" lines of the dcache.kpwd file. If you alreay have a dcache.kwpd file, create storage-authzdb by taking the lines from your dcache.kpwd file that start with the word "login", for example,
 
-<blockquote>
-<programlisting width="80">
-login uscms01 read-write 60076 5063 / /pnfs/fnal.gov/usr/cms/WAX/resilient/uscms01 /pnfs/fnal.gov/usr/cms/WAX/resilient/uscms01
-</programlisting>
-</blockquote>
+</para>
 
+<para>
+<emphasis role="bold">
+login uscms01 read-write 60076 5063 / /pnfs/fnal.gov/usr/cms/WAX/resilient/uscms01 /pnfs/fnal.gov/usr/cms/WAX/resilient/uscms01
+</emphasis>
+</para>
+
+<para>
 and replacing the word "login" with "authorize".
 
 
