@@ -1,428 +1,371 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
-
 <chapter id="cf-gplazma">
 
 <title>gPlazma authorization in dCache</title>
 <partauthors>Ted Hesselroth</partauthors>
 
+
   <para>
-      gPlazma is a cell in dCache that authorizes users. Cells make requests 
-      to gPlazma by submitting user credential information 
-      to it, receiving the authorization decision and site-specific user 
-      information such as uid, gid, and rootpath in return.
+gPlazma is a cell in dCache that authorizes users. Cells make requests to gPlazma by submitting user credential information to it, receiving the authorization decision and site-specific user information such as uid, gid, and rootpath in return.
   </para> 
 
   <para>
-     The acronym stands for Grid-aware PLuggable 
-     AuthoriZation Management, and supports the use of plugins which implement 
-     various selectable authorization methods. The 
-     four currently-available methods are:
+The acronym stands for Grid-aware PLuggable AuthoriZation Management, and supports the use of plugins which implement various selectable authorization methods. The four currently-available methods are:
   </para>
 
-  <itemizedlist spacing="compact">
-   <listitem>
-    <para>
-     kpwd : This is the "legacy" method. The dcache.kpwd file is used to map a user's DN to a local username, and the same 
-     file is used in a second mapping of the username to the uid, gid, and rootpath. As in all methods, if the mappings succeed, 
-     file system access is done using the obtained uid and gid, and a check is done that the local path of the transfer starts 
-     with the designated rootpath.
-    </para>
-   </listitem>
+<itemizedlist spacing="compact">
+ <listitem>
+  <para>
+kpwd : This is the "legacy" method. The dcache.kpwd file is used to map a user's DN to a local username, and the same file is used in a second mapping of the username to the uid, gid, and rootpath. As in all methods, if the mappings succeed, file system access is done using the obtained uid and gid, and a check is done that the local path of the transfer starts with the designated rootpath.
+  </para>
+ </listitem>
 
-   <listitem>
-    <para>
-     grid-mapfile : This method employs a grid mapfile. From the mapfile, the user's DN is mapped to a username. A second file, 
-     storage-authdb, is used for the mapping of the username to the uid, gid, and rootpath.
-    </para>
-   </listitem>
-
-   <listitem>
-    <para>
-     gplazmalite-vorole-mapping : In this method the mapping to the username is done from the concatenation of the user's DN 
-     with the user's Role (or, more precisely, with the user's Fully Qualified Attribute Name). The mapping of username to uid, 
-     gid, and rootpath is through the storage-authdb file.
-    </para>
-   </listitem>
-
-   <listitem>
-    <para>
-     saml-vo-mapping : The DN and Role are mapped to a username via a callout to a <ulink
-       url="http://grid.racf.bnl.gov/GUMS/">GUMS</ulink> server. The GUMS service may run an extension which returns the uid, 
-       gid, and rootpath as well. Otherwise, the mapping of username to uid, gid, and rootpath is through the storage-authdb file. 
-    </para>
-   </listitem>
-  </itemizedlist>
+ <listitem>
+  <para>
+grid-mapfile : This method employs a grid mapfile. From the mapfile, the user's DN is mapped to a username. A second file, storage-authdb, is used for the mapping of the username to the uid, gid, and rootpath.
+  </para>
+ </listitem>
+ 
+ <listitem>
+  <para>
+gplazmalite-vorole-mapping : In this method the mapping to the username is done from the concatenation of the user's DN with the user's Role (or, more precisely, with the user's Fully Qualified Attribute Name). The mapping of username to uid, gid, and rootpath is through the storage-authdb file.
+  </para>
+ </listitem>
+ 
+ <listitem>
+  <para>
+saml-vo-mapping : The DN and Role are mapped to a username via a callout to a <ulink
+  url="http://grid.racf.bnl.gov/GUMS/">GUMS</ulink> server. The GUMS service may run an extension which returns the uid, gid, and rootpath as well. Otherwise, the mapping of username to uid, gid, and rootpath is through the storage-authdb file. 
+  </para>
+ </listitem>
+</itemizedlist>
 
 
-<para>
-   The following describes how to use gPlazma in dCache.
+<para>The following describes how to use gPlazma in dCache.
 </para>
 
 
   
 
+
 <section>
-   <title>Installation</title>
+ <title>Installation</title>
 
 
-   <para>
-   gPlazma is included in dCache version 1.7 or higher. As of that version,the gPlazma cell can be called from gridftp 
-   doors and the srm server . 
-   </para>
+<para>
+gPlazma is included in dCache version 1.7 or higher. As of that version,the gPlazma cell can be called from gridftp doors and the srm server . 
+</para>
 
-   <para>
-   For the dCache 1.7 version, there must be host certificates on the node running the gPlazma cell.
-   </para>
+<para>
+For the dCache 1.7 version, there must be host certificates on the node running the gPlazma cell.
+</para>
 
-   <para>
-   Depending on which authorization methods are to be used, some configuration files must be modified. The configuration files 
-   described here must exist on the node on which you wish to run the gPlazma cell and must contain the correct site-specific 
-   information for the dCache on which it is deployed. 
-   </para>
+<para>
+Depending on which authorization methods are to be used, some configuration files must be modified. The configuration files described here must exist on the node on which you wish to run the gPlazma cell and must contain the correct site-specific information for the dCache on which it is deployed. 
+</para>
 
 </section>
 
 <section>
-   <title>Configuring the gPlazma Policy File</title>
-   <para>
-   The gPlazma policy file, located in
+ <title>Configuring the gPlazma Policy File</title>
+<para>
+The gPlazma policy file, located in
 
-   <blockquote>
-   <programlisting>
-   ${ourHomeDir}/etc/dcachesrm-gplazma.policy</programlisting>
-   </blockquote>
+<blockquote>
+<programlisting width="80">
+${ourHomeDir}/etc/dcachesrm-gplazma.policy        
+</programlisting>
+</blockquote>
 
 
-   controls which authorization plugins will be tried and the order in which they will be tried. The first of 
-   these is specified lines containing "ON" or "OFF" for each plugin, for example
+controls which authorization plugins will be tried and the order in which they will be tried. The first of these is specified lines containing "ON" or "OFF" for each plugin, for example
 
-   <blockquote>
-   <programlisting>
-   # Switches
-   saml-vo-mapping="ON"
-   kpwd="ON"
-   grid-mapfile="OFF"
-   gplazmalite-vorole-mapping="OFF"</programlisting>
-   </blockquote>
+<blockquote>
+<programlisting width="80">
+# Switches
+saml-vo-mapping="ON"
+kpwd="ON"
+grid-mapfile="OFF"
+gplazmalite-vorole-mapping="OFF"
+</programlisting>
+</blockquote>
 
-   The order is specified by assigning a different number to each plugin, such as
+The order is specified by assigning a different number to each plugin, such as
 
-   <blockquote>
-   <programlisting>
-   # Priorities
-   saml-vo-mapping-priority="1"
-   kpwd-priority="3"
-   grid-mapfile-priority="4"
-   gplazmalite-vorole-mapping-priority="2"</programlisting>
-   </blockquote>
+<blockquote>
+<programlisting width="80">
+# Priorities
+saml-vo-mapping-priority="1"
+kpwd-priority="3"
+grid-mapfile-priority="4"
+gplazmalite-vorole-mapping-priority="2"
+</programlisting>
+</blockquote>
 
-   In the above example, the saml-vo-mapping plugin would be tried first. If authorization was denied 
-   for that method, or if the authentication method itself failed, then the kpwd plugin would be tried. 
-   The "Priorities" numbering shows that if gplazmalite-vorole-mapping were to also be turned on, it 
-   would be tried after the saml-vo-mapping plugin and before the kpwd method.
-   </para>
+In the above example, the saml-vo-mapping plugin would be tried first. If authorization was denied for that method, or if the authentication method itself failed, then the kpwd plugin would be tried. The "Priorities" numbering shows that if gplazmalite-vorole-mapping were to also be turned on, it would be tried after the saml-vo-mapping plugin and before the kpwd method.
+</para>
 
-   <para>
-   Having more than one plugin turned on allows a plugin to be used as fallback for another plugin that 
-   may fail. It also allows for the authorization of special users who may be denied by the other methods. 
-   </para>
+<para>
+Having more than one plugin turned on allows a plugin to be used as fallback for another plugin that may fail. It also allows for the authorization of special users who may be denied by the other methods. 
+</para>
 
-   <para>
-   The policy file also contains a section for each of the plugins, for configuration specific to that 
-   plugin. These sections are described in the documentation for each plugin, as follows.
-   </para>
+<para>
+The policy file also contains a section for each of the plugins, for configuration specific to that plugin. These sections are described in the documentation for each plugin, as follows.
+</para>
 
 </section>
 
 <section>
-  <title>Configuring the kpwd Plugin</title>
+ <title>Configuring the kpwd Plugin</title>
 
-  <para>
-  The section in the gPlazma policy file for the kpwd plugin specifies the location of the dcache.kpwd file, 
-  for example
+<para>
+The section in the gPlazma policy file for the kpwd plugin specifies the location of the dcache.kpwd file, for example
 
-  <blockquote>
-  <literallayout width="80">
-  # dcache.kpwd
-  kpwdPath="/opt/d-cache/etc/dcache.kpwd"
-  </literallayout>
-  </blockquote>
+<blockquote>
+<programlisting width="80">
+# dcache.kpwd
+kpwdPath="/opt/d-cache/etc/dcache.kpwd"
+</programlisting>
+</blockquote>
 
-  To maintain only one such file, make sure that this is the same location as defined in dCacheSetup.
+To maintain only one such file, make sure that this is the same location as defined in dCacheSetup.
 
-  Please see dCache documentation for <ulink url="http://www.dcache.org/downloads/Release.notes1.6.5-2">dcache.kpwd</ulink> for how to create this file.
-  </para>
-
-</section>
-
-<section>
-   <title> Configuring the grid-mapfile Plugin </title>
-
-   <para>
-   Two file locations are defined in the policy file for this plugin:
-
-   <blockquote>
-   <literallayout width="80">
-   # grid-mapfile
-   gridMapFilePath="/etc/grid-security/grid-mapfile"
-   storageAuthzPath="/etc/grid-security/storage-authzdb"
-   </literallayout>
-   </blockquote>
-
-   </para>
-
-
-   <section>
-       <title>
-      Preparing the grid mapfile
-       </title>
-
-      <para>
-
-
-      The grid mapfile is the same as that used in other applications. It can be created in various ways, either by connecting directly to VOMS or GUMS servers, or by hand.
-
-      Each line contains a DN (Certificate Subject) in quotes, and the username it is to be mapped to.
-
-      <blockquote>
-      <literallayout width="80">
-      "/DC=org/DC=doegrids/OU=People/CN=Gina Carlson 584065" uscms01
-      </literallayout>
-      </blockquote>
-
-      </para>
-
-   </section>
-
-   <section id='storage-authzdb-sect'>
-       <title>
-      Preparing storage-authzdb
-       </title>
-
-      <para>
-      This file is used to map the username to a site-specific uid, gid, and rootpath. It's location is
-
-      <blockquote>
-      <literallayout width="80">
-      /etc/grid-security/storage-authzdb
-      </literallayout>
-      </blockquote>
-
-
-      Each line contains the string "authorize", followed by the username, read-write permission, uid, gid, and three paths. 
-
-      <blockquote>
-      <literallayout width="80">
-      authorize uscms01 read-write 60076 5063 / /pnfs/fnal.gov/usr/cms/WAX/resilient/uscms01 /pnfs/fnal.gov/usr/cms/WAX/resilient/uscms01
-      </literallayout>
-      </blockquote>
-
-      In the storage-authzdb file, there must be a line for each username to be authorized. The use of three 
-      paths is for legacy puposes. Make the last two equal to the path under which the user is allowed to access files. 
-      It is permissible to simply use a "/" for the last two paths
-
-      <blockquote>
-      <literallayout width="80">
-      authorize uscms01 read-write 60076 5063 / / /
-      </literallayout>
-      </blockquote>
-
-      in which case the user will be authorized for any path (the filesystem permissions in pnfs must also allow the transfer).
-      </para>
-
-      <para>
-      The lines are similar to the "login" lines of the dcache.kpwd file. If you alreay have a dcache.kwpd file, create 
-      storage-authzdb by taking the lines from your dcache.kpwd file that start with the word "login", for example,
-
-      <blockquote>
-      <literallayout width="80">
-      login uscms01 read-write 60076 5063 / /pnfs/fnal.gov/usr/cms/WAX/resilient/uscms01 /pnfs/fnal.gov/usr/cms/WAX/resilient/uscms01
-      </literallayout>
-      </blockquote>
-
-      and replacing the word "login" with "authorize".
-
-
-
-
-      </para>
-   </section>
+Please see dCache documentation for <ulink   url="http://www.dcache.org/downloads/Release.notes1.6.5-2">dcache.kpwd</ulink> for how to create this file.
+</para>
 
 </section>
 
 <section>
-    <title>
-   Configuring the gplazmalite-vorole-mapping Plugin
-    </title>
+ <title>
+Configuring the grid-mapfile Plugin
+ </title>
 
-   <para>
-   The gPlazma policy file contains two lines for this plugin.
+<para>
+Two file locations are defined in the policy file for this plugin:
 
-   <blockquote>
-   <literallayout width="80">
-   # Built-in gPLAZMAlite grid VO role mapping
-   gridVoRolemapPath="/etc/grid-security/grid-vorolemap"
-   gridVoRoleStorageAuthzPath="/etc/grid-security/storage-authzdb"
-   </literallayout>
-   </blockquote>
+<blockquote>
+<programlisting width="80">
+# grid-mapfile
+gridMapFilePath="/etc/grid-security/grid-mapfile"
+storageAuthzPath="/etc/grid-security/storage-authzdb"
+</programlisting>
+</blockquote>
 
-   The second is the storage-authz-db used in other plugins. See the above documentation <link linkend='storage-authzdb-sect'>"Preparing 
-   storage-authzdb"</link> for how to create the file.
-
-   </para>
+</para>
 
 
-   <section>
-       <title>
-      Preparing grid-vorolemap
-       </title>
+<section>
+ <title>
+Preparing the grid mapfile
+ </title>
 
-      <para>
+<para>
 
 
-      The file is similar in format to the grid-mapfile, however there is a field following the DN (Certificate Subject), containing 
-      the Role (Fully Qualified Attribute Name)
+The grid mapfile is the same as that used in other applications. It can be created in various ways, either by connecting directly to VOMS or GUMS servers, or by hand.
 
-      <blockquote>
-      <literallayout width="80">
-      "/DC=org/DC=doegrids/OU=People/CN=Gina Carlson 584065" "/cms/uscms" uscms01
-      "/DC=org/DC=doegrids/OU=People/CN=Gina Carlson 584065" "/cms/uscms/Role=cmsprod" cmsprod
-      </literallayout>
-      </blockquote>
+Each line contains a DN (Certificate Subject) in quotes, and the username it is to be mapped to.
 
-      The same user can be mapped to different usernames depending on what their role is. The role is typically determined by
-       how the user creates their proxy, for example, using voms-proxy-init. The FQAN contains the user's group, role (optional), 
-       and capability (optional). The latter two may be set to the string "NULL", in which case they will be ignored by the plugin.
-      </para>
-   </section>
+<blockquote>
+<programlisting width="80">
+"/DC=org/DC=doegrids/OU=People/CN=Gina Carlson 584065" uscms01
+</programlisting>
+</blockquote>
+
+</para>
+
+</section>
+
+<section id='storage-authzdb-sect'>
+ <title>
+Preparing storage-authzdb
+ </title>
+ 
+<para>
+This file is used to map the username to a site-specific uid, gid, and rootpath. It's location is
+
+<blockquote>
+<programlisting width="80">
+/etc/grid-security/storage-authzdb
+</programlisting>
+</blockquote>
+
+
+Each line contains the string "authorize", followed by the username, read-write permission, uid, gid, and three paths. 
+
+<blockquote>
+<programlisting width="80">
+authorize uscms01 read-write 60076 5063 / /pnfs/fnal.gov/usr/cms/WAX/resilient/uscms01 /pnfs/fnal.gov/usr/cms/WAX/resilient/uscms01
+</programlisting>
+</blockquote>
+
+In the storage-authzdb file, there must be a line for each username to be authorized. The use of three paths is for legacy puposes. Make the last two equal to the path under which the user is allowed to access files. It is permissible to simply use a "/" for the last two paths
+
+<blockquote>
+<programlisting width="80">
+authorize uscms01 read-write 60076 5063 / / /
+</programlisting>
+</blockquote>
+
+in which case the user will be authorized for any path (the filesystem permissions in pnfs must also allow the transfer).
+</para>
+
+<para>
+The lines are similar to the "login" lines of the dcache.kpwd file. If you alreay have a dcache.kwpd file, create storage-authzdb by taking the lines from your dcache.kpwd file that start with the word "login", for example,
+
+<blockquote>
+<programlisting width="80">
+login uscms01 read-write 60076 5063 / /pnfs/fnal.gov/usr/cms/WAX/resilient/uscms01 /pnfs/fnal.gov/usr/cms/WAX/resilient/uscms01
+</programlisting>
+</blockquote>
+
+and replacing the word "login" with "authorize".
+
+
+
+
+</para>
+</section>
 
 </section>
 
 <section>
-    <title>
-   Configuring the saml-vo-mapping Plugin
-    </title>
+ <title>
+Configuring the gplazmalite-vorole-mapping Plugin
+ </title>
 
-   <para>
-   There is only one line in the policy file for this plugin, containing the URL for the GUMS web service.
+<para>
+The gPlazma policy file contains two lines for this plugin.
 
-   <blockquote>
-   <literallayout width="80">
-   # SAML-based grid VO role mapping
-   mappingServiceUrl="https://fledgling09.fnal.gov:8448/gums/services/GUMSAuthorizationServicePort"
-   </literallayout>
-   </blockquote>
+<blockquote>
+<programlisting width="80">
+# Built-in gPLAZMAlite grid VO role mapping
+gridVoRolemapPath="/etc/grid-security/grid-vorolemap"
+gridVoRoleStorageAuthzPath="/etc/grid-security/storage-authzdb"
+</programlisting>
+</blockquote>
 
-   Replace the URL with that of the site-specific <ulink
-     url="http://grid.racf.bnl.gov/GUMS/">GUMS</ulink> (the port is more likely to be 8443). When using the 
-     "GUMSAuthorizationServicePort", the service will only provide the username mapping and it will still be 
-     necesary to have the storage-authzdb file used in other plugins. See the above 
-     documentation <link linkend='storage-authzdb-sect'>"Preparing storage-authzdb"</link> for how to create 
-     the file. If a GUMS server providing a "StorageAuthorizationServicePort" with correct uid, gid, and 
-     rootpath information for your site is available, the storage-authzdb file is not necesary.
-   </para>
+The second is the storage-authz-db used in other plugins. See the above documentation <link linkend='storage-authzdb-sect'>"Preparing storage-authzdb"</link> for how to create the file.
+
+</para>
 
 
-   <section>
-       <title>
-      Creating the VOMS directory
-       </title>
+<section>
+ <title>
+Preparing grid-vorolemap
+ </title>
 
-      <para>
-      Because of an assumption in a dependent jar used by the saml-vo-mapping plugin, it is necesary that the directory
+<para>
 
-      <blockquote>
-      <literallayout width="80">
-      /etc/grid-security/vomsdir 
-      </literallayout>
-      </blockquote>
 
-      exist, and have at least one file in it. The file can be of zero length.
-      </para>
-   </section>
+The file is similar in format to the grid-mapfile, however there is a field following the DN (Certificate Subject), containing the Role (Fully Qualified Attribute Name)
+
+<blockquote>
+<programlisting width="80">
+"/DC=org/DC=doegrids/OU=People/CN=Gina Carlson 584065" "/cms/uscms" uscms01
+"/DC=org/DC=doegrids/OU=People/CN=Gina Carlson 584065" "/cms/uscms/Role=cmsprod" cmsprod
+</programlisting>
+</blockquote>
+
+The same user can be mapped to different usernames depending on what their role is. The role is typically determined by how the user creates their proxy, for example, using voms-proxy-init. The FQAN contains the user's group, role (optional), and capability (optional). The latter two may be set to the string "NULL", in which case they will be ignored by the plugin.
+</para>
+</section>
 
 </section>
 
 <section>
-    <title>
-   The Batch Files
-    </title>
+ <title>
+Configuring the saml-vo-mapping Plugin
+ </title>
 
-   <para>Changes to batch files require a restart of the cell.
-   </para>
+<para>
+There is only one line in the policy file for this plugin, containing the URL for the GUMS web service.
 
+<blockquote>
+<programlisting width="80">
+# SAML-based grid VO role mapping
+mappingServiceUrl="https://fledgling09.fnal.gov:8448/gums/services/GUMSAuthorizationServicePort"
+</programlisting>
+</blockquote>
 
-
-   <section>
-      <title>The gPlazma Batch File</title>
-      <para>
-
-
-      The batch file is found in ${ourHomeDir}/config/gPlazma.batch. The section of the batch file which controls 
-      the operation of the cell is as follows:
-
-      <blockquote>
-      <programlisting>
-      create diskCacheV111.services.authorization.GPLAZMA gPlazma \
-          "default \
-          -gplazma-authorization-module-policy=${gplazmaPolicy} \
-          -num-simultaneous-requests=30 \
-          -request-timeout=30 \
-          "</programlisting>
-      </blockquote>
-
-      The first line states that a cell named gPlazma is to be started from the GPLAZMA class. Do not change 
-      the name of the gPlazma cell.
-
-      The second line, "default", makes the cell "well-known" in the dCache routing, and allows other cells 
-      to contact it without having the name of gPlazma's domain. Do not change this line.
-
-      The line defining gplazma-authorization-module-policy refers to a variable defined in the dCacheSetup file. 
-      If the path to the gPlazma policy file changes, change the value in that file, not on the above line.
-
-      The variable num-simultaneous-requests determines the number of threads which will be started on the gPlazma 
-      cell to handle requests.The default value should be sufficient, but may be raised or lowered depending on the 
-      capacity of the hardware and other processes running on it.
-
-      The variable request-timeout is the amount of time in seconds that a request thread has to finish an 
-      authorization decision. If this time is exceeded, authorization is denied.
-
-
-      </para>
+Replace the URL with that of the site-specific <ulink
+  url="http://grid.racf.bnl.gov/GUMS/">GUMS</ulink> (the port is more likely to be 8443). When using the "GUMSAuthorizationServicePort", the service will only provide the username mapping and it will still be necesary to have the storage-authzdb file used in other plugins. See the above documentation <link linkend='storage-authzdb-sect'>"Preparing storage-authzdb"</link> for how to create the file. If a GUMS server providing a "StorageAuthorizationServicePort" with correct uid, gid, and rootpath information for your site is available, the storage-authzdb file is not necesary.
+</para>
 
 </section>
 
 <section>
-    <title>
-   The gridftpdoor and SRM Batch Files
-    </title>
+ <title>
+The Batch Files
+ </title>
 
-   <para>
-
-   When contained in the file ${ourHomeDir}/config/gridftpdoor.batch as an argument to 
-   the "LoginManager" domain, the line below will cause the gridftpdoor to use the gPlazma cell for 
-   authentication. If no lines regarding gplazma are included, the gridftpdoor will use the dcache.kpwd 
-   lookup method. A dcache.kpwd file must be present on the gridftpdoor node in that case.
-
-   <blockquote>
-   <literallayout width="80">
-   -use-gplazma-authorization-cell=true \
-   </literallayout>
-   </blockquote>
+<para>Changes to batch files require a restart of the cell.
+</para>
 
 
-   The same option is used in ${ourHomeDir}/config/srm.batch, for the "Storage" domain. Again, 
-   no gplazma line at all results in use of the dcache.kpwd lookup method. In that case, a 
-   dcache.kpwd file must exist on the srm node.
 
-   <blockquote>
-   <literallayout width="80">
-   -use-gplazma-authorization-cell=true \
-   </literallayout>
-   </blockquote>
+<section>
+ <title>
+The gPlazma Batch File
+ </title>
 
-   </para>
+<para>
+
+
+The batch file is found in ${ourHomeDir}/config/gPlazma.batch. The section of the batch file which controls the operation of the cell is as follows:
+
+<blockquote>
+<programlisting width="80">
+create diskCacheV111.services.authorization.GPLAZMA gPlazma \
+"default \
+-gplazma-authorization-module-policy=${gplazmaPolicy} \
+-num-simultaneous-requests=30 \
+-request-timeout=30 \
+"
+</programlisting>
+</blockquote>
+
+The first line states that a cell named gPlazma is to be started from the GPLAZMA class. Do not change the name of the gPlazma cell.
+
+The second line, "default", makes the cell "well-known" in the dCache routing, and allows other cells to contact it without having the name of gPlazma's domain. Do not change this line.
+
+The line defining gplazma-authorization-module-policy refers to a variable defined in the dCacheSetup file. If the path to the gPlazma policy file changes, change the value in that file, not on the above line.
+
+The variable num-simultaneous-requests determines the number of threads which will be started on the gPlazma cell to handle requests.The default value should be sufficient, but may be raised or lowered depending on the capacity of the hardware and other processes running on it.
+
+The variable request-timeout is the amount of time in seconds that a request thread has to finish an authorization decision. If this time is exceeded, authorization is denied.
+
+
+</para>
+
+</section>
+
+<section>
+ <title>
+The gridftpdoor and SRM Batch Files
+ </title>
+
+<para>
+
+When contained in the file ${ourHomeDir}/config/gridftpdoor.batch as an argument to the "LoginManager" domain, the line below will cause the gridftpdoor to use the gPlazma cell for authentication. If no lines regarding gplazma are included, the gridftpdoor will use the dcache.kpwd lookup method. A dcache.kpwd file must be present on the gridftpdoor node in that case.
+
+<blockquote>
+<programlisting width="80">
+-use-gplazma-authorization-cell=true \
+</programlisting>
+</blockquote>
+
+
+The same option is used in ${ourHomeDir}/config/srm.batch, for the "Storage" domain. Again, no gplazma line at all results in use of the dcache.kpwd lookup method. In that case, a dcache.kpwd file must exist on the srm node.
+
+<blockquote>
+<programlisting width="80">
+-use-gplazma-authorization-cell=true \
+</programlisting>
+</blockquote>
+
+</para>
 
 </section>
 
@@ -430,72 +373,62 @@
 
 
 <section>
-    <title>
-   Using Direct Calls of gPlazma Methods
-    </title>
+ <title>
+Using Direct Calls of gPlazma Methods
+ </title>
 
-   <para>Cells may also call gPlazma methods as an alternative, or as a fallback, to using the gPlazma cell.
-   </para>
+<para>Cells may also call gPlazma methods as an alternative, or as a fallback, to using the gPlazma cell.
+</para>
 
-   <section>
-       <title>
-      Operation without a gPlazma Cell
-       </title>
+<section>
+ <title>
+Operation without a gPlazma Cell
+ </title>
 
-      <para>
-
-
-      If the GPLAZMA cell is not started, other cells can still authenticate by calling gplazma methods 
-      directly from a pluggable module. The gplazma control files and host 
-      certificates (and any file in "/etc/grid-security/vomsdir" if the saml-vo-mapping plugin is used) are 
-      needed on the node from which authentication will take place. To invoke the gplazma modules, add the 
-      following lines to the batch files for the appropriate domain:
-
-      <blockquote>
-      <literallayout width="80">
-      -use-gplazma-authorization-module=true \
-      -gplazma-authorization-module-policy=${gplazmaPolicy} \
-      </literallayout>
-      </blockquote>
-
-      In dCache 1.7, the direct calls are supported in gridftpdoor and srm. Therefore, the batch files 
-      which can be modified with the above lines are gridftpdoor.batch and srm.batch.
-
-      No adjustable timeout is available, but any blocking would likely be due to a socket read in the 
-      saml-vo-mapping plugin, which is circumvented by a built-in 30-second timeout. If the GUMS server is 
-      not available to the saml-vo-mapping plugin at all, the request will return immediately with a "connection refused" message.
-      </para>
-
-   </section>
+<para>
 
 
-   <section>
-       <title>
-      Using a gPlazma Cell with a Direct-Call Fallback
-       </title>
+If the GPLAZMA cell is not started, other cells can still authenticate by calling gplazma methods directly from a pluggable module. The gplazma control files and host certificates (and any file in "/etc/grid-security/vomsdir" if the saml-vo-mapping plugin is used) are needed on the node from which authentication will take place. To invoke the gplazma modules, add the following lines to the batch files for the appropriate domain:
 
-      <para>
+<blockquote>
+<programlisting width="80">
+-use-gplazma-authorization-module=true \
+-gplazma-authorization-module-policy=${gplazmaPolicy} \
+</programlisting>
+</blockquote>
 
+In dCache 1.7, the direct calls are supported in gridftpdoor and srm. Therefore, the batch files which can be modified with the above lines are gridftpdoor.batch and srm.batch.
 
-      Both a call to the GPLAZMA cell and the direct call of the gplazma module may be specified. 
-      In that case, authentication will first be tried via the GPLAZMA cell, and if that does not 
-      succeed, authentication by direct invocation of gplazma methods will be tried. Place these 
-      lines in the batch file: 
+No adjustable timeout is available, but any blocking would likely be due to a socket read in the saml-vo-mapping plugin, which is circumvented by a built-in 30-second timeout. If the GUMS server is not available to the saml-vo-mapping plugin at all, the request will return immediately with a "connection refused" message.
+</para>
 
-      <blockquote>
-      <literallayout width="80">
-      -use-gplazma-authorization-cell=true \
-      -use-gplazma-authorization-module=true \
-      -gplazma-authorization-module-policy=${gplazmaPolicy} \
-      </literallayout>
-      </blockquote>
-
-      The variable gplazma-authorization-module-policy must be set to a local policy file, which does 
-      not have to specify the same plugins as the gPlazma cell. 
-
-      </para>
-
-   </section>
 </section>
+
+
+<section>
+ <title>
+Using a gPlazma Cell with a Direct-Call Fallback
+ </title>
+
+<para>
+
+
+Both a call to the GPLAZMA cell and the direct call of the gplazma module may be specified. In that case, authentication will first be tried via the GPLAZMA cell, and if that does not succeed, authentication by direct invocation of gplazma methods will be tried. Place these lines in the batch file: 
+
+<blockquote>
+<programlisting width="80">
+-use-gplazma-authorization-cell=true \
+-use-gplazma-authorization-module=true \
+-gplazma-authorization-module-policy=${gplazmaPolicy} \
+</programlisting>
+</blockquote>
+
+The variable gplazma-authorization-module-policy must be set to a local policy file, which does not have to specify the same plugins as the gPlazma cell. 
+
+</para>
+
+</section>
+</section>
+
 
 </chapter>
