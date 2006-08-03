@@ -198,7 +198,7 @@ Each line contains the string "authorize", followed by the username, read-write 
 
 <para>
 <emphasis role="bold">
-authorize uscms01 read-write 60076 5063 / /pnfs/fnal.gov/usr/cms/WAX/resilient/uscms01 /pnfs/fnal.gov/usr/cms/WAX/resilient/uscms01
+authorize uscms01 read-write 60076 5063 / /pnfs/fnal.gov/resilient/uscms01 /pnfs/fnal.gov/resilient/uscms01
 </emphasis>
 </para>
 
@@ -222,7 +222,7 @@ The lines are similar to the "login" lines of the dcache.kpwd file. If you alrea
 
 <para>
 <emphasis role="bold">
-login uscms01 read-write 60076 5063 / /pnfs/fnal.gov/usr/cms/WAX/resilient/uscms01 /pnfs/fnal.gov/usr/cms/WAX/resilient/uscms01
+login uscms01 read-write 60076 5063 / /pnfs/fnal.gov/resilient/uscms01 /pnfs/fnal.gov/resilient/uscms01
 </emphasis>
 </para>
 
