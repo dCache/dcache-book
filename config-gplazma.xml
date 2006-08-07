@@ -191,8 +191,17 @@ This file is used to map the username to a site-specific uid, gid, and rootpath.
 </programlisting>
 </blockquote>
 
+The file must contain a line specifying the version of the storage-authdb format.
 
-Each line contains the string "authorize", followed by the username, read-write permission, uid, gid, and three paths. 
+<blockquote>
+<programlisting width="80">
+version 2.1
+</programlisting>
+</blockquote>
+
+
+
+The other lines in the file each contain the string "authorize", followed by the username, read-write permission, uid, gid, and three paths. 
 
 </para>
 
