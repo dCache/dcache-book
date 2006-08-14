@@ -53,6 +53,15 @@
     <xi:include href="rf-cc-pm.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
     
   </chapter>
+  <!--       Devopers corner -->
+  <chapter id="rf-dc">
+    <title>dCache Developers Corner</title>
+    
+    <para>
+      This chapter is meant to provide useful informatiom for dCache developers only.
+    </para>
+    <xi:include href="rf-dc-StorageInfoQuotaObserver.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+  </chapter>
 
   <!-- <xi:include href="rf-dvl.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/> -->
 

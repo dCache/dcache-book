@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
+
+<section id="rf-dc-StorageInfoQuotaObserver">
+  <title>The StorageInfoQuotaObserver cell</title>
+  
+   <para>
+   The StorageInfoQuotaObserver keeps track on spaces for all attached pools.
+   The space granularity is based on the StorageInfo. It records precious, total,
+   pinned, free and removable spaces of currently available pools. Pools, not
+   active are not counted. Spaces may be queried by pool, storageinfo or link.
+   For link queries, additional, link specific information is provided for convenience.
+   </para>
+   
+   <section id="rf-dc-siqo">
+     <title>Calling Sequence</title>
+     <programlisting>
+        #
+        define context QuotaManagerSetup  endDefine
+           set pool query interval 180
+           set pool query steps     20
+           set pool query break    200
+           set poolmanager query interval 350
+           set pool validity timeout 400
+        endDefine
+        #
+        create diskCacheV111.services.space.StorageInfoQuotaObserver QuotaManager \
+              "default -export"
+        #</programlisting>
+        
+   </section>
+   <section id="rf-dc-sc">
+     <title>Parameter setter commands</title>
+       <blockquote>
+          <para>
+            These commands allow to customize the behaviour of the StorageInfoQuotaObserver.
+            They many determine how offen information is updated and how agressive the cells
+            queries other services for updates. The meaning of the <literal>set pool/poolmanager query
+            interval</literal> is obvious. Because of the fact, that the number of pools to query
+            can be rather large, the cell allows to send the space update queries in junks with
+            some time inbetween. The junk size is set by <literal>set pool query steps</literal> and
+            the break between sending junks by <literal>set pool query break</literal>.
+            If no pool information arrived within the <literal>set pool validity timeout</literal> the
+            corresponding pool is declared OFFLINE and the spaces are no longer counted.
+          </para>
+           <table>
+             <title>Parameter setting reference</title>
+             <tgroup cols="4" align="center">
+               <colspec colnum="1" colname="Command" colwidth="50"/>
+               <colspec colnum="2" colname="Argument Type"/>
+               <colspec colnum="3" colname="Argument Unit"/>
+               <colspec colnum="4" colname="Meaning"/>
+               <thead>
+                 <row>
+                   <entry>Command</entry>
+                   <entry>Argument Type</entry>
+                   <entry>Argument Unit</entry>
+                   <entry>Meaning</entry>
+                 </row>
+               </thead>
+               <tbody>
+                 <row>
+                   <entry>set pool query interval</entry>
+                   <entry>Time</entry>
+                   <entry>seconds</entry>
+                   <entry>Time interval between pool space queries</entry>
+                 </row>
+                 <row>
+                   <entry>set poolmanager query interval</entry>
+                   <entry>Time</entry>
+                   <entry>seconds</entry>
+                   <entry>Time interval between pool manager pool/link queries</entry>
+                 </row>
+                 <row>
+                   <entry>set pool query break</entry>
+                   <entry>Time</entry>
+                   <entry>Milli Seconds</entry>
+                   <entry>Time interval between pool query 'steps'</entry>
+                 </row>
+                 <row>
+                   <entry>set pool query steps</entry>
+                   <entry>Counter</entry>
+                   <entry>None</entry>
+                   <entry>Number of space queries between 'break'</entry>
+                 </row>
+                 <row>
+                   <entry>set pool validity timeout</entry>
+                   <entry>Time</entry>
+                   <entry>Seconds</entry>
+                   <entry>If if pool info arrived within this time, the pool is declared OFFLINE</entry>
+                 </row>
+               </tbody>
+             </tgroup>
+           </table>
+       </blockquote>    
+   </section>
+   <section id="rf-dc-qc">
+     <title>Information query commands</title>
+       <blockquote>
+       <itemizedlist>
+         <listitem>
+          <para><command>show pool [<replaceable>poolName</replaceable>]</command></para>
+         </listitem>
+         <listitem>
+          <para><command>show link [<replaceable>-a</replaceable>]</command> Lists spaces per link. The
+          <replaceable>-a</replaceable> option provides additional information, eg. the storage classes 
+          and pools assigned to the particular link.
+          </para>
+         </listitem>
+         <listitem>
+          <para><command>show sci</command> Lists spaces per storage element.
+          </para>
+         </listitem>
+       </itemizedlist>
+       </blockquote>
+   </section>
+   <section id="rf-dc-messages">
+     <title>Messages</title>
+     <para>
+     This cells currently replies on the following cell messages.
+     </para>
+     <section>
+     <title>diskCacheV111.vehicles.PoolMgrGetPoolLinks</title>
+       <blockquote>
+       <para>
+        The StorageInfoQuotaCell provides a list of <literal>PoolLinkInfo</literal>
+        structures, one per known link, on arrival of the message. Each <literal>PoolLinkInfo</literal>
+        is filled with the name of the link, the list of storage classes, this link is
+        associtated to, and the totally available space, left in this link. OFFLINE pools
+        are not counted.
+       </para>
+       </blockquote>
+     </section>
+     <section>
+     <title>diskCacheV111.vehicles.QuotaMgrCheckQuotaMessage</title>
+       <blockquote>
+       <para>
+        StorageInfoQuotaCell provides the soft and hard quota defined for the specified
+        <literal>StorageClass</literal> together with the space used.
+       </para>
+       </blockquote>
+     </section>
+   </section>
+</section>
