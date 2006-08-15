@@ -71,7 +71,7 @@
       application-specific meta-data is accessed by reading, writing,
       or creating files of the form
       <filename>.(<replaceable>command</replaceable>)(<replaceable>para</replaceable>)</filename>.
-      For example, the following prints the <pnfs/>-ID of the file
+      For example, the following prints the pnfsID of the file
       <filename>/pnfs/site.de/some/dir/file.dat</filename>:
 
       <screen><userprompt/>cat /pnfs/site.de/any/sub/directory/'.(id)(file.dat)' 
@@ -111,18 +111,18 @@
   </section>
 
   <section id="cf-pnfs-ids">
-    <title><pnfs/>-IDs</title>
+    <title>pnfsIDs</title>
 
     <para>
-      Each file in <pnfs/> has a unique 12 byte long <pnfs/>-ID. This
+      Each file in <pnfs/> has a unique 12 byte long pnfsID. This
       is comparable to the inode number in other filesystems. The
-      <pnfs/>-ID used for a file will never be reused, even if the
-      file is deleted. <dcache/> uses the <pnfs/>-ID for all internal
+      pnfsID used for a file will never be reused, even if the
+      file is deleted. <dcache/> uses the pnfsID for all internal
       references to a file. 
     </para>
     
     <para>
-      The <pnfs/>-ID of the file
+      The pnfsID of the file
       <filename><replaceable>filename</replaceable></filename> can be
       obtained by reading the command-file
       <filename>.(id)(<replaceable>filename</replaceable>)</filename>
@@ -130,22 +130,22 @@
     </para>
     
     <para>
-      A file in <pnfs/> can be referred to by <pnfs/>-ID for most
+      A file in <pnfs/> can be referred to by pnfsID for most
       operations. For example, the name of a file can be obtained from
-      the <pnfs/>-ID with the command <literal>nameof</literal> as follows:
+      the pnfsID with the command <literal>nameof</literal> as follows:
 
 <screen><userprompt/>cd /pnfs/site.de/any/sub/directory/
 <userprompt/>cat '.(nameof)(0004000000000000002320B8)'
 file.dat</screen>
 
-      And the <pnfs/>-ID of the directory it resides in is obtained by:
+      And the pnfsID of the directory it resides in is obtained by:
 
 <screen><userprompt/>cat '.(parent)(0004000000000000002320B8)'
 0004000000000000001DC9E8
 </screen>
 
       This way, the complete path of a file may be obtained starting
-      from the <pnfs/>-ID. Precisely this is done by the tool
+      from the pnfsID. Precisely this is done by the tool
       <command>pathfinder</command>:
 
 <screen><userprompt/>. /usr/etc/pnfsSetup
@@ -168,7 +168,7 @@ file.dat</screen>
       path obtained by <command>pathfinder</command> does not agree
       with the local path, since the latter depends on the mountpoint
       (in the example <filename
-      class="directory">/pnfs/site.de/</filename>). The <pnfs/>-ID
+      class="directory">/pnfs/site.de/</filename>). The pnfsID
       corresponding to the mountpoint may be obtained with
 
 <screen><userprompt/>cat '.(get)(cursor)'
@@ -177,7 +177,7 @@ dirPerm=0000001400000020
 mountID=000000000000000000001080
 </screen>
       
-      The <literal>dirID</literal> is the <pnfs/>-ID of the current
+      The <literal>dirID</literal> is the pnfsID of the current
       directory and <literal>mountID</literal> that of the
       mountpoint. In the example, the <pnfs/> server path <filename
       class="directory">/root/fs/usr/</filename> is mounted on
@@ -643,7 +643,7 @@ ID Name Type Status Path
 <screen><rootprompt/><command>sclient</command> getroot ${shmkey} 0
 0 000000000000000000001000 <replaceable>wormholePnfsId</replaceable></screen>
 
-      The last <pnfs/> ID is the one of the wormhole directory of the
+      The last pnfsID is the one of the wormhole directory of the
       database with ID 0 (already set correctly). Now you can set this ID with
 
 <screen><rootprompt/><command>sclient</command> getroot ${shmkey} <replaceable>newDbID</replaceable> <replaceable>wormholePnfsId</replaceable>
@@ -678,7 +678,7 @@ ID Name Type Status Path
     </section>
 
     <unfinished>
-      <para><literal>.(showid)(<replaceable>pnfs-ID</replaceable>)</literal></para>
+      <para><literal>.(showid)(<replaceable>pnfsID</replaceable>)</literal></para>
     </unfinished>
       
   </section>

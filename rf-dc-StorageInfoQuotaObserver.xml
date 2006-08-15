@@ -3,6 +3,9 @@
 
 <section id="rf-dc-StorageInfoQuotaObserver">
   <title>The StorageInfoQuotaObserver cell</title>
+  <para>
+  Autor : Patrick Fuhrmann
+  </para>
   
    <para>
    The StorageInfoQuotaObserver keeps track on spaces for all attached pools.

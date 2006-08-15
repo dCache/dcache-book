@@ -153,7 +153,7 @@ dCache-Installation-Instructions.txt: install.xml $(STYLESHEETS_HTML)
 
 # The whole thing
 #
-dcache.org: $(WEB_LOCATION)/dCacheBook.html $(WEB_LOCATION)/dCacheBook.pdf shtml
+dcache.org: $(WEB_LOCATION)/dCacheBook.html  shtml
 $(WEB_LOCATION)/dCacheBook.html: $(HTML_LOCATION)/Book.html .shtml.images.copied
 	cp $(HTML_LOCATION)/Book.html $(WEB_LOCATION)/dCacheBook.html
 $(WEB_LOCATION)/dCacheBook.pdf: Book.pdf
