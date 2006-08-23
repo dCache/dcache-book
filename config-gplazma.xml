@@ -290,6 +290,71 @@ The same user can be mapped to different usernames depending on what their role 
 </para>
 </section>
 
+<section>
+ <title>
+Authorizing a VO
+ </title>
+
+<para>
+
+Instead of individual DNs, it is allowable to use * or "*" as the first field, such as
+
+<blockquote>
+<programlisting width="80">
+"*" "/cms/uscms/Role=cmsprod" cmsprod
+</programlisting>
+</blockquote>
+
+In that case, any DN with the corresponding role will match. It should be noted that a match is first attempted with the full DN. Therefore if both DN and "*" matches can be made, the DN match will take precedence. This is true for the revocation matches as well (see below).
+
+Thus a user with subject
+
+<blockquote>
+<programlisting width="80">
+"/DC=org/DC=doegrids/OU=People/CN=Ted Hesselroth 897321"
+</programlisting>
+</blockquote>
+
+and role
+
+<blockquote>
+<programlisting width="80">
+"/cms/uscms/Role=cmsprod"
+</programlisting>
+</blockquote>
+
+will be mapped to username "cmsprod" via the above line with "*" for the DN, except if there is also a line such as
+
+<blockquote>
+<programlisting width="80">
+"/DC=org/DC=doegrids/OU=People/CN=Ted Hesselroth 898521" "/cms/uscms/Role=cmsprod" uscms01
+</programlisting>
+</blockquote>
+
+in which case the username will be "uscms01".
+</para>
+</section>
+
+<section>
+ <title>
+Revocation Entries
+ </title>
+
+<para>
+To create a revocation entry, add a line with "-" (without quotes) as the username, such as
+
+<blockquote>
+<programlisting width="80">
+"/DC=org/DC=doegrids/OU=People/CN=Timur Perelmutov 623542" "/uscms/production" -
+</programlisting>
+</blockquote>
+
+or modify the username of the entry if it already exists. The behaviour is undefined if there are two entries which differ only by username.
+
+Since DN is matched first, if a user would be authorized by his VO membership through a "*" entry, but is matched according to his DN to a revocation entry, authorization would be denied. Likewise if a whole VO were denied in a revocation entry, but some user in that VO could be mapped to a username through his DN, then authorization would be granted.
+</para>
+</section>
+
 </section>
 
 <section>
