@@ -260,6 +260,56 @@ create dmg.cells.services.login.LoginManager DCap-strict \
   </section>
   
   
+  <section id="cb-proto-dcap-passive">
+    <title>Passive dCap</title>
+
+    <partauthors>Tigran, Patrick</partauthors>
+
+    <para>
+      The dCap protocol, similiar to FTP, uses a control channel to request a transfer which 
+      is subsequently done through data channels. Per default, the data channel
+      is initiated by the server, connecting to an open port in the client library.
+      This is commonly known as active transfer.
+      Starting with dCache 1.7.0 the dCap protocol supports passive transfer mode as well,
+      which consequently means that the client connects to the server
+      pool to initiate the data channel. This is essential to support dCap clients running
+      behind firewalls and within private networks.
+    </para>
+    <section>
+    <title>Preparing the server for dCap passive transfer</title>
+    <para>
+    The port(s), the server pools should listens on, can be specified by the
+    org.dcache.net.tcp.portrange variable, as part of the 'java_options' directive in the
+    <filename>config/dCacheSetup</filename> configuration file. A range has to be
+    given if pools are split amoung multiple JVMs. E.g:
+<programlisting>
+java_options="-server ... -Dorg.dcache.net.tcp.portrange=33115:33145"</programlisting>
+    </para>
+    </section>
+    <section>
+    <title>Switching the dCap library resp. dccp to PASSIVE</title>
+    <para>
+    <screen>Remark : The commonly used expression 'passive' is seen from the server perspective and
+actually means 'server passive'. From the client perspective this is of course 'active'.
+Both means that the client connects to the server to establish the data connection. 
+This mode is supported by the server
+starting with 1.7.0 and dccp with 1-2-40 (included in 1.7.0)</screen>
+    </para>
+    <para>
+    The following dCap Api call  switches all subsequent dc_open calls to server-passive mode
+    if this mode is supported by the corresponding door. (dCache Version >= 1.7.0).
+<programlisting>
+<command>void dc_setClientActive()</command></programlisting>
+    </para>
+    <para>
+    The environment variable <command>DCACHE_CLIENT_ACTIVE</command>  switches
+    the dCap library to server-passive. This is true for dCap, dCap preload and dccp.
+    </para>
+    <para>
+    dccp, switches to server-passive when issuing the <command>-A</command> command line option.
+    </para>
+    </section>
+  </section>
   <section id="cb-proto-firewall">
     <title>Access to SRM and GridFTP server from behind a firewall</title>
 
