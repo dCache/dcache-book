@@ -282,8 +282,7 @@ create dmg.cells.services.login.LoginManager DCap-strict \
     org.dcache.net.tcp.portrange variable, as part of the 'java_options' directive in the
     <filename>config/dCacheSetup</filename> configuration file. A range has to be
     given if pools are split amoung multiple JVMs. E.g:
-<programlisting>
-java_options="-server ... -Dorg.dcache.net.tcp.portrange=33115:33145"</programlisting>
+<programlisting>java_options="-server ... -Dorg.dcache.dcap.port=0 -Dorg.dcache.net.tcp.portrange=33115:33145"</programlisting>
     </para>
     </section>
     <section>
