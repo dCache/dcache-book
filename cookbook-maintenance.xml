@@ -1,0 +1,578 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
+
+<chapter id="cb-maintenance">
+  <title>The Maintenance Module</title>
+  <partauthors>Patrick Fuhrmann</partauthors>
+  <para>
+  The maintenance module is designed to perform regular duties on a dCache system. Those tasks may run
+  in parallel and may be busy for a long period of time if not permanently. Users may attach to
+  those task and manipulate their behaviour. The first paragraph describes the framework itself
+  and subsequent paragraphs the different loadable modules.
+  </para>
+  <section id="cb-m-basics">
+    <title>The Basic Framework</title>
+    <para>
+      The <classname>CommandTaskCell</classname> allows for multiple subtasks to perform
+      various timeconsuming operations on the dCache system. For now only the
+      file copy management is available. Multiple of those "pool draining tasks" may run independently
+      within one maintenance Cell.
+    </para>
+    <section>
+    <title>Configuration</title>
+    <para>
+    In case the dCache distribution is not coming with this feature 
+    installed, please follow the instructions below to get it enabled.
+    </para>
+    <para>
+    Create a file <filename>/opt/d-cache/config/maintenance.batch</filename> with the
+    following content.
+<programlisting>
+set printout default 3
+set printout CellGlue none
+onerror shutdown
+#
+check -strong setupFile
+#
+copy file:${setupFile} context:setupContext
+#
+#  import the variables into our $context.
+#  don't overwrite already existing variables.
+#
+import context -c setupContext
+#
+#   Make sure we got what we need.
+#
+check -strong serviceLocatorPort serviceLocatorHost
+#
+create dmg.cells.services.RoutingManager  RoutingMgr
+#
+#   The LocationManager Part
+#
+create dmg.cells.services.LocationManager lm \
+       "${serviceLocatorHost} ${serviceLocatorPort}"
+#
+#
+define context taskSetup endDefine
+  define module copy-module diskCacheV111.replicaManager.EasyCopyCellModule -base=${config}/copytask
+  set logout time 18000
+endDefine
+#
+create dmg.cells.services.CommandTaskCell maintenance "default -export"
+#</programlisting>
+   <itemizedlist>
+   <listitem>
+     <para> Change to ../jobs and run ./initPackage.sh. The script may complain about some security
+     issues which are not relevant in this context. 
+     </para>
+    </listitem>
+    <listitem>
+    <para> Make sure you create the
+    directory <filename>/opt/d-cache/config/copytask</filename>. It will hold temporary
+    information for the various copy tasks.
+    </para>
+    </listitem>
+    <listitem>
+    <para>
+    Start the service by :
+<screen>
+./maintenance start</screen>
+</para>
+    </listitem>
+    </itemizedlist>
+    </para>
+   
+    </section>
+    <section>
+    <title>The concept</title>
+    <para>
+    A maintenance cell provides a set of modules each of which can be
+    instantiated multiple times and run concurrently. An instantiated module
+    is called a task. A user session may be attached and detached to/from any task.
+    Different modules provide different functionalities and consequently comes
+    with a diffferent command set.
+    
+    A typical session would look as follows :
+    </para>
+    <blockquote>
+    <para>
+    Change to the maintenance cell and get a listing of all available modules.
+    
+<screen>
+<dcprompt>local</dcprompt><command>cd maitenance</command>
+<dcprompt>maintenance</dcprompt><command>ls module</command> -l
+copy-module -> diskCacheV111.replicaManager.EasyCopyCellModule</screen>
+    Create a new task of module copy-module.
+<screen>
+<dcprompt>maintenance</dcprompt><command>create task</command> my-first-task  copy-module
+Task &lt;my-first-task&gt; created and attached to (us) [alm-admin-101@adminDoorDomain]</screen>
+    The task 'my-first-task' has been created and the current terminal session is attached to that task.
+    (as the message says). 'my-first-task' will show up in the task listing as follows :
+<screen>    
+<dcprompt>maintenance</dcprompt><command>ls task</command>  -l 
+my-first-task copy-module {my-first-task;Status=idle;m=IDLE}</screen>
+    Communiction with the task is done by prepending the actual task command    
+    by the keywork 'task'. So if there a is a copy-module command 'load pool' one would
+    have to issue 'task load pool'.
+<screen>
+<dcprompt>maintencance</dcprompt><command>task help</command>
+ exclude pinned|cached|precious|bad|locked|&lt;storageClass&gt;
+ info
+ halt  # halt processing
+ ***
+ keeponly pinned|cached|precious|bad|locked|&lt;storageClass&gt;
+ load pool &lt;PoolName&gt; [&lt;StorageInfoPattern&gt;]
+<dcprompt>maintencance</dcprompt>
+<dcprompt>maintencance</dcprompt>
+<dcprompt>maintencance</dcprompt>
+<dcprompt>maintencance</dcprompt>
+<dcprompt>maintencance</dcprompt><command>task info</command>
+Task
+----
+        Name : copy
+ Module Args : define module copy diskCacheV111.***
+   Task Args : create task copy copy
+Parameter
+---------
+   ***</screen>
+The <command>task</command> keyword may be omited as long as the command is not ambiguous.
+</para>
+<para>
+In order to create a new task or to attach to another, already existing one, 
+one has to detach from the current task.
+<screen>
+<dcprompt>maintenance</dcprompt><command>detach</command>
+Detached from : &lt;my-first-task&gt;</screen>
+</para>
+<para>
+If a session is idle for more than an hour, it automatically detaches from the
+currently attached  task, if it had been connected. In order to continue working with that
+task, one has to reattach :
+<screen>
+<dcprompt>maintenance</dcprompt><command>attach my-first-task</command>
+Task &lt;my-first-task&gt; attached to (us) [alm-admin-101@adminDoorDomain]</screen>
+</para>
+</blockquote>
+</section>
+    <section>
+    <title>Framework Reference Manual</title>
+    <blockquote>
+    <para>
+    <screen><command>define module <replaceable>ModuleName</replaceable> <replaceable>ModuleClass</replaceable></command></screen>
+    </para>
+    <blockquote>
+    <para>
+    Assigns a java class to a module name. Subsequently this module may be instantiated using the module name only.
+    This command is typically executed during startup in <filename>maintenance.batch</filename>.
+    </para>
+    </blockquote>
+    
+    <para>
+    <screen><command>undefine module <replaceable>ModuleName</replaceable></command></screen>
+    </para>
+    <blockquote>
+    <para>
+    Undefines a module name. Tasks still running the module are not affected.
+    </para>
+    </blockquote>
+    
+    <para>
+    <screen><command>ls -l module</command></screen>
+    </para>
+    <blockquote>
+    <para>
+    Lists all available modules.
+    </para>
+    </blockquote>
+    
+    <para>
+    <screen><command>ls -l task</command></screen>
+    </para>
+    <blockquote>
+    <para>
+    Lists all active tasks.
+    </para>
+    </blockquote>
+    
+    <para>
+    <screen><command>ls -l session</command></screen>
+    </para>
+    <blockquote>
+    <para>
+    Lists all session together with tasks they are currently attached to.
+    </para>
+    </blockquote>
+    
+    <para>
+    <screen><command>ceate task <replaceable>taskName</replaceable> <replaceable>moduleName</replaceable></command></screen>
+    </para>
+    <blockquote>
+    <para>
+    Creates a new task based on the specified module. The <replaceable>taskName</replaceable> must be unique.
+    The current session is automatically attached to the new task.
+    </para>
+    </blockquote>
+    
+    <para>
+    <screen><command>attach <replaceable>taskName</replaceable></command></screen>
+    </para>
+    <blockquote>
+    <para>
+    Attached to an already active task. The <replaceable>taskName</replaceable> must exists.
+    The current session must not be attached to any other task. So it might become necesssary
+    to <command>detach</command> first.
+    </para>
+    </blockquote>
+    
+    <para>
+    <screen><command>detach</command></screen>
+    </para>
+    <blockquote>
+    <para>
+    Detaches this session from the currently attached task.
+    </para>
+    </blockquote>
+    
+    <para>
+    <screen><command>task <replaceable>task specific command</replaceable></command></screen>
+    </para>
+    <blockquote>
+    <para>
+    Forward the command <replaceable>task specific command</replaceable> to the attached task for
+    execution. If the command is not ambiguous, the <command>task</command> keywork may be omitted.
+    </para>
+    </blockquote>
+   </blockquote>
+    
+    
+    
+    </section>
+</section>
+<!--
+
+            T H E   C O P Y    M O D U L E
+
+  -->  
+  
+  
+  <section id="cb-m-copy-module">
+    <title>The copy module</title>
+
+    <para>
+    The purpose of the copy module is essentially to copy the content
+    of a pool to one or more other pools to have the data available 
+    while the source pool is under maintenance.
+    </para>
+    
+    <section>
+    <title>The Concept</title>
+    <para>
+    Vacating a pool is done in three steps.
+    <itemizedlist>
+    <listitem>
+    <para>
+    The pool, to be vacated, has to be set to read-only to make sure that
+    during the copy procedure, the content doesn't change anymore. This 
+    is not a technical requirement, it simply ensures consistency.
+    </para>
+    </listitem>
+    <listitem>
+    <para>
+    A snapshot is taken from the repository of the source pool. 
+    Filters can be run on this repostiory listing to select or deselect
+    classes of files to be copied. Classes can be either special types like
+    'cached' 'precious' a.s.o or the storage groups like cms:generated@osm.
+    </para>
+    </listitem>
+    <listitem>
+    <para>
+    The actual copy is initiated. The copy is done only on the preselected
+    list. The destination pools may be specified individually or as a 
+    PoolManager pool group.
+    </para>
+    </listitem>
+    </itemizedlist>
+    </para>
+    <para>
+    </para>
+    </section>
+
+
+    <section>
+    <title>Setting a pool read only</title>
+    <para>
+    In oder to ensure consistency during a data copy process a pool needs to be set 'read-only'
+    within the pool manager. Subsequently no repository-modification operation will be submitted
+    to the pool. (write or restore).
+    <screen><dcprompt>PoolManager</dcprompt><command>psu set pool <replaceable>PoolName</replaceable> rdonly</command></screen>
+    This command doesn't stop ongoing transfers to the pool. So one needs to wait until all write 
+    and restore movers have finished.
+    </para>
+    </section>
+    <section>
+    <title>Creating or attaching to a maintenance task</title>
+    <para>
+    All subsequent operations need to be done within the framework of a copy-task. So one either has to
+    create a new copy task or has to reuse an already existing, idle one.
+    <screen><dcprompt>maintenance</dcprompt><command>create task my-copy-task copy-module</command></screen>
+    or if there is already an idle task :
+    <screen><dcprompt>maintenance</dcprompt><command>attach my-copy-task</command></screen>   
+    </para>
+    </section>
+    <section>
+    <title>Getting and customizing the source repository listing</title>
+    <para>
+    Next one has to obtain a listing of the source pool repository.
+    <screen><dcprompt>maintenance</dcprompt><command>load pool <replaceable>poolName</replaceable></command></screen>
+    Depending on the size of the source pool listing, this may take awhile. Checkout 'task info' to
+    learn when the fetch operation is done.
+    </para>
+    <para>
+    With 
+    <screen><dcprompt>maintenance</dcprompt><command>ls stat</command></screen>
+    a the content of the source pool repository is shown. It provides a table of file classes containing
+    the number of bytes and the number of files per class. For simplification, a file class may either be
+    a the status of a file, (precious,cached,pinned, locked and bad) or the storage class, like 
+    cms:generated@osm.
+    Use
+    <screen><dcprompt>maintenance</dcprompt><command>ls files</command></screen>
+    to get a full listing of all  files  found in the repository. 
+    </para>
+    <para>
+    The <command>ls files/stat</command> listing is the bases of the subsequent copy process.
+    The listing may be customized to select/deselect particular file classes to be copied or not.
+    Any class may be excluded from the repository listing by
+    <screen><dcprompt>maintenance</dcprompt><command>exclude <replaceable>fileClass</replaceable></command></screen>
+    where file class may be 'cached, precious, pinned, locked or bad' or a storage class
+    like 'cms:generated@osm'. 
+    The 
+    <screen><dcprompt>maintenance</dcprompt><command>keeponly <replaceable>fileClass</replaceable></command></screen>
+    excludes all file classes except for the specified one.
+    Both, 'exclude' and 'keeponly" may be used unitl the repository listing fit your needs.
+    </para>
+    </section>
+
+  </section>
+  
+  <section id="cb-m-vacate">
+    <title>Vacating a Pool with the copy-module</title>
+
+    <para>
+      The <classname>CopyManager</classname> is a <dcache/> cell type
+      which is capable of copying the content of a pool (one to one)
+      to another pool.  The mode of the files (precious or cached) are
+      retained unchanged.
+    </para>
+
+    <section>
+      <title>Limitations</title>
+
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    Beta version, not yet tested properly.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    The destination pool must have suffient (empty or removable)
+	    space to hold the content of the source pool.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    A single <classname>CoypManager</classname> can only manage a
+	    single source destination pool pair at a time.
+	    But more than one CopyManager can be started to
+	    manage other pool copy pairs.
+	  </para>
+	</listitem>
+      </itemizedlist>
+
+    </section>
+
+    <section>
+      <title>Preparing the copy manager</title>
+
+      <para>
+	The following is only necessary, if a copy manager cell is not
+	already started. This might already be done e.g. in the
+	<literal>utility</literal> Domain.
+      </para>
+
+      <para>
+	Create a batch file with the following content within the
+	<dcache/> config directory (preferrable on the headnode).
+	The file may be called <filename>config/copy.batch</filename>:
+
+<programlisting>#
+set printout default 3
+set printout CellGlue none
+onerror shutdown
+#
+check -strong setupFile
+#
+copy file:${setupFile} context:setupContext
+#
+#  import the variables into our $context.
+#  don't overwrite already existing variables.
+#
+import context -c setupContext
+#
+#   Make sure we got what we need.
+#
+check -strong serviceLocatorHost serviceLocatorPort
+#
+create dmg.cells.services.RoutingManager  RoutingMgr
+#
+#   The LocationManager Part
+#
+create dmg.cells.services.LocationManager lm \
+       "${serviceLocatorHost} ${serviceLocatorPort} "
+#
+#
+#
+create diskCacheV111.replicaManager.CopyManager copy0 \
+       "default -export"
+#</programlisting>
+
+	Change the cwd to <filename class="directory">jobs</filename>
+	and run
+	
+<screen><rootprompt/>cd /opt/d-cache/jobs
+<rootprompt/>./initPackage.sh</screen> 
+	
+	(Ignore possible error message.)
+	Start the <literal>copy</literal> domain with
+
+<screen>/opt/d-cache/jobs/copy start</screen>
+
+      </para>
+      
+      <para>
+	Everything up to here only has to be done once.
+The follow procedure has to be done for
+each full pool copy.
+      </para>
+
+    </section>
+
+    <section>
+      <title>Copy manager commands</title>
+
+      <para>
+	Use the admin interface to do the following commands:
+	Change the pnfs timeout of the destination pool:
+
+<screen><dcprompt select="local"/><command>cd</command> <replaceable>destinationPool</replaceable>
+<dcprompt><replaceable>destinationPool</replaceable></dcprompt><command>pp set pnfs timeout</command> 300
+<dcprompt><replaceable>destinationPool</replaceable></dcprompt><command>save</command></screen>
+
+	define the maximum number of pool-to-pool transfers of the
+	source pool:
+
+<screen><dcprompt><replaceable>destinationPool</replaceable></dcprompt><command>..</command>
+<dcprompt select="local"/><command>cd</command> <replaceable>sourcePool</replaceable>
+<!-- pool disable -strict -->
+<dcprompt><replaceable>sourcePool</replaceable></dcprompt><command>p2p set max active</command> 10</screen>
+
+	make sure, all incoming trafic stopped:
+
+<screen><dcprompt><replaceable>sourcePool</replaceable></dcprompt><command>mover ls</command>
+<dcprompt><replaceable>sourcePool</replaceable></dcprompt><command>pp ls</command></screen>
+
+	change to
+	<literal><replaceable>copyManagerCell</replaceable></literal>
+	and start the transfers:
+
+<screen><dcprompt><replaceable>sourcePool</replaceable></dcprompt><command>..</command>
+<dcprompt select="local"/><command>cd</command> <replaceable>copyManagerCell</replaceable>
+<dcprompt><replaceable>copyManagerCell</replaceable></dcprompt><command>copy</command> <replaceable>sourcePool</replaceable> <replaceable>destinationPool</replaceable> -max=5</screen>
+
+	  check progress with
+
+<screen><dcprompt><replaceable>copyManagerCell</replaceable></dcprompt><command>info</command></screen>
+
+	The <option>-max</option> option allows to specify the maximum
+	number of active transfers at a time. The number in the
+	<command>p2p set max active</command> command must be larger
+	than the <option>-max</option> number.
+      </para>
+
+      <para>
+	Check the progress by using the info command in the copy cell.
+	A progess bar should grow from right to left until the full
+	content has been copied.
+      </para>
+
+      <para>
+	It might happen, that the <command>info</command> command
+	times out when used immediately after the
+	<command>copy</command> had been started.  This is because the
+	copy cell is rather busy while setting up the transfers. After
+	awhile <command>info</command> will become responsive again.
+      </para>
+
+      <para>
+	Using the <option>-precious</option> option restricts the copy process
+	to files which are <glossterm linkend="gl-precious">precious</glossterm>:
+
+<screen><dcprompt><replaceable>copyManagerCell</replaceable></dcprompt><command>copy</command> <replaceable>sourcePool</replaceable> <replaceable>destinationPool</replaceable> -max=5 <emphasis>-precious</emphasis></screen>
+      </para>
+
+      <para>
+	One may modify the copy.batch file to start more than one
+	CopyManager. In that case make sure all of them have
+	distingued names. (copy0, coyp1, copy2).
+
+<programlisting>create diskCacheV111.replicaManager.CopyManager <emphasis>copy0</emphasis> \
+       "default -export"
+#
+create diskCacheV111.replicaManager.CopyManager <emphasis>copy1</emphasis> \
+       "default -export"
+#
+create diskCacheV111.replicaManager.CopyManager <emphasis>copy2</emphasis> \
+       "default -export"
+#</programlisting>
+
+      </para>
+
+      <para>
+	If the destionation pool already holds a subset of the content
+	of the source pool, those files are not copied again but are
+	shown in the <command>copy</command> cell
+	<command>info</command> command.
+      </para>
+    </section>
+
+    <section>
+      <title>Precautions and recovery from problems</title>
+
+      <para>
+	Because the software is not yet suffiently tested it would be good to do a
+
+<screen><dcprompt><replaceable>poolName</replaceable></dcprompt><command>rep ls</command> -s</screen>
+
+	on the source and destination pools before the copy process
+	started and the same on the destination pool after the process
+	finished. Make sure the numbers are consistent.
+      </para>
+
+      <para>
+	If for whatever reason, the copy process messes up, its no
+	problem to restart the copy domain with
+
+<screen><rootprompt/><command>/opt/d-cache/jobs/copy</command> stop
+<rootprompt/><command>/opt/d-cache/jobs/copy</command> start</screen>
+
+	One only needs to restart the <command>copy</command> command
+	to proceed.  Files already copied will not be copied again.
+      </para>
+      
+    </section>
+  </section>
+  
+
+</chapter>
+  
+  
