@@ -6,8 +6,8 @@
   <partauthors>Patrick Fuhrmann</partauthors>
   <para>
   The maintenance module is designed to perform regular duties on a dCache system. Those tasks may run
-  in parallel and may be busy for a long period of time if not permanently. Users may attach to
-  those task and manipulate their behaviour. The first paragraph describes the framework itself
+  in parallel and may be busy for a long period of time or even permanently. Users may attach to
+  those tasks and manipulate their behaviour. The first paragraph describes the framework itself
   and subsequent paragraphs the different loadable modules.
   </para>
   <section id="cb-m-basics">
@@ -53,7 +53,7 @@ create dmg.cells.services.LocationManager lm \
        "${serviceLocatorHost} ${serviceLocatorPort}"
 #
 #
-define context taskSetup endDefine
+define context maintenanceSetup endDefine
   define module copy-module diskCacheV111.replicaManager.EasyCopyCellModule -base=${config}/copytask
   set logout time 18000
 endDefine
@@ -261,7 +261,7 @@ Task &lt;my-first-task&gt; attached to (us) [alm-admin-101@adminDoorDomain]</scr
     <para>
     The purpose of the copy module is essentially to copy the content
     of a pool to one or more other pools to have the data available 
-    while the source pool is under maintenance.
+    while the source pool is not available.
     </para>
     
     <section>
@@ -272,7 +272,7 @@ Task &lt;my-first-task&gt; attached to (us) [alm-admin-101@adminDoorDomain]</scr
     <listitem>
     <para>
     The pool, to be vacated, has to be set to read-only to make sure that
-    during the copy procedure, the content doesn't change anymore. This 
+    during the copy procedure, the content doesn't change. This 
     is not a technical requirement, it simply ensures consistency.
     </para>
     </listitem>
@@ -280,8 +280,8 @@ Task &lt;my-first-task&gt; attached to (us) [alm-admin-101@adminDoorDomain]</scr
     <para>
     A snapshot is taken from the repository of the source pool. 
     Filters can be run on this repostiory listing to select or deselect
-    classes of files to be copied. Classes can be either special types like
-    'cached' 'precious' a.s.o or the storage groups like cms:generated@osm.
+    classes of files to be copied. Classes can either be special types like
+    'cached' 'precious' a.s.o or storage groups like cms:generated@osm.
     </para>
     </listitem>
     <listitem>
@@ -322,21 +322,21 @@ Task &lt;my-first-task&gt; attached to (us) [alm-admin-101@adminDoorDomain]</scr
     <section>
     <title>Getting and customizing the source repository listing</title>
     <para>
-    Next one has to obtain a listing of the source pool repository.
+    The next step is to obtain a listing of the source pool repository.
     <screen><dcprompt>maintenance</dcprompt><command>load pool <replaceable>poolName</replaceable></command></screen>
     Depending on the size of the source pool listing, this may take awhile. Checkout 'task info' to
     learn when the fetch operation is done.
     </para>
     <para>
-    With 
+     
     <screen><dcprompt>maintenance</dcprompt><command>ls stat</command></screen>
-    a the content of the source pool repository is shown. It provides a table of file classes containing
+    shows the content of the source pool repository. It provides a table of file classes containing
     the number of bytes and the number of files per class. For simplification, a file class may either be
     a the status of a file, (precious,cached,pinned, locked and bad) or the storage class, like 
     cms:generated@osm.
-    Use
+   
     <screen><dcprompt>maintenance</dcprompt><command>ls files</command></screen>
-    to get a full listing of all  files  found in the repository. 
+    gives a full listing of all  files  found in the repository. 
     </para>
     <para>
     The <command>ls files/stat</command> listing is the bases of the subsequent copy process.
@@ -348,227 +348,210 @@ Task &lt;my-first-task&gt; attached to (us) [alm-admin-101@adminDoorDomain]</scr
     The 
     <screen><dcprompt>maintenance</dcprompt><command>keeponly <replaceable>fileClass</replaceable></command></screen>
     excludes all file classes except for the specified one.
-    Both, 'exclude' and 'keeponly" may be used unitl the repository listing fit your needs.
+    Both, 'exclude' and 'keeponly" may be used until the repository listing fits your needs.
     </para>
     </section>
 
-  </section>
-  
-  <section id="cb-m-vacate">
-    <title>Vacating a Pool with the copy-module</title>
+    <section>
+    <title>Starting the copy process</title>
+    <para>
+    Two parameters should be set before starting the copy procedure. All parameters are valid
+    for all subsequent copy operations or until they  are changed. 
+    <itemizedlist>
+    <listitem>
+    <para><command>task set copy-mode nn|same|precious|cached</command> defines the mode of the
+    replicated file.
+       <warning>
+       <para>
+       Replicating precious files or creating precious replica from or to pools which are connected
+       to an HSM system will very likely result in a serious error condition 
+       </para>
+       </warning>
+       Mode can be one of the following :
+       <itemizedlist>
+       <listitem>
+       <para>
+       <command>precious</command> Independend of the source mode, the created replica will be 
+          created in 'precious' mode.
+       </para>
+       </listitem>
+       <listitem>
+       <para>
+       <command>cached</command> Independend of the source mode, the created replica will be 
+          created in 'cached' mode. 
+       </para>
+       </listitem>
+       <listitem>
+       <para>
+       <command>same</command> The mode of the destination file will be identical to the mode of
+       the soure file.
+       </para>
+       </listitem>
+       <listitem>
+       <para>
+       <command>nn</command> The mode of the destination file is determined by the setting of the
+       destination pool. (Don't use)
+       </para>
+       </listitem>
+       </itemizedlist>
+       </para> 
+   
+    </listitem>
+    <listitem>
+    <para><command>task set parallel <replaceable>numberOfParallelTransfers</replaceable></command> defines the number
+    of concurrent parallel copy operations. This doesn't overwrite the 'max mover' settings of the
+    pools themselves.
+    </para>
+    </listitem>
+    </itemizedlist>
+    </para>
+    <para>
+    The actual copy operation is trigged by either
+    <command>copyto pools <replaceable>PoolName</replaceable> [<replaceable>PoolName</replaceable> [...]]</command>
+    or
+    <command>copyto group <replaceable>PoolGroupName</replaceable></command>
+    The command is processed asynchronously and progress may be checked by 'task info'. 
+    The process may be stopped using <command>halt</command>. Already started transfers will be finished first.
+    After the process has been finished, the <command>ls stat -l</command> command will show files not
+    transferred. Information is provided for which reason the transfer hasn't been performed. This includes 
+    a manual 'halt'. This allows to resume from an 'halt'.
+    </para>
+    <para>
+    Remarks:
+    <itemizedlist>
+    <listitem>
+    <para>
+    Replicating a file to a pool which already contains a copy of this file is not an error condition
+    and is silently ignored.
+    </para>
+    </listitem>
+    <listitem>
+    <para>
+    To get a fair distribution of files among the destination pools, one should allow for
+    a reasonable parallism. (<command>task set parallel</command>
+    </para>
+    </listitem>
+    <listitem>
+    <para>
+    Space management : Among the available destination pools, the copy process will always chose the
+    pool with the maximum 'free + replaceable' space. In the worst case this may lead to deleting 'cached' files
+    though there would have been 'real free' space available on a different pool. We are currently trying to improve the
+    distribution algorithm.
+    </para>
+    </listitem>
+    </itemizedlist>
+    </para>
+    </section>
+    
+    <section>
+    <title>Copy Module Reference Manual</title>
+    <blockquote>
+<!--
+ exclude pinned|cached|precious|bad|locked|<storageClass>
+ info
+ halt  # halt processing
+ send <destination> <message>
+ replicate OPTIONS # see help go for further infos
+ ls stat [-error]
+ ls files [-l]
+ ls active
+ clear  # clears state
+ copyto pools <pool1> [<pool2>[...]] [-copy-mode=precious|cached|nn|same] [-parallel=<streams>]
+ copyto group <poolGroup> [-copy-mode=precious|cached|nn|same] [-parallel=<streams>]
+ set <key> <value> # see help set
+ keeponly pinned|cached|precious|bad|locked|<storageClass>
+ load pool <PoolName> [<StorageInfoPattern>]
+
+-->
+    <para>
+    <screen><command>task load pool <replaceable>PoolName</replaceable></command></screen>
+    </para>
+    <blockquote>
+    <para>
+    The pool repository of pool <replaceable>PoolName</replaceable> is loaded and becomes the
+    current pool listing. Use 'info' to check for completion of the command.
+    </para>
+    </blockquote>
 
     <para>
-      The <classname>CopyManager</classname> is a <dcache/> cell type
-      which is capable of copying the content of a pool (one to one)
-      to another pool.  The mode of the files (precious or cached) are
-      retained unchanged.
+    <screen><command>[task] info</command></screen>
     </para>
+    <blockquote>
+    <para>
+    Provides information on the current status of this copy task.
+    </para>
+    </blockquote>
 
-    <section>
-      <title>Limitations</title>
+    <para>
+    <screen><command>[task] ls stat [-l]</command></screen>
+    </para>
+    <blockquote>
+    <para>
+    Provides information on the currently loaded pool repository.
+    </para>
+    </blockquote>
 
-      <itemizedlist>
-	<listitem>
-	  <para>
-	    Beta version, not yet tested properly.
-	  </para>
-	</listitem>
-	<listitem>
-	  <para>
-	    The destination pool must have suffient (empty or removable)
-	    space to hold the content of the source pool.
-	  </para>
-	</listitem>
-	<listitem>
-	  <para>
-	    A single <classname>CoypManager</classname> can only manage a
-	    single source destination pool pair at a time.
-	    But more than one CopyManager can be started to
-	    manage other pool copy pairs.
-	  </para>
-	</listitem>
-      </itemizedlist>
+    <para>
+    <screen><command>[task] ls files [-l]</command></screen>
+    </para>
+    <blockquote>
+    <para>
+    Lists all files of the currently loaded pool repository. This may be a very long list.
+    (Don't use)
+    </para>
+    </blockquote>
 
-    </section>
+    <para>
+    <screen><command>[task] exclude pinned|cached|precious|bad|locked|<replaceable>storageClass</replaceable></command></screen>
+    <screen><command>[task] keeponly pinned|cached|precious|bad|locked|<replaceable>storageClass</replaceable></command></screen>
+    </para>
+    <blockquote>
+    <para>
+    </para>
+    </blockquote>
 
-    <section>
-      <title>Preparing the copy manager</title>
+    <para>
+    <screen><command>[task] halt</command></screen>
+    </para>
+    <blockquote>
+    <para>
+    </para>
+    </blockquote>
 
-      <para>
-	The following is only necessary, if a copy manager cell is not
-	already started. This might already be done e.g. in the
-	<literal>utility</literal> Domain.
-      </para>
+    <para>
+    <screen><command>[task] clear</command></screen>
+    </para>
+    <blockquote>
+    <para>
+    </para>
+    </blockquote>
 
-      <para>
-	Create a batch file with the following content within the
-	<dcache/> config directory (preferrable on the headnode).
-	The file may be called <filename>config/copy.batch</filename>:
+    <para>
+    <screen><command>[task] set copy-mode precious|cached|same|nn</command></screen>
+    </para>
+    <blockquote>
+    <para>
+    </para>
+    </blockquote>
 
-<programlisting>#
-set printout default 3
-set printout CellGlue none
-onerror shutdown
-#
-check -strong setupFile
-#
-copy file:${setupFile} context:setupContext
-#
-#  import the variables into our $context.
-#  don't overwrite already existing variables.
-#
-import context -c setupContext
-#
-#   Make sure we got what we need.
-#
-check -strong serviceLocatorHost serviceLocatorPort
-#
-create dmg.cells.services.RoutingManager  RoutingMgr
-#
-#   The LocationManager Part
-#
-create dmg.cells.services.LocationManager lm \
-       "${serviceLocatorHost} ${serviceLocatorPort} "
-#
-#
-#
-create diskCacheV111.replicaManager.CopyManager copy0 \
-       "default -export"
-#</programlisting>
+    <para>
+    <screen><command>[task] set parallel <replaceable>NumberOfParallelStreams</replaceable></command></screen>
+    </para>
+    <blockquote>
+    <para>
+    </para>
+    </blockquote>
 
-	Change the cwd to <filename class="directory">jobs</filename>
-	and run
-	
-<screen><rootprompt/>cd /opt/d-cache/jobs
-<rootprompt/>./initPackage.sh</screen> 
-	
-	(Ignore possible error message.)
-	Start the <literal>copy</literal> domain with
+    <para>
+    <screen><command>[task] copyto pools <replaceable>PoolName</replaceable> [<replaceable>PoolName</replaceable> [...]]</command></screen>
+    <screen><command>[task] copyto group <replaceable>PoolGroupName</replaceable></command></screen>
+    </para>
+    <blockquote>
+    <para>
+    </para>
+    </blockquote>
 
-<screen>/opt/d-cache/jobs/copy start</screen>
-
-      </para>
-      
-      <para>
-	Everything up to here only has to be done once.
-The follow procedure has to be done for
-each full pool copy.
-      </para>
-
-    </section>
-
-    <section>
-      <title>Copy manager commands</title>
-
-      <para>
-	Use the admin interface to do the following commands:
-	Change the pnfs timeout of the destination pool:
-
-<screen><dcprompt select="local"/><command>cd</command> <replaceable>destinationPool</replaceable>
-<dcprompt><replaceable>destinationPool</replaceable></dcprompt><command>pp set pnfs timeout</command> 300
-<dcprompt><replaceable>destinationPool</replaceable></dcprompt><command>save</command></screen>
-
-	define the maximum number of pool-to-pool transfers of the
-	source pool:
-
-<screen><dcprompt><replaceable>destinationPool</replaceable></dcprompt><command>..</command>
-<dcprompt select="local"/><command>cd</command> <replaceable>sourcePool</replaceable>
-<!-- pool disable -strict -->
-<dcprompt><replaceable>sourcePool</replaceable></dcprompt><command>p2p set max active</command> 10</screen>
-
-	make sure, all incoming trafic stopped:
-
-<screen><dcprompt><replaceable>sourcePool</replaceable></dcprompt><command>mover ls</command>
-<dcprompt><replaceable>sourcePool</replaceable></dcprompt><command>pp ls</command></screen>
-
-	change to
-	<literal><replaceable>copyManagerCell</replaceable></literal>
-	and start the transfers:
-
-<screen><dcprompt><replaceable>sourcePool</replaceable></dcprompt><command>..</command>
-<dcprompt select="local"/><command>cd</command> <replaceable>copyManagerCell</replaceable>
-<dcprompt><replaceable>copyManagerCell</replaceable></dcprompt><command>copy</command> <replaceable>sourcePool</replaceable> <replaceable>destinationPool</replaceable> -max=5</screen>
-
-	  check progress with
-
-<screen><dcprompt><replaceable>copyManagerCell</replaceable></dcprompt><command>info</command></screen>
-
-	The <option>-max</option> option allows to specify the maximum
-	number of active transfers at a time. The number in the
-	<command>p2p set max active</command> command must be larger
-	than the <option>-max</option> number.
-      </para>
-
-      <para>
-	Check the progress by using the info command in the copy cell.
-	A progess bar should grow from right to left until the full
-	content has been copied.
-      </para>
-
-      <para>
-	It might happen, that the <command>info</command> command
-	times out when used immediately after the
-	<command>copy</command> had been started.  This is because the
-	copy cell is rather busy while setting up the transfers. After
-	awhile <command>info</command> will become responsive again.
-      </para>
-
-      <para>
-	Using the <option>-precious</option> option restricts the copy process
-	to files which are <glossterm linkend="gl-precious">precious</glossterm>:
-
-<screen><dcprompt><replaceable>copyManagerCell</replaceable></dcprompt><command>copy</command> <replaceable>sourcePool</replaceable> <replaceable>destinationPool</replaceable> -max=5 <emphasis>-precious</emphasis></screen>
-      </para>
-
-      <para>
-	One may modify the copy.batch file to start more than one
-	CopyManager. In that case make sure all of them have
-	distingued names. (copy0, coyp1, copy2).
-
-<programlisting>create diskCacheV111.replicaManager.CopyManager <emphasis>copy0</emphasis> \
-       "default -export"
-#
-create diskCacheV111.replicaManager.CopyManager <emphasis>copy1</emphasis> \
-       "default -export"
-#
-create diskCacheV111.replicaManager.CopyManager <emphasis>copy2</emphasis> \
-       "default -export"
-#</programlisting>
-
-      </para>
-
-      <para>
-	If the destionation pool already holds a subset of the content
-	of the source pool, those files are not copied again but are
-	shown in the <command>copy</command> cell
-	<command>info</command> command.
-      </para>
-    </section>
-
-    <section>
-      <title>Precautions and recovery from problems</title>
-
-      <para>
-	Because the software is not yet suffiently tested it would be good to do a
-
-<screen><dcprompt><replaceable>poolName</replaceable></dcprompt><command>rep ls</command> -s</screen>
-
-	on the source and destination pools before the copy process
-	started and the same on the destination pool after the process
-	finished. Make sure the numbers are consistent.
-      </para>
-
-      <para>
-	If for whatever reason, the copy process messes up, its no
-	problem to restart the copy domain with
-
-<screen><rootprompt/><command>/opt/d-cache/jobs/copy</command> stop
-<rootprompt/><command>/opt/d-cache/jobs/copy</command> start</screen>
-
-	One only needs to restart the <command>copy</command> command
-	to proceed.  Files already copied will not be copied again.
-      </para>
-      
+    </blockquote>
     </section>
   </section>
   

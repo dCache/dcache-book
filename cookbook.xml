@@ -28,6 +28,8 @@
 
   <xi:include  href="cookbook-general.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
   
+  <xi:include  href="cookbook-maintenance.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+  
   <xi:include  href="cookbook-pool.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
   
   <xi:include  href="cookbook-pnfs-postgres.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
