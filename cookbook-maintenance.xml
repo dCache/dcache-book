@@ -90,7 +90,7 @@ create dmg.cells.services.CommandTaskCell maintenance "default -export"
     instantiated multiple times and run concurrently. An instantiated module
     is called a task. A user session may be attached and detached to/from any task.
     Different modules provide different functionalities and consequently comes
-    with a diffferent command set.
+    with a different command set.
     
     A typical session would look as follows :
     </para>
@@ -107,8 +107,8 @@ copy-module -> diskCacheV111.replicaManager.EasyCopyCellModule</screen>
 <dcprompt>maintenance</dcprompt><command>create task</command> my-first-task  copy-module
 Task &lt;my-first-task&gt; created and attached to (us) [alm-admin-101@adminDoorDomain]</screen>
     The task 'my-first-task' has been created and the current terminal session is attached to that task.
-    (as the message says). 'my-first-task' will show up in the task listing as follows :
-<screen>    
+    (as the message says). 'my-first-task' is listed as follows :
+<screen>
 <dcprompt>maintenance</dcprompt><command>ls task</command>  -l 
 my-first-task copy-module {my-first-task;Status=idle;m=IDLE}</screen>
     Communiction with the task is done by prepending the actual task command    
@@ -507,6 +507,8 @@ Task &lt;my-first-task&gt; attached to (us) [alm-admin-101@adminDoorDomain]</scr
     </para>
     <blockquote>
     <para>
+    Either excludes the specified class from the pool listing 'ls stat' or only keeps the specified class.
+    The result may be viewed by 'ls stat -l'.
     </para>
     </blockquote>
 
@@ -515,6 +517,8 @@ Task &lt;my-first-task&gt; attached to (us) [alm-admin-101@adminDoorDomain]</scr
     </para>
     <blockquote>
     <para>
+    This command finishes the currently active transfers but doesn't launch new ones.
+    The 'ls stat' command reports on files not yet transferred. Use the 'copyto' command(s) to resume transfers.
     </para>
     </blockquote>
 
@@ -523,22 +527,61 @@ Task &lt;my-first-task&gt; attached to (us) [alm-admin-101@adminDoorDomain]</scr
     </para>
     <blockquote>
     <para>
+    Clears the internal status of a command. This might become necessary of a component (e.g. pool) doesn't
+    respond on a request.
     </para>
     </blockquote>
-
     <para>
     <screen><command>[task] set copy-mode precious|cached|same|nn</command></screen>
     </para>
-    <blockquote>
+    <blockquote>    
     <para>
+    Sets the copy mode, valide for subsequent 'copyto' request.
     </para>
-    </blockquote>
-
+    <para>
+       <warning>
+       <para>
+       Replicating precious files or creating precious replica from or to pools which are connected
+       to an HSM system will very likely result in a serious error condition 
+       </para>
+       </warning>
+       <!-- Mode can be one of the following : -->
+       <itemizedlist>
+       <listitem>
+       <para>
+       <command>precious</command> Independend of the source mode, the created replica will be 
+          created in 'precious' mode.
+       </para>
+       </listitem>
+       <listitem>
+       <para>
+       <command>cached</command> Independend of the source mode, the created replica will be 
+          created in 'cached' mode. 
+       </para>
+       </listitem>
+       <listitem>
+       <para>
+       <command>same</command> The mode of the destination file will be identical to the mode of
+       the soure file.
+       </para>
+       </listitem>
+       <listitem>
+       <para>
+       <command>nn</command> The mode of the destination file is determined by the setting of the
+       destination pool. (Don't use)
+       </para>
+       </listitem>
+       </itemizedlist>
+   
+    </para>  
+    </blockquote>   
     <para>
     <screen><command>[task] set parallel <replaceable>NumberOfParallelStreams</replaceable></command></screen>
     </para>
     <blockquote>
     <para>
+    Sets the nimber of parallel transferes. This is actually the number of transfer requests. Depending on the
+    pp and p2p values of the involved pools, the number may be lower.
     </para>
     </blockquote>
 
@@ -548,6 +591,9 @@ Task &lt;my-first-task&gt; attached to (us) [alm-admin-101@adminDoorDomain]</scr
     </para>
     <blockquote>
     <para>
+    Starts the actual transfer of all files prepared by the 'load pool' and 'exclude/keeponly' commands. 
+    The destination pools by either be directly specified using the  'copyto pools' command or indirectly to
+    a PoolManager pool group using 'copyto group'. Check 'task info' on the progress of the command.
     </para>
     </blockquote>
 
