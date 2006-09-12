@@ -238,5 +238,43 @@ create dmg.cells.services.login.LoginManager DCap \
     </section>
     
   </section>
-  
+  <section id="cb-tuning-parameters">
+    <title>Tunable Parameters</title>
+    
+    
+    <section id="cb-tuning-parameters-gsiftp">
+      <title>gridftp</title>
+      <blockquote>
+      <table tabstyle="cellattributes">
+        <title>Protocol Overview</title>
+
+        <tgroup cols="3" align="center">
+          <colspec colnum="1" colname="Variable" colwidth="70"/>
+          <colspec colnum="2" colname="Default Value" colwidth="70"/>
+          <colspec colnum="3" colname="Description" colwidth="120"/>
+          <thead>
+             <row><entry>Variable</entry><entry>Default Value</entry><entry>Description</entry></row>
+          </thead>
+          <tbody>
+            <row><entry>gsiFtpPortNumber</entry><entry>2811</entry><entry>gsi ftp port listen port</entry></row>
+            <row><entry>spaceReservation</entry><entry>false</entry><entry>Use the space reservation service</entry></row>
+            <row><entry>spaceReservationStrict</entry><entry>false</entry><entry>Use the space reservation service</entry></row>
+            <row><entry>performanceMarkerPeriod</entry><entry>180</entry><entry>Performance markers in seconds</entry></row>
+            <row><entry>gplazmaPolicy</entry><entry>${ourHomeDir}/etc/dcachesrm-gplazma.policy</entry><entry>Location of the gPlazma Policy File</entry></row>
+            <row><entry>useGPlazmaAuthorizationModule</entry><entry>true</entry><entry>Use the gPlazma module</entry></row>
+            <row><entry>useGPlazmaAuthorizationCell</entry><entry>false</entry><entry>Use the gPlazma cell</entry></row>
+            <row><entry>gsiftpPoolManagerTimeout</entry><entry>5400</entry><entry>Pool Manager timeout in seconds</entry></row>
+            <row><entry>gsiftpPoolTimeout</entry><entry>600</entry><entry>Pool timeout in seconds</entry></row>
+            <row><entry>gsiftpPnfsTimeout</entry><entry>300</entry><entry>Pnfs timeout in seconds</entry></row>
+            <row><entry>gsiftpMaxRetries</entry><entry>80</entry><entry>Number of PUT/GET retries</entry></row>
+            <row><entry>gsiftpMaxStreamsPerClient</entry><entry>10</entry><entry>Number of parallel streams per ftp PUT/GET</entry></row>
+            <row><entry>gsiftpDeleteOnConnectionClosed</entry><entry>true</entry><entry>Delete file on connection closed</entry></row>
+            <row><entry>gsiftpMaxLogin</entry><entry>100</entry><entry>Maximum number of concurrently logged in users</entry></row>
+            <row><entry>clientDataPortRange</entry><entry>20000:25000</entry><entry>The client data port range</entry></row>
+          </tbody>
+        </tgroup>
+      </table>
+      </blockquote>
+    </section>
+  </section>
 </chapter>
