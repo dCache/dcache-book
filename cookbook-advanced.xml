@@ -246,7 +246,7 @@ create dmg.cells.services.login.LoginManager DCap \
       <title>gridftp</title>
       <blockquote>
       <table tabstyle="cellattributes">
-        <title>Protocol Overview</title>
+        <title>Variable Overview</title>
 
         <tgroup cols="3" align="center">
           <colspec colnum="1" colname="Variable" colwidth="70"/>
@@ -271,6 +271,56 @@ create dmg.cells.services.login.LoginManager DCap \
             <row><entry>gsiftpDeleteOnConnectionClosed</entry><entry>true</entry><entry>Delete file on connection closed</entry></row>
             <row><entry>gsiftpMaxLogin</entry><entry>100</entry><entry>Maximum number of concurrently logged in users</entry></row>
             <row><entry>clientDataPortRange</entry><entry>20000:25000</entry><entry>The client data port range</entry></row>
+          </tbody>
+        </tgroup>
+      </table>
+      </blockquote>
+    </section>
+    <section id="cb-tuning-parameters-srm">
+      <title>SRM</title>
+      <blockquote>
+      <table tabstyle="cellattributes">
+        <title>Variable Overview</title>
+
+        <tgroup cols="3" align="center">
+          <colspec colnum="1" colname="Variable" colwidth="70"/>
+          <colspec colnum="2" colname="Default Value" colwidth="70"/>
+          <colspec colnum="3" colname="Description" colwidth="120"/>
+          <thead>
+             <row><entry>Variable</entry><entry>Default Value</entry><entry>Description</entry></row>
+          </thead>
+          <tbody>
+              <row><entry>srmPort</entry><entry>8443</entry><entry>srmPort</entry></row>
+              <row><entry>srmDatabaseHost</entry><entry>localhost</entry><entry>srmDatabaseHost</entry></row>
+              <row><entry> srmTimeout</entry><entry>3600</entry><entry> srmTimeout</entry></row>
+              <row><entry> srmVacuum</entry><entry>true</entry><entry> srmVacuum</entry></row>
+              <row><entry> srmVacuumPeriod</entry><entry>21600</entry><entry> srmVacuumPeriod</entry></row>
+              <row><entry> srmProxiesDirectory</entry><entry>/tmp</entry><entry> srmProxiesDirectory</entry></row>
+              <row><entry> srmBufferSize</entry><entry>1048576</entry><entry> srmBufferSize</entry></row>
+              <row><entry> srmTcpBufferSize</entry><entry>1048576</entry><entry> srmTcpBufferSize</entry></row>
+              <row><entry> srmDebug</entry><entry>true</entry><entry> srmDebug</entry></row>
+              <row><entry> srmGetReqThreadQueueSize</entry><entry>1000</entry><entry> srmGetReqThreadQueueSize</entry></row>
+              <row><entry> srmGetReqThreadPoolSize</entry><entry>100</entry><entry> srmGetReqThreadPoolSize</entry></row>
+              <row><entry> srmGetReqMaxWaitingRequests</entry><entry>1000</entry><entry> srmGetReqMaxWaitingRequests</entry></row>
+              <row><entry> srmGetReqReadyQueueSize</entry><entry>1000</entry><entry> srmGetReqReadyQueueSize</entry></row>
+              <row><entry> srmGetReqMaxReadyRequests</entry><entry>100</entry><entry> srmGetReqMaxReadyRequests</entry></row>
+              <row><entry> srmGetReqMaxNumberOfRetries</entry><entry>10</entry><entry> srmGetReqMaxNumberOfRetries</entry></row>
+              <row><entry> srmGetReqRetryTimeout</entry><entry>60000</entry><entry> srmGetReqRetryTimeout</entry></row>
+              <row><entry> srmGetReqMaxNumOfRunningBySameOwner</entry><entry>10</entry><entry> srmGetReqMaxNumOfRunningBySameOwner</entry></row>
+              <row><entry> srmPutReqThreadQueueSize</entry><entry>1000</entry><entry> srmPutReqThreadQueueSize</entry></row>
+              <row><entry> srmPutReqThreadPoolSize</entry><entry>100</entry><entry> srmPutReqThreadPoolSize</entry></row>
+              <row><entry> srmPutReqMaxWaitingRequests</entry><entry>1000</entry><entry> srmPutReqMaxWaitingRequests</entry></row>
+              <row><entry> srmPutReqReadyQueueSize</entry><entry>1000</entry><entry> srmPutReqReadyQueueSize</entry></row>
+              <row><entry> srmPutReqMaxReadyRequests</entry><entry>100</entry><entry> srmPutReqMaxReadyRequests</entry></row>
+              <row><entry> srmPutReqMaxNumberOfRetries</entry><entry>10</entry><entry> srmPutReqMaxNumberOfRetries</entry></row>
+              <row><entry> srmPutReqRetryTimeout</entry><entry>60000</entry><entry> srmPutReqRetryTimeout</entry></row>
+              <row><entry> srmPutReqMaxNumOfRunningBySameOwner</entry><entry>10</entry><entry> srmPutReqMaxNumOfRunningBySameOwner</entry></row>
+              <row><entry> srmCopyReqThreadQueueSize</entry><entry>1000</entry><entry> srmCopyReqThreadQueueSize</entry></row>
+              <row><entry> srmCopyReqThreadPoolSize</entry><entry>100</entry><entry> srmCopyReqThreadPoolSize</entry></row>
+              <row><entry> srmCopyReqMaxWaitingRequests</entry><entry>1000</entry><entry> srmCopyReqMaxWaitingRequests</entry></row>
+              <row><entry> srmCopyReqMaxNumberOfRetries</entry><entry>30</entry><entry> srmCopyReqMaxNumberOfRetries</entry></row>
+              <row><entry> srmCopyReqRetryTimeout</entry><entry>60000</entry><entry> srmCopyReqRetryTimeout</entry></row>
+              <row><entry> srmCopyReqMaxNumOfRunningBySameOwner</entry><entry>10</entry><entry> srmCopyReqMaxNumOfRunningBySameOwner</entry></row>
           </tbody>
         </tgroup>
       </table>
