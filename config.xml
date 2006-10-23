@@ -30,6 +30,8 @@
   <xi:include href="config-central-flushing.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
 
   <xi:include href="config-gplazma.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+  
+  <xi:include href="config-xrootd.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
 
 </part>
 

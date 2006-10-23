@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">
+
+<chapter id="cf-xrootd">
+
+	<title>dCache as xRootd-Server</title>
+
+	<partauthors>Martin Radicke</partauthors>
+
+	<para>
+		This chapter explains how to configure dCache in order to access
+		it via the xrootd-protocol, allowing xrootd-Clients like ROOT's
+		TXNetfile and xrdcp to do file operations against a
+		dCache-instance in a transparent manner. The current
+		implementation in dCache 1.7.0 is based on the most recent
+		production version of the xrootd-protocol (2.4.5).
+	</para>
+
+	<section id="cf-xrootd-setup">
+		<title>Setting up</title>
+
+		<para>
+			The xrootd functionality is contained in all dCache releases
+			starting from 1.7.0. Versions prior to this are not
+			supported!
+		</para>
+
+		<para>
+			To allow file transfers in and out of
+			<dcache />
+			using xrootd, a new xrootd-Door must be started. This door
+			acts then as the entry point to all xrootd requests.
+			Compared to the native xrootd server-implementation
+			(produced by SLAC), the xrootd-door refers to the redirector
+			node.
+		</para>
+
+		<para>
+			To enable the xrootd door, just change the config file
+			<filename>${dCacheHome}/etc/node_config</filename>
+			so that it contains the line
+			<programlisting>..
+XROOTD=yes
+..</programlisting>
+
+			After a restart of the dcache core-services, done by
+			executing <screen><rootprompt/><command>${dCacheHome}/bin/dcache-core</command>	restart</screen>
+			, the xrootd door should be running. A few minutes later it
+			should appear at the web monitoring interface under "Cell
+			Services" (see
+			<xref linkend="intouch-web" />
+			).
+		</para>
+		
+		<para>
+			The default port the xrootd door is listening on is 1094. This can be changed in 
+			<filename>${dCacheHome}/config/dCacheSetup</filename> by setting the variable "xrootdPort" to the
+			desired value (again restart required). 
+		</para>
+
+		
+		<warning>
+			<para>
+				The procedure described above will start a xrootd-Door in unsecure mode,
+				 giving clients unrestricted read and write access. Please refer to
+				<xref linkend="cf-xrootd-sec"/> on how to enable security.
+			</para>
+		</warning>
+	</section>
+
+	<section id="cf-xrootd-tests">
+		<title>quick tests</title>
+
+		<para>
+			The subsequent paragraphs describe a quick guide on how to
+			test xrootd using the <filename>xrdcp</filename> and <filename>ROOT</filename> clients.
+		</para>
+
+		<section id="cf-xrootd-tests-xrdcp">
+			<title>copying files with xrdcp</title>
+
+			<para>
+				A simple way to get files in and out of dCache via
+				xrootd is the command xrdcp.
+			</para>
+		</section>
+	</section>
+
+	<section id="cf-xrootd-sec">
+		<title>xrootd security</title>
+		
+		<para>
+			to be written..
+		</para>
+	</section>
+
+</chapter>
