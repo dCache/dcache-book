@@ -699,7 +699,8 @@ OK
       </listitem>
       <listitem>
 	<para>
-          xRoot protocol added. (No security yet). Can be configured to allow read only.
+          xRootd protocol added. This allows to access dCache from within ROOT transparently. Token-
+          based authorization is available as well.
 	</para>
       </listitem>
       <listitem>
