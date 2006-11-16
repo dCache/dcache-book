@@ -69,9 +69,9 @@ XROOTD=yes
 		
 		<warning>
 			<para>
-				The procedure described above will start a xrootd-Door in unsecure mode,
-				 giving clients unrestricted read and write access. Please refer to
-				<xref linkend="cf-xrootd-sec"/> on how to enable security.
+				Starting from version 1.7.0 (patchlevel 20), the xrootd-Door is set to readonly by default. In prior 
+				versions, the door is started in unsecure mode, giving clients unrestricted read and write access. 
+				Please refer to <xref linkend="cf-xrootd-sec"/> on how to setup security.
 			</para>
 		</warning>
 		
