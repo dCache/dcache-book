@@ -377,47 +377,79 @@ Replace the URL with that of the site-specific <ulink
 </para>
 
 </section>
+<section>
+ <title>
+An example policy file
+ </title>
+
+<para>
+Here is an example of how a policy file might be set up.
+
+<blockquote>
+<programlisting width="80">
+saml-vo-mapping="ON"
+kpwd="ON"
+grid-mapfile="OFF"
+gplazmalite-vorole-mapping="OFF"
+saml-vo-mapping-priority="1"
+kpwd-priority="3"
+grid-mapfile-priority="4"
+gplazmalite-vorole-mapping-priority="2"
+kpwdPath="/opt/d-cache/etc/dcache.kpwd"
+gridMapFilePath="/etc/grid-security/grid-mapfile"
+storageAuthzPath="/etc/grid-security/storage-authzdb"
+mappingServiceUrl="https://fledgling09.fnal.gov:8443/gums/services/GUMSAuthorizationServicePort"
+gridVoRolemapPath="/etc/grid-security/grid-vorolemap"
+gridVoRoleStorageAuthzPath="/etc/grid-security/storage-authzdb" 
+</programlisting>
+</blockquote>
+
+In this case, gPlazma will attempt to authorize first through a GUMS server, and fall back to using dcache.kpwd. The mappingServiceUrl would have to be changed to a GUMS server appropriate for the site.
+</para>
+
+</section>
+
 
 <section>
  <title>
-The Batch Files
+The Setup Files
  </title>
 
-<para>Changes to batch files require a restart of the cell.
+<para>Changes to Setup files require a restart of the cell.
 </para>
 
 
 
 <section>
  <title>
-The gPlazma Batch File
+The gPlazmaSetup File
  </title>
 
 <para>
 
 
-The batch file is found in ${ourHomeDir}/config/gPlazma.batch. The section of the batch file which controls the operation of the cell is as follows:
+This file will normally be a link to ${ourHomeDir}/config/dCacheSetup. The section of the file which controls the operation of the cell is as follows:
 
 <blockquote>
 <programlisting width="80">
-create diskCacheV111.services.authorization.GPLAZMA gPlazma \
-"default \
--gplazma-authorization-module-policy=${gplazmaPolicy} \
--num-simultaneous-requests=30 \
--request-timeout=30 \
-"
+gplazmaPolicy=${ourHomeDir}/etc/dcachesrm-gplazma.policy
+#
+# gPlazmaNumberOfSimutaneousRequests  30
+# gPlazmaRequestTimeout               30
+#
+# useGPlazmaAuthorizationModule=false
+# useGPlazmaAuthorizationCell=true
 </programlisting>
 </blockquote>
 
-The first line states that a cell named gPlazma is to be started from the GPLAZMA class. Do not change the name of the gPlazma cell.
 
-The second line, "default", makes the cell "well-known" in the dCache routing, and allows other cells to contact it without having the name of gPlazma's domain. Do not change this line.
+The first line defines the path to the gPlazma policy file. It is set to the default location of the policy file. If the path to the gPlazma policy file changes, enter the full path in the above line.
 
-The line defining gplazma-authorization-module-policy refers to a variable defined in the dCacheSetup file. If the path to the gPlazma policy file changes, change the value in that file, not on the above line.
+The variable gPlazmaNumberOfSimutaneousRequests determines the number of threads which will be started on the gPlazma cell to handle requests.The default value should be sufficient, but may be raised or lowered depending on the capacity of the hardware and other processes running on it.
 
-The variable num-simultaneous-requests determines the number of threads which will be started on the gPlazma cell to handle requests.The default value should be sufficient, but may be raised or lowered depending on the capacity of the hardware and other processes running on it.
+The variable gPlazmaRequestTimeout is the amount of time in seconds that a request thread has to finish an authorization decision. If this time is exceeded, authorization is denied.
 
-The variable request-timeout is the amount of time in seconds that a request thread has to finish an authorization decision. If this time is exceeded, authorization is denied.
+The next two variables are not used by gPlazma, but by gridftpdoor and SRM. Their description follows.
 
 
 </para>
@@ -426,27 +458,30 @@ The variable request-timeout is the amount of time in seconds that a request thr
 
 <section>
  <title>
-The gridftpdoor and SRM Batch Files
+The gridftpdoorSetup and srmSetup Files
  </title>
 
 <para>
 
-When contained in the file ${ourHomeDir}/config/gridftpdoor.batch as an argument to the "LoginManager" domain, the line below will cause the gridftpdoor to use the gPlazma cell for authentication. If no lines regarding gplazma are included, the gridftpdoor will use the dcache.kpwd lookup method. A dcache.kpwd file must be present on the gridftpdoor node in that case.
+Thes two files will normally be links to ${ourHomeDir}/config/dCacheSetup. The lines of interest for gPlazma are
 
 <blockquote>
 <programlisting width="80">
--use-gplazma-authorization-cell=true \
+gplazmaPolicy=${ourHomeDir}/etc/dcachesrm-gplazma.policy
+</programlisting>
+</blockquote>
+
+and
+
+<blockquote>
+<programlisting width="80">
+# useGPlazmaAuthorizationModule=false
+# useGPlazmaAuthorizationCell=true
 </programlisting>
 </blockquote>
 
 
-The same option is used in ${ourHomeDir}/config/srm.batch, for the "Storage" domain. Again, no gplazma line at all results in use of the dcache.kpwd lookup method. In that case, a dcache.kpwd file must exist on the srm node.
-
-<blockquote>
-<programlisting width="80">
--use-gplazma-authorization-cell=true \
-</programlisting>
-</blockquote>
+The latter two lines control whether the gridftpdoor or SRM will authorize locally, or use the gPlazma cell for authorization. The default is to use the gPlazma cell for authorization. If both values are set to "false", the gridftpdoor or SRM will use the dcache.kpwd lookup method. A dcache.kpwd file must be present on the gridftpdoor or SRM node in that case. It is possible to use gPlazma methods on the door or SRM without calling the gPlazma cell. See the following section.
 
 </para>
 
@@ -471,18 +506,24 @@ Operation without a gPlazma Cell
 <para>
 
 
-If the GPLAZMA cell is not started, other cells can still authenticate by calling gplazma methods directly from a pluggable module. The gplazma control files and host certificates (and any file in "/etc/grid-security/vomsdir" if the saml-vo-mapping plugin is used) are needed on the node from which authentication will take place. To invoke the gplazma modules, add the following lines to the batch files for the appropriate domain:
+If the GPLAZMA cell is not started, other cells can still authorize by calling gplazma methods directly from a pluggable module. The gplazma control files and host certificates are needed on the node from which authorization will take place. To invoke the gplazma modules, modify the following line in gridftpdoorSetup or srmSetup to
 
 <blockquote>
 <programlisting width="80">
--use-gplazma-authorization-module=true \
--gplazma-authorization-module-policy=${gplazmaPolicy} \
+useGPlazmaAuthorizationModule=true
 </programlisting>
 </blockquote>
 
-In dCache 1.7, the direct calls are supported in gridftpdoor and srm. Therefore, the batch files which can be modified with the above lines are gridftpdoor.batch and srm.batch.
+and make sure that the gplazmaPolicy line defines a valid gplazma policy file on the node for which authorization is to occur:
 
-No adjustable timeout is available, but any blocking would likely be due to a socket read in the saml-vo-mapping plugin, which is circumvented by a built-in 30-second timeout. If the GUMS server is not available to the saml-vo-mapping plugin at all, the request will return immediately with a "connection refused" message.
+<blockquote>
+<programlisting width="80">
+gplazmaPolicy=${ourHomeDir}/etc/dcachesrm-gplazma.policy
+</programlisting>
+</blockquote>
+
+
+No adjustable timeout is available, but any blocking would likely be due to a socket read in the saml-vo-mapping plugin, which is circumvented by a built-in 30-second timeout.
 </para>
 
 </section>
@@ -495,18 +536,25 @@ Using a gPlazma Cell with a Direct-Call Fallback
 
 <para>
 
-
-Both a call to the GPLAZMA cell and the direct call of the gplazma module may be specified. In that case, authentication will first be tried via the GPLAZMA cell, and if that does not succeed, authentication by direct invocation of gplazma methods will be tried. Place these lines in the batch file: 
+Both a call to the GPLAZMA cell and the direct call of the gplazma module may be specified. In that case, authentication will first be tried via the GPLAZMA cell, and if that does not succeed, authentication by direct invocation of gplazma methods will be tried. Modify the following lines to: 
 
 <blockquote>
 <programlisting width="80">
--use-gplazma-authorization-cell=true \
--use-gplazma-authorization-module=true \
--gplazma-authorization-module-policy=${gplazmaPolicy} \
+useGPlazmaAuthorizationModule=true
+useGPlazmaAuthorizationCell=true
 </programlisting>
 </blockquote>
 
-The variable gplazma-authorization-module-policy must be set to a local policy file, which does not have to specify the same plugins as the gPlazma cell. 
+
+Make sure that the line for gplazmaPolicy
+
+<blockquote>
+<programlisting width="80">
+gplazmaPolicy=${ourHomeDir}/etc/dcachesrm-gplazma.policy
+</programlisting>
+</blockquote>
+
+set to a local policy file on the node. The gplazma policy file on the gridftp door or SRM does not have to specify the same plugins as the gPlazma cell.
 
 </para>
 
