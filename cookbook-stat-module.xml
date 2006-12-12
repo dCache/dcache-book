@@ -178,7 +178,7 @@ create diskCacheV111.services.PoolStatisticsV0 PoolStatistics  \
 
        <para>
         Add the following line to the <literal>context httpdSetup</literal> section of
-        the <literal>config/httpd.conf</literal> file.
+        the <literal>config/httpd.batch</literal> file.
         <screen>
            set alias statistics directory /<replaceable>StatBase</replaceable></screen>
        </para>
