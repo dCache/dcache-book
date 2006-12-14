@@ -52,7 +52,11 @@ CVS_BINARY ?= cvs
 
 # Default value for docbook-xml version
 #
-DBXML_VERSION ?= 1.68.1
+DBXML_VERSION ?= 1.71.1
+
+# Default value of Apache fop version
+#
+FOP_VERSION ?= fop-0.90alpha1
 
 # Default value for user for uploads to web server
 #
@@ -70,6 +74,7 @@ XALAN := java -Xbootclasspath/p:software/fop/lib/xml-apis.jar:software/fop/lib/x
 # FOP command
 #
 FOP := java -classpath software/fop/lib/xml-apis.jar:software/fop/lib/xercesImpl-2.2.1.jar:software/fop/lib/xalan-2.4.1.jar:software/fop/lib/resolver.jar:software/fop/lib/batik.jar:software/fop/lib/avalon-framework-cvs-20020806.jar:software/fop/build/fop.jar: org.apache.fop.apps.Fop
+
 
 ###### Docbook targets. Pure DocBook is generated from the sources first
 #
@@ -224,8 +229,9 @@ Book.fo:	Book.db.xml $(STYLESHEETS_FO)
 # PDF from XSL-FO
 #
 pdf:		Book.pdf
-Book.pdf:	Book.fo $(IMAGES)
-	$(FOP) Book.fo Book.pdf 
+Book.pdf:	$(IMAGES)
+	software/fop/fop -xml Book.db.xml -xsl software/docbook-xsl/fo/docbook.xsl -pdf Book.pdf
+#	$(FOP) Book.fo Book.pdf 
 #	pdfxmltex Book.fo
 
 # PDF directly via xmlto (still broken)
@@ -264,11 +270,15 @@ software/docbook-xsl/README: software/docbook-xsl-$(DBXML_VERSION).tar.bz2
 
 software/fop-current-bin.tar.gz:
 	mkdir -p software/
-	cd software/ && wget http://ftp.uni-erlangen.de/pub/mirrors/apache/xml/fop/fop-current-bin.tar.gz
+	cd software/ && wget http://archive.apache.org/dist/xml/fop/binaries/$(FOP_VERSION)-bin-jdk1.4.tar.gz
+#	cd software/ && wget http://ftp.uni-erlangen.de/pub/mirrors/apache/xml/fop/fop-current-bin.tar.gz
+    
 
 software/fop/fop.sh: software/fop-current-bin.tar.gz
-	cd software/ && gunzip -c fop-current-bin.tar.gz | tar xf - && ln -ns fop-0* fop
-	touch software/fop/fop.sh
+#	cd software/ && gunzip -c fop-current-bin.tar.gz | tar xf - && ln -ns fop-0* fop
+	cd software/ && gunzip -c $(FOP_VERSION)-bin-jdk1.4.tar.gz | tar xf - && ln -ns $(FOP_VERSION) fop
+#	touch software/fop/fop.sh
+	touch software/fop/fop
 
 software/xml-commons-resolver-latest.tar.gz:
 	mkdir -p software/
