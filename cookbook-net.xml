@@ -366,18 +366,8 @@ create dmg.cells.services.login.LoginManager <emphasis>GFTP-door-a</emphasis> \
              -prot=raw \
              <emphasis>-service-cert=/etc/grid-security/door-a.grid.domain-cert.pem \
              -service-key=/etc/grid-security/door-a.grid.domain-key.pem \</emphasis>
-             -clientDataPortRange=${clientDataPortRange} \
-             -root=${ftpBase} \
-             -kpwd-file=${kpwdFile} \
-             -tlog=/tmp/dcache-ftp-tlog \
-             -maxLogin=100 \
-             -brokerUpdateTime=5 \
-             -protocolFamily=gsiftp \
-             -loginBroker=LoginBroker \
-             -poolManagerTimeout=5400 \
-             -pnfsTimeout=120 \
-             -maxRetries=80 \
-             -maxStreamsPerClient=10 \
+             ..
+             ..
 "
 
 create dmg.cells.services.login.LoginManager <emphasis>GFTP-door-b</emphasis> \
@@ -388,18 +378,8 @@ create dmg.cells.services.login.LoginManager <emphasis>GFTP-door-b</emphasis> \
              -prot=raw \
              <emphasis>-service-cert=/etc/grid-security/door-b.other.domain-cert.pem \
              -service-key=/etc/grid-security/door-b.other.domain-key.pem \</emphasis>
-             -clientDataPortRange=${clientDataPortRange} \
-            -root=${ftpBase} \
-             -kpwd-file=${kpwdFile} \
-             -tlog=/tmp/dcache-ftp-tlog \
-             -maxLogin=100 \
-             -brokerUpdateTime=5 \
-             -protocolFamily=gsiftp \
-             -loginBroker=LoginBroker \
-             -poolManagerTimeout=5400 \
-             -pnfsTimeout=120 \
-             -maxRetries=80 \
-             -maxStreamsPerClient=10 \
+             ..
+             ..
 "</programlisting>
 
       </example>
