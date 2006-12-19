@@ -239,6 +239,18 @@ Book.pdf:	$(IMAGES)
 Book.db2.pdf:	Book.db2.xml $(IMAGES)
 	xmlto pdf Book.db2.xml
 
+# Clean all generated docs
+#
+clean:
+	rm -rf built/
+	rm -f Book.db.xml
+	rm -f Book.pdf
+
+# Clean everything (software, generated docs)
+#
+cleanall: clean
+	rm -rf software/
+
 ###### Utility and install targets
 #
 
