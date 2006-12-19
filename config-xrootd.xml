@@ -163,20 +163,11 @@ TXNetFile**             //pnfs/<replaceable>site.de</replaceable>/data/test.root
 		<title>xrootd security</title>
 		
 		<section id="cf-xrootd-sec-ro">
-			<title>Read-Only access</title>
+			<title>Read-Write access</title>
 			
 			<para>
-				Only in rare cases it makes sense to leave dCache open to arbitrary write access. Hence there
-				is a builtin switch to restrict all xrootd requests to read only. To enable read-only access, 
-				add to <filename>${dCacheHome}/config/dCacheSetup</filename> the line 
-				<programlisting>..
-xrootdIsReadOnly=true
-..</programlisting>
-				and do a restart of the dCache core services.
-			</para>
-			
-			<para>
-				Any requests trying to write a file will fail from now on:
+				Per default dCache-xrootd is restricted to read-only. A typical error message on the 
+				clientside if the server is read-only looks like:
 				<screen><userprompt/>xrdcp -d 1 /bin/sh root://ford.desy.de//pnfs/desy.de/data/xrd_test2
 Setting debug level 1
 061024 18:43:05 001 Xrd: main: (C) 2004 SLAC INFN xrdcp 0.2 beta
@@ -192,6 +183,15 @@ Setting debug level 1
 Error accessing path/file for root://ford//pnfs/desy.de/data/asdfas
 				</screen>
 			</para>
+			
+			<para>
+				To enable read-write access, edit the following line in <filename>${dCacheHome}/config/dCacheSetup</filename>
+				<programlisting>..
+xrootdIsReadOnly=false
+..</programlisting>
+				and do a restart of the dCache core services.
+			</para>
+			
 		</section>
 		
 		<section id="cf-xrootd-sec-authz">
@@ -199,8 +199,47 @@ Error accessing path/file for root://ford//pnfs/desy.de/data/asdfas
 			
 			<para>
 				The xrootd-dCache implementation includes a generic mechanism to plug in different 
-				authorization handler. The only module available so far is doing token-based authorization 
+				authorization handler. The only plugin available so far implements token-based authorization 
 				as suggested in <ulink url="http://people.web.psi.ch/feichtinger/doc/authz.pdf"/>.
+			</para>
+			
+			<para>
+				The first thing to do is to setup the keystore. The keystore file basically specifies 
+				all RSA-keypairs used within the authorization process and has exactly the same syntax
+				as in the native xrootd tokenauthorization implementation. In this file, each line beginning with
+				the keyword <literal>KEY</literal> corresponds to a certain Virtual Organisation (VO) and 
+				specifies the remote public (owned by the file catalogue) and the local private key belonging
+				to that VO. A line containing the statement <literal>"KEY VO:*"</literal> defines a default
+				keypair that is used as a fallback solution if no VO is specified in token-enhanced xrootd 
+				requests. Lines not starting with the <literal>KEY</literal> keyword are ignored. A template 
+				can be found in <filename>${dCacheHome}/etc/keystore.template</filename>.
+			</para>
+			
+			<para>
+				The keys itself have to be converted into a certain format in order to be loaded into the
+				authorization plugin. dCache expects the private key to be in the (DER-encoded) PKCS#8-format 
+				and	the public key in X.509-fomat (byte-encoded).
+			</para>
+			
+			<para>
+				The following example demonstrates how to create and convert a keypair using OpenSSL:
+<screen> # generate new RSA private key
+<rootprompt/>openssl genrsa -rand 12938467 -out key.pem 1024
+ # create certificate request
+<rootprompt/>openssl req -new -inform PEM -key key.pem -outform PEM -out certreq.pem
+ # create certificate by self-signing certificate request 
+<rootprompt/>openssl x509 -days 3650 -signkey key.pem -in certreq.pem -req -out cert.pem
+ # extract public key from certificate
+<rootprompt/>openssl x509 -pubkey -in cert.pem -out pkey.pem
+
+<rootprompt/>openssl pkcs8 -in key.pem -topk8 -nocrypt -outform DER -out <replaceable>new_private_key</replaceable>
+<rootprompt/>openssl enc -base64 -d -in pkey.pem -out <replaceable>new_public_key</replaceable></screen>
+			</para>
+			
+			<para>
+				Only the last two lines are performing the actual conversion, therefore you can skip the 
+				previous lines in case you already have a keypair. Make sure that you keystore file correctly
+				points to the converted keys.
 			</para>
 			
 			<para>
@@ -210,15 +249,6 @@ Error accessing path/file for root://ford//pnfs/desy.de/data/asdfas
 xrootdAuthzPlugin=org.dcache.xrootd.security.plugins.tokenauthz.TokenAuthorizationFactory
 xrootdAuthzKeystore=<replaceable>Path_to_your_Keystore</replaceable>
 ..</programlisting>
-			
-				The second line points to the location of the keystore file, which has exactly the same syntax
-				as in the native xrootd tokenauthorization implementation. In this file, each line beginning with
-				the keyword <literal>KEY</literal> corresponds to a certain Virtual Organisation (VO) and 
-				specifies the remote public (owned by the file catalogue) and the local private key belonging
-				to that VO. A line containing the statement <literal>"KEY VO:*"</literal> defines a default
-				keypair that is used as a fallback solution if no VO is specified in token-enhanced xrootd 
-				requests. Lines not starting with the <literal>KEY</literal> keyword are ignored. A template 
-				can be found in <filename>${dCacheHome}/etc/keystore.template</filename>.
 			</para>
 			
 			<para>
