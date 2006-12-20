@@ -217,8 +217,9 @@ xrootdIsReadOnly=false
 			
 			<para>
 				The keys itself have to be converted into a certain format in order to be loaded into the
-				authorization plugin. dCache expects the private key to be in the (DER-encoded) PKCS#8-format 
-				and	the public key in X.509-fomat (byte-encoded).
+				authorization plugin. dCache expects both keys to be binary DER-encoded 
+				(Distinguished Encoding Rules for ASN.1). Furthermore the private key must be PKCS #8-compliant
+				and	the public key must follow the X.509-standard.
 			</para>
 			
 			<para>
