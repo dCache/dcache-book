@@ -158,8 +158,9 @@ dCache-Installation-Instructions.txt: install.xml $(STYLESHEETS_HTML)
 
 # The whole thing
 #
-dcache.org: $(WEB_LOCATION)/dCacheBook.html  shtml
+dcache.org: $(WEB_LOCATION)/dCacheBook.html shtml $(WEB_LOCATION)/dCacheBook.pdf
 $(WEB_LOCATION)/dCacheBook.html: $(HTML_LOCATION)/Book.html .shtml.images.copied
+	mkdir -p $(WEB_LOCATION)
 	cp $(HTML_LOCATION)/Book.html $(WEB_LOCATION)/dCacheBook.html
 $(WEB_LOCATION)/dCacheBook.pdf: Book.pdf
 	cp Book.pdf $(WEB_LOCATION)/dCacheBook.pdf
@@ -242,9 +243,7 @@ Book.db2.pdf:	Book.db2.xml $(IMAGES)
 # Clean all generated docs
 #
 clean:
-	rm -rf built/
-	rm -f Book.db.xml
-	rm -f Book.pdf
+	rm -rf $(WEB_LOCATION) $(HTML_LOCATION) Book.db.xml Book.pdf
 
 # Clean everything (software, generated docs)
 #
