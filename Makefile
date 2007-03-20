@@ -231,7 +231,7 @@ Book.fo:	Book.db.xml $(STYLESHEETS_FO)
 #
 pdf:		Book.pdf
 Book.pdf:	$(IMAGES)
-	software/fop/fop -xml Book.db.xml -xsl software/docbook-xsl/fo/docbook.xsl -pdf Book.pdf
+	software/fop/fop.sh -xml Book.db.xml -xsl software/docbook-xsl/fo/docbook.xsl -pdf Book.pdf
 #	$(FOP) Book.fo Book.pdf 
 #	pdfxmltex Book.fo
 
