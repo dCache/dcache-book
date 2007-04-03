@@ -12,7 +12,7 @@
   <bookinfo>
     <abstract>
       <para>
-	The <dcache/> Book is the guide for administratos of dCache
+	The <dcache/> Book is the guide for administrators of dCache
 	systems. The first part describes the installation of a
 	simple single-host dCache instance. The second part
 	describes the components of dCache and in what ways they can

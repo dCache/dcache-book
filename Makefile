@@ -229,9 +229,9 @@ Book.fo:	Book.db.xml $(STYLESHEETS_FO)
 
 # PDF from XSL-FO
 #
-pdf:		Book.pdf
+pdf:		html Book.pdf
 Book.pdf:	$(IMAGES)
-	software/fop/fop.sh -xml Book.db.xml -xsl software/docbook-xsl/fo/docbook.xsl -pdf Book.pdf
+	software/fop/fop -xml Book.db.xml -xsl software/docbook-xsl/fo/docbook.xsl -pdf Book.pdf
 #	$(FOP) Book.fo Book.pdf 
 #	pdfxmltex Book.fo
 
@@ -260,7 +260,7 @@ cvs:
 
 # Install DTD, XSL stylesheet, and FOP (xsltproc, xmllint, 
 #
-install-software:	software/db43xml/docbookx.dtd software/docbook-xsl/README software/fop/fop.sh software/fop/lib/resolver.jar software/batik/batik-rasterizer.jar
+install-software:	software/db43xml/docbookx.dtd software/docbook-xsl/README software/fop/fop software/fop/lib/resolver.jar software/batik/batik-rasterizer.jar
 
 software/db43xml/docbook-xml-4.3.zip: 
 	mkdir -p software/db43xml/
@@ -285,10 +285,9 @@ software/fop-current-bin.tar.gz:
 #	cd software/ && wget http://ftp.uni-erlangen.de/pub/mirrors/apache/xml/fop/fop-current-bin.tar.gz
     
 
-software/fop/fop.sh: software/fop-current-bin.tar.gz
+software/fop/fop: software/fop-current-bin.tar.gz
 #	cd software/ && gunzip -c fop-current-bin.tar.gz | tar xf - && ln -ns fop-0* fop
 	cd software/ && gunzip -c $(FOP_VERSION)-bin-jdk1.4.tar.gz | tar xf - && ln -ns $(FOP_VERSION) fop
-#	touch software/fop/fop.sh
 	touch software/fop/fop
 
 software/xml-commons-resolver-latest.tar.gz:
@@ -301,7 +300,7 @@ software/xml-commons-resolver/resolver.jar: software/xml-commons-resolver-latest
 	  ln -ns `gunzip -c xml-commons-resolver-latest.tar.gz | tar tf - | head -1` xml-commons-resolver
 	touch software/xml-commons-resolver/resolver.jar
 
-software/fop/lib/resolver.jar: software/xml-commons-resolver/resolver.jar software/fop/fop.sh
+software/fop/lib/resolver.jar: software/xml-commons-resolver/resolver.jar software/fop/fop
 	cp software/xml-commons-resolver/resolver.jar software/fop/lib/resolver.jar
 
 software/batik-current.zip:
