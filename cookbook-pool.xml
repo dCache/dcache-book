@@ -31,6 +31,74 @@
   </unfinished>
 
 
+  <section id="cb-pool-checksumming">
+  	<title>Checksums</title>
+	<section id="cb-pool-checksumming-enable">
+		<title>How to enable checksums</title>
+	<para>
+	The follwing section describes how to enable checksum calculation on write transfers with maximum security. Two checksums will be computed on different points for each transfer: on the fly during file arrival and once the file was completely written to disk . Both checksums are compared with each other and (if available) with another checksum sent by the client. If, and only if, all of them match, the transfer is considered to be successful and the checksum is stored in PNFS.</para>
+	<para>
+      		To enable checksumming (independent from access protocol type), make sure the following option appears in the pool.batch-file:
+
+<programlisting>
+define context startPools endDefine
+  create diskCacheV111.pools.MultiProtocolPool2 ${0} \
+  ..
+  <command>-calculate-transfer-crc \</command>
+  ..
+"</programlisting>
+
+	Additionally, the checksum policy must be customized accordingly. This is done by modifying the pool-setup-file (found at <replaceable>poolPath</replaceable>/pool/setup) such that it contains the following line:
+
+<programlisting>
+  csm set policy -onwrite=on -ontransfer=on -enforcecrc=on
+</programlisting>
+
+Now a restart of the pool should activate all changes. Please repeat the upper procedure on all write-pools you want to have checksum-enabled.
+    	</para>
+<warning>
+<para>
+Please note that the following policy options should NOT be touched:
+
+<itemizedlist>
+      <listitem>
+	<para>
+		getcrcfromhsm - this option is tailored to DESY's HSM and won't work anywhere else
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+		onread - reserved for future use, no checksum handling on read transfers for now
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+		frequently - reserved for future use (recalculating checksums for files residing in the pool on a regular basis)
+	</para>
+      </listitem>
+</itemizedlist>
+</para>
+</warning>
+  </section>
+
+	<section id="cb-pool-checksumming-default">
+		<title>The default pool behavior</title>
+<para>	
+		When setting up a pool from scratch, the default policy is to calculate only the checksum on the file written to disk, but not on the fly upon arrival. In case there is a client checksum available (always true for DCap), they get compared and must match. Otherwise, the checksum computed on the written disk file will be stored in PNFS instead.
+</para>
+<para>
+		To reset the default behavior, set the following line in the pool-setup-file and restart the pool:
+<programlisting>
+  csm set policy -onwrite=on -enforcecrc=on
+</programlisting>
+</para>		
+</section>
+
+	
+
+
+</section>
+
   <section id="cb-pool-vacate">
     <title>Vacating a Pool with the Copy Manager</title>
 
