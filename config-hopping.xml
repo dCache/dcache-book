@@ -8,7 +8,7 @@
   
   <para>
     File hopping is a collective term in dCache, summarizing 
-    the possibilty of having files being transferred
+    the possibility of having files being transferred
     between dCache pools triggered by a variety of conditions.
     Most of the features described here will be available starting
     with dCache release 1.6.7. The most prominent examples are :
@@ -65,10 +65,415 @@
     </para>
   </section>
   <section id="cf-hopping-onarrival">
-  <title>File Hopping after on arrival from outside dCache</title>
+  <title>File Hopping 'on arrival' from outside dCache</title>
     <para>
-
+      'File Hopping on arrival' is a term, denoting the possibility of 
+      initiating a pool to pool transfer as the result of a file successfully arriving
+      on a pool. The file must have been written by an external client using any
+      supported protocol (dCap,ftp,xroot). Files restored from HSM or arriving on a pool as the result
+      of a pool to pool transfer will not yet be forwarded.
     </para>
+    <para>
+       Forwarding of incoming files is enabled per pool in the <replaceable>hostname</replaceable>.poollist file.
+       The pool is requested to send a 'replicateFile' message to either the PoolManager or to the
+       HoppingManager, if available. The different approaches are briefly described below and
+       in more detail in the subsequent sections.
+    </para>
+    <itemizedlist>
+    <listitem>
+     <para>
+        The 'replicateFile' message is sent to the PoolManager. This happens for all files arriving
+        at that pool from outside (no restore or p2p). No intermediate HoppingManager is needed.
+        The restrictions are
+        <itemizedlist>
+        <listitem>
+        <para>
+         All files are replicated. No pre-selection, e.g. on the storage class can be done.
+        </para>
+        </listitem>
+        <listitem>
+        <para>
+          The mode of the replicated file is determined by the destination pool and can't be overwritten.
+          See 'File mode of replicated files'.
+        </para>
+        </listitem>
+        </itemizedlist>
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+        The 'replicateFile' message is sent to the HoppingManager. The HoppingManager can
+        be configured to replicate certain storage classes only and to set the 
+        mode of the replicated file according to rules. The file mode of the
+        source file can't be modified. 
+     </para>
+    </listitem>
+    </itemizedlist>
+    <section>
+    <title>File mode of replicated files</title>
+    <para>   
+    The mode of a replicated file can either be determined by settings in the destination pool or
+    by the HoppingManager.
+    <itemizedlist>
+    <listitem>
+      <para>If no HoppingManager is used for replication, the mode of the replicated file is determined
+            by the <command>p2p=<replaceable>cached|precious</replaceable></command> setting in
+            the <replaceable>hostname</replaceable>.poollist file of the destination pool. 
+            The default setting is <command>cached</command>.
+      </para>
+    </listitem>
+    <listitem>
+      <para>If a HoppingManager is used for file replication, the mode of the replicated file is determined by
+      the HoppingManager rule responsible for this particular replication. If the destination mode is set
+      to 'keep' in the rule, the mode of the destination pool determines the final mode of the replicated file.
+      </para>
+    </listitem>
+    </itemizedlist>
+    </para>
+    </section>
+    <section>
+    <title>File Hopping managed by the PoolManager</title>
+    <para>   
+       File hopping configuration instructs a pool to send a 
+       'replicateFile' request to the PoolManager as the result of a file arriving
+       on that pool from some external client. All arriving files will be treated the
+       same. The PoolManager will process this request by trying to find a 'link' with
+       the following attributes :
+    
+
+         <table>
+         <title>Pool Manager Hopping Request Attributes</title>
+         <tgroup cols="4">
+           <colspec colnum="1" colname="Direction" align="center"/>
+           <colspec colnum="2" colname="Protocol" align="center"/>
+           <colspec colnum="3" colname="Class" align="center"/>
+           <colspec colnum="4" colname="ClientIP" align="center"/>
+           <thead>
+             <row>
+               <entry>Data Flow Direction</entry>
+               <entry>Protocol</entry>
+               <entry>Storage Class</entry>
+               <entry>Client IP Number</entry>
+             </row>
+           </thead>
+           <tbody>
+             <row> 
+              <entry>Pool 2 Pool</entry>
+              <entry>dCap/3</entry>
+              <entry>Class of file</entry>
+              <entry>Configurable</entry>
+             </row>
+           </tbody>
+         </tgroup>
+         </table>      
+   
+        In order to get pool 2 pool enabled for a particular pool, the corresponding entry
+        of that pool in the XXX.poollist file has to be extended by the replicateOnArrival key-value pair.
+        <screen>
+        <command><replaceable>PoolName</replaceable> <replaceable>PoolPath</replaceable>  replicateOnArrival=PoolManager,<replaceable>ip-number</replaceable> ... </command></screen>
+        where <replaceable>ip-number</replaceable> may be a real ip number of a farm node which may
+        be taken as example node for others intending to read the file, or the ip number may be 
+        taken from a non existing ip number range. This range can be used to instruct the PoolManager to
+        replicate files from this pool to a special set of destination pools.       
+    </para>
+    <para>
+    The mode of the file at the destination pool is determined by the mode of the pool itself.
+    If the pool mode is set to 'lfs=precious' the replicated file will be precious, otherwise,
+    if 'lfs' is not set in the <replaceable>hostname</replaceable>.poollist file, the 
+    mode mode of the replica will be 'cached'. This can only be overwritten using the HoppingMangaer.
+    (see next section).
+    </para>
+    </section>
+    <section>
+    <title>Example for File Hopping by the PoolManager only</title>
+    <para> 
+    We assume that we want of have all files, arriving on pool 'ocean' of host 'earth' to be immediately 
+    replicated to a subset of read pools. This subset of pools is described by pool group
+    'ocean-copies'. No other pool is member of pool group 'ocean-copies'. Other than that, files arriving 
+    at pool 'mountain' should be replicated to all read pools from which farm nodes on the 131.169.10
+    subnet are allowed to read.
+    </para>
+    <para>
+    The <filename>earth.poollist</filename> file must be modified as followes.
+    <screen>
+       ...
+       ocean     /bigdisk/pools/ocean     replicateOnArrival=PoolManager,192.1.1.1    <replaceable>more options</replaceable>
+       mountain  /bigdisk/pools/mountain  replicateOnArrival=PoolManager,131.169.10.1 <replaceable>more options</replaceable>
+       ...</screen>
+    While 131.169.10.1 is a legal ip address e.g. of one of you farm nodes, 
+    the 192.1.1.1 ip number must not exist anywhere at your site.
+    </para>    
+    <para>
+    Add the following lines to the <filename>PoolManager.conf</filename> in order to
+    instruct the PoolManager to replicate files, arriving at the 'ocean' pool to be replicated to
+    the 'ocean-copies' subset of your read pools.
+    </para>
+    <screen>
+    #
+    #  define the read-pools pool group and add pool members
+    #
+    psu create pgroup farm-read-pools
+    #
+    psu addto pgroup farm-read-pools read-pool-1
+    psu addto pgroup farm-read-pools read-pool-2
+    psu addto pgroup farm-read-pools read-pool-3
+    psu addto pgroup farm-read-pools read-pool-4
+    ...
+    #
+    psu create unit -net 131.169.10.0/255.255.255.0
+    #
+    psu create ugroup farm-network
+    #
+    psu addto ugroup farm-network  131.169.10.0/255.255.255.0
+    #
+    psu create link farm-read-link any-store any-protocol farm-network
+    #
+    psu addto link farm-read-link farm-read-pools
+    #
+    psu set link farm-read-link -p2ppref=100 -readpref=100 -writepref=0 -cachepref=XXX...
+    #
+    #
+    #--------------------------------------------------------------
+    #
+    # create the faked net unit
+    #
+    psu create unit -net 192.1.1.1/255.255.255.255
+    #
+    psu create ugroup ocean-copy-network
+    #
+    psu addto ugroup ocean-copy-network  192.1.1.1/255.255.255.255
+    #
+    # we assume that 'any-protocol' and 'any-store' is already defined.
+    #
+    psu create link ocean-copy-link any-store any-protocol ocean-copy-network
+    #
+    psu addto link ocean-copy-link ocean-copy-pools
+    #
+    #  define the ocean-copy pool group and add pool members
+    #
+    psu create pgroup ocean-copy-pools
+    #
+    psu addto pgroup ocean-copy-pools  read-pool-1
+    ...
+    #
+    psu set link ocean-copy-link -p2ppref=100 -readpref=100 -writepref=0 -cachepref=XXX...
+    #
+    #
+    #
+    #</screen>
+    </section>
+    <section>
+    <title>File Hopping managed by the HoppingManager</title>
+    <section>
+    <title>Starting the FileHopping Manager service</title>
+    <para>
+    The HoppingManager is not automatically started in 1.7.0. Please perform the following
+    steps to get it started :
+    <itemizedlist>
+    <listitem>
+    <para>
+    Create a file <filename>hopping.batch</filename> in the <filename>/opt/d-cache/config</filename> directory with 
+    the following content :
+    <screen>
+    set printout default 3
+    set printout CellGlue none
+    onerror shutdown
+    #
+    check -strong setupFile
+    #
+    copy file:${setupFile} context:setupContext
+    #
+    #  import the variables into our $context.
+    #  don't overwrite already existing variables.
+    #
+    import context -c setupContext
+    #
+    #   Make sure we got what we need.
+    #
+    check -strong serviceLocatorPort serviceLocatorHost
+    #
+    create dmg.cells.services.RoutingManager  RoutingMgr
+    #
+    #   The LocationManager Part
+    #
+    create dmg.cells.services.LocationManager lm \
+           "${serviceLocatorHost} ${serviceLocatorPort}"
+    #
+    #
+    create diskCacheV111.services.FileHoppingManager HoppingManager \
+         "${config}/HoppingManager.conf -export"
+    #</screen>
+    </para>
+    </listitem>
+    <listitem>
+    <para>
+     change to <filename>/opt/d-cache/jobs</filename>
+    </para>
+    </listitem>
+    <listitem>
+    <para>
+     Run ./initPackage.sh
+    </para>
+    </listitem>
+    <listitem>
+    <para>
+      Start the service ./hopping start
+    </para>
+    </listitem>
+    </itemizedlist>
+    Initially no rules are configured for the hopping manager. You may add rules by either 
+    edit the <filename>/opt/d-cache/config/HoppingManager.conf</filename> and restart the hopping service, or use the
+    admin interface and save the modifications by 'save' into <filename>HoppingManager.conf</filename>
+    </para>
+    </section>
+      <section>
+      <title>Configuring pools to use the HoppingManager(x)</title>
+      <para>
+        In order to instruct the pool to send a 'replicateFile' message to the 
+        HoppingManager service, modify the <replaceable>hostname</replaceable>.poolllist file as follows :
+        <screen>
+           ...
+           ocean     /bigdisk/pools/ocean     replicateOnArrival=HoppingManager  <replaceable>more options</replaceable>
+           ...</screen>
+     
+      </para>
+      </section>
+      <section>
+      <title>HoppingManager Configuration Introduction</title>
+      <para>
+      
+        <itemizedlist>
+        <listitem>
+          <para>
+            The Hopping Manager essentially receives 'replicateFile' messages from 
+            pools, configured to support file hopping, and either discards
+            or modifies and forwards them to the PoolManager, depending on rules described below.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            The Hopping Manager decides on the action to perform, based on a set of 
+            configurable rules. Each rule has a name. Rules are checked in alphabetic order
+            concerning their names.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+             A rule it triggered if the storage class matches the storage class pattern
+             assigned to that rule. If a rule is triggered, it is processed and no further 
+             rule checking is performed. If no rule is found for this request the file
+             is not replicated.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+             If for whatever reason, a file couldn't be replicated, NO RETRY is being performed.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+             Processing a triggered rule can be :
+             <itemizedlist>
+             <listitem>
+             <para>
+                The message is discarded. No replication is done for this particular storage class.
+             </para>
+             </listitem>
+             <listitem>
+             <para>
+                The rule modifies the 'replicate message', before it is forwarded to
+                the PoolManager. 
+             </para>
+             <para>
+                The 'destination ip number can be added to the 'replicate file' message. 
+                This has the same effect as the ip-number following the "PoolManager" keyword
+                in the <replaceable>hostname</replaceable>.poollist file in the 'unconditional replication section above.
+                The rule assignes a 'destination' ip number to the 'replicate message', before it is forwarded to
+                the PoolManager. This has the same effect as the ip-number following the "PoolManager" keyword
+                in the <replaceable>hostname</replaceable>.poollist file in the 'unconditional replication section above.
+             </para>
+             <para>
+                The mode of the replicated file can be specified. This can either be 'precious', 'cached' or 'keep'. 
+                'keep' means that the pool mode determines the replicated file mode.
+             </para>
+             <para>
+                The requested protocol can be specified.
+             </para>
+             </listitem>
+             </itemizedlist>
+          </para>
+        </listitem>
+        </itemizedlist>
+        
+      </para>
+      </section>
+      <section>
+      <title>HoppingManager Configuration Reference</title>
+      <para>
+      <screen>
+         define hop OPTIONS <replaceable>name</replaceable> <replaceable>pattern</replaceable> precious|cached|keep
+            OPTIONS
+              -destination=<replaceable>cellDestination</replaceable> # default : PoolManager
+              -overwrite
+              -continue
+              -source=write|restore|*   #  !!!! for experts only      StorageInfoOptions
+              -host=<replaceable>destinationHostIp</replaceable>
+              -protType=dCap|ftp...
+              -protMinor=<replaceable>minorProtocolVersion</replaceable>
+              -protMajor=<replaceable>majorProtocolVersion</replaceable> </screen>
+      </para>
+      <para>
+        <command>pattern</command> is a storage class pattern which. If the incoming storage class matches
+        this pattern, this rule is processed.
+      </para>
+      <para>
+        <command>precious|cached|keep</command> determines the mode of the replicated file. 'keep' leaves
+        the destination mode to the pool setting.
+      </para>
+      <para>
+        <command>destination</command> shouldn't be used. For experts only.
+      </para>
+      <para>
+        <command>overwrite</command> In case, a rule with the same name already exists, it is overwritten. If 
+        this overwrite option is specified, the error will occure.
+      </para>
+      <para>
+        <command>continue</command> If a rule has triggered and the corresponding action has been
+        performed, no other rules are checked. If the 'continue' option is specified, rule checking
+        continues. This is for debugging purposes only. 
+      </para>
+      <para>
+        <command>source</command> Don't use.
+      </para>
+      <para>
+        <command>host, protType</command> This is the 'host ip number' and 'protocol type'used by the 
+        PoolManager in order find an appropriate pool for the replication  request. Please note
+        that 'host' is not the host of the destination pool.
+      </para>
+      </section>
+      <section>
+      <title>HoppingManager configuration examples</title>
+      <para>
+         Define the HoppingManager as destination for the 'replicate file' requests on the pool(s).
+        <screen>
+           ...
+           ocean     /bigdisk/pools/ocean     replicateOnArrival=HoppingManager  <replaceable>more options</replaceable>
+           ...</screen>
+        Replicate 'raw' data files by all experiments.
+        <screen>
+          #
+          define hop replicate-raw  .*:raw@osm -host=<replaceable>Farm Node Ip Number</replaceable>
+          #</screen>
+        Replicate all CMS files to pools assigned to CMS farm nodes and all ATLAS files to pools assigned to
+        ATLAS farm nodes. Don't replicate any other files.
+        <screen>
+          #
+          define hop replicate-cms    cms:.*@osm    -host=<replaceable>Farm Node Ip Number of cms farm</replaceable>
+          define hop replicate-atlas  atlase:.*@osm -host=<replaceable>Farm Node Ip Number of atlas farm</replaceable>
+          #</screen>
+      </para>
+      </section>
+   </section>
   </section>
  
 </chapter>
