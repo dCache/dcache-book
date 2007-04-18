@@ -177,11 +177,7 @@
         replicate files from this pool to a special set of destination pools.       
     </para>
     <para>
-    The mode of the file at the destination pool is determined by the mode of the pool itself.
-    If the pool mode is set to 'lfs=precious' the replicated file will be precious, otherwise,
-    if 'lfs' is not set in the <replaceable>hostname</replaceable>.poollist file, the 
-    mode mode of the replica will be 'cached'. This can only be overwritten using the HoppingMangaer.
-    (see next section).
+    Please see the section "File mode of replicated files" for the mode of the file on the destination pool.
     </para>
     </section>
     <section>
