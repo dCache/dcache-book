@@ -166,7 +166,7 @@ TXNetFile**             //pnfs/<replaceable>site.de</replaceable>/data/test.root
 			<title>Read-Write access</title>
 			
 			<para>
-				Per default dCache-xrootd is restricted to read-only. A typical error message on the 
+				Per default dCache-xrootd is restricted to read-only, because plain xrootd is completely unauthenticated. A typical error message on the 
 				clientside if the server is read-only looks like:
 				<screen><userprompt/>xrdcp -d 1 /bin/sh root://ford.desy.de//pnfs/desy.de/data/xrd_test2
 Setting debug level 1
@@ -189,11 +189,29 @@ Error accessing path/file for root://ford//pnfs/desy.de/data/asdfas
 				<programlisting>..
 xrootdIsReadOnly=false
 ..</programlisting>
-				and do a restart of the dCache core services.
+				and do a restart of the dCache core services. 
+		</para>
+		<para>
+Please note that due to the unauthenticated nature of this access mode, files can be written and read to/from any subdirectory in the PNFS namespace (including the automatic creation of parent directories). Because there is no user information at the time of request, new files/subdirectories generated through xrootd will inherit UID/GID from it's parent directory.
 			</para>
 			
 		</section>
 		
+		<section id="cf-xrootd-sec-selected">
+			<title>Permitting write access on selected PNFS directories </title>
+		<para>
+		To overcome the security issue of uncontrolled xrootd write access mentioned in the previous section, it is possible to restrict write access on a per-directory basis (including subdirectories). This feature is available from dCache 1.7.0-36 on.
+		</para>
+		<para>
+			To activate this feature, a colon-seperated list containing the full PNFS paths of authorized directories must be provided in <filename>${dCacheHome}/config/dCacheSetup</filename>:
+ <programlisting>..
+xrootdAllowedPaths=/pnfs/<replaceable>site.de</replaceable>/path1:/pnfs/<replaceable>site.de</replaceable>/path2
+..</programlisting>
+		</para>
+		<para>
+		A restart of the xrootd door is required to make the changes take effect. As soon as <emphasis>${xrootdAllowedPaths}</emphasis> is set, all write requests to directories not matching the allowed path list will be refused.
+		</para>
+		</section>
 		<section id="cf-xrootd-sec-authz">
 			<title>Token-based authorization</title>
 			
@@ -263,7 +281,17 @@ xrootdAuthzKeystore=<replaceable>Path_to_your_Keystore</replaceable>
 				dominate (local settings have precedence over remote file catalogue permissions).
 			</para>
 		</section>
-		
+	<section id="cf-xrootd-sec-precedence">
+			<title>Precedence of security mechanisms</title>
+		<para>
+			The previously explained methods to restrict access via xrootd can also be used in conjunction. The precedence applied in that case is as following:
+		</para>
+		<para>
+			The permission check executed by the authorization plugin (if one is installed) is given the lowest priority, because it can controlled by a remote party. E.g. in the case of tokenbased authorization, access control is determined by the file catalogue (global namespace).
+			To allow local site's administrators to override remote security settings, write access can be further restricted to few directories (based on the local namespace, the PNFS). Setting xrootd access to read-only has the highest priority, overriding all other settings.
+		</para>
 	</section>
+	</section>
+	
 
 </chapter>
