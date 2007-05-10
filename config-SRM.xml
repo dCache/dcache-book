@@ -6,7 +6,7 @@
   
   
   <title>Configuring the Storage Resource Manager Component</title>
-
+  <partauthors>Dmitry Litvintsev, Timur Perelmutov</partauthors>
   <!--
   <para>(We assume a basic knowledge of the functionality and terminology of
   dCache. Pool, domain, cell, how to log into a cell, and execute
@@ -398,17 +398,98 @@ SRM=yes
 	</listitem>
 	<listitem>
 	<para>
-          Srm Monitoring page should be visible at http://<replaceable>srmnode</replaceable>:8080/srmwatch/
+          Srm Monitoring page should be visible at 
+	  http://<replaceable>srmnode</replaceable>:8080/srmwatch/
 	</para>
 	</listitem>
 	</itemizedlist>
        </para>
       </section>
     </section>
+    
    <section id="cf-srm-space">
     <title>SRM Space Manager configuration</title>
-    <para>f
+    <section >
+    <title>SRM Space Manager and LinkGroups</title>
+    <para>
+      Space Manager is making reservations agains space in LinkGroups, LinkGroup 
+      is an object created by the PoolManager, that consists of several "Links". 
+      The total space available in the given LinkGroup is a sum of available 
+      spaces in all links.An available space in each link is a sum of  the 
+      available spaces in all pools assinged to a given link. Therefore for the 
+      space reservation to work correctly it is essential that each pool belongs to 
+      one and only one link, and each link belongs to only one LinkGroup.
+      LinkGroups are assigned several parameters that determine what kind of 
+      space the LinkGroup correspond to and who can make reservation against this
+      space. The main parameter is HSM, If its value is "none" then the space in this
+      LinkGroup is considered non-Custodial, and reservations of space  with "Replica"
+      and "Output" RetentionPolicy can reserve space in it. If HSM parameter is assinged 
+      any other value, this value is considered to be the name of the backend tape 
+      storage system and  the LinkGroup is then considered Custodial. Only space 
+      reservations with "Custodial" RetentionPolicy will be able to reserve space in such 
+      LinkGroup. 
+    </para>  
+    <para>
+       AccessLatency parameter of the space reservation does not influence the the 
+       LinkGroup selection for a particular reservation.
     </para>
+    </section>
+    <section>
+    <title> Definition of the LinkGroups in the PoolManager.conf</title>
+    <para>
+     To configure PoolManager to create the new LinkGroup (a new reservable entity in 
+     dCache), please use following example (given in the PoolManager). 
+     Here we assume that write-link link already exists:
+     <programlisting>
+	psu create linkGroup write-link-group
+	psu addto linkGroup  write-link-group write-link
+     </programlisting>
+     </para>
+     <para>
+      To tell Space Manager if the LinkGroup will be able to store the Custodial files, 
+      we need to specify the Hsm Type property of the LinkGroup. If the Hsm Type is "None" 
+      then Custodial files can not go into the link Group, anything else is enterpreted as 
+      tape backend and allows Custodial file. For example to specify the Hsm Type to be 
+      "enstore" add following command:
+     <programlisting>
+         psu set linkGroup attribute -r write-link-group HSM=enstore
+     </programlisting>
+     </para>
+     <para>
+      If no Vo information is assigned to the LinkGroup, any Vo group can make reservation 
+      please see the following examples of how to assign particular VOs and VO Groups to a 
+      given link: 1) assign VOs to a LinkGroup. While PoolManager does not have a ability 
+      to specify VO and Role it's given to it as attributes of the linkGroup.
+     <programlisting>
+	psu set linkGroup attribute write-link-group VO=alice
+	psu set linkGroup attribute write-link-group VO=cms
+	psu set linkGroup attribute write-link-group VO=atlas
+     </programlisting>
+     </para>
+     <para>
+       To add Roles for a VO see the following example. Here syntax is important. The role 
+       attribute name is constructed from + "Role".
+     <programlisting>
+	psu set linkGroup attribute write-link-group cmsRole=/cms/NULL/production
+	psu set linkGroup attribute write-link-group cmsRole=/cms/NULL/mc
+     </programlisting>
+     </para>
+     <para>
+       Ff no vos or roles are excluded, "*" can used for both vo and role. If the vo groups 
+       and roles are not specified at all, then every user of dCache is allowed to make 
+       reservations.
+     </para>
+    </section>
+    <section >
+    <title>Activating SRM Space Manager</title>
+    <para>
+     In order to enable the new space reservation: add (uncomment) the following 
+     definition in dCacheSetup
+     <programlisting>
+       srmSpaceManagerEnabled=yes
+     </programlisting>
+    </para>
+     </section>
    </section>
    
 
