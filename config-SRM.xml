@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">
+
+<!-- <namespacewrapper xmlns:xi="http://www.w3.org/2001/XInclude"> -->
+<chapter id="cf-srm">
+  
+  
+  <title>Configuring the Storage Resource Manager Component</title>
+
+  <!--
+  <para>(We assume a basic knowledge of the functionality and terminology of
+  dCache. Pool, domain, cell, how to log into a cell, and execute
+  commands)</para>
+  -->
+
+  <para><firstterm>Storage Resource Managers</firstterm> (SRMs) are 
+  middleware components whose 
+  function is to provide dynamic space allocation and file management on 
+  shared storage components on the Grid. SRMs support protocol negotiation 
+  and a reliable replication mechanism. The SRM specification standardizes 
+  the interface, thus allowing for a uniform access to heterogeneous storage 
+  elements.</para>
+
+  <para>SRM interface consists of the five categories of functions: Space 
+  Management, Data Transfer, Request Status, Directory and Permission 
+  Functions. SRM interface utilizes Grid 
+  Security Infrastructure (GSI) for authentications. SRM service is a Web 
+  Service implementation of a published WSDL document.</para>
+
+  <para>dCache SRM is implemented as Web Service Interface running under 
+  Apache Tomcat application server and Axis Web Services engine. This service
+  starts a dCache <literal> SRM </literal>domain with a main SRM cell and a 
+  number of other cells srm service relies on. These are SrmSpaceManager, 
+  PinManager, RemoteGsiftpCopyManager, etc.  Of these serivices only 
+  SrmSpaceManager requires special configuration.</para>
+
+
+  <section id="cf-srm-hrd-os">
+    <title>Choosing The right hardware and OS for the SRM node</title>
+	<section>
+	    <title> Hardware </title>
+        <para>We recommend to install dCache SRM server on a separate node with 
+	    sufficient memory and a fast disk optimized for database application. 
+         For example Fermilab US-CMS T1 site uses the following hardware for SRM node.
+        Dual Intel Xeon Duo, 4 GB RAM, 3ware raid disk array.
+        </para>
+    </section>
+    <section>
+      <title>Operating System</title>
+
+      <para>Latest Scientific Linux  or RHEL would do.</para>
+	  <para>
+	  The kernel.shmmax=1073741824 and kernel.shmall=1073741824  kernel parameters 
+	  should be set. This can be accomplished by running:
+	  <programlisting>
+	  $ echo 'kernel.shmmax=1073741824' >>  /etc/sysctl.conf
+      $ echo 'kernel.shmall=1073741824' >>  /etc/sysctl.conf
+	  $ /bin/sysctl -p
+      </programlisting>
+	  
+	  The exact content of US-CMS T1 SRM sysctl.conf is:
+	  <programlisting>
+	  kernel.core_uses_pid = 1
+	  kernel.sysrq = 1
+	  kernel.panic = 60
+	  fs.file-max = 131072
+	  net.ipv4.ip_forward = 0
+	  vm.vfs_cache_pressure = 10000
+	  # Keep this amount of memory free for emergency, IRQ and atomic allocations.
+	  vm.min_free_kbytes = 65535
+	  # Network tune parameters
+	  net.ipv4.tcp_timestamps = 0
+	  net.ipv4.tcp_sack = 0
+	  net.ipv4.tcp_window_scaling = 1
+	  kernel.shmmax=1073741824
+	  kernel.shmall=1073741824
+	  </programlisting>
+	  </para>
+    </section>
+ </section>
+
+
+</chapter>
+<!-- </namespacewrapper> -->
