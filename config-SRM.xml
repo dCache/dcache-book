@@ -51,12 +51,18 @@
       <para>Latest Scientific Linux  or RHEL would do.</para>
 	  <para>
 	  The kernel.shmmax=1073741824 and kernel.shmall=1073741824  kernel parameters 
-	  should be set. This can be accomplished by running:
-	  <programlisting>
-	  $ echo 'kernel.shmmax=1073741824' >>  /etc/sysctl.conf
-      $ echo 'kernel.shmall=1073741824' >>  /etc/sysctl.conf
-	  $ /bin/sysctl -p
-      </programlisting>
+	  should be set for a 4GB RAM Machine. This can be accomplished by running:
+	  
+	  <screen>
+	  <rootprompt/><command>echo</command> 'kernel.shmmax=1073741824' >>  /etc/sysctl.conf
+	  </screen>
+	  <screen>
+	  <rootprompt/><command>echo</command> 'kernel.shmall=1073741824' >>  /etc/sysctl.conf
+	  </screen>
+	  <screen>
+	  <rootprompt/><command>/bin/sysctl</command> -p
+	  </screen>
+
 	  
 	  The exact content of US-CMS T1 SRM sysctl.conf is:
 	  <programlisting>
@@ -78,7 +84,333 @@
 	  </para>
     </section>
  </section>
+ 
+  <section id="cf-srm-psql">
+    <title>Configuring Postgres Database</title>
+    <para>
+    Install the latest  postgres database from 
+    <ulink url="http://www.postgresql.org/download/"> PostgreSQL web site </ulink>. 
+    While some like rpms, others find that they have 100% guarantee of compatibility 
+    of the software only if they build it locally from sources. In later case source 
+    rpms or archive of sources are available. 
+    </para>
+    <para> We highly recommend to make sure that postgres database files are stored 
+    on a separate disk that is not used for anything else (not even postgres logging). 
+    BNL Atlas Tier one observed a great improvement in srm-database communication 
+    performance after they deployed postgres on a separate dedicated machine.
+    </para>
+    <para>
+     To provide seamless local access to the database please make the following modifications:
+     
+     The file /var/lib/pgsql/data/pg_hba.conf should contain 
+      <programlisting>
+	...
+	local   all         all                        trust
+	host    all         all         127.0.0.1/32   trust
+	host    all         all         ::1/128        trust
+     </programlisting>
+     If SRM  or srm monitoring is going to be installed on a separate node, you need to add 
+     entry for this node as well:
+      <programlisting>
+        host    all         all       <replaceable>monitoring node</replaceable>    trust
+        host    all         all       <replaceable>srm node</replaceable>    trust
+     </programlisting>
+     
+     The postgresql.conf should contain the following :
+      <programlisting>
+	#to enable network connection on the default port
+	max_connections = 100
+	port = 5432
+	...
+	shared_buffers = 114688
+	...
+	work_mem = 10240
+	...
+	#to enable autovacuuming
+	stats_row_level = on
+		autovacuum = on
+		autovacuum_vacuum_threshold = 500       # min # of tuple updates before
+	                                        # vacuum
+	autovacuum_analyze_threshold = 250      # min # of tuple updates before
+        	                                # analyze
+	autovacuum_vacuum_scale_factor = 0.2    # fraction of rel size before
+	                                        # vacuum
+	autovacuum_analyze_scale_factor = 0.1   # fraction of rel size before
+	# 
+	# setting vacuum_cost_delay might be useful to avoid
+	# autovacuum penalize general performance
+	# it is not set in US-CMS T1 at Fermilab
+	#
+	# In IN2P3 add_missing_from = on 
+	# In Fermilab it is commented out
+	
+	# - Free Space Map -
+	max_fsm_pages = 500000
+	
+	In the postgresql.conf file
+	
+	# - Planner Cost Constants -
+	
+	effective_cache_size = 16384            # typically 8KB each
+	.......................
+     </programlisting>
+     </para>
+     <para>
+     To enable dCache SRM components access to the database server with the user "srmdcache": 
+     <screen>
+	  <rootprompt/>createuser -U postgres --no-superuser --no-createrole --createdb --pwprompt srmdcache
+     </screen>	  
+     SRM will use the database "dcache" for storing its state information: 
+     <screen>
+	  <rootprompt/> createdb -U srmdcache dcache
+     </screen>	  
+     </para>
+     </section>  
+     
+     <section id="cf-srm-srm">
+        <title>Configuring SRM Domain</title>
+	<para>
+	Once database and  and jvm are installed and database is running, you may install dCache SRM. 
+	</para>
+        <section >
+         <title>Install dCache server.rpm</title>
+	 <para>
+	  <screen>
+	  <rootprompt/> <command>rpm</command> -Uvh <replaceable>dcache.server.rpm</replaceable>
+	  </screen>
+	  </para>
+	 
+        </section>
+	<section >
+         <title> node_config </title>
+	 <para>
+	 copy /pt/d-cache/etc/node_config.template into /opt/d-cache/etc/node_config
+	 </para>
+	 <para>
+	 edit /opt/d-cache/etc/node_config
+NODE_TYPE=custom
+...
+SRM=yes
+...
+# all other parameters should be turned off on "srm only" node
+         </para>
+        </section>
+        <section >
+         <title>srm_setup.env</title> 
+	 <para>
+	 edit /opt/d-cache/etc/srm_setup.env
+	<itemizedlist>
+	<listitem>
+         <para>Make sure that JAVA_HOME is set to correct value, for example
+         <programlisting>
+         JAVA_HOME=/usr/java/jdk1.5.0_07
+         </programlisting>
+	 </para>
+	</listitem>
+	<listitem>
+         <para> Tomcat port does not interfere with with services that are 
+	 already using network
+         <programlisting>
+          TOMCAT_PORT=8080
+         </programlisting>
+         </para>
+	</listitem>
+	<listitem>
+         <para>If you are going to run the monitoring on the same node:
+        <programlisting>
+        TOMCAT_HTTP_ENABLED=true
+       JAVA_OPTS="-Xmx512m -Djava.awt.headless=true"
+        </programlisting>
+         </para>	
+	</listitem>
+	 </itemizedlist>
+         </para>
+        </section>
+        <section >
+         <title>install dCacheSetup </title>
+	 <para>
+	 copy /opt/d-cache/etc/dCacheSetup.template into /opt/d-cache/config/dCacheSetup 
+	 and edit it so  that, serviceLocatorHost and serviceLocatorPort point to 
+	 central dcache node:
+         <programlisting>
+	  serviceLocatorHost=<replaceable>host of central node</replaceable>
+	  serviceLocatorPort=<replaceable>11111</replaceable>
+          </programlisting>
+	</para>
+	<para>
+        following SRM parameters should be configured as following:
+      <programlisting>
+	srmVacuum=false
+	srmDbName=dcache
+	srmDbUser=srmdcache
+      </programlisting>
+       </para>
+       <para>
+          Make sure that both srmCopyReqThreadPoolSize and remoteGsiftpMaxTransfers 
+	  are set to the same values and the common value should be the roughly equal 
+	  to the maximum number of the SRM - to -SRM copies your system can sustain. 
+	  So if you think about 3 gridftp transfer per pool and you have 30 pools than 
+	  the number should be 3x30=90.
+      <programlisting>
+       srmCopyReqThreadPoolSize=90
+       remoteGsiftpMaxTransfers=90
+      </programlisting>
+        Note US-CMS T1 has:
+     <programlisting>
+        srmCopyReqThreadPoolSize=2000
+        remoteGsiftpMaxTransfers=2000 
+      </programlisting>
 
+           </para>
+        </section>
+        <section >
+         <title>tomcat/axis deployment </title>
+	 <para>
+	   run 
+          <screen>
+	  <rootprompt/> <command>/opt/d-cache/install/install.sh </command>
+          </screen>
+	 </para>
+        </section>
+        <section >
+         <title> Starting and stopping SRM domain </title>
+	 <para>
+	 run 
+	<screen>
+	  <rootprompt/> <command>/opt/d-cache/bin/dcache-core</command> start
+          </screen>
+	 to start srm domain
+	 </para>
+	 <para>
+	 run 
+	<screen>
+	  <rootprompt/> <command>/opt/d-cache/bin/dcache-core</command> stop
+          </screen>
+	 to stop srm domain
+	 </para>
+        </section>
+        <section >
+         <title>SRM Logs</title>
+	   <para>srm might produce a lot of logs, especially if it run in debug mode.
+	    Need to run SRM in debug mode is greatly reduced if SRM monitoring is 
+	    installed. It is recommended to make sure that logs are redirected into a 
+	    file on large disk. dCache SRM 1.7 logs into 
+	    /opt/d-cache/libexec/apache-tomcat-5.5.20/logs/catalina.out.
+	    </para>
+       </section>
+   </section>  
+   
+   <section id="cf-srm-monitor">
+    <title>SRMWatch, SRM Monitoring Tool</title>
+    <para>
+    For large sites in order to avoid interference from Tomcat activities related to 
+    web interface, we recommend installation of srm monitoring on a separate node.
+    </para>
+      <section>
+        <title> Separate Node Installation</title>
+	<para>
+	<itemizedlist>
+	<listitem>
+	<para>
+ 	 Install JDK1.5
+	</para>
+	</listitem>
+	<listitem>
+	<para>
+	  Download, install and start latest tomcat 5.5 from http://tomcat.apache.org/
+	</para>
+	</listitem>
+	<listitem>
+  	<para>
+       Download srmwatch rpm from http://www.dcache.org.
+	</para>
+	</listitem>
+	<listitem>
+	<para>
+          Install rpm. Installation can be performed using this command:
+         <screen>
+	  <rootprompt/> <command>rpm</command> -Uvh srmwatch-1.0-0.i386.rpm
+	 </screen>
+	</para>
+	</listitem>
+	<listitem>
+	<para>
+          Edit configuration file /opt/d-cache/srmwatch-1.0/WEB-INF/web.xml
+           in the line saying:
+          <programlisting>
+             &lt;param-value&gt;jdbc:postgresql://localhost/dcache&lt;/param-value&gt;
+          </programlisting>
+
+           Make sure that the localhost is in jdbc url substitutes with srm 
+	   database host name. For example:
+          <programlisting>
+           &lt;param-value&gt;jdbc:postgresql://fledgling06.fnal.gov/dcache&lt;/param-value&gt;
+          </programlisting>
+	</para>
+	</listitem>
+	<listitem>
+	<para>
+          execute
+        <screen>
+	  <rootprompt/> <command>export</command> CATALINA_HOME=<replaceable>YOUR_TOMCAT_LOCATION</replaceable>
+        </screen>
+	</para>
+	</listitem>
+	<listitem>
+	<para>
+            execute
+       <screen>
+	  <rootprompt/> <command>/opt/d-cache/srmwatch-1.0/deploy_srmwatch</command>
+       </screen>
+	</para>
+	</listitem>
+	<listitem>
+	<para>
+           Srm Monitoring page should be visible at 
+            http://<replaceable>srm-monitoring-node</replaceable>:8080/srmwatch/
+	</para>
+	</listitem>
+     	</itemizedlist>
+ 
+	</para>
+      </section>
+      <section>
+        <title> Same Node Installation</title>
+	<para>
+	<itemizedlist>
+	<listitem>
+	<para>
+          download srmwatch rpm from http://www.dcache.org.
+	</para>
+	</listitem>
+	<listitem>
+	<para>
+         Install rpm after srm server is installed and running, with 
+          /opt/d-cache/etc/srm_setup.env containing before the installation
+     <programlisting>
+         TOMCAT_HTTP_ENABLED=true
+     </programlisting>
+   	rpm installation can be performed using this command:
+         <screen>
+	  <rootprompt/> <command>rpm</command> -Uvh srmwatch-1.0-0.i386.rpm
+	 </screen>
+	</para>
+	</listitem>
+	<listitem>
+	<para>
+          Srm Monitoring page should be visible at http://<replaceable>srmnode</replaceable>:8080/srmwatch/
+	</para>
+	</listitem>
+	</itemizedlist>
+       </para>
+      </section>
+    </section>
+   <section id="cf-srm-space">
+    <title>SRM Space Manager configuration</title>
+    <para>f
+    </para>
+   </section>
+   
 
 </chapter>
 <!-- </namespacewrapper> -->
