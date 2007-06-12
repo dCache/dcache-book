@@ -455,43 +455,117 @@ SRM=yes
          psu set linkGroup attribute -r write-link-group HSM=enstore
      </programlisting>
      </para>
-     <para>
-      If no Vo information is assigned to the LinkGroup, any Vo group can make reservation 
-      please see the following examples of how to assign particular VOs and VO Groups to a 
-      given link: 1) assign VOs to a LinkGroup. While PoolManager does not have a ability 
-      to specify VO and Role it's given to it as attributes of the linkGroup.
-     <programlisting>
-	psu set linkGroup attribute write-link-group VO=alice
-	psu set linkGroup attribute write-link-group VO=cms
-	psu set linkGroup attribute write-link-group VO=atlas
-     </programlisting>
-     </para>
-     <para>
-       To add Roles for a VO see the following example. Here syntax is important. The role 
-       attribute name is constructed from + "Role".
-     <programlisting>
-	psu set linkGroup attribute write-link-group cmsRole=/cms/NULL/production
-	psu set linkGroup attribute write-link-group cmsRole=/cms/NULL/mc
-     </programlisting>
-     </para>
-     <para>
-       Ff no vos or roles are excluded, "*" can used for both vo and role. If the vo groups 
-       and roles are not specified at all, then every user of dCache is allowed to make 
-       reservations.
-     </para>
     </section>
     <section >
-    <title>Activating SRM Space Manager</title>
-    <para>
-     In order to enable the new space reservation: add (uncomment) the following 
-     definition in dCacheSetup
-     <programlisting>
-       srmSpaceManagerEnabled=yes
-     </programlisting>
-    </para>
+      <title>Activating SRM Space Manager</title>
+       <para>
+         In order to enable the new space reservation: add (uncomment) the following 
+         definition in dCacheSetup
+        <programlisting>
+          srmSpaceManagerEnabled=yes
+        </programlisting>
+       </para>
      </section>
+      
    </section>
    
+    <section id="cf-srm-space-ac">
+    <title> SRM Space Manager Virtual Organization based access control configuration</title>
+     <section>
+      <title> VO based Authorization</title>
+       <para>
+            In order to be able to take advantage of the Virtual Organization (VO) infrastructure 
+	    and VO based authorization and VO Based Access Control to the Space in dCache, 
+	    certain things need to be in place:
+	<itemizedlist>
+	<listitem>
+	<para>
+          User needs to be registered with the VO
+	</para>
+	</listitem>
+	<listitem>
+	<para>
+          User needs to use voms-proxy-init to create a vo proxy
+	</para>
+	</listitem>
+	<listitem>
+	<para>
+          dCache needs to use gPlazma and not gPlazma with dcache.kpwd plugin, but other modules 
+	  that know how to extract  VO attributes from the proxy.(see 
+	  <ulink url="http://www.dcache.org/manuals/Book/cf-gplazma.shtml">gPlazma Documentation</ulink>, 
+	  have a look at gplazmalite-vorole-mapping Plugin).
+	</para>
+	</listitem>
+	</itemizedlist>
+          Only if these 3 conditions are satisfied the VO based authorization of the Space Manager can work.
+	</para>
+	<para>
+          If a client uses a regular grid proxy, created with grid-proxy-init, and not a Virtual 
+	  Organization (VO) proxy, which is created with the voms-proxy-init, when he is communicating 
+	  with SRM server in dCache, then the VO attributes can not be extracted its credential.
+	  voms-proxy-init adds a Fully Qualified Attribute Name (FQAN) section(s) to the grid proxy, which 
+	  contain informaton about user's VO membership, in particular it contain VO Group name and VO Role 
+	  that the client intends to play at this time. In this case the name of the user is extracted on 
+	  basis of the direct Distinguished Name (DN) to use name mapping. For the purposes of the space 
+	  reservation the name of the user is used as its VO Group name, and the VO Role is left empty.
+	</para>
+	<para>
+          So if the 3 conditions mentioned above are not satisfied, there are two options
+	<itemizedlist>
+	<listitem>
+	<para>
+          Add all the allowed user names to list of the VOs associated with the particular link groups. 
+	  Since most sites use group accounts like dteam001, there should not be too many of these. 
+	  For example to enable the authorization of the dteam001
+         <programlisting>
+           psu set linkGroup attribute write-link-group HSM=None
+           psu set linkGroup attribute write-link-group VO=dteam001
+            psu set linkGroup attribute write-link-group dteamRole=*
+         </programlisting>
+        </para>
+	</listitem>
+	<listitem>
+	<para>
+          Remove the VO attributes from the link groups altogether  for now, so that all the users 
+	  can make reservations in all the links. Once the 3 conditions mentioned above will be 
+	  satisfied the vo based authorization can be activated again.
+        </para>
+	</listitem>
+	</itemizedlist>
+       </para>
+     </section>
+     <section>
+      <title> Access Control configuration</title>
+       <para>
+         dCache Space Access Control is currently performed at the level of the LinkGroups, and 
+	 is done by defining LinkGroup attributes in PoolManager.conf file
+	</para>
+	<para>
+        If no Vo information is assigned to the LinkGroup, any Vo group can make reservation 
+        please see the following examples of how to assign particular VOs and VO Groups to a 
+        given link: 1) assign VOs to a LinkGroup. While PoolManager does not have a ability 
+        to specify VO and Role it's given to it as attributes of the linkGroup.
+       <programlisting>
+	  psu set linkGroup attribute write-link-group VO=alice
+  	  psu set linkGroup attribute write-link-group VO=cms
+          psu set linkGroup attribute write-link-group VO=atlas
+       </programlisting>
+      </para>
+      <para>
+        To add Roles for a VO see the following example. Here syntax is important. The role 
+        attribute name is constructed from + "Role".
+       <programlisting>
+	  psu set linkGroup attribute write-link-group cmsRole=/cms/NULL/production
+          psu set linkGroup attribute write-link-group cmsRole=/cms/NULL/mc
+       </programlisting>
+      </para>
+      <para>
+         If no vos or roles are excluded, "*" can used for both vo and role. If the vo groups 
+         and roles are not specified at all, then every user of dCache is allowed to make 
+         reservations.
+      </para>
+      </section>
+    </section>
 
 </chapter>
 <!-- </namespacewrapper> -->
