@@ -23,20 +23,20 @@ kpwd : This is the "legacy" method. The dcache.kpwd file is used to map a user's
 
  <listitem>
   <para>
-grid-mapfile : This method employs a grid mapfile. From the mapfile, the user's DN is mapped to a username. A second file, storage-authdb, is used for the mapping of the username to the uid, gid, and rootpath.
+grid-mapfile : This method employs a grid mapfile. From the mapfile, the user's DN is mapped to a username. A second file, storage-authzdb, is used for the mapping of the username to the uid, gid, and rootpath.
   </para>
  </listitem>
  
  <listitem>
   <para>
-gplazmalite-vorole-mapping : In this method the mapping to the username is done from the concatenation of the user's DN with the user's Role (or, more precisely, with the user's Fully Qualified Attribute Name). The mapping of username to uid, gid, and rootpath is through the storage-authdb file.
+gplazmalite-vorole-mapping : In this method the mapping to the username is done from the concatenation of the user's DN with the user's Role (or, more precisely, with the user's Fully Qualified Attribute Name). The mapping of username to uid, gid, and rootpath is through the storage-authzdb file.
   </para>
  </listitem>
  
  <listitem>
   <para>
 saml-vo-mapping : The DN and Role are mapped to a username via a callout to a <ulink
-  url="http://grid.racf.bnl.gov/GUMS/">GUMS</ulink> server. The GUMS service may run an extension which returns the uid, gid, and rootpath as well. Otherwise, the mapping of username to uid, gid, and rootpath is through the storage-authdb file. 
+  url="http://grid.racf.bnl.gov/GUMS/">GUMS</ulink> server. The GUMS service may run an extension which returns the uid, gid, and rootpath as well. Otherwise, the mapping of username to uid, gid, and rootpath is through the storage-authzdb file. 
   </para>
  </listitem>
 </itemizedlist>
@@ -54,7 +54,7 @@ saml-vo-mapping : The DN and Role are mapped to a username via a callout to a <u
 
 
 <para>
-gPlazma is included in dCache version 1.7 or higher. As of that version,the gPlazma cell can be called from gridftp doors and the srm server . 
+gPlazma is included in dCache version 1.7 or higher. As of that version,the gPlazma cell can be called from gridftp and gsidcap doors and the srm server. 
 </para>
 
 <para>
@@ -165,7 +165,7 @@ Preparing the grid mapfile
 
 The grid mapfile is the same as that used in other applications. It can be created in various ways, either by connecting directly to VOMS or GUMS servers, or by hand.
 
-Each line contains a DN (Certificate Subject) in quotes, and the username it is to be mapped to.
+Each line contains two fields: a DN (Certificate Subject) in quotes, and the username it is to be mapped to.
 
 <blockquote>
 <programlisting width="80">
@@ -199,28 +199,26 @@ version 2.1
 </programlisting>
 </blockquote>
 
-
-
-The other lines in the file each contain the string "authorize", followed by the username, read-write permission, uid, gid, and three paths. 
+The other lines in the file each contain eight fields: the string "authorize", followed by the username, read-write permission, uid, gid, and three paths. 
 
 </para>
 
+<blockquote>
+<programlisting width="80">
+authorize uscms01 read-write 60076 5063 / /pnfs/fnal.gov/resilient/uscms01 /
+</programlisting>
+</blockquote>
+
 <para>
-<emphasis role="bold">
-authorize uscms01 read-write 60076 5063 / /pnfs/fnal.gov/resilient/uscms01 /pnfs/fnal.gov/resilient/uscms01
-</emphasis>
+
+In the storage-authzdb file, there must be a line for each username to be authorized. The existence of three paths is for legacy puposes. Only the second path is used; it is the path under which the user is allowed to access files. It is permissible to simply use a "/" for the second path
 </para>
 
-<para>
-
-In the storage-authzdb file, there must be a line for each username to be authorized. The use of three paths is for legacy puposes. Make the last two equal to the path under which the user is allowed to access files. It is permissible to simply use a "/" for the last two paths
-</para>
-
-<para>
-<emphasis role="bold">
+<blockquote>
+<programlisting width="80">
 authorize uscms01 read-write 60076 5063 / / /
-</emphasis>
-</para>
+</programlisting>
+</blockquote>
 
 <para>
 in which case the user will be authorized for any path (the filesystem permissions in pnfs must also allow the transfer).
@@ -231,11 +229,11 @@ The lines are similar to the "login" lines of the dcache.kpwd file. If you alrea
 
 </para>
 
-<para>
-<emphasis role="bold">
-login uscms01 read-write 60076 5063 / /pnfs/fnal.gov/resilient/uscms01 /pnfs/fnal.gov/resilient/uscms01
-</emphasis>
-</para>
+<blockquote>
+<programlisting width="80">
+login uscms01 read-write 60076 5063 / /pnfs/fnal.gov/resilient/uscms01 /
+</programlisting>
+</blockquote>
 
 <para>
 and replacing the word "login" with "authorize".
@@ -277,7 +275,7 @@ Preparing grid-vorolemap
 <para>
 
 
-The file is similar in format to the grid-mapfile, however there is a field following the DN (Certificate Subject), containing the Role (Fully Qualified Attribute Name)
+The file is similar in format to the grid-mapfile, however there is an additional field following the DN (Certificate Subject), containing the Role (Fully Qualified Attribute Name). 
 
 <blockquote>
 <programlisting width="80">
@@ -286,7 +284,33 @@ The file is similar in format to the grid-mapfile, however there is a field foll
 </programlisting>
 </blockquote>
 
-The same user can be mapped to different usernames depending on what their role is. The role is typically determined by how the user creates their proxy, for example, using voms-proxy-init. The FQAN contains the user's group, role (optional), and capability (optional). The latter two may be set to the string "NULL", in which case they will be ignored by the plugin.
+Therefore each line has three fields: the user's DN, the user's role, and the username that the DN and Role combination are to be mapped to.
+
+The same user can be mapped to different usernames depending on what their role is. The role is  determined by how the user creates their proxy, for example, using voms-proxy-init. The FQAN contains the user's group, role (optional), and capability (optional). The latter two may be set to the string "NULL", in which case they will be ignored by the plugin.
+</para>
+
+<para>
+If a user is authorized in multiple roles, for example
+
+<blockquote>
+<programlisting width="80">
+"/DC=org/DC=doegrids/OU=People/CN=Gina Carlson 584065" "/cms/uscms" uscms01
+"/DC=org/DC=doegrids/OU=People/CN=Gina Carlson 584065" "/cms/uscms/Role=cmsuser" cms2847
+"/DC=org/DC=doegrids/OU=People/CN=Gina Carlson 584065" "/cms/uscms/Role=cmsphedex" phedex
+"/DC=org/DC=doegrids/OU=People/CN=Gina Carlson 584065" "/cms/uscms/Role=cmsprod" cmsprod
+</programlisting>
+</blockquote>
+
+they would be mapped to the username corresponding to the role found in the proxy that the user creates for use by the client software. Starting in dCache 1.8, if the user actually creates several roles in their proxy, authorization (and subsequent check of path and filesystem permissions) will be attempted for each role in the order that they are found in the proxy. In a griftp URL, the user may also explicity request a username
+
+<blockquote>
+<programlisting width="80">
+gsiftp://cmsprod@griddoor1.oursite.edu:2811/testfile1
+</programlisting>
+</blockquote>
+
+in which case other roles will be disregarded.
+
 </para>
 </section>
 
@@ -305,7 +329,7 @@ Instead of individual DNs, it is allowable to use * or "*" as the first field, s
 </programlisting>
 </blockquote>
 
-In that case, any DN with the corresponding role will match. It should be noted that a match is first attempted with the full DN. Therefore if both DN and "*" matches can be made, the DN match will take precedence. This is true for the revocation matches as well (see below).
+In that case, any DN with the corresponding role will match. It should be noted that a match is first attempted with the explicit DN. Therefore if both DN and "*" matches can be made, the DN match will take precedence. This is true for the revocation matches as well (see below).
 
 Thus a user with subject
 
@@ -323,7 +347,7 @@ and role
 </programlisting>
 </blockquote>
 
-will be mapped to username "cmsprod" via the above line with "*" for the DN, except if there is also a line such as
+will be mapped to username "cmsprod" via the above storage-authzdb line with "*" for the DN, except if there is also a line such as
 
 <blockquote>
 <programlisting width="80">
@@ -353,6 +377,67 @@ or modify the username of the entry if it already exists. The behaviour is undef
 
 Since DN is matched first, if a user would be authorized by his VO membership through a "*" entry, but is matched according to his DN to a revocation entry, authorization would be denied. Likewise if a whole VO were denied in a revocation entry, but some user in that VO could be mapped to a username through his DN, then authorization would be granted.
 </para>
+</section>
+
+<section>
+ <title>
+More Examples
+ </title>
+
+<para>
+Suppose that there are users in production roles that are expected to write into the storage system data which will be read by other users. In that case, to protect the data the non-production users would be given read-only access. Here in /etc/grid-security/grid-vorolemap the production role maps to username "cmsprod", and the role which reads the data maps to "cmsuser".
+
+<blockquote>
+<programlisting width="80">
+"*" "/cms/uscms/Role=cmsprod" cmsprod
+"*" "/cms/uscms/Role=cmsuser" cmsuser
+</programlisting>
+</blockquote>
+
+The read-write privilege is controlled by the third field in the lines of /etc/grid-security/storage-authzdb
+
+<blockquote>
+<programlisting width="80">
+authorize cmsprod  read-write  9811 5063 / /pnfs/fnal.gov/data /
+authorize cmsuser  read-only  10001 6800 / /pnfs/fnal.gov/data /
+</programlisting>
+</blockquote>
+
+</para>
+
+<para>
+Another use case is when users are to have their own directories within the storage system. This can be arranged within the gPlazma configuration files by mapping each user's DN to a unique username and then mapping each username to a unique root path. As an example, lines from /etc/grid-security/grid-vorolemap would therefore be written
+
+<blockquote>
+<programlisting width="80">
+"/DC=org/DC=doegrids/OU=People/CN=Selby Booth" "/cms" cms821
+"/DC=org/DC=doegrids/OU=People/CN=Kenja Kassi" "/cms" cms822
+"/DC=org/DC=doegrids/OU=People/CN=Ameil Fauss" "/cms" cms823
+</programlisting>
+</blockquote>
+
+and the corresponding lines from /etc/grid-security/storage-authzdb would be
+
+<blockquote>
+<programlisting width="80">
+authorize cms821 read-write 10821 7000 / /pnfs/fnal.gov/data/cms821 /
+authorize cms822 read-write 10822 7000 / /pnfs/fnal.gov/data/cms822 /
+authorize cms823 read-write 10823 7000 / /pnfs/fnal.gov/data/cms823 /
+</programlisting>
+</blockquote>
+
+Starting with dCache 1.8, regular expressions are supported in the /etc/grid-security/storage-authzdb file. Substitutions by regular expression group are also permitted. Place a regular expression in the username field of the storage-authzdb file. Any groups in the regular expression (defined by enclosure in parentheses) can be referred to in later fields of the line, and the corresponding susbstitution will be made when the file is read. For example, the above lines for granting users individual directories can be replaced with
+
+<blockquote>
+<programlisting width="80">
+authorize cms(\d\d\d) read-write 10$1 7000 / /pnfs/fnal.gov/data/cms$1 /
+</programlisting>
+</blockquote>
+
+in which case cms821 matches cms(\d\d\d) and the group (\d\d\d) is substituted in 10$1 to yield 10821 and in /pnfs/fnal.gov/data/cms$1 to yield /pnfs/fnal.gov/data/cms821, and so on.
+
+</para>
+
 </section>
 
 </section>
