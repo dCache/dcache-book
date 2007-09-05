@@ -275,7 +275,7 @@ Preparing grid-vorolemap
 <para>
 
 
-The file is similar in format to the grid-mapfile, however there is an additional field following the DN (Certificate Subject), containing the Role (Fully Qualified Attribute Name). 
+The file is similar in format to the grid-mapfile, however there is an additional field following the DN (Certificate Subject), containing the FQAN (Fully Qualified Attribute Name).  
 
 <blockquote>
 <programlisting width="80">
@@ -284,9 +284,9 @@ The file is similar in format to the grid-mapfile, however there is an additiona
 </programlisting>
 </blockquote>
 
-Therefore each line has three fields: the user's DN, the user's role, and the username that the DN and Role combination are to be mapped to.
+Therefore each line has three fields: the user's DN, the user's FQAN, and the username that the DN and FQAN combination are to be mapped to.
 
-The same user can be mapped to different usernames depending on what their role is. The role is  determined by how the user creates their proxy, for example, using voms-proxy-init. The FQAN contains the user's group, role (optional), and capability (optional). The latter two may be set to the string "NULL", in which case they will be ignored by the plugin.
+The FQAN is sometimes sematically referred to as the "role". The same user can be mapped to different usernames depending on what their role is. The role is  determined by how the user creates their proxy, for example, using voms-proxy-init. The FQAN contains the user's Group, Role (optional), and Capability (optional). The latter two may be set to the string "NULL", in which case they will be ignored by the plugin.
 </para>
 
 <para>
@@ -453,12 +453,12 @@ There is only one line in the policy file for this plugin, containing the URL fo
 <blockquote>
 <programlisting width="80">
 # SAML-based grid VO role mapping
-mappingServiceUrl="https://fledgling09.fnal.gov:8448/gums/services/GUMSAuthorizationServicePort"
+mappingServiceUrl="https://gums.oursite.edu:8443/gums/services/GUMSAuthorizationServicePort"
 </programlisting>
 </blockquote>
 
 Replace the URL with that of the site-specific <ulink
-  url="http://grid.racf.bnl.gov/GUMS/">GUMS</ulink> (the port is more likely to be 8443). When using the "GUMSAuthorizationServicePort", the service will only provide the username mapping and it will still be necesary to have the storage-authzdb file used in other plugins. See the above documentation <link linkend='storage-authzdb-sect'>"Preparing storage-authzdb"</link> for how to create the file. If a GUMS server providing a "StorageAuthorizationServicePort" with correct uid, gid, and rootpath information for your site is available, the storage-authzdb file is not necesary.
+  url="http://grid.racf.bnl.gov/GUMS/">GUMS</ulink>. When using the "GUMSAuthorizationServicePort", the service will only provide the username mapping and it will still be necesary to have the storage-authzdb file used in other plugins. See the above documentation <link linkend='storage-authzdb-sect'>"Preparing storage-authzdb"</link> for how to create the file. If a GUMS server providing a "StorageAuthorizationServicePort" with correct uid, gid, and rootpath information for your site is available, the storage-authzdb file is not necesary.
 </para>
 
 </section>
