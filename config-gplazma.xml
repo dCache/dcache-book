@@ -286,7 +286,7 @@ The file is similar in format to the grid-mapfile, however there is an additiona
 
 Therefore each line has three fields: the user's DN, the user's FQAN, and the username that the DN and FQAN combination are to be mapped to.
 
-The FQAN is sometimes sematically referred to as the "role". The same user can be mapped to different usernames depending on what their role is. The role is  determined by how the user creates their proxy, for example, using voms-proxy-init. The FQAN contains the user's Group, Role (optional), and Capability (optional). The latter two may be set to the string "NULL", in which case they will be ignored by the plugin.
+The FQAN is sometimes semantically referred to as the "role". The same user can be mapped to different usernames depending on what their role is. The role is  determined by how the user creates their proxy, for example, using voms-proxy-init. The FQAN contains the user's Group, Role (optional), and Capability (optional). The latter two may be set to the string "NULL", in which case they will be ignored by the plugin.
 </para>
 
 <para>
