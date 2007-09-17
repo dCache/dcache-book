@@ -210,8 +210,7 @@ authorize uscms01 read-write 60076 5063 / /pnfs/fnal.gov/resilient/uscms01 /
 </blockquote>
 
 <para>
-
-In the storage-authzdb file, there must be a line for each username to be authorized. The existence of three paths is for legacy puposes. Only the second path is used; it is the path under which the user is allowed to access files. It is permissible to simply use a "/" for the second path
+In the storage-authzdb file, there must be a line for each username to be authorized. The existence of three paths is for legacy puposes. The second path is of most importance; it is the path under which the user is allowed to access files. It is permissible to simply use a "/" for the second path
 </para>
 
 <blockquote>
@@ -225,7 +224,11 @@ in which case the user will be authorized for any path (the filesystem permissio
 </para>
 
 <para>
-The lines are similar to the "login" lines of the dcache.kpwd file. If you alreay have a dcache.kwpd file, create storage-authzdb by taking the lines from your dcache.kpwd file that start with the word "login", for example,
+The first path is nearly always left as "/", but it may be used as a home directory in interactive session, as a subdirectory of the second path. Upon login, the second path is used as the user's root, and a "cd" is performed to the first path. The first path is always defined as being relative to the second path.
+</para>
+
+<para>
+The lines of the storage-authzdb file are similar to the "login" lines of the dcache.kpwd file. If you alreay have a dcache.kwpd file, create storage-authzdb by taking the lines from your dcache.kpwd file that start with the word "login", for example,
 
 </para>
 
@@ -645,6 +648,53 @@ set to a local policy file on the node. The gplazma policy file on the gridftp d
 
 </section>
 </section>
+
+<section>
+ <title>
+gPlazma Options
+ </title>
+
+<section>
+ <title>
+Validating User Attributes
+ </title>
+ 
+<para>
+A user's roles (Fully Qualified Attribute Names) are read from the certificate chain found within the proxy. These attributes are signed by the user's VOMS server when the proxy is created. Starting with version 1.8, gPlazma supports checking the signature of the attributes against VOMS server certificates installed on the gPlazma node. To have gPlazma validate the proxy attributes, place the voms server certificates in /etc/grid-security/vomsdir and in /opt/d-cache/etc/dcachesrm-gplazma.policy set
+
+<blockquote>
+<programlisting width="80">
+vomsValidation="true"
+</programlisting>
+</blockquote>
+
+The default is "false". The same would need to be done on the srm or any door node for which gPlazma modules are called directly as a fallback.
+</para>
+
+</section>
+
+<section>
+ <title>
+Delegation to gPlazma
+ </title>
+ 
+ <para>
+In dCache version 1.7, SRM or the gridftpdoor delegated the user's credentials to gPlaza, and the user's attributes were extracted from the secure context. For performance purposes, starting in version 1.8 the delegation step is not performed. To turn on delegation, in /opt/d-cache/config/dCacheSetup on the node running SRM or the gridftpdoor, set the line
+
+<blockquote>
+<programlisting width="80">
+delegateToGPlazma=true
+</programlisting>
+</blockquote>
+
+The default value is false.
+
+</para>
+
+</section>
+
+</section>
+
 
 
 </chapter>
