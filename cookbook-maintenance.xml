@@ -99,7 +99,7 @@ create dmg.cells.services.CommandTaskCell maintenance "default -export"
     Change to the maintenance cell and get a listing of all available modules.
     
 <screen>
-<dcprompt>local</dcprompt><command>cd maitenance</command>
+<dcprompt>local</dcprompt><command>cd maintenance</command>
 <dcprompt>maintenance</dcprompt><command>ls module</command> -l
 copy-module -> diskCacheV111.replicaManager.EasyCopyCellModule</screen>
     Create a new task of module copy-module.
