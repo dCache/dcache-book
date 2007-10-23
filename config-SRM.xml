@@ -5,15 +5,16 @@
 <chapter id="cf-srm">
   
   
-  <title>Configuring the Storage Resource Manager Component</title>
+  <title>dCache Storage Resource Manager </title>
   <partauthors>Dmitry Litvintsev, Timur Perelmutov, Vladimir Podstavkov</partauthors>
   <!--
   <para>(We assume a basic knowledge of the functionality and terminology of
   dCache. Pool, domain, cell, how to log into a cell, and execute
   commands)</para>
   -->
-
-  <para><firstterm>Storage Resource Managers</firstterm> (SRMs) are 
+<section id="cf-srm-intro">
+    <title>	Introduction</title>
+ <para><firstterm>Storage Resource Managers</firstterm> (SRMs) are 
   middleware components whose 
   function is to provide dynamic space allocation and file management on 
   shared storage components on the Grid. SRMs support protocol negotiation 
@@ -21,18 +22,101 @@
   the interface, thus allowing for a uniform access to heterogeneous storage 
   elements.</para>
 
-  <para>SRM interface consists of the five categories of functions: Space 
-  Management, Data Transfer, Request Status, Directory and Permission 
-  Functions. SRM interface utilizes Grid 
-  Security Infrastructure (GSI) for authentications. SRM service is a Web 
-  Service implementation of a published WSDL document.</para>
-
-  <para>dCache SRM is implemented as Web Service Interface running under 
-  Apache Tomcat application server and Axis Web Services engine. This service
-  starts a dCache <literal> SRM </literal>domain with a main SRM cell and a 
-  number of other cells srm service relies on. These are SrmSpaceManager, 
-  PinManager, RemoteGsiftpCopyManager, etc.  Of these serivices only 
-  SrmSpaceManager requires special configuration.</para>
+	<section>
+	    <title> 	General SRM Concepts </title>
+<para> SRM interface consists of the five categories of functions: Space Management, Data Transfer, Request Status, Directory and Permission Functions. SRM interface utilizes Grid Security Infrastructure (GSI) for authentications. SRM service is a Web Service implementation of a published WSDL document. Please visit http://sdm.lbl.gov/srm-wg/ to see the SRM Version 1.1 and SRM Version 2.2 protocol specification documents.
+</para>
+  	<section>
+	      <title> 		SURLs</title>
+         <para>
+SRM defines a protocol name “srm”, and introduces a way to address the files stored in the SRM managed storage by Site URL of the format srm://&lt;host&gt;:&lt;port&gt;/[&lt;web service path&gt;?SFN=]&lt;path&gt;. Examples of the Site URLs a.k.a. SRM URLs are:
+<programlisting>srm://fapl110.fnal.gov:8443/srm/managerv2?SFN=//pnfs/fnal.gov/data/test/file1,srm://fapl110.fnal.gov:8443/srm/managerv1?SFN=/pnfs/fnal.gov/data/test/file2srm://srm.cern.ch:8443/castor/cern.ch/cms/store/cmsfile23</programlisting>All SRM functions that operate on files use Site URLs (SURLs) for file references. 
+         </para>
+      </section>
+  	<section>
+	      <title> 	Data Transfer functions </title>
+         <para>
+There are three functions for performing data transfers in SRM, namely srmPrepareToGet, srmPrepareToPut and srmCopy. These are SRM Version 2.2 names, in SRM Version 1.1 they were called get, put and copy, but their roles were essentially the same. These functions take list of sources(srmPrepareToGet), destinations(srmPrepareToPut) or both (srmCopy). The role of the srmPrepareToGet function is to prepare the system for the receipt of the data into the given file names, to make sure that the system has enough space to store the files, that the user has sufficient privileges to create the files in the paths designated by the SURLs. The purpose of the srmPrepareToPut function is to prepare the data stored in files, designated by the given SURLs , that are already a part of the system for the network access; SRM needs again to check that the user has sufficient privileges to access the files in the paths designated by the SURLs.  One of the features of thesrmPrepareToGet and srmPrepareToPut functions is that they both support transfer protocol negotiation. This means that  in case of both of these functions client supplies a list of supported transfer protocols and SRM server computes the Transfer URL in the first protocol from the list that it supports. Depending on the implementation the real action in the Storage System performed in response to this invocation may range from simple SURL to TURL translation to a Stage from Tape to Disk Cache and dynamic selection of the transfer host and transfer protocol depending on the protocol availability and  current load on each of the transfer server load. It is a responsibility of the client to perform the transfer and to notify the SRM that it is done with the files.  srmCopy function  performs a copy between a local and a remote storage system, it is given a list of source – destination URL pairs. At least one of the URLs in each pair must be an SURL of file in the SRM system contacted with the srmCopy request. Second URL can be a local or remote SURL or URL in some other transfer protocol. In case of srmCopy the SRM system performs data transfer itself, without data ever flowing though the client’s computer.         </para>
+         <para>
+ The Data Transfer functions are asynchronous, initial SRM call leads to the start of the execution of the client’s request, and the functions return the request statuses, that contain unique request tokens, that can be used in subsequent calls for periodic polling of the status of the request. Once the SRM completes the requests, and clients are done with the data transfers, clients notify the system that they are done with the files and are ready to release the associated resources, the client notifies the system by execution of the srmReleaseFiles in case of srmPrepareToGet or srmPutDone in case of srmPrepareToPut. In case of srmCopy, system knows when the transfer is competed and resources can be released, so it requires no special function at the end.          </para>
+         <para>
+Clients are free to cancel the requests at any time by execution of the srmAbortFiles or srmAbortRequest.         </para>
+    
+      </section>
+  	<section>
+	      <title> 		Space Management functions  </title>
+         <para>
+SRM Version 2.2 introduces a concept of space reservation. Space reservation is a promise by the storage system to make certain amount of storage space of certain type available for usage for a specified period of time. Space reservation is made using srmReserveSpace function. In case of successful reservation, a unique name, called space token is assigned to the reservation. Space token can be used during the transfer operations to tell the system to put the files being manipulated or transferred into an associated space reservation . A storage system ensures that the reserved amount of the disk space is indeed available, thus providing a guarantee that a  client does not run out of space until all space promised by the reservation has been used. When files are deleted, the space is returned to the space reservation.         </para>
+         <para>
+A space reservation has a property called retention policy. Possible values of retention policy are Replica, Output and Custodial. The retention policy describes the quality of the storage service that will be provided for the data (files) stored in this space reservation. Replica corresponds to the lowest quality of the service, usually associated with storing a single copy of each file on the disk. Custodial is the highest quality service, usually interpreted as storage of the data on Tape. WLCG has decided not to use Output retention policy in its data grid. Output is an intermediate retention policy is stronger than Replica and weaker than Custodial, and in dCache Output retention policy will possibly be used for files managed by Resilient Manager, which will make several internal copies of each file, distributed on distinct instances of hardware. Once a file is written into a given space reservation, it inherits the reservation's retention policy.         </para>
+         <para>
+Another property of the space reservation is called access latency. The two values allowed are Nearline and Online. Nearline means that the data stored in this reservation are allowed to be stored in such a way that retrieving them might require storage system to perform additional preparatory steps (staging data from tape to a disk cache for example). Online means that data is readily available and it will not take long to start reading the date. In case of dCache Online means that there will always be a copy of the file on disk, while Nearline does not provide such guarantee. As with retention policy, once a file is written into a given space reservation, it inherits the reservation's access latency.         </para>
+         <para>
+DCache however only manages write space, i.e. only space on disk can be reserved and only for write operations. Once files are migrated to tape, and if no copy is required on disk,  space used by these files is returned back into space reservation. When files are read back from tape and cached on disk, they are not counted as part of any space. SRM Space reservation can be assigned a non-unique description, then the description cab be used in the future to discover all space reservation with a given description.          </para>
+         <para>
+Properties of the SRM Space Reservations can be discovered using SrmGetSpaceMetadata function. Space Reservations might be released with srmReleaseSpace. For a complete description of the available functions please see SRM Version 2.2 specification at http://sdm.lbl.gov/srm-wg/doc/SRM.v2.2.html         </para>
+    
+      </section>
+  	<section>
+	      <title> 		Directory functions</title>
+         <para>
+Starting from SRM Version 2.2, interface provides a complete set of the directory management functions. These are srmLs, srmRm, srmMkDir, srmRmDir and srmMv.
+         </para>
+    
+      </section>
+  	<section>
+	      <title> 		Permission functions </title>
+         <para>
+SRM Version 2.2 support the following three space permission functions, srmGetPermission, srmCheckPermission and srmSetPermission. dCache contains a rudimentary implementation of these functions that mostly allow setting and checking of the Unix file permission.
+         </para>
+    
+      </section>
+     </section>
+	<section>
+	    <title> 		SRM Service </title>
+         <para>
+dCache SRM is implemented as Web Service Interface running under Apache Tomcat application server and Axis Web Services engine. This service starts a dCache SRM domain with a main SRM cell and a number of other cells SRM service relies on. These are SrmSpaceManager, PinManager, RemoteGsiftpCopyManager, etc. Of these services only SRM and SrmSpaceManager require special configuration.
+         </para>
+    </section>
+    <section>
+	    <title> 	dCache specific concepts </title>
+  	<section>
+	      <title> 		Link Groups </title>
+         <para>
+dCache 1.8 PoolManager supports new type of objects called LinkGroups. Each link group corresponds to a number of dCache pools in the following way:  LinkGroup is a collection of the Links, each of which is a collection of the PoolGroups associated (Linked, hence a name “Link”) with a set of the Pool Selection Units or PSUs. Each link group knows about its available size, which is a sum of all available sizes in all the pools included in this link group. In addition link group has 5 boolean properties called replicaAllowed, outputAllowed, custodialAllowed, onlineAllowed and nearlineAllowed, the values of these properties (true or false) can be configured in PoolManager.conf.
+         </para>
+    
+      </section>
+  	<section>
+	      <title> 		Space Reservations </title>
+         <para>
+In dCache 1.8 each SRM Space Reservation is made against the total available disk space of a particular link group. The total space in dCache that can be reserved is the sum of the available sizes of all Link Groups. If dCache is configured correctly each byte of disk space, that can be reserved, belongs to one and only one Link Group. Therefore it is important to make sure that no pool belongs to more than one pool group, no Pool Group belongs to more than one Link and no Link belongs to more than one LinkGroup.         </para>
+    
+         <para>
+Files written into a space made within a particular link group will end up on one of the pools referred to by this link group.  The difference between the Link Group's available  space and the sum of all the current space reservation sizes is the available space in the link group.         </para>
+      </section>
+  	<section>
+	      <title> 		Space Manager access control </title>
+         <para>
+When SRM Space Reservation request is executed, its parameters, such as reservation size, lifetime, access latency and retention policy as well as user's Virtual Organization (VO) membership information is forwarded to the SRM SpaceManager.         </para>
+         <para>
+Space Manager uses a special file for listing all the Virtual Organizations (VOs) and all the VO Roles that are permitted to make reservations in the given link group. List of the allowed VOs and VO Roles, together with the total available space and  replicaAllowed, outputAllowed, custodialAllowed, onlineAllowed and nearlineAllowed properties of the group is than matched against the information from the user request in order to determine if a given space reservation can be made in particular link group.  Once a space reservation is created, no access control is performed, any user can attempt to store the files in this space reservation, provided he or she knows the exact space token.          </para>
+    
+      </section>
+  	<section>
+	      <title> 	General SRM Concepts </title>
+         <para>
+SRM Version 2.2 srmPrepareToPut and srmCopy pull mode transfers allow the user to specify a space reservation token or a retention policy and an access latency. In the protocol, any of these values are optional, and it is up to the implementation to decide what to do, if these properties are not specified. The specification does however require that if a space reservation is given, then any access latency or retention policy specified must match the same properties of the space reservation.         </para>
+         <para>
+In dCache, if a space reservation is specified, the file will be stored in it (assuming the user has permission to do so in the name space).          </para>
+         <para>
+If the reservation token is not specified, and implicit space reservation is enabled, then a space reservation will be performed implicitly for each SRM v1.1 and SRM 2.2 srmPrepareToPut or srmCopy in pull mode. If an Access Latency and a Retention Policy are specified, the user defined retention policy and default access latency. If the user has not specified Access Latency or Retention Policy (or if SRM v1.1 is used) , the system will attempt to extract special tags (not surprisingly called  “AccessLatency” and “RetentionPolicy”) from PNFS namespace from the directory to which file is being written. If the tags are present, then their values will determine the default Access Latency or Retention Policy that will be used for implicit space reservations. If the tags are not present, then system wide defaults will be used. If no implicit space reservation can be made, the transfer will fail. (Note: some clients also have default values, which are used when not explicitly specified by the user. I this case server side defaults will have no effect. )         </para>
+         <para>
+If the implicit space reservation is not enabled in dCache 1.8 the pools in the link groups will be excluded from consideration and only the remaining pools will be considered to be the candidates for storing the incoming data, and classical pool selection mechanism will be used. If the space reservation is not used and no LinkGroups are specified, the system behavior will be exactly the same as in dCache 1.7.         </para>
+    
+      </section>
+    </section>
+</section>
 
 
   <section id="cf-srm-hrd-os">
@@ -226,7 +310,7 @@ SRM=yes
 	 </itemizedlist>
          </para>
         </section>
-        <section >
+      <section >
          <title>install dCacheSetup </title>
 	 <para>
 	 copy /opt/d-cache/etc/dCacheSetup.template into /opt/d-cache/config/dCacheSetup 
@@ -261,8 +345,8 @@ SRM=yes
         remoteGsiftpMaxTransfers=2000 
       </programlisting>
 
-           </para>
-        </section>
+         </para>
+      </section>
         <section >
          <title>tomcat/axis deployment </title>
 	 <para>
@@ -299,114 +383,348 @@ SRM=yes
 	    </para>
        </section>
    </section>  
-   
-   <section id="cf-srm-monitor">
-    <title>SRMWatch, SRM Monitoring Tool</title>
-    <para>
-    For large sites in order to avoid interference from Tomcat activities related to 
-    web interface, we recommend installation of srm monitoring on a separate node.
-    </para>
-      <section>
-        <title> Separate Node Installation</title>
-	<para>
-	<itemizedlist>
-	<listitem>
-	<para>
- 	 Install JDK1.5
-	</para>
-	</listitem>
-	<listitem>
-	<para>
-	  Download, install and start latest tomcat 5.5 from http://tomcat.apache.org/
-	</para>
-	</listitem>
-	<listitem>
-  	<para>
-       Download srmwatch rpm from http://www.dcache.org.
-	</para>
-	</listitem>
-	<listitem>
-	<para>
-          Install rpm. Installation can be performed using this command:
-         <screen>
-	  <rootprompt/> <command>rpm</command> -Uvh srmwatch-1.0-0.i386.rpm
-	 </screen>
-	</para>
-	</listitem>
-	<listitem>
-	<para>
-          Edit configuration file /opt/d-cache/srmwatch-1.0/WEB-INF/web.xml
-           in the line saying:
-          <programlisting>
-             &lt;param-value&gt;jdbc:postgresql://localhost/dcache&lt;/param-value&gt;
-          </programlisting>
 
-           Make sure that the localhost is in jdbc url substitutes with srm 
-	   database host name. For example:
-          <programlisting>
-           &lt;param-value&gt;jdbc:postgresql://fledgling06.fnal.gov/dcache&lt;/param-value&gt;
-          </programlisting>
-	</para>
-	</listitem>
-	<listitem>
-	<para>
-          execute
-        <screen>
-	  <rootprompt/> <command>export</command> CATALINA_HOME=<replaceable>YOUR_TOMCAT_LOCATION</replaceable>
-        </screen>
-	</para>
-	</listitem>
-	<listitem>
-	<para>
-            execute
-       <screen>
-	  <rootprompt/> <command>/opt/d-cache/srmwatch-1.0/deploy_srmwatch</command>
-       </screen>
-	</para>
-	</listitem>
-	<listitem>
-	<para>
-           Srm Monitoring page should be visible at 
-            http://<replaceable>srm-monitoring-node</replaceable>:8080/srmwatch/
-	</para>
-	</listitem>
-     	</itemizedlist>
- 
-	</para>
-      </section>
+   <section id="cf-srm-expert-config">
+         <title>SRM configuration for experts</title>
+      <para>
+          There are a few parameters in dCacheSetup that you might find useful for nontrivial SRM deployment.
+      </para>
       <section>
-        <title> Same Node Installation</title>
+         <title> srmSpaceManagerEnabled </title>
+
 	<para>
-	<itemizedlist>
-	<listitem>
+       <emphasis>srmSpaceManagerEnabled </emphasis>tells if the space management is activated in SRM. 	</para>
 	<para>
-          download srmwatch rpm from http://www.dcache.org.
+Possible values are “yes” and “no”. Default is “yes”.
 	</para>
-	</listitem>
-	<listitem>
 	<para>
-         Install rpm after srm server is installed and running, with 
-          /opt/d-cache/etc/srm_setup.env containing before the installation
-     <programlisting>
-         TOMCAT_HTTP_ENABLED=true
-     </programlisting>
-   	rpm installation can be performed using this command:
-         <screen>
-	  <rootprompt/> <command>rpm</command> -Uvh srmwatch-1.0-0.i386.rpm
-	 </screen>
+Usage example:
+       <programlisting>
+srmSpaceManagerEnabled=yes
+       </programlisting>
 	</para>
-	</listitem>
-	<listitem>
-	<para>
-          Srm Monitoring page should be visible at 
-	  http://<replaceable>srmnode</replaceable>:8080/srmwatch/
-	</para>
-	</listitem>
-	</itemizedlist>
-       </para>
       </section>
-    </section>
-    
+
+      <section>
+         <title> srmImplicitSpaceManagerEnabled </title>
+	<para>
+       <emphasis>srmImplicitSpaceManagerEnabled </emphasis>
+tells if the space should be reserved for SRM Version 1 transfers and for SRM Version 2 transfers that have no space token specified. Will have effect only if srmSpaceManagerEnabled.
+	</para>
+	<para>
+Possible values are “yes” and “no”. This is enabled by default, disabled if srmSpaceManagerEnabled is  set to “no”.	</para>
+	<para>
+Usage example:
+       <programlisting>
+srmImplicitSpaceManagerEnabled=yes
+       </programlisting>
+	</para>
+      </section>
+
+      <section>
+         <title> overwriteEnabled </title>
+	<para>
+       <emphasis>overwriteEnabled </emphasis>
+tells to SRM and gridftp servers if the overwrite is allowed. If enabled on SRM node, should be enabled on all gridftp nodes.
+	</para>
+	<para>
+Possible values are “yes” and “no”. Default is “no”.	</para>
+	<para>
+Usage example:
+       <programlisting>
+overwriteEnabled=yes       </programlisting>
+	</para>
+      </section>
+
+      <section>
+         <title> srmOverwriteByDefault </title>
+	<para>
+       <emphasis>srmOverwriteByDefault </emphasis>Set this to true if you want overwrite to be enabled for SRM v1.1 interface as well as for SRM v2.2 interface when client does not specify desired overwrite mode.This option will be considered only if overwriteEnabled is set to yes.
+	</para>
+	<para>
+Possible values are “true” and “false”. Default is “false”.	</para>
+	<para>
+Usage example:
+       <programlisting>
+srmOverwriteByDefault=false       </programlisting>
+	</para>
+      </section>
+
+      <section>
+         <title> srmDatabaseHost </title>
+	<para>
+       <emphasis>srmDatabaseHost </emphasis>tells to SRM which database host to connect to. Do not change unless you know what you are doing.
+	</para>
+	<para>
+Default value is  “localhost”.	</para>
+	<para>
+Usage example:
+       <programlisting>
+srmDatabaseHost=database.mydomain.org       </programlisting>
+	</para>
+      </section>
+
+      <section>
+         <title> spaceManagerDatabaseHost </title>
+	<para>
+       <emphasis>spaceManagerDatabaseHost </emphasis>tells to SRM Space Manager  which database host to connect to. Do not change unless you know what you are doing.
+	</para>
+	<para>
+Default value is  “localhost”.	</para>
+	<para>
+Usage example:
+       <programlisting>
+spaceManagerDatabaseHost=database.mydomain.org       </programlisting>
+	</para>
+      </section>
+
+      <section>
+         <title> pinManagerDatabaseHost </title>
+	<para>
+       <emphasis>pinManagerDatabaseHost </emphasis> tells to SRM Pin Manager  which database host to connect to. Do not change unless you know what you are doing.
+	</para>
+	<para>
+Default value is  “localhost”.	</para>
+	<para>
+Usage example:
+       <programlisting>
+pinManagerDatabaseHost=database.mydomain.org       </programlisting>
+	</para>
+      </section>
+
+      <section>
+         <title> srmDbName </title>
+	<para>
+       <emphasis>srmDbName </emphasis> tells to SRM which database to connect to. Do not change unless you know what you are doing.
+	</para>
+	<para>
+Default value is  “dcache”.	</para>
+	<para>
+Usage example:
+       <programlisting>
+srmDbName=dcache       </programlisting>
+	</para>
+      </section>
+
+      <section>
+         <title> srmDbUser </title>
+	<para>
+       <emphasis>srmDbUser </emphasis>tells to SRM which database user name to use when connecting to database. Do not change unless you know what you are doing.
+	</para>
+	<para>
+Default value is  “srmdcache”.	</para>
+	<para>
+Usage example:
+       <programlisting>
+srmDbUser=srmdcache       </programlisting>
+	</para>
+      </section>
+
+      <section>
+         <title> srmDbPassword </title>
+	<para>
+       <emphasis>srmDbPassword  </emphasis> tells to SRM which database password to use when connecting to database. Do not change unless you know what you are doing.
+	</para>
+	<para>
+Default value is  “srmdcache”.
+	</para>
+	<para>
+Usage example:
+       <programlisting>
+srmDbPassword=srmdcache       </programlisting>
+	</para>
+      </section>
+
+      <section>
+         <title> srmPasswordFile </title>
+	<para>
+       <emphasis> srmPasswordFile </emphasis> tells to SRM which database password file to use when connecting to database.  Do not change unless you know what you are doing. It is recommended that MD5 authentication method is used.To learn about file format please see http://www.postgresql.org/docs/8.1/static/libpq-pgpass.html. To learn more about authentication methods please visit http://www.postgresql.org/docs/8.1/static/encryption-options.html, Please read "Encrypting Passwords Across A Network” section. 
+	</para>
+	<para>
+This option is not set by default.
+	</para>
+	<para>
+Usage example:
+       <programlisting>
+srmPasswordFile=/root/.pgpass       </programlisting>
+	</para>
+      </section>
+
+      <section>
+         <title> srmJdbsMonitoringLogEnabled </title>
+	<para>
+       <emphasis> srmJdbsMonitoringLogEnabled  </emphasis> srmJdbsMonitoringLogEnabled tells to SRM to store the history of the SRM  request executions in the database. This option is useful if you are using SRMWatch web monitoring tool. Activation of this option might lead to the increase of the database activity, so if the postgreSQL load generated by SRM is excessive, disable it.
+	</para>
+	<para>
+Possible values are “true” and “false”. Default is “false”.	</para>
+	<para>
+Usage example:
+       <programlisting>
+srmJdbsMonitoringLogEnabled=false       </programlisting>
+	</para>
+      </section>
+
+      <section>
+         <title> srmDbLogEnabled </title>
+	<para>
+       <emphasis> srmDbLogEnabled </emphasis>tells to SRM to store the information about the remote (copy, srmCopy) transfer details in the database. This option is useful if you are using SRMWatch web monitoring tool. Activation of this option might lead to the increase of the database activity, so if the postgreSQL load generated by SRM is excessive, diable it.
+	</para>
+	<para>
+Possible values are “true” and “false”. Default is “false”.
+	</para>
+	<para>
+Usage example:
+       <programlisting>
+srmDbLogEnabled=false       </programlisting>
+	</para>
+      </section>
+
+      <section>
+         <title> srmVersion </title>
+	<para>
+       <emphasis>srmVersion  </emphasis> not used by SRM, it was mentioned that this value us used by some publishing scritps.
+	</para>
+	<para>
+Default is “version1”.	</para>
+      </section>
+
+      <section>
+         <title> pnfsSrmPath </title>
+	<para>
+       <emphasis>pnfsSrmPath  </emphasis> tells to SRM what is the root of all SRM paths is in pnfs. SRM will prepend path to all the local SURL paths passed to it by SRM client. So if the   pnfsSrmPath is set to “/pnfs/fnal.gov/THISISTHEPNFSSRMPATH” and someone requests the read of srm://srm:8443//file1, SRM will translate the SURL path “/file1” into “/pnfs/fnal.gov/THISISTHEPNFSSRMPATH/file1”. Setting this variable to something different from “/” is equivalent of performing Unix chroot for all SRM operations. 
+	</para>
+	<para>
+Default value is “/”.	</para>
+	<para>
+Usage example:
+       <programlisting>
+pnfsSrmPath=”/pnfs/fnal.gov/data/experiment”       </programlisting>
+	</para>
+      </section>
+
+      <section>
+         <title> parallelStreams </title>
+	<para>
+       <emphasis>parallelStreams  </emphasis>specifies the number of the parallel streams that SRM will use when performing third party transfers between this system and remote gsiftp servers, in response to SRM v1.1 copy or SRM V2.2 srmCopy function. This will have no effect on srmPrepareToPut and srmPrepareToGet command results and parameters of gridftp transfers driven by the SRM clients.
+	</para>
+	<para>
+Default value is “10”.	</para>
+	<para>
+Usage example:
+       <programlisting>
+parallelStreams=20       </programlisting>
+	</para>
+      </section>
+
+      <section>
+         <title> srmBufferSize </title>
+	<para>
+       <emphasis>srmBufferSize  </emphasis>specifies the number of bytes to use for the in memory buffers for  performing third party transfers between this system and remote gsiftp servers, in response to SRM v1.1 copy or SRM V2.2 srmCopy function. This will have no effect on srmPrepareToPut and srmPrepareToGet command results and parameters of gridftp transfers driven by the SRM clients.
+	</para>
+	<para>
+Default value is “1048576”.	</para>
+	<para>
+Usage example:
+       <programlisting>
+srmBufferSize=1048576       </programlisting>
+	</para>
+      </section>
+
+      <section>
+         <title> srmTcpBufferSizeferSize </title>
+	<para>
+       <emphasis>srmTcpBufferSizeferSize  </emphasis> specifies the number of bytes to use for the tcp buffers for  performing third party transfers between this system and remote gsiftp servers, in response to SRM v1.1 copy or SRM V2.2 srmCopy function. This will have no effect on srmPrepareToPut and srmPrepareToGet command results and parameters of gridftp transfers driven by the SRM clients.
+	</para>
+	<para>
+Default value is “1048576”.	</para>
+	<para>
+Usage example:
+       <programlisting>
+srmTcpBufferSize=1048576       </programlisting>
+	</para>
+      </section>
+
+      <section>
+         <title> srmGetLifeTime, srmPutLifeTime and srmCopyLifeTime </title>
+	<para>
+       <emphasis> srmGetLifeTime, srmPutLifeTime and srmCopyLifeTime </emphasis>specify the lifetimes of the srmPrepareToGet (srmBringOnline) srmPrepareToPut and srmCopy requests lifetimes in millisecond. If the system is unable to fulfill the requests before the request lifetimes expire, the requests are automatically garbage collected.
+	</para>
+	<para>
+Default value is “14400000” (4 hours)	</para>
+	<para>
+Usage example:
+       <programlisting>
+srmGetLifeTime=14400000srmPutLifeTime=14400000srmCopyLifeTime=14400000       </programlisting>
+	</para>
+      </section>
+
+      <section>
+         <title> srmGetReqMaxReadyRequests, srmPutReqMaxReadyRequests, srmGetReqReadyQueueSize and srmPutReqReadyQueueSize </title>
+	<para>
+       <emphasis>    
+srmGetReqMaxReadyRequests and srmPutReqMaxReadyRequests </emphasis>  specify the maximum number of the files for which the transfer urls will be be computed and given to the users in responce to SRM get (srmPrepareToGet) and put (srmPrepareToPut) requests. The rest of the files that are ready to be transfered are put on the “Ready” queues, the maximum length of these queues are controlled by <emphasis> srmGetReqReadyQueueSize and srmPutReqReadyQueueSize </emphasis> parameters. These parameters should be set according to the capacity of the system, and are usually greater than the maximum number of the gridftp transfers that this dCache instance gridftp doors can sustain.
+	</para>
+	<para>
+Usage example:
+       <programlisting>
+srmGetReqReadyQueueSize=10000srmGetReqMaxReadyRequests=2000srmPutReqReadyQueueSize=10000srmPutReqMaxReadyRequests=1000       </programlisting>
+	</para>
+      </section>
+
+      <section>
+         <title> srmCopyReqThreadPoolSize and remoteGsiftpMaxTransfers </title>
+	<para>
+       <emphasis>srmCopyReqThreadPoolSize and remoteGsiftpMaxTransfers.  </emphasis> srmCopyReqThreadPoolSize is used to specify how many parallel srmCopy file copies to execute simultaneously. Once the this SRM contacted remote SRM system, and obtained a Transfer URL(usually Gsiftp URL), it contact a Copy Manager module (Usually RemoteGsiftpTransferManager), and asks it to perform a gridftp transfer between remote GridFTP server and a dCache pool. The maximum number of the simultaneous  transfers that  RemoteGsiftpTransferManager will support is  remoteGsiftpMaxTransfers, therefore it is important that  remoteGsiftpMaxTransfers is greater than or equal to srmCopyReqThreadPoolSize.
+	</para>
+	<para>
+Usage example:
+       <programlisting>
+srmCopyReqThreadPoolSize=250remoteGsiftpMaxTransfers=260        </programlisting>
+	</para>
+      </section>
+
+      <section>
+         <title> srmCustomGetHostByAddr </title>
+	<para>
+       <emphasis> srmCustomGetHostByAddr </emphasis> srmCustomGetHostByAddr enables using the BNL developed  procedure for host by ip resolution if standard InetAddress method failed.
+	</para>
+	<para>
+Usage example:
+       <programlisting>
+srmCustomGetHostByAddr=true       </programlisting>
+	</para>
+      </section>
+
+      <section>
+         <title> RecursiveDirectoryCreation </title>
+	<para>
+       <emphasis> RecursiveDirectoryCreation </emphasis> allows or disallows automatic creation of directories via SRM, allow=true, disallow=false. 
+	</para>
+	<para>
+Automatic directory creation is allowed by default.	</para>
+	<para>
+Usage example:
+       <programlisting>
+RecursiveDirectoryCreation=true       </programlisting>
+	</para>
+      </section>
+
+      <section>
+         <title>  </title>
+	<para>
+       <emphasis> </emphasis>
+	</para>
+	<para>
+	</para>
+	<para>
+Usage example:
+       <programlisting>
+       </programlisting>
+	</para>
+      </section>
+
+      </section>
+
    <section id="cf-srm-space">
     <title>SRM Space Manager configuration</title>
     <section >
@@ -566,6 +884,115 @@ SRM=yes
       </para>
       </section>
     </section>
+
+   
+   <section id="cf-srm-monitor">
+    <title>SRMWatch, SRM Monitoring Tool</title>
+    <para>
+    For large sites in order to avoid interference from Tomcat activities related to 
+    web interface, we recommend installation of srm monitoring on a separate node.
+    </para>
+      <section>
+        <title> Separate Node Installation</title>
+	<para>
+	<itemizedlist>
+	<listitem>
+	<para>
+ 	 Install JDK1.5
+	</para>
+	</listitem>
+	<listitem>
+	<para>
+	  Download, install and start latest tomcat 5.5 from http://tomcat.apache.org/
+	</para>
+	</listitem>
+	<listitem>
+  	<para>
+       Download srmwatch rpm from http://www.dcache.org.
+	</para>
+	</listitem>
+	<listitem>
+	<para>
+          Install rpm. Installation can be performed using this command:
+         <screen>
+	  <rootprompt/> <command>rpm</command> -Uvh srmwatch-1.0-0.i386.rpm
+	 </screen>
+	</para>
+	</listitem>
+	<listitem>
+	<para>
+          Edit configuration file /opt/d-cache/srmwatch-1.0/WEB-INF/web.xml
+           in the line saying:
+          <programlisting>
+             &lt;param-value&gt;jdbc:postgresql://localhost/dcache&lt;/param-value&gt;
+          </programlisting>
+
+           Make sure that the localhost is in jdbc url substitutes with srm 
+	   database host name. For example:
+          <programlisting>
+           &lt;param-value&gt;jdbc:postgresql://fledgling06.fnal.gov/dcache&lt;/param-value&gt;
+          </programlisting>
+	</para>
+	</listitem>
+	<listitem>
+	<para>
+          execute
+        <screen>
+	  <rootprompt/> <command>export</command> CATALINA_HOME=<replaceable>YOUR_TOMCAT_LOCATION</replaceable>
+        </screen>
+	</para>
+	</listitem>
+	<listitem>
+	<para>
+            execute
+       <screen>
+	  <rootprompt/> <command>/opt/d-cache/srmwatch-1.0/deploy_srmwatch</command>
+       </screen>
+	</para>
+	</listitem>
+	<listitem>
+	<para>
+           Srm Monitoring page should be visible at 
+            http://<replaceable>srm-monitoring-node</replaceable>:8080/srmwatch/
+	</para>
+	</listitem>
+     	</itemizedlist>
+ 
+	</para>
+      </section>
+      <section>
+        <title> Same Node Installation</title>
+	<para>
+	<itemizedlist>
+	<listitem>
+	<para>
+          download srmwatch rpm from http://www.dcache.org.
+	</para>
+	</listitem>
+	<listitem>
+	<para>
+         Install rpm after srm server is installed and running, with 
+          /opt/d-cache/etc/srm_setup.env containing before the installation
+     <programlisting>
+         TOMCAT_HTTP_ENABLED=true
+     </programlisting>
+   	rpm installation can be performed using this command:
+         <screen>
+	  <rootprompt/> <command>rpm</command> -Uvh srmwatch-1.0-0.i386.rpm
+	 </screen>
+	</para>
+	</listitem>
+	<listitem>
+	<para>
+          Srm Monitoring page should be visible at 
+	  http://<replaceable>srmnode</replaceable>:8080/srmwatch/
+	</para>
+	</listitem>
+	</itemizedlist>
+       </para>
+      </section>
+    </section>
+    
 
 </chapter>
 <!-- </namespacewrapper> -->
