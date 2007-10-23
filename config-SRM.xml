@@ -12,6 +12,11 @@
   dCache. Pool, domain, cell, how to log into a cell, and execute
   commands)</para>
   -->
+  <!--
+     ##############################################################
+     #            Introduction                                    #
+     ##############################################################
+   -->
 <section id="cf-srm-intro">
     <title>	Introduction</title>
  <para><firstterm>Storage Resource Managers</firstterm> (SRMs) are 
@@ -24,7 +29,7 @@
 
 	<section>
 	    <title> 	General SRM Concepts </title>
-<para> SRM interface consists of the five categories of functions: Space Management, Data Transfer, Request Status, Directory and Permission Functions. SRM interface utilizes Grid Security Infrastructure (GSI) for authentications. SRM service is a Web Service implementation of a published WSDL document. Please visit http://sdm.lbl.gov/srm-wg/ to see the SRM Version 1.1 and SRM Version 2.2 protocol specification documents.
+<para> SRM interface consists of the five categories of functions: Space Management, Data Transfer, Request Status, Directory and Permission Functions. SRM interface utilizes Grid Security Infrastructure (GSI) for authentications. SRM service is a Web Service implementation of a published WSDL document. Please visit <ulink url="http://sdm.lbl.gov/srm-wg/"> SRM Working Group Page </ulink> to see the SRM Version 1.1 and SRM Version 2.2 protocol specification documents.
 </para>
   	<section>
 	      <title> 		SURLs</title>
@@ -54,7 +59,7 @@ Another property of the space reservation is called access latency. The two valu
          <para>
 DCache however only manages write space, i.e. only space on disk can be reserved and only for write operations. Once files are migrated to tape, and if no copy is required on disk,  space used by these files is returned back into space reservation. When files are read back from tape and cached on disk, they are not counted as part of any space. SRM Space reservation can be assigned a non-unique description, then the description cab be used in the future to discover all space reservation with a given description.          </para>
          <para>
-Properties of the SRM Space Reservations can be discovered using SrmGetSpaceMetadata function. Space Reservations might be released with srmReleaseSpace. For a complete description of the available functions please see SRM Version 2.2 specification at http://sdm.lbl.gov/srm-wg/doc/SRM.v2.2.html         </para>
+Properties of the SRM Space Reservations can be discovered using SrmGetSpaceMetadata function. Space Reservations might be released with srmReleaseSpace. For a complete description of the available functions please see <ulink url="http://sdm.lbl.gov/srm-wg/doc/SRM.v2.2.html"> SRM Version 2.2 Specification </ulink>          </para>
     
       </section>
   	<section>
@@ -118,6 +123,11 @@ If the implicit space reservation is not enabled in dCache 1.8 the pools in the 
     </section>
 </section>
 
+  <!--
+     ##############################################################
+     #            Choosing The right hardware                     #
+     ##############################################################
+   -->
 
   <section id="cf-srm-hrd-os">
     <title>Choosing The right hardware and OS for the SRM node</title>
@@ -168,6 +178,11 @@ If the implicit space reservation is not enabled in dCache 1.8 the pools in the 
 	  </para>
     </section>
  </section>
+  <!--
+     ##############################################################
+     #            Configuring Postgres Database                   #
+     ##############################################################
+   -->
  
   <section id="cf-srm-psql">
     <title>Configuring Postgres Database</title>
@@ -250,6 +265,11 @@ If the implicit space reservation is not enabled in dCache 1.8 the pools in the 
      </screen>	  
      </para>
      </section>  
+  <!--
+     ##############################################################
+     #            Configuring SRM Domain                          #
+     ##############################################################
+   -->
      
      <section id="cf-srm-srm">
         <title>Configuring SRM Domain</title>
@@ -384,6 +404,11 @@ SRM=yes
        </section>
    </section>  
 
+  <!--
+     ##############################################################
+     #            SRM configuration for experts                   #
+     ##############################################################
+   -->
    <section id="cf-srm-expert-config">
          <title>SRM configuration for experts</title>
       <para>
@@ -538,7 +563,7 @@ srmDbPassword=srmdcache       </programlisting>
       <section>
          <title> srmPasswordFile </title>
 	<para>
-       <emphasis> srmPasswordFile </emphasis> tells to SRM which database password file to use when connecting to database.  Do not change unless you know what you are doing. It is recommended that MD5 authentication method is used.To learn about file format please see http://www.postgresql.org/docs/8.1/static/libpq-pgpass.html. To learn more about authentication methods please visit http://www.postgresql.org/docs/8.1/static/encryption-options.html, Please read "Encrypting Passwords Across A Network” section. 
+       <emphasis> srmPasswordFile </emphasis> tells to SRM which database password file to use when connecting to database.  Do not change unless you know what you are doing. It is recommended that MD5 authentication method is used.To learn about file format please see <ulink url="http://www.postgresql.org/docs/8.1/static/libpq-pgpass.html"/>. To learn more about authentication methods please visit <ulink url="http://www.postgresql.org/docs/8.1/static/encryption-options.html"/>, Please read "Encrypting Passwords Across A Network” section. 
 	</para>
 	<para>
 This option is not set by default.
@@ -631,9 +656,9 @@ srmBufferSize=1048576       </programlisting>
       </section>
 
       <section>
-         <title> srmTcpBufferSizeferSize </title>
+         <title> srmTcpBufferSize </title>
 	<para>
-       <emphasis>srmTcpBufferSizeferSize  </emphasis> specifies the number of bytes to use for the tcp buffers for  performing third party transfers between this system and remote gsiftp servers, in response to SRM v1.1 copy or SRM V2.2 srmCopy function. This will have no effect on srmPrepareToPut and srmPrepareToGet command results and parameters of gridftp transfers driven by the SRM clients.
+       <emphasis>srmTcpBufferSize  </emphasis> specifies the number of bytes to use for the tcp buffers for  performing third party transfers between this system and remote gsiftp servers, in response to SRM v1.1 copy or SRM V2.2 srmCopy function. This will have no effect on srmPrepareToPut and srmPrepareToGet command results and parameters of gridftp transfers driven by the SRM clients.
 	</para>
 	<para>
 Default value is “1048576”.	</para>
@@ -708,8 +733,119 @@ Usage example:
 RecursiveDirectoryCreation=true       </programlisting>
 	</para>
       </section>
+      </section>
 
-      <section>
+  <!--
+     ##############################################################
+     #            SRM Space Manager configuration                 #
+     ##############################################################
+   -->
+
+   <section id="cf-srm-space">
+    <title>SRM Space Manager configuration</title>
+    <section >
+    <title>SRM Space Manager and LinkGroups</title>
+    <para>
+      Space Manager is making reservations agains space in LinkGroups, LinkGroup is an object created by the PoolManager, that consists of several "Links". The total space available in the given LinkGroup is a sum of available spaces in all links.An available space in each link is a sum of the available spaces in all pools assinged to a given link. Therefore for the space reservation to work correctly it is essential that each pool belongs to one and only one link, and each link belongs to only one LinkGroup. LinkGroups are assigned several parameters that determine what kind of space the LinkGroup correspond to and who can make reservation against this space.  
+    </para>  
+    </section>
+    <section>
+      <title> Definition of the LinkGroups in the PoolManager.conf</title>
+      <para>
+     To configure PoolManager to create the new LinkGroup (a new reservable entity in dCache), please use following example (given in the PoolManager). Here we assume that write-link link already exists: 
+         <programlisting>
+psu create linkGroup write-link-group
+psu addto linkGroup  write-link-group write-link
+         </programlisting>
+       </para>
+       <para>
+      To tell Space Manager if the LinkGroup will be able to store files with given AccessLatency and RetentionPolicy, LinkGroups have 5 attributes: custodialAllowed,  outputAllowed , replicaAllowed , onlineAllowed  and nearlineAllowed. These attributes can be specified with the following commands:
+     <programlisting>
+psu set linkGroup custodialAllowed &lt;group name&gt; &lt;true|false&gt;psu set linkGroup outputAllowed &lt;group name&gt; &lt;true|false&gt;psu set linkGroup replicaAllowed &lt;group name&gt; &lt;true|false&gt;psu set linkGroup onlineAllowed &lt;group name&gt; &lt;true|false&gt;psu set linkGroup nearlineAllowed &lt;group name&gt; &lt;true|false&gt;     </programlisting>
+Please note that that it is up to administrators that the link groups attributes are specified correctly. For example dcache will not complain if the linkGroup that does not support tape backend will be declared as one that supports custodial.    
+      </para>
+    </section>
+    <section >
+      <title>Activating SRM Space Manager</title>
+       <para>
+         In order to enable the new space reservation: add (uncomment) the following 
+         definition in dCacheSetup
+        <programlisting>
+          srmSpaceManagerEnabled=yes
+        </programlisting>
+      </para>
+    </section>
+
+    <section >
+      <title>SRM  Space Manager Parameters in dCacheSetup  </title>
+       <para>
+       </para>
+     </section>
+
+     <section>
+         <title> SpaceManagerDefaultRetentionPolicy </title>
+	<para>
+       If space reservation request does not specify retention policy we will assign <emphasis>SpaceManagerDefaultRetentionPolicy </emphasis> retention policy by default.
+	</para>
+	<para>
+        Possible values are REPLICA, OUTPUT and CUSTODIAL.
+	</para>
+	<para>
+Usage example:
+       <programlisting>
+SpaceManagerDefaultRetentionPolicy=CUSTODIAL
+       </programlisting>
+	</para>
+      </section>
+     <section>
+         <title> SpaceManagerDefaultAccessLatency </title>
+	<para>
+       If space reservation request does not specify access latency we will assign <emphasis> SpaceManagerDefaultAccessLatency </emphasis> this access latency by default.
+	</para>
+	<para>
+        Possible values are ONLINE  and NEARLINE.
+	</para>
+	<para>
+Usage example:
+       <programlisting>
+SpaceManagerDefaultAccessLatency=NEARLINE
+       </programlisting>
+	</para>
+      </section>
+
+     <section>
+         <title> SpaceManagerReserveSpaceForNonSRMTransfers </title>
+	<para>
+       If <emphasis> SpaceManagerReserveSpaceForNonSRMTransfers </emphasis>is set to true, and if the transfer request come from the door, and there was not prior space reservation made for this file,Space Manager will try to reserve space before satisfying the request.
+	</para>
+	<para>
+Possible values are true and false.
+	</para>
+	<para>
+Usage example:
+       <programlisting>
+SpaceManagerReserveSpaceForNonSRMTransfers=false
+       </programlisting>
+	</para>
+      </section>
+
+     <section>
+         <title>SpaceManagerLinkGroupAuthorizationFileName  </title>
+	<para>
+       <emphasis>SpaceManagerLinkGroupAuthorizationFileName </emphasis> specifies a file that contains the list of FQANs that are allowed to make space reservations in a given link group.The file syntax is described in the next section.
+	</para>
+	<para>
+ This parameter is not set by default.
+	</para>
+	<para>
+Usage example:
+       <programlisting>
+SpaceManagerLinkGroupAuthorizationFileName="/opt/d-cache/etc/LinkGroupAuthiorization.conf” 
+      </programlisting>
+	</para>
+      </section>
+
+     <section>
          <title>  </title>
 	<para>
        <emphasis> </emphasis>
@@ -722,79 +858,20 @@ Usage example:
        </programlisting>
 	</para>
       </section>
-
-      </section>
-
-   <section id="cf-srm-space">
-    <title>SRM Space Manager configuration</title>
-    <section >
-    <title>SRM Space Manager and LinkGroups</title>
-    <para>
-      Space Manager is making reservations agains space in LinkGroups, LinkGroup 
-      is an object created by the PoolManager, that consists of several "Links". 
-      The total space available in the given LinkGroup is a sum of available 
-      spaces in all links.An available space in each link is a sum of  the 
-      available spaces in all pools assinged to a given link. Therefore for the 
-      space reservation to work correctly it is essential that each pool belongs to 
-      one and only one link, and each link belongs to only one LinkGroup.
-      LinkGroups are assigned several parameters that determine what kind of 
-      space the LinkGroup correspond to and who can make reservation against this
-      space. The main parameter is HSM, If its value is "none" then the space in this
-      LinkGroup is considered non-Custodial, and reservations of space  with "Replica"
-      and "Output" RetentionPolicy can reserve space in it. If HSM parameter is assinged 
-      any other value, this value is considered to be the name of the backend tape 
-      storage system and  the LinkGroup is then considered Custodial. Only space 
-      reservations with "Custodial" RetentionPolicy will be able to reserve space in such 
-      LinkGroup. 
-    </para>  
-    <para>
-       AccessLatency parameter of the space reservation does not influence the the 
-       LinkGroup selection for a particular reservation.
-    </para>
-    </section>
-    <section>
-    <title> Definition of the LinkGroups in the PoolManager.conf</title>
-    <para>
-     To configure PoolManager to create the new LinkGroup (a new reservable entity in 
-     dCache), please use following example (given in the PoolManager). 
-     Here we assume that write-link link already exists:
-     <programlisting>
-	psu create linkGroup write-link-group
-	psu addto linkGroup  write-link-group write-link
-     </programlisting>
-     </para>
-     <para>
-      To tell Space Manager if the LinkGroup will be able to store the Custodial files, 
-      we need to specify the Hsm Type property of the LinkGroup. If the Hsm Type is "None" 
-      then Custodial files can not go into the link Group, anything else is enterpreted as 
-      tape backend and allows Custodial file. For example to specify the Hsm Type to be 
-      "enstore" add following command:
-     <programlisting>
-         psu set linkGroup attribute -r write-link-group HSM=enstore
-     </programlisting>
-     </para>
-    </section>
-    <section >
-      <title>Activating SRM Space Manager</title>
-       <para>
-         In order to enable the new space reservation: add (uncomment) the following 
-         definition in dCacheSetup
-        <programlisting>
-          srmSpaceManagerEnabled=yes
-        </programlisting>
-       </para>
-     </section>
       
    </section>
+  <!--
+     ##############################################################
+     #            SRM Space Manager VO bases Access control      #
+     ##############################################################
+   -->
    
     <section id="cf-srm-space-ac">
     <title> SRM Space Manager Virtual Organization based access control configuration</title>
      <section>
-      <title> VO based Authorization</title>
+      <title> VO based Authorization Prerequisites </title>
        <para>
-            In order to be able to take advantage of the Virtual Organization (VO) infrastructure 
-	    and VO based authorization and VO Based Access Control to the Space in dCache, 
-	    certain things need to be in place:
+            In order to be able to take advantage of the Virtual Organization (VO) infrastructure and VO based authorization and VO Based Access Control to the Space in dCache, certain things need to be in place: 
 	<itemizedlist>
 	<listitem>
 	<para>
@@ -808,83 +885,57 @@ Usage example:
 	</listitem>
 	<listitem>
 	<para>
-          dCache needs to use gPlazma and not gPlazma with dcache.kpwd plugin, but other modules 
-	  that know how to extract  VO attributes from the proxy.(see 
-	  <ulink url="http://www.dcache.org/manuals/Book/cf-gplazma.shtml">gPlazma Documentation</ulink>, 
-	  have a look at gplazmalite-vorole-mapping Plugin).
+          dCache needs to use gPlazma and not gPlazma with dcache.kpwd plugin, but other modules that know how to extract  VO attributes from the proxy.(see <xref linkend="cf-gplazma"/>, have a look at gplazmalite-vorole-mapping Plugin).
 	</para>
 	</listitem>
 	</itemizedlist>
           Only if these 3 conditions are satisfied the VO based authorization of the Space Manager can work.
 	</para>
 	<para>
-          If a client uses a regular grid proxy, created with grid-proxy-init, and not a Virtual 
-	  Organization (VO) proxy, which is created with the voms-proxy-init, when he is communicating 
-	  with SRM server in dCache, then the VO attributes can not be extracted its credential.
-	  voms-proxy-init adds a Fully Qualified Attribute Name (FQAN) section(s) to the grid proxy, which 
-	  contain informaton about user's VO membership, in particular it contain VO Group name and VO Role 
-	  that the client intends to play at this time. In this case the name of the user is extracted on 
-	  basis of the direct Distinguished Name (DN) to use name mapping. For the purposes of the space 
-	  reservation the name of the user is used as its VO Group name, and the VO Role is left empty.
+          If a client uses a regular grid proxy, created with grid-proxy-init, and not a Virtual Organization (VO) proxy, which is created with the voms-proxy-init, when he is communicating with SRM server in dCache, then the VO attributes can not be extracted its credential. voms-proxy-init adds a Fully Qualified Attribute Name (FQAN) section(s) to the grid proxy, which contain informaton about user's VO membership, in particular it contain VO Group name and VO Role that the client intends to play at this time. In this case the name of the user is extracted on basis of the direct Distinguished Name (DN) to use name mapping. For the purposes of the space reservation the name of the user is used as its VO Group name, and the VO Role is left empty. 
 	</para>
-	<para>
-          So if the 3 conditions mentioned above are not satisfied, there are two options
-	<itemizedlist>
-	<listitem>
-	<para>
-          Add all the allowed user names to list of the VOs associated with the particular link groups. 
-	  Since most sites use group accounts like dteam001, there should not be too many of these. 
-	  For example to enable the authorization of the dteam001
-         <programlisting>
-           psu set linkGroup attribute write-link-group HSM=None
-           psu set linkGroup attribute write-link-group VO=dteam001
-            psu set linkGroup attribute write-link-group dteamRole=*
-         </programlisting>
-        </para>
-	</listitem>
-	<listitem>
-	<para>
-          Remove the VO attributes from the link groups altogether  for now, so that all the users 
-	  can make reservations in all the links. Once the 3 conditions mentioned above will be 
-	  satisfied the vo based authorization can be activated again.
-        </para>
-	</listitem>
-	</itemizedlist>
-       </para>
      </section>
      <section>
-      <title> Access Control configuration</title>
-       <para>
-         dCache Space Access Control is currently performed at the level of the LinkGroups, and 
-	 is done by defining LinkGroup attributes in PoolManager.conf file
+      <title> VO based Access Control configuration</title>
+      <para>
+         dCache Space Reservation Functionality Access Control is currently performed at the level of the LinkGroups. The access to making reservations in each LinkGroup is controlled by the <emphasis> SpaceManagerLinkGroupAuthorizationFile </emphasis>.
 	</para>
+
+    <section>
+         <title> SpaceManagerLinkGroupAuthorizationFile syntax </title>
 	<para>
-        If no Vo information is assigned to the LinkGroup, any Vo group can make reservation 
-        please see the following examples of how to assign particular VOs and VO Groups to a 
-        given link: 1) assign VOs to a LinkGroup. While PoolManager does not have a ability 
-        to specify VO and Role it's given to it as attributes of the linkGroup.
+       <emphasis> SpaceManagerLinkGroupAuthorizationFile  </emphasis> has following syntax:
+	</para> 
+	  <para>
+LinkGroup Name followed by the list of the Fully Qualified Attribute Names (FQANs), each FQAN on separate line, followed by an empty line, which is used as a record separator, or by the end of file. FQAN is usually a string of the form &lt;VO&gt;/Role=&lt;VORole&gt;. Both &lt;VO&gt; and &lt;VORole&gt; could be set to “*”, in this case all VOs or VO Roles will be allowed to make reservations in this LinkGroup.Any line that starts with # is a comment and may appear anywhere.	</para>
+	<para>
+File location is specified by defining 
        <programlisting>
-	  psu set linkGroup attribute write-link-group VO=alice
-  	  psu set linkGroup attribute write-link-group VO=cms
-          psu set linkGroup attribute write-link-group VO=atlas
-       </programlisting>
-      </para>
-      <para>
-        To add Roles for a VO see the following example. Here syntax is important. The role 
-        attribute name is constructed from + "Role".
+SpaceManagerLinkGroupAuthorizationFileName= <replaceable>FILENAME</replaceable> 
+     </programlisting>
+in the dCacheSetup 
+	</para> 
+
+      </section>
+
+     <section>
+         <title> Example of the SpaceManagerLinkGroupAuthorizationFile </title>
+	<para>
        <programlisting>
-	  psu set linkGroup attribute write-link-group cmsRole=/cms/NULL/production
-          psu set linkGroup attribute write-link-group cmsRole=/cms/NULL/mc
-       </programlisting>
+# this is comment and is ignoredLinkGroup LFSOnly-LinkGroup/atlas/Role=/atlas/role1LinkGroup CMS-LinkGroup/cms/Role=*#/dteam/Role=/testerLinkGroup default-LinkGroup#allow anyone :-) */Role=*#/dteam/Role=/tester       </programlisting>
+	</para>
+<para> Successful VO and Experiment specific examples of dCache SRM Space Manager configurations are or will be published at <ulink url="http://trac.dcache.org/trac.cgi/wiki/manuals/index"> dCache WIKI documentation pages </ulink>. 
       </para>
-      <para>
-         If no vos or roles are excluded, "*" can used for both vo and role. If the vo groups 
-         and roles are not specified at all, then every user of dCache is allowed to make 
-         reservations.
-      </para>
+      </section> 
+ 
       </section>
     </section>
 
+  <!--
+     ##############################################################
+     #            SRMWatch, SRM Monitoring Tool                   #
+     ##############################################################
+   -->
    
    <section id="cf-srm-monitor">
     <title>SRMWatch, SRM Monitoring Tool</title>
@@ -903,12 +954,12 @@ Usage example:
 	</listitem>
 	<listitem>
 	<para>
-	  Download, install and start latest tomcat 5.5 from http://tomcat.apache.org/
+	  Download, install and start latest tomcat 5.5 from <ulink url="http://tomcat.apache.org/"> Tomcat Web Site </ulink>
 	</para>
 	</listitem>
 	<listitem>
   	<para>
-       Download srmwatch rpm from http://www.dcache.org.
+       Download srmwatch rpm from <ulink url="http://www.dcache.org"/>.
 	</para>
 	</listitem>
 	<listitem>
@@ -966,7 +1017,7 @@ Usage example:
 	<itemizedlist>
 	<listitem>
 	<para>
-          download srmwatch rpm from http://www.dcache.org.
+          download srmwatch rpm from <ulink url="http://www.dcache.org>"/>.
 	</para>
 	</listitem>
 	<listitem>
