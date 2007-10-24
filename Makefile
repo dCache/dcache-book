@@ -43,6 +43,12 @@ HTML_LOCATION ?= built
 #   Directory for dcache.org SHTML output. Some files from $(HTML_LOCATION) get copied here
 WEB_LOCATION ?= web-output
 
+# homedir of the web content on the remote web server
+SERVER_HOME ?= /data/www/dcache.org
+
+# homedir of all documentation on the remote web server
+MANUALS_HOME ?= $(SERVER_HOME)/manuals
+
 ######### Software Configs
 #
 
@@ -169,14 +175,16 @@ $(WEB_LOCATION)/dCacheBook.pdf: Book.pdf
 #
 ssh-dcache.org: .ssh-dcache.org-copied
 .ssh-dcache.org-copied: dcache.org
-	cd $(WEB_LOCATION)/ && tar cf - * | ssh $(WEB_USER)cvs-dcache.desy.de 'cd /home/dcache.org/manuals/Book && sh -c "rm -rf *" && tar xf -'
+	cd $(WEB_LOCATION)/ && rsync -rt * $(WEB_USER)cvs-dcache:$(MANUALS_HOME)/Book     
+	ssh $(WEB_USER)cvs-dcache.desy.de "cd $(MANUALS_HOME)/Book && chmod -R g+w * && chgrp -R dcache *"
 	touch .ssh-dcache.org-copied
 
 # Copy the WEB_LOCATION to the correct spot on www.dcache.org DRAFT
 #
 ssh-draft: .ssh-draft-copied
 .ssh-draft-copied: dcache.org
-	cd $(WEB_LOCATION)/ && tar cf - * | ssh $(WEB_USER)cvs-dcache 'cd /home/dcache.org/manuals/Book-draft && sh -c "rm -rf *" && tar xf -'
+	cd $(WEB_LOCATION)/ && rsync -rt * $(WEB_USER)cvs-dcache:$(MANUALS_HOME)/Book-draft	
+	ssh $(WEB_USER)cvs-dcache.desy.de "cd $(MANUALS_HOME)/Book-draft && chmod -R g+w * && chgrp -R dcache *"
 	touch .ssh-draft-copied
 
 # Titlepage customization for Sidebar
