@@ -6,7 +6,7 @@
   
   
   <title>dCache Storage Resource Manager </title>
-  <partauthors>Dmitry Litvintsev, Timur Perelmutov, Vladimir Podstavkov</partauthors>
+  <partauthors>Gerd Behrmann, Dmitry Litvintsev, Timur Perelmutov, Vladimir Podstavkov</partauthors>
   <!--
   <para>(We assume a basic knowledge of the functionality and terminology of
   dCache. Pool, domain, cell, how to log into a cell, and execute
