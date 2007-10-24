@@ -63,6 +63,11 @@ Properties of the SRM Space Reservations can be discovered using SrmGetSpaceMeta
     
       </section>
   	<section>
+	      <title> 	Utilization of the Space Reservations for Data Storage </title>
+         <para>
+SRM Version 2.2 srmPrepareToPut and srmCopy pull mode transfers allow the user to specify a space reservation token or a retention policy and an access latency. In the protocol, any of these values are optional, and it is up to the implementation to decide what to do, if these properties are not specified. The specification does however require that if a space reservation is given, then any access latency or retention policy specified must match the same properties of the space reservation.         </para>
+      </section>
+  	<section>
 	      <title> 		Directory functions</title>
          <para>
 Starting from SRM Version 2.2, interface provides a complete set of the directory management functions. These are srmLs, srmRm, srmMkDir, srmRmDir and srmMv.
@@ -101,23 +106,21 @@ In dCache 1.8 each SRM Space Reservation is made against the total available dis
 Files written into a space made within a particular link group will end up on one of the pools referred to by this link group.  The difference between the Link Group's available  space and the sum of all the current space reservation sizes is the available space in the link group.         </para>
       </section>
   	<section>
-	      <title> 		Space Manager access control </title>
-         <para>
-When SRM Space Reservation request is executed, its parameters, such as reservation size, lifetime, access latency and retention policy as well as user's Virtual Organization (VO) membership information is forwarded to the SRM SpaceManager.         </para>
-         <para>
-Space Manager uses a special file for listing all the Virtual Organizations (VOs) and all the VO Roles that are permitted to make reservations in the given link group. List of the allowed VOs and VO Roles, together with the total available space and  replicaAllowed, outputAllowed, custodialAllowed, onlineAllowed and nearlineAllowed properties of the group is than matched against the information from the user request in order to determine if a given space reservation can be made in particular link group.  Once a space reservation is created, no access control is performed, any user can attempt to store the files in this space reservation, provided he or she knows the exact space token.          </para>
-    
-      </section>
-  	<section>
-	      <title> 	General SRM Concepts </title>
-         <para>
-SRM Version 2.2 srmPrepareToPut and srmCopy pull mode transfers allow the user to specify a space reservation token or a retention policy and an access latency. In the protocol, any of these values are optional, and it is up to the implementation to decide what to do, if these properties are not specified. The specification does however require that if a space reservation is given, then any access latency or retention policy specified must match the same properties of the space reservation.         </para>
+	      <title> 	Explicit and Implicit Space Reservations for Data Storage in dCache </title>
          <para>
 In dCache, if a space reservation is specified, the file will be stored in it (assuming the user has permission to do so in the name space).          </para>
          <para>
 If the reservation token is not specified, and implicit space reservation is enabled, then a space reservation will be performed implicitly for each SRM v1.1 and SRM 2.2 srmPrepareToPut or srmCopy in pull mode. If an Access Latency and a Retention Policy are specified, the user defined retention policy and default access latency. If the user has not specified Access Latency or Retention Policy (or if SRM v1.1 is used) , the system will attempt to extract special tags (not surprisingly called  “AccessLatency” and “RetentionPolicy”) from PNFS namespace from the directory to which file is being written. If the tags are present, then their values will determine the default Access Latency or Retention Policy that will be used for implicit space reservations. If the tags are not present, then system wide defaults will be used. If no implicit space reservation can be made, the transfer will fail. (Note: some clients also have default values, which are used when not explicitly specified by the user. I this case server side defaults will have no effect. )         </para>
          <para>
 If the implicit space reservation is not enabled in dCache 1.8 the pools in the link groups will be excluded from consideration and only the remaining pools will be considered to be the candidates for storing the incoming data, and classical pool selection mechanism will be used. If the space reservation is not used and no LinkGroups are specified, the system behavior will be exactly the same as in dCache 1.7.         </para>
+    
+      </section>
+  	<section>
+	      <title> 		Space Manager access control </title>
+         <para>
+When SRM Space Reservation request is executed, its parameters, such as reservation size, lifetime, access latency and retention policy as well as user's Virtual Organization (VO) membership information is forwarded to the SRM SpaceManager.         </para>
+         <para>
+Space Manager uses a special file for listing all the Virtual Organizations (VOs) and all the VO Roles that are permitted to make reservations in the given link group. List of the allowed VOs and VO Roles, together with the total available space and  replicaAllowed, outputAllowed, custodialAllowed, onlineAllowed and nearlineAllowed properties of the group is than matched against the information from the user request in order to determine if a given space reservation can be made in particular link group.  Once a space reservation is created, no access control is performed, any user can attempt to store the files in this space reservation, provided he or she knows the exact space token.          </para>
     
       </section>
     </section>
