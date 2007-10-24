@@ -175,7 +175,7 @@ $(WEB_LOCATION)/dCacheBook.pdf: Book.pdf
 #
 ssh-dcache.org: .ssh-dcache.org-copied
 .ssh-dcache.org-copied: dcache.org
-	cd $(WEB_LOCATION)/ && rsync -rt * $(WEB_USER)cvs-dcache:$(MANUALS_HOME)/Book     
+	cd $(WEB_LOCATION)/ && rsync -rt * $(WEB_USER)cvs-dcache.desy.de:$(MANUALS_HOME)/Book     
 	ssh $(WEB_USER)cvs-dcache.desy.de "cd $(MANUALS_HOME)/Book && chmod -R g+w * && chgrp -R dcache *"
 	touch .ssh-dcache.org-copied
 
@@ -183,7 +183,7 @@ ssh-dcache.org: .ssh-dcache.org-copied
 #
 ssh-draft: .ssh-draft-copied
 .ssh-draft-copied: dcache.org
-	cd $(WEB_LOCATION)/ && rsync -rt * $(WEB_USER)cvs-dcache:$(MANUALS_HOME)/Book-draft	
+	cd $(WEB_LOCATION)/ && rsync -rt * $(WEB_USER)cvs-dcache.desy.de:$(MANUALS_HOME)/Book-draft	
 	ssh $(WEB_USER)cvs-dcache.desy.de "cd $(MANUALS_HOME)/Book-draft && chmod -R g+w * && chgrp -R dcache *"
 	touch .ssh-draft-copied
 
