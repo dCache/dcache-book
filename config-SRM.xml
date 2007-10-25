@@ -151,13 +151,13 @@ Space Manager uses a special file for listing all the Virtual Organizations (VOs
 	  should be set for a 4GB RAM Machine. This can be accomplished by running:
 	  
 	  <screen>
-	  <rootprompt/><command>echo</command> 'kernel.shmmax=1073741824' >>  /etc/sysctl.conf
+<rootprompt/><command>echo</command> 'kernel.shmmax=1073741824' >>  /etc/sysctl.conf
 	  </screen>
 	  <screen>
-	  <rootprompt/><command>echo</command> 'kernel.shmall=1073741824' >>  /etc/sysctl.conf
+<rootprompt/><command>echo</command> 'kernel.shmall=1073741824' >>  /etc/sysctl.conf
 	  </screen>
 	  <screen>
-	  <rootprompt/><command>/bin/sysctl</command> -p
+<rootprompt/><command>/bin/sysctl</command> -p
 	  </screen>
 
 	  
@@ -260,11 +260,11 @@ Space Manager uses a special file for listing all the Virtual Organizations (VOs
      <para>
      To enable dCache SRM components access to the database server with the user "srmdcache": 
      <screen>
-	  <rootprompt/>createuser -U postgres --no-superuser --no-createrole --createdb --pwprompt srmdcache
+<rootprompt/>createuser -U postgres --no-superuser --no-createrole --createdb --pwprompt srmdcache
      </screen>	  
      SRM will use the database "dcache" for storing its state information: 
      <screen>
-	  <rootprompt/> createdb -U srmdcache dcache
+<rootprompt/> createdb -U srmdcache dcache
      </screen>	  
      </para>
      </section>  
@@ -283,7 +283,7 @@ Space Manager uses a special file for listing all the Virtual Organizations (VOs
          <title>Install dCache server.rpm</title>
 	 <para>
 	  <screen>
-	  <rootprompt/> <command>rpm</command> -Uvh <replaceable>dcache.server.rpm</replaceable>
+<rootprompt/> <command>rpm</command> -Uvh <replaceable>dcache.server.rpm</replaceable>
 	  </screen>
 	  </para>
 	 
@@ -375,7 +375,7 @@ SRM=yes
 	 <para>
 	   run 
           <screen>
-	  <rootprompt/> <command>/opt/d-cache/install/install.sh </command>
+<rootprompt/> <command>/opt/d-cache/install/install.sh </command>
           </screen>
 	 </para>
         </section>
@@ -384,14 +384,14 @@ SRM=yes
 	 <para>
 	 run 
 	<screen>
-	  <rootprompt/> <command>/opt/d-cache/bin/dcache-core</command> start
+<rootprompt/> <command>/opt/d-cache/bin/dcache-core</command> start
           </screen>
 	 to start srm domain
 	 </para>
 	 <para>
 	 run 
 	<screen>
-	  <rootprompt/> <command>/opt/d-cache/bin/dcache-core</command> stop
+<rootprompt/> <command>/opt/d-cache/bin/dcache-core</command> stop
           </screen>
 	 to stop srm domain
 	 </para>
@@ -781,9 +781,6 @@ Please note that that it is up to administrators that the link groups attributes
 
     <section >
       <title>SRM  Space Manager Parameters in dCacheSetup  </title>
-       <para>
-       </para>
-     </section>
 
      <section>
          <title> SpaceManagerDefaultRetentionPolicy </title>
@@ -847,7 +844,9 @@ SpaceManagerLinkGroupAuthorizationFileName="/opt/d-cache/etc/LinkGroupAuthorizat
       </programlisting>
 	</para>
       </section>
+     </section>
 
+    <!--
      <section>
          <title>  </title>
 	<para>
@@ -861,7 +860,55 @@ Usage example:
        </programlisting>
 	</para>
       </section>
+      -->
+   <section >
+      <title>Implicit Space Reservations  </title>
+      <para>
+      As it was described in <xref linkend="cf-srm-intro"/>, dCache can perform implicit space reservations for SRM Version 1 data transfers and for SRM Version 2.2 data transfers that are not given the space token explicitly. The parameter that enables this behavior is srmImplicitSpaceManagerEnabled, which is described in <xref linkend="cf-srm-expert-config"/>. In case of SRM version 1.1 data transfers, when the Access Latency and Retention Policy cannot be specified, and in case of SRM V2.2 clients, when  Access Latency and Retention Policy are not specified, the default values will be used. First SRM will attempt to  use the values of   "AccessLatency" and "RetentionPolicy" tags from PNFS namespace from the directory to which a file is being written. If the tags are present, then the values of Access Latency and Retention Policy will be set on basis of the system wide defaults, which are controlled by SpaceManagerDefaultRetentionPolicy and SpaceManagerDefaultAccessLatency variables in dCacheSetup; these variable are described in details in the previous section "SRM  Space Manager Parameters in dCacheSetup".
+      </para>
+      <para>
+ If you have a direct access to pnfs namespace, you can check if the AccessLatency and RetentionPolicy tags are present by using the following commands:     
       
+      <screen>
+<rootprompt/> <command>cd</command> <replaceable>pnfsDir</replaceable>
+<rootprompt/> <command>cat</command> ".(tags)(all)"
+.(tag)(OSMTemplate)
+.(tag)(file_family)
+.(tag)(storage_group)
+.(tag)(AccessLatency)
+.(tag)(RetentionPolicy)
+     </screen>
+     </para>
+     
+      <para>
+     If the output contains the lines saying "(tag)(AccessLatency)" and ".(tag)(RetentionPolicy)" than the tags are already present and you can get the actual values of these tags by executing the following commands, which are shown together with example outputs:
+      <screen>
+<rootprompt/> <command>cat</command>  ".(tag)(AccessLatency)"
+ONLINE
+<rootprompt/> <command>cat</command>  ".(tag)(RetentionPolicy)"
+CUSTODIAL
+     </screen>
+     </para>
+    
+
+      <para>
+     To create/change the values of the tags, please execute :
+<screen>
+<rootprompt/> <command>echo</command>  <replaceable>"New Access Latency"</replaceable> > ".(tag)(AccessLatency)"
+<rootprompt/> <command>echo</command>  <replaceable>"New Retention Policy"</replaceable> > ".(tag)(RetentionPolicy)"
+</screen>
+      The valid AccessLatency Values are "ONLINE" and "NEARLINE", valid RetentionLatency Values are  "REPLICA", "OUTPUT" and "CUSTODIAL".
+      </para>
+
+      <para>
+     Bellow are the reals examples of these commands:
+      <screen>
+<rootprompt/> <command>echo</command>  "ONLINE" > ".(tag)(AccessLatency)"
+<rootprompt/> <command>echo</command>  "REPLICA" > ".(tag)(RetentionPolicy)"
+      </screen>
+      </para>
+      
+    </section >    
    </section>
   <!--
      ##############################################################
@@ -890,7 +937,7 @@ Usage example:
 	<para>
           dCache needs to use gPlazma and not gPlazma with dcache.kpwd plugin, but other modules that know how to extract  VO attributes from the proxy.(see <xref linkend="cf-gplazma"/>, have a look at gplazmalite-vorole-mapping Plugin).
 	</para>
-	</listitem>
+	</listitem> 
 	</itemizedlist>
           Only if these 3 conditions are satisfied the VO based authorization of the Space Manager can work.
 	</para>
@@ -969,7 +1016,7 @@ in the dCacheSetup
 	<para>
           Install rpm. Installation can be performed using this command:
          <screen>
-	  <rootprompt/> <command>rpm</command> -Uvh srmwatch-1.0-0.i386.rpm
+<rootprompt/> <command>rpm</command> -Uvh srmwatch-1.0-0.i386.rpm
 	 </screen>
 	</para>
 	</listitem>
@@ -992,7 +1039,7 @@ in the dCacheSetup
 	<para>
           execute
         <screen>
-	  <rootprompt/> <command>export</command> CATALINA_HOME=<replaceable>YOUR_TOMCAT_LOCATION</replaceable>
+<rootprompt/> <command>export</command> CATALINA_HOME=<replaceable>YOUR_TOMCAT_LOCATION</replaceable>
         </screen>
 	</para>
 	</listitem>
@@ -1000,7 +1047,7 @@ in the dCacheSetup
 	<para>
             execute
        <screen>
-	  <rootprompt/> <command>/opt/d-cache/srmwatch-1.0/deploy_srmwatch</command>
+<rootprompt/> <command>/opt/d-cache/srmwatch-1.0/deploy_srmwatch</command>
        </screen>
 	</para>
 	</listitem>
@@ -1032,7 +1079,7 @@ in the dCacheSetup
      </programlisting>
    	rpm installation can be performed using this command:
          <screen>
-	  <rootprompt/> <command>rpm</command> -Uvh srmwatch-1.0-0.i386.rpm
+<rootprompt/> <command>rpm</command> -Uvh srmwatch-1.0-0.i386.rpm
 	 </screen>
 	</para>
 	</listitem>
