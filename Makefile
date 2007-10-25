@@ -175,7 +175,8 @@ $(WEB_LOCATION)/dCacheBook.pdf: Book.pdf
 #
 ssh-dcache.org: .ssh-dcache.org-copied
 .ssh-dcache.org-copied: dcache.org
-	cd $(WEB_LOCATION)/ && rsync -rt * $(WEB_USER)cvs-dcache.desy.de:$(MANUALS_HOME)/Book     
+	ssh $(WEB_USER)cvs-dcache.desy.de "cd $(MANUALS_HOME)/Book && rm -rf *"
+	cd $(WEB_LOCATION)/ && rsync -rat * $(WEB_USER)cvs-dcache.desy.de:$(MANUALS_HOME)/Book     
 	ssh $(WEB_USER)cvs-dcache.desy.de "cd $(MANUALS_HOME)/Book && chmod -R g+w * && chgrp -R dcache *"
 	touch .ssh-dcache.org-copied
 
@@ -183,7 +184,8 @@ ssh-dcache.org: .ssh-dcache.org-copied
 #
 ssh-draft: .ssh-draft-copied
 .ssh-draft-copied: dcache.org
-	cd $(WEB_LOCATION)/ && rsync -rt * $(WEB_USER)cvs-dcache.desy.de:$(MANUALS_HOME)/Book-draft	
+	ssh $(WEB_USER)cvs-dcache.desy.de "cd $(MANUALS_HOME)/Book-draft && rm -rf *"
+	cd $(WEB_LOCATION)/ && rsync -rat * $(WEB_USER)cvs-dcache.desy.de:$(MANUALS_HOME)/Book-draft	
 	ssh $(WEB_USER)cvs-dcache.desy.de "cd $(MANUALS_HOME)/Book-draft && chmod -R g+w * && chgrp -R dcache *"
 	touch .ssh-draft-copied
 
@@ -251,7 +253,7 @@ Book.db2.pdf:	Book.db2.xml $(IMAGES)
 # Clean all generated docs
 #
 clean:
-	rm -rf $(WEB_LOCATION) $(HTML_LOCATION) Book.db.xml Book.pdf
+	rm -rf $(WEB_LOCATION) $(HTML_LOCATION) Book.db.xml Book.pdf .???*
 
 # Clean everything (software, generated docs)
 #
