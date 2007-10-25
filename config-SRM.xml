@@ -843,7 +843,7 @@ SpaceManagerReserveSpaceForNonSRMTransfers=false
 	<para>
 Usage example:
        <programlisting>
-SpaceManagerLinkGroupAuthorizationFileName="/opt/d-cache/etc/LinkGroupAuthiorization.conf” 
+SpaceManagerLinkGroupAuthorizationFileName="/opt/d-cache/etc/LinkGroupAuthorization.conf” 
       </programlisting>
 	</para>
       </section>
