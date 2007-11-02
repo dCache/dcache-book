@@ -673,6 +673,21 @@ srmTcpBufferSize=1048576       </programlisting>
       </section>
 
       <section>
+         <title> srmAuthzCacheLifetime </title>
+	<para>
+       <emphasis> srmAuthzCacheLifetime </emphasis>specifies the duration that authorizations will be cached. Caching decreases the volume of messages to the gPlazma cell or other authorization mechanism.  To turn off caching, set the value to 0.
+	</para>
+	<para>
+Default value is 120.	</para>
+	<para>
+Usage example:
+       <programlisting>
+srmAuthzCacheLifetime=60       </programlisting>
+	</para>
+      </section>
+
+
+      <section>
          <title> srmGetLifeTime, srmPutLifeTime and srmCopyLifeTime </title>
 	<para>
        <emphasis> srmGetLifeTime, srmPutLifeTime and srmCopyLifeTime </emphasis>specify the lifetimes of the srmPrepareToGet (srmBringOnline) srmPrepareToPut and srmCopy requests lifetimes in millisecond. If the system is unable to fulfill the requests before the request lifetimes expire, the requests are automatically garbage collected.
