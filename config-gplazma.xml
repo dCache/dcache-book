@@ -9,7 +9,8 @@
   <para>
 gPlazma is a cell in dCache that authorizes users. Cells make requests to gPlazma by submitting user credential information to it, receiving the authorization decision and site-specific user information such as uid, gid, and rootpath in return.
   </para> 
-
+  
+  
   <para>
 The acronym stands for Grid-aware PLuggable AuthoriZation Management, and supports the use of plugins which implement various selectable authorization methods. The four currently-available methods are:
   </para>
@@ -48,7 +49,6 @@ saml-vo-mapping : The DN and Role are mapped to a username via a callout to a <u
 
   
 
-
 <section>
  <title>Installation</title>
 
@@ -58,7 +58,7 @@ gPlazma is included in dCache version 1.7 or higher. As of that version,the gPla
 </para>
 
 <para>
-For the dCache 1.7 version, there must be host certificates on the node running the gPlazma cell.
+For the dCache 1.7 version, there must be host certificates on the node running the gPlazma cell. For version 1.8, host certificates are needed if the option to delegate (see section "Delegation to gPlazma") to gPlazma is used.
 </para>
 
 <para>
@@ -66,6 +66,10 @@ Depending on which authorization methods are to be used, some configuration file
 </para>
 
 </section>
+
+
+
+
 
 <section>
  <title>Configuring the gPlazma Policy File</title>
@@ -116,6 +120,7 @@ The policy file also contains a section for each of the plugins, for configurati
 
 </section>
 
+
 <section>
  <title>Configuring the kpwd Plugin</title>
 
@@ -136,6 +141,7 @@ Please see dCache documentation for <ulink   url="http://www.dcache.org/download
 
 </section>
 
+
 <section>
  <title>
 Configuring the grid-mapfile Plugin
@@ -154,18 +160,18 @@ storageAuthzPath="/etc/grid-security/storage-authzdb"
 
 </para>
 
-
 <section>
  <title>
 Preparing the grid mapfile
  </title>
 
 <para>
-
-
 The grid mapfile is the same as that used in other applications. It can be created in various ways, either by connecting directly to VOMS or GUMS servers, or by hand.
+</para>
 
+<para>
 Each line contains two fields: a DN (Certificate Subject) in quotes, and the username it is to be mapped to.
+</para>
 
 <blockquote>
 <programlisting width="80">
@@ -173,17 +179,35 @@ Each line contains two fields: a DN (Certificate Subject) in quotes, and the use
 </programlisting>
 </blockquote>
 
+
+
+<para>
+When using the grid-mapfile plugin, the storage-authzdb file must also be configured. See the section "Configuring storage-authzdb" for details.
 </para>
 
 </section>
 
+
+</section>
+
+
+
 <section id='storage-authzdb-sect'>
+ <title>
+Configuring storage-authzdb
+ </title>
+ 
+<para>
+In gPlazma, except for the dcache.kpwd plugin, authorization mapping is a two-step process. First, a username is obtained from a mapping of the user's DN or DN and role, then a mapping of username to uid, gid, rootpath is performed. The storage-authzdb file is used for the second mapping.
+</para>
+
+<section>
  <title>
 Preparing storage-authzdb
  </title>
  
 <para>
-This file is used to map the username to a site-specific uid, gid, and rootpath. It's location is
+The location of storage-authzdb is
 
 <blockquote>
 <programlisting width="80">
@@ -240,14 +264,53 @@ login uscms01 read-write 60076 5063 / /pnfs/fnal.gov/resilient/uscms01 /
 
 <para>
 and replacing the word "login" with "authorize".
-
-
-
-
 </para>
 </section>
 
+<section>
+ <title>
+Support for the Priority Field in storage-authzdb
+ </title>
+ 
+<para>
+In the future, dCache services may support the use of priorites, to be assigned in storage-authzdb. To assign priorities in storage-authzdb, replace the stated version number with "2.2"
+</para>
+
+<blockquote>
+<programlisting width="80">
+version 2.2
+</programlisting>
+</blockquote>
+
+<para>
+In the remainder of the file, the fourth field of each line is the priority, which is an integer. Otherwise the fields have the same definitions as in version 2.1.
+</para>
+
+<blockquote>
+<programlisting width="80">
+authorize uscms01     read-write    2       60076 5063   / /pnfs/fnal.gov/resilient/uscms01 /
+authorize cmssoft     read-write    0       60501 5502   / /pnfs/fnal.gov/reduction/cmssoft /
+</programlisting>
+</blockquote>
+
+<para>
+Using version 2.1, the default priority is "0", therefore use this value if it is desired to have the same behavior as in 2.2. Interpretation of the priority value is dependent on the implementation of any dCache service which may use it, however, the convention is that higher numerical values of the field result in higher priority. See the documentation of the specific service in question for details.
+</para>
+
+<para>
+There are currently no dCache services which make use of the priority field. 
+</para>
+
 </section>
+
+
+</section>
+
+
+
+
+
+
 
 <section>
  <title>
@@ -265,7 +328,7 @@ gridVoRoleStorageAuthzPath="/etc/grid-security/storage-authzdb"
 </programlisting>
 </blockquote>
 
-The second is the storage-authz-db used in other plugins. See the above documentation <link linkend='storage-authzdb-sect'>"Preparing storage-authzdb"</link> for how to create the file.
+The second is the storage-authz-db used in other plugins. See the above documentation <link linkend='storage-authzdb-sect'>"Configuring storage-authzdb"</link> for how to create the file.
 
 </para>
 
@@ -442,8 +505,8 @@ in which case cms821 matches cms(\d\d\d) and the group (\d\d\d) is substituted i
 </para>
 
 </section>
-
 </section>
+
 
 <section>
  <title>
@@ -451,20 +514,42 @@ Configuring the saml-vo-mapping Plugin
  </title>
 
 <para>
-There is only one line in the policy file for this plugin, containing the URL for the GUMS web service.
+There are two lines in the policy file for this plugin.
 
 <blockquote>
 <programlisting width="80">
 # SAML-based grid VO role mapping
 mappingServiceUrl="https://gums.oursite.edu:8443/gums/services/GUMSAuthorizationServicePort"
+# Time in seconds to cache the mapping in memory
+saml-vo-mapping-cache-lifetime="60"
 </programlisting>
 </blockquote>
 
-Replace the URL with that of the site-specific <ulink
-  url="http://grid.racf.bnl.gov/GUMS/">GUMS</ulink>. When using the "GUMSAuthorizationServicePort", the service will only provide the username mapping and it will still be necesary to have the storage-authzdb file used in other plugins. See the above documentation <link linkend='storage-authzdb-sect'>"Preparing storage-authzdb"</link> for how to create the file. If a GUMS server providing a "StorageAuthorizationServicePort" with correct uid, gid, and rootpath information for your site is available, the storage-authzdb file is not necesary.
+ The first line containins the URL for the GUMS web service. Replace the URL with that of the site-specific <ulink
+  url="http://grid.racf.bnl.gov/GUMS/">GUMS</ulink>. When using the "GUMSAuthorizationServicePort", the service will only provide the username mapping and it will still be necesary to have the storage-authzdb file used in other plugins. See the above documentation <link linkend='storage-authzdb-sect'>"Configuring storage-authzdb"</link> for how to create the file. If a GUMS server providing a "StorageAuthorizationServicePort" with correct uid, gid, and rootpath information for your site is available, the storage-authzdb file is not necesary.
 </para>
 
+<para>
+The second line contains the value of the caching lifetime. In order to decrease the volume of requests to the SAML authorization (GUMS) service, authorizations for the saml-vo-mapping method are by default cached for a period of time. To change the caching duration, modify the saml-vo-mapping-cache-lifetime value in /opt/d-cache/etc/dcachesrm-gplazma.policy
+</para>
+
+<blockquote>
+<programlisting width="80">
+saml-vo-mapping-cache-lifetime="120"
+</programlisting>
+</blockquote>
+
+<para>
+The default value is 60 seconds. To turn off cach caching, set the value to 0.
+</para>
+
+
 </section>
+
+
+
+
+
 <section>
  <title>
 An example policy file
@@ -487,8 +572,9 @@ kpwdPath="/opt/d-cache/etc/dcache.kpwd"
 gridMapFilePath="/etc/grid-security/grid-mapfile"
 storageAuthzPath="/etc/grid-security/storage-authzdb"
 mappingServiceUrl="https://fledgling09.fnal.gov:8443/gums/services/GUMSAuthorizationServicePort"
+saml-vo-mapping-cache-lifetime="60"
 gridVoRolemapPath="/etc/grid-security/grid-vorolemap"
-gridVoRoleStorageAuthzPath="/etc/grid-security/storage-authzdb" 
+gridVoRoleStorageAuthzPath="/etc/grid-security/storage-authzdb"
 </programlisting>
 </blockquote>
 
@@ -574,8 +660,8 @@ The latter two lines control whether the gridftpdoor or SRM will authorize local
 </para>
 
 </section>
-
 </section>
+
 
 
 <section>
@@ -649,6 +735,7 @@ set to a local policy file on the node. The gplazma policy file on the gridftp d
 </section>
 </section>
 
+
 <section>
  <title>
 gPlazma Options
@@ -687,14 +774,12 @@ delegateToGPlazma=true
 </programlisting>
 </blockquote>
 
-The default value is false.
+The default value is false. To support delegation, host certificates must exist on the host which runs gPlazma.
 
 </para>
 
 </section>
-
 </section>
-
 
 
 </chapter>
