@@ -554,12 +554,9 @@ srmDbUser=srmdcache       </programlisting>
        <emphasis>srmDbPassword  </emphasis> tells to SRM which database password to use when connecting to database. Do not change unless you know what you are doing.
 	</para>
 	<para>
-Default value is  “srmdcache”.
-	</para>
-	<para>
 Usage example:
        <programlisting>
-srmDbPassword=srmdcache       </programlisting>
+srmDbPassword=*********       </programlisting>
 	</para>
       </section>
 
