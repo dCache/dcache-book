@@ -23,6 +23,66 @@
     replicas exist, some of them will be deleted.
   </para>
 
+  <section id="cf-repman-install">
+    <title>Installation</title>
+
+   <para>
+  To activate Replica Manager you need make changes in all 3 places:
+	<itemizedlist>
+	<listitem>   <para>
+         1) etc/node_config on ALL ADMIN NODES in this dcache instance.
+   </para>        </listitem>
+
+	<listitem>      <para>
+         2) replicaSetup file on node where replica manager is runnig
+   </para>         </listitem>
+
+	<listitem>      <para>
+        3) define Resilient pool group(s) in PoolManager.conf
+   </para>       </listitem>
+
+	</itemizedlist>
+	   </para>
+
+   <para>
+
+<programlisting>
+#  - - - - Will Replica Manager be started?
+#   Values:  no, yes
+#   Default: no
+#</programlisting>
+   </para>
+   <para>
+   This has to be set to 'yes' on every node, if there is a replica
+   manager in this dCache instance. Where the replica manager is started
+   is controlled in 'etc/node_config'. If it is not started and this is
+   set to 'yes' there will be error messages in log/dCacheDomain.log. If
+   this is set to 'no' and a replica manager is started somewhere, it will
+   not work properly.
+   </para>
+
+   <para>
+
+<programlisting>
+#replicaManager=no
+
+#  - - - - Which pool-group will be the group of resilient pools?
+#   Values:  &lt;pool-Group-Name&gt;, a pool-group name existing in the PoolManager.conf
+#   Default: ResilientPools
+#
+</programlisting>
+   </para>
+   <para>
+   Only pools defined in pool group ResilientPools in config/PoolManager.conf
+   will be managed by ReplicaManager. You shall edit config/PoolManager.conf
+   to make replica manager work. To use another pool group defined
+   in PoolManager.conf for replication, please specify group name by changing setting :
+       #resilientGroupName=ResilientPools
+   Please scroll down "replica manager tuning" make this and other changes.
+
+   </para>
+  </section> 
+
   <section id="cf-repman-start">
     <title>Starting the Replica Manager</title>
 
