@@ -8,7 +8,7 @@ SOURCES := Book.xml config-hsm.xml config-pnfs.xml config-PoolManager.xml config
 # The images. They cannot be compiled from one source but have to be saved as PNG and SVG from e.g. OpenOffice
 # For the dependencies I assume that PNG version has changed when SVG has changed 
 # 
-IMAGES := images/test.svg
+IMAGES := images/test.svg images/resilient_poolstate_v1-0.svg
 
 # All stylesheets included by xsl/html-chunk.xsl
 #
