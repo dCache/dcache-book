@@ -3,7 +3,7 @@
 
 # The souce files. Written in dCache extended DocBook and using XInclude
 #
-SOURCES := Book.xml config-hsm.xml config-pnfs.xml config-PoolManager.xml config-cellpackage.xml config-ReplicaManager.xml config-xrootd.xml config.xml cookbook-accounting.xml  cookbook-advanced.xml  cookbook-general.xml  cookbook-net.xml  cookbook-pool.xml cookbook-pnfs-postgres.xml cookbook-postgres.xml  cookbook-protos.xml cookbook.xml  rf-glossary.xml  intro.xml install.xml  reference.xml  rf-cc-common.xml  rf-cc-pm.xml  rf-cc-pnfsm.xml rf-dvl.xml rf-glossary.xml rf-changelog.xml intouch.xml config-SRM.xml
+SOURCES := Book.xml config-hsm.xml config-pnfs.xml config-PoolManager.xml config-cellpackage.xml config-ReplicaManager.xml config-xrootd.xml config.xml cookbook-accounting.xml  cookbook-advanced.xml  cookbook-general.xml  cookbook-net.xml  cookbook-pool.xml cookbook-pnfs-postgres.xml cookbook-postgres.xml  cookbook-protos.xml cookbook.xml  rf-glossary.xml  intro.xml install.xml  reference.xml  rf-cc-common.xml  rf-cc-pm.xml  rf-cc-pnfsm.xml rf-dvl.xml rf-glossary.xml rf-changelog.xml intouch.xml config-SRM.xml config-web-dcache.xml
 
 # The images. They cannot be compiled from one source but have to be saved as PNG and SVG from e.g. OpenOffice
 # For the dependencies I assume that PNG version has changed when SVG has changed 
