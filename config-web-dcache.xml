@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
+
+<chapter id="cf-webmon">
+  
+  
+  <title>dCache Web Monitoring</title>
+  
+  <partauthors>Vladimir Podstavkov</partauthors>
+  
+  
+  <para>
+      This part describes how to configure the web application which prepares and shows various 
+      plots using the billing information of dCache.
+  </para>
+  
+  <para>
+The monitoring system for dCache is built as a separate application using Java servlet technology and works in the Apache Tomcat servlet container. 
+It consists from two parts - the first one works with the database where dCache system puts the detailed information about the data transfers, 
+and the second one is a presentation layer.
+	</para>
+  
+  <para>
+ Such modular architecture allows to use the tools which do best in each case. 
+The backend part is built using Java and JDBC database driver API and is configurable using XML configuration files. 
+The frontend part is built with OpenLaszlo technology, which allows developers to create applications with the rich user 
+interface capabilities of desktop client software. OpenLaszlo applications are written in XML and JavaScript - just like DHTML, but portable across browsers.
+	</para>
+  
+  <para>
+ The monitoring system builds the set of plots for various datasets and various time intervals - day, week, month, year... The datasets, the time intervals and 
+ data presentation are configurable via XML configuration files. The changes in the configuration can be activated remotely by the system administrator.
+	</para>
+  
+  <para>
+ The total number of plots varies from system to system and currently is about 50 - 60. 
+This system is used by public dCache, CDF, and CMS dCache systems at Fermilab.
+	</para>
+  
+  <section id="cf-webmon-install">
+    <title>Installation</title>
+	
+	
+	<para>
+      If you want to try it for your dCache installation you can find two rpm files you need on this page: 
+      <ulink url="http://www.dcache.org/downloads/dcache_plots/index.shtml"/>.
+    </para>
+	
+	<para>
+The first one (http://www.dcache.org/downloads/dcache_plots/web-dcache-*-i386.rpm) is a binary package, 
+the second one (http://www.dcache.org/downloads/dcache_plots/web-dcache-*-src.rpm) is a source package.
+  </para>
+
+	<para>
+To install the monitoring package do the following:
+	<orderedlist>
+		<listitem>   
+		  <para>
+          Install binary rpm. Installation can be performed using this command:
+            <screen>
+              <rootprompt/><command>rpm</command> -Uvh web-dcache-*-i386.rpm
+            </screen>
+          </para>
+		</listitem>
+		
+		<listitem>   
+		  <para>
+          Stop tomcat if it is running
+          </para>
+		</listitem>
+		
+		<listitem>
+		  <para>
+            Untar  <filename>web-dcache.tgz</filename> archive into tomcat <filename>webapps/</filename> directory. This should be done by
+           <screen><rootprompt/><command>tar</command> xfz /opt-dcache/web-dcache/web-dcache.tgz</screen>
+          </para>
+		</listitem>
+		
+		<listitem>
+		  <para>
+            Install lps servlet into tomcat <filename>webapps/</filename> directory
+          </para>
+		</listitem>
+		
+		<listitem>
+		  
+		  <orderedlist>
+			<listitem>
+			  <para>
+			  Untar <filename>lps.tgz</filename> archive. This should be done by
+			  <screen><rootprompt/><command>tar</command> xfz /opt-dcache/web-dcache/lps.tgz</screen>
+              </para>
+			</listitem>
+			
+			<listitem>
+			  <para>
+			  Untar <filename>plots.tar</filename> archive. This should be done by
+			  <screen><rootprompt/><command>tar</command> xf /opt-dcache/web-dcache/plots.tar</screen>
+			  </para>
+			</listitem>
+		  </orderedlist>
+		  
+		  
+		</listitem>
+		
+		<listitem>
+		  <para>
+            Copy the file <filename>/opt/d-cache/share/java/postgresql-8.1-405.jdbc3.jar</filename> into tomcat <filename>common/lib/</filename> directory
+          </para>
+		</listitem>
+		
+		<listitem>
+		  <para>
+            In the file <filename>...webapps/web-dcache/META-INF/context.xml</filename> put your real database name, database username and the password. 
+            Set its protection to 0600
+ 		    <screen><rootprompt/><command>chmod</command> 0600 ...webapps/web-dcache/META-INF/context.xml</screen>
+          </para>
+		</listitem>
+		
+		<listitem>
+		  <para>
+            Start tomcat and wait for a few minutes
+          </para>
+		</listitem>
+		
+		<listitem>
+		  <para>
+   Go to URL: http://<replaceable>your_server_name</replaceable>:<replaceable>tomcat_port_number</replaceable>/lps/plots/src/plots.lzx
+         </para>
+		</listitem>
+	  </orderedlist>
+	</para>
+	
+	
+  </section>
+  
+  <section id="cf-webmon-config">
+    <title>Configuration</title>
+	<para>
+     There are three xml configuration files used by the application.
+	</para>
+	<orderedlist>
+	  
+	  <listitem>
+		<para>
+        File <filename>.../web-dcache/WEB-INF/classes/tableConfig.xml</filename> contains the rules for the tables creation/update. 
+        It changes only if the dcache administrator wants to add more tables into the database to work with. Here is the fragment of such file, 
+        which describes two SQL statements to create the table named <emphasis>en_rd_daily</emphasis> and to update it.
+        </para>
+		
+		<screen>
+        <![CDATA[
+ ....................
+  <table id="en_rd_daily">
+    <create>
+      select date(datestamp), count(*), sum(fullsize) as fullSize
+      into en_rd_daily from storageinfo
+      where action='restore' and errorcode=0 group by date(datestamp) order by date
+    </create>
+    <update>
+      <query>
+        delete from en_rd_daily where date between current_date-6 and current_date
+      </query>
+      <query>
+        insert into en_rd_daily
+        select date(datestamp), count(*), sum(fullsize) as fullSize
+        from storageinfo
+        where datestamp between current_date-6 and now() and action='restore' and errorcode=0 
+        group by date(datestamp) order by date
+      </query>
+    </update>
+  </table>
+ ....................
+      ]]>
+ 		</screen>
+	  </listitem>
+	  
+	  <listitem>
+		<para>
+         File <filename>.../web-dcache/plotConfig.xml</filename> contains the set of commands for gnuplot program 
+         which is used to build the images. It defines the table(s) where to get data from, what data to use, and the plot format.
+         Here is the fragment of such file, 
+         which describes plot named <emphasis>billing.cst.year</emphasis>, 
+         which uses the data from the table <emphasis>cost_daily</emphasis> from the billing database for the current year, 
+         and build the plot with the line and points on it.
+        </para>
+		<screen>
+        <![CDATA[
+ ....................
+  <plot id="billing.cst.year">
+    <title>Transaction Cost</title>
+    <datasource table="cost_daily">
+       date between current_date-interval '1 year' and current_date ORDER BY date
+    </datasource>
+    <gnusetup>
+      <c>set xdata time</c>
+      <c>set timefmt '%Y-%m-%d'</c>
+      <c>set format x '%y-%m-%d'</c>
+      <c>set xlabel 'Date (Year-month-day)'</c>
+      <c>set ylabel 'Cost'</c>
+      <c>###set logscale y</c>
+      <dataset title="Cost" src="cost_daily">
+        using {date}:{mean}  with linespoints lw 3 lt 2
+       </dataset>
+    </gnusetup>
+  </plot>
+ ....................
+      ]]>
+ 		</screen>
+	  </listitem>
+
+	  <listitem>
+		<para>
+         File <filename>.../lps/plots/resources/pltnames.xml</filename> contains the URLs for the generated files with the images and previews, 
+         which are shown on the web page.
+         Here is the fragment of such file, 
+         which describes plot set named <emphasis>Bytes read</emphasis>, 
+         which contains the plots for a year, a month, a week, a week with one hour interval, a day, and the corresponding thumbnail previews.
+        </para>
+		<screen>
+        <![CDATA[
+ ....................
+  <plot>
+    Bytes read
+    <pic>
+      <Year>http:../../../web-dcache/viewer?name=billing.brd.year.png</Year>
+      <Month>http:../../../web-dcache/viewer?name=billing.brd.month.png</Month>
+      <Week>http:../../../web-dcache/viewer?name=billing.brd.week.png</Week>
+      <Week-daily>http:../../../web-dcache/viewer?name=billing.brd.week-daily.png</Week-daily>
+      <Day>http:../../../web-dcache/viewer?name=billing.brd.day.png</Day>
+    </pic>
+    <pre>
+      <Year>file:../../../web-dcache/viewer?name=billing.brd.year.pre</Year>
+      <Month>file:../../../web-dcache/viewer?name=billing.brd.month.pre</Month>
+      <Week>file:../../../web-dcache/viewer?name=billing.brd.week.pre</Week>
+      <Week-daily>file:../../../web-dcache/viewer?name=billing.brd.week-daily.pre</Week-daily>
+      <Day>file:../../../web-dcache/viewer?name=billing.brd.day.pre</Day>
+    </pre>
+  </plot>
+ ....................
+      ]]>
+ 		</screen>
+	  </listitem>
+	  
+	</orderedlist>
+  </section>
+
+</chapter>
