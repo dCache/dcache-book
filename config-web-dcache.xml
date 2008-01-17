@@ -57,9 +57,7 @@ To install the monitoring package do the following:
 		<listitem>   
 		  <para>
           Install binary rpm. Installation can be performed using this command:
-            <screen>
-              <rootprompt/><command>rpm</command> -Uvh web-dcache-*-i386.rpm
-            </screen>
+            <screen><rootprompt/><command>rpm</command> -Uvh web-dcache-*-i386.rpm</screen>
           </para>
 		</listitem>
 		
@@ -148,7 +146,9 @@ To install the monitoring package do the following:
         which describes two SQL statements to create the table named <emphasis>en_rd_daily</emphasis> and to update it.
         </para>
 		
-		<screen>
+		<example>
+		  <title>Fragment of <filename>tableConfig.xml</filename> configuration file </title>
+		  <screen>
         <![CDATA[
  ....................
   <table id="en_rd_daily">
@@ -173,6 +173,7 @@ To install the monitoring package do the following:
  ....................
       ]]>
  		</screen>
+		</example>
 	  </listitem>
 	  
 	  <listitem>
@@ -184,6 +185,9 @@ To install the monitoring package do the following:
          which uses the data from the table <emphasis>cost_daily</emphasis> from the billing database for the current year, 
          and build the plot with the line and points on it.
         </para>
+
+		<example>
+		  <title>Fragment of <filename>plotConfig.xml</filename> configuration file </title>
 		<screen>
         <![CDATA[
  ....................
@@ -207,6 +211,7 @@ To install the monitoring package do the following:
  ....................
       ]]>
  		</screen>
+		</example>
 	  </listitem>
 
 	  <listitem>
@@ -217,6 +222,8 @@ To install the monitoring package do the following:
          which describes plot set named <emphasis>Bytes read</emphasis>, 
          which contains the plots for a year, a month, a week, a week with one hour interval, a day, and the corresponding thumbnail previews.
         </para>
+		<example>
+		  <title>Fragment of <filename>pltnames.xml</filename> configuration file </title>
 		<screen>
         <![CDATA[
  ....................
@@ -240,6 +247,7 @@ To install the monitoring package do the following:
  ....................
       ]]>
  		</screen>
+		</example>
 	  </listitem>
 	  
 	</orderedlist>
