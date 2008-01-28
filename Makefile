@@ -1,148 +1,120 @@
 ######## Configuration
 #
 
-# The souce files. Written in dCache extended DocBook and using XInclude
+
 #
-SOURCES := Book.xml config-hsm.xml config-pnfs.xml config-PoolManager.xml config-cellpackage.xml config-ReplicaManager.xml config-xrootd.xml config.xml cookbook-accounting.xml  cookbook-advanced.xml  cookbook-general.xml  cookbook-net.xml  cookbook-pool.xml cookbook-pnfs-postgres.xml cookbook-postgres.xml  cookbook-protos.xml cookbook.xml  rf-glossary.xml  intro.xml install.xml  reference.xml  rf-cc-common.xml  rf-cc-pm.xml  rf-cc-pnfsm.xml rf-dvl.xml rf-glossary.xml rf-changelog.xml intouch.xml config-SRM.xml config-web-dcache.xml
-
-# The images. They cannot be compiled from one source but have to be saved as PNG and SVG from e.g. OpenOffice
-# For the dependencies I assume that PNG version has changed when SVG has changed 
-# 
-IMAGES := images/test.svg images/resilient_poolstate_v1-0.svg
-
-# All stylesheets included by xsl/html-chunk.xsl
+#  This makefile supports multiple targets.  Currently we have only one.
 #
-STYLESHEETS_CHUNK := xsl/html-chunk.xsl \
-                    xsl/dcb-docbook-parameters.xsl xsl/dcb-docbook-html-chunk-customizations.xsl
-
-# All stylesheets included by xsl/html.xsl
+#  SOURCES must end ".xml" and must be DocBook files.
 #
-STYLESHEETS_HTML := xsl/html.xsl \
-                    xsl/dcb-docbook-parameters.xsl xsl/dcb-docbook-html-chunk-customizations.xsl
+SOURCES = Book.xml
 
-# All stylesheets included by xsl/html-dcache.org-sidebar.xsl
+#  The extension for all HTML output (e.g. html or shtml).  Must NOT
+#  start with a dot.
+HTML_EXT = shtml
+
+
+# All stylesheets used by various outputs
 #
-STYLESHEETS_SIDEBAR := xsl/html-dcache.org-sidebar.xsl xsl/dcb-dcache.org-customizations.xsl \
-                       xsl/dcb-docbook-parameters.xsl xsl/dcb-docbook-html-chunk-customizations.xsl \
-                       xsl/dcb-dcache.org-sidebar-title.xsl 
+STYLESHEETS_CHUNK := xsl/html-chunk.xsl xsl/html-common.xsl xsl/common.xsl
+STYLESHEETS_HTML := xsl/html-single.xsl xsl/html-common.xsl xsl/common.xsl
+STYLESHEETS_FO := xsl/fo.xsl xsl/fo-titlepage.xsl xsl/common.xsl 
 
-# All stylesheets included by xsl/html-dcache.org.xsl
+
+
+#########  Some derived locations: output files
 #
-STYLESHEETS_MAIN := xsl/html-dcache.org.xsl xsl/dcb-dcache.org-customizations.xsl \
-                    xsl/dcb-docbook-parameters.xsl xsl/dcb-docbook-html-chunk-customizations.xsl
 
-# All stylesheets included by xsl/fo.xsl
+FO_FILES  = $(SOURCES:%.xml=%-a4.fo) $(SOURCES:%.xml=%-letter.fo)
+PDF_FILES = $(FO_FILES:%.fo=%.pdf)
+
+HTML_SINGLE_FILES = $(SOURCES:%.xml=%.$(HTML_EXT))
+HTML_CHUNK_FILES = $(SOURCES:%.xml=%/index.$(HTML_EXT))
+HTML_ALL_CHUNK_FILES = $(SOURCES:%.xml=%) # used only for rm -rf.
+
+TXT_FILES = $(SOURCES:%.xml=%.txt)
+
+FO_DEPS = $(FO_FILES:%=.%.d)
+HTML_SINGLE_DEPS = $(HTML_SINGLE_FILES:%=.%.d)
+HTML_CHUNK_DEPS = $(SOURCES:%.xml=.%-chunk.d)
+
+# Used by deploy target
+ALL = $(HTML_SINGLE_FILES) $(PDF_FILES) $(HTML_ALL_CHUNK_FILES) book.css
+ALL_INSTALLED = $(ALL:%=%__INSTALL__)
+
+
+WWW_SERVER = www.dcache.org
+WWW_LOCATION = /data/www/dcache.org/manuals/Book/
+
+# NB we don't do deps on txt as it depends on html-single output.  This
+#    is cheating, but hey, it works.
+
+DEP_FILES = $(FO_DEPS) $(HTML_SINGLE_DEPS) $(HTML_CHUNK_DEPS)
+
+
+######### Common options
 #
-STYLESHEETS_FO := xsl/fo.xsl xsl/dcb-docbook-fo-customizations.xsl \
-                    xsl/dcb-docbook-parameters.xsl
 
-# Default values for output directories
-#
-#   Directory for all regular HTML output, also used as a temporary dir for dcache.org 
-HTML_LOCATION ?= built
-#   Directory for dcache.org SHTML output. Some files from $(HTML_LOCATION) get copied here
-WEB_LOCATION ?= web-output
+XSLT_FLAGS = --nonet --xinclude
 
-# homedir of the web content on the remote web server
-SERVER_HOME ?= /data/www/dcache.org
-
-# homedir of all documentation on the remote web server
-MANUALS_HOME ?= $(SERVER_HOME)/manuals
 
 ######### Software Configs
 #
 
-# Default value for CVS binary (assume in the path)
+# Default value for binaries
 #
-CVS_BINARY ?= cvs
-
-# Default value for docbook-xml version
-#
-DBXML_VERSION ?= 1.71.1
-
-# Default value of Apache fop version
-#
-FOP_VERSION ?= fop-0.90alpha1
-
-# Default value for user for uploads to web server
-#
-WEB_USER ?= 
-
-# xsltproc and so will use env. $XML_CATALOG_FILES
-export XML_CATALOG_FILES := xsl/catalog
-
-# xalan command
-# The xalan script doesnt work, since xalan is in the JRE and will use the Xbootclasspath for
-# dynamically loading org.apache.xml.resolver.tools.CatalogResolver and not classpath
-#
-XALAN := java -Xbootclasspath/p:software/fop/lib/xml-apis.jar:software/fop/lib/xercesImpl-2.2.1.jar:software/fop/lib/xalan-2.4.1.jar:software/fop/lib/resolver.jar:software/fop/lib/batik.jar:software/fop/lib/avalon-framework-cvs-20020806.jar:software/fop/build/fop.jar -Dxml.catalog.files=$(XML_CATALOG_FILES) -Dxml.catalog.prefer=public -Dxml.catalog.verbosity=9 -Dxml.catalog.staticCatalog=yes org.apache.xalan.xslt.Process -UriResolver org.apache.xml.resolver.tools.CatalogResolver
-
-# FOP command
-#
-FOP := java -classpath software/fop/lib/xml-apis.jar:software/fop/lib/xercesImpl-2.2.1.jar:software/fop/lib/xalan-2.4.1.jar:software/fop/lib/resolver.jar:software/fop/lib/batik.jar:software/fop/lib/avalon-framework-cvs-20020806.jar:software/fop/build/fop.jar: org.apache.fop.apps.Fop
+SVN ?= svn
+FOP ?= fop
+XSLTPROC ?= xsltproc
 
 
 ###### Docbook targets. Pure DocBook is generated from the sources first
 #
 
-# Generates and validates DocBook and checks for xinclude error of xsltproc -- other procs probably dont need that
-#
-Book.db.xml:	$(SOURCES) xsl/dcb-extensions.xsl xsl/docbook-from-dcb-extensions.xsl
-	xsltproc --nonet --xinclude -o Book.db.xml xsl/docbook-from-dcb-extensions.xsl Book.xml 2> xsltproc.output
-	cat xsltproc.output
-	if grep error xsltproc.output >/dev/null ; then echo "Error in xi:include statement" ; rm Book.db.xml ; exit 1 ; fi
-	if ! xmllint --noout --dtdvalid software/db43xml/docbookx.dtd Book.db.xml ; then mv Book.db.xml Book.broken.xml; exit 1 ; fi
+.PHONY: info
+info:
+	@echo
+	@echo "  The dCache Book"
+	@echo "  ---------------"
+	@echo
+	@echo "Available main build targets:"
+	@echo
+	@echo "  all         -- build everything"
+	@echo "  pdf         -- build PDF versions"
+	@echo "  html        -- build HTML pages"
+	@echo "  txt         -- build text version"
+	@echo "  deploy      -- use scp to deploy files at www.dCache.org"
+	@echo
+	@echo "More specific build targets:"
+	@echo
+	@echo "  html-single --  Build single-page HTML pages"
+	@echo "  html-chunk  --  Build multi-page HTML pages"
+	@echo
+	@echo "Cleaning targets:"
+	@echo "  clean       -- remove backup files"
+	@echo "  distclean   -- remove all generated files"
+	@echo
 
-# Generates DocBook and adds the correct DOCTYPE (not needed at the moment and should be added differently)
-#
-Book.db2.xml:	$(SOURCES) xsl/dcb-extensions.xsl xsl/docbook-from-dcb-extensions.xsl
-	xsltproc --nonet --xinclude -o Book.db2.xml xsl/docbook-from-dcb-extensions.xsl Book.xml
-	echo '<?xml version="1.0" encoding="UTF-8"?>' > tmp.xml
-	echo '<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">' >> tmp.xml
-	grep -v '<?xml' Book.db2.xml >> tmp.xml
-	mv -f tmp.xml Book.db2.xml
+all: pdf html txt
 
-# Generates and validates DocBook including the unfinished parts and todo entries
-#
-Book.draft.xml:	$(SOURCES) xsl/dcb-extensions.xsl xsl/docbook-draft-from-dcb-extensions.xsl
-	xsltproc --nonet --xinclude -o Book.draft.xml xsl/docbook-draft-from-dcb-extensions.xsl Book.xml 2> xsltproc.output
-	cat xsltproc.output
-	if grep error xsltproc.output >/dev/null ; then echo "Error in xi:include statement" ; rm Book.draft.xml ; exit 1 ; fi
-	if ! xmllint --noout --dtdvalid software/db43xml/docbookx.dtd Book.draft.xml ; then mv Book.draft.xml Book.broken.xml ; exit 1 ; fi
 
 ###### HTML targets
 #
 
 #  Plain chunked HTML
 #
-html:		.html.built .html.images.copied $(HTML_LOCATION)/dcb.css
-.html.built:	$(STYLESHEETS_CHUNK) Book.db.xml
-	xsltproc --nonet -o $(HTML_LOCATION)/ xsl/html-chunk.xsl Book.db.xml
-	touch .html.built
+html:  html-single html-chunk
 
-# Plain single HTML
-#
-singlehtml: $(HTML_LOCATION)/Book.html .html.images.copied $(HTML_LOCATION)/dcb.css
-$(HTML_LOCATION)/Book.html: $(STYLESHEETS_HTML) Book.db.xml
-	xsltproc --nonet -o $(HTML_LOCATION)/Book.html xsl/html.xsl Book.db.xml
+html-single: $(HTML_SINGLE_FILES)
+html-chunk: $(HTML_CHUNK_FILES)
 
-# Plain single HTML with unfinished and todos
-#
-draft: $(HTML_LOCATION)/Book.draft.html .html.images.copied $(HTML_LOCATION)/dcb.css
-$(HTML_LOCATION)/Book.draft.html: $(STYLESHEETS_HTML) Book.draft.xml
-	xsltproc --nonet -o $(HTML_LOCATION)/Book.draft.html xsl/html.xsl Book.draft.xml
 
-# Just copying the CSS
-#
-$(HTML_LOCATION)/dcb.css: xsl/dcb.css
-	mkdir -p $(HTML_LOCATION)
-	cp -f xsl/dcb.css $(HTML_LOCATION)
+%.$(HTML_EXT): %.xml $(STYLESHEETS_HTML) shared-entities.xml
+	$(XSLTPROC) $(XSLT_FLAGS) --stringparam html.ext ".$(HTML_EXT)" -o $@ xsl/html-single.xsl $<
 
-# Just copying the images
-#
-.html.images.copied:	$(IMAGES)
-	mkdir -p $(HTML_LOCATION)/images
-	cp -f images/*.png $(HTML_LOCATION)/images/
+%/index.$(HTML_EXT): %.xml $(STYLESHEETS_CHUNK) shared-entities.xml
+#	$(XSLTPROC) $(XSLT_FLAGS) -o $(@:%/index.$(HTML_EXT)=%)/ xsl/html-chunk.xsl $<
+	$(XSLTPROC) $(XSLT_FLAGS) --stringparam html.ext ".$(HTML_EXT)" --stringparam base.dir $(@:%/index.$(HTML_EXT)=%)/ xsl/html-chunk.xsl $<
 
 ###### Text only
 
@@ -150,178 +122,74 @@ HTML_TO_TXT := /usr/bin/w3m -T text/html -dump
 #HTML_TO_TXT := /usr/bin/lynx -force_html -dump -nolist -width=72
 #HTML_TO_TXT : = /usr/bin/links -dump
 
-txt: Book.txt
-Book.txt:	$(HTML_LOCATION)/Book.html
-	$(HTML_TO_TXT) $(HTML_LOCATION)/Book.html > Book.txt
+txt: $(TXT_FILES)
 
-install: dCache-Installation-Instructions.txt
-dCache-Installation-Instructions.txt: install.xml $(STYLESHEETS_HTML)
-	xsltproc --nonet -o dCache-Installation-Instructions.html xsl/html.xsl install.xml
-	$(HTML_TO_TXT) dCache-Installation-Instructions.html > dCache-Installation-Instructions.txt
+%.txt: %.$(HTML_EXT)
+	$(HTML_TO_TXT) $< > $@
 
-###### www.dcache.org SHTML targets
+# (should we also produce install instructions as separate txt file?)
+
+
+###### FO-based targets
 #
-
-# The whole thing
-#
-dcache.org: $(WEB_LOCATION)/dCacheBook.html shtml $(WEB_LOCATION)/dCacheBook.pdf
-$(WEB_LOCATION)/dCacheBook.html: $(HTML_LOCATION)/Book.html .shtml.images.copied
-	mkdir -p $(WEB_LOCATION)
-	cp $(HTML_LOCATION)/Book.html $(WEB_LOCATION)/dCacheBook.html
-$(WEB_LOCATION)/dCacheBook.pdf: Book.pdf
-	cp Book.pdf $(WEB_LOCATION)/dCacheBook.pdf
-
-# Copy the WEB_LOCATION to the correct spot on www.dcache.org
-#
-ssh-dcache.org: .ssh-dcache.org-copied
-.ssh-dcache.org-copied: dcache.org
-	ssh $(WEB_USER)cvs-dcache.desy.de "cd $(MANUALS_HOME)/Book && rm -rf *"
-	cd $(WEB_LOCATION)/ && rsync -rat * $(WEB_USER)cvs-dcache.desy.de:$(MANUALS_HOME)/Book     
-	ssh $(WEB_USER)cvs-dcache.desy.de "cd $(MANUALS_HOME)/Book && chmod -R g+w * && chgrp -R dcache *"
-	touch .ssh-dcache.org-copied
-
-# Copy the WEB_LOCATION to the correct spot on www.dcache.org DRAFT
-#
-ssh-draft: .ssh-draft-copied
-.ssh-draft-copied: dcache.org
-	ssh $(WEB_USER)cvs-dcache.desy.de "cd $(MANUALS_HOME)/Book-draft && rm -rf *"
-	cd $(WEB_LOCATION)/ && rsync -rat * $(WEB_USER)cvs-dcache.desy.de:$(MANUALS_HOME)/Book-draft	
-	ssh $(WEB_USER)cvs-dcache.desy.de "cd $(MANUALS_HOME)/Book-draft && chmod -R g+w * && chgrp -R dcache *"
-	touch .ssh-draft-copied
-
-# Titlepage customization for Sidebar
-#
-xsl/dcb-dcache.org-sidebar-title.xsl: xsl/dcb-dcache.org-sidebar-title-tpl.xml
-	xsltproc -nonet -output xsl/dcb-dcache.org-sidebar-title.xsl \
-	http://docbook.sourceforge.net/release/xsl/current/template/titlepage.xsl \
-	xsl/dcb-dcache.org-sidebar-title-tpl.xml
-
-# Sidebar
-#
-$(WEB_LOCATION)/sidebar-index.shtml: $(STYLESHEETS_SIDEBAR) Book.db.xml
-	mkdir -p $(HTML_LOCATION)
-	mkdir -p $(WEB_LOCATION)
-	xsltproc --nonet --xinclude -o $(HTML_LOCATION)/ xsl/html-dcache.org-sidebar.xsl Book.db.xml
-	cp $(HTML_LOCATION)/index.shtml $(WEB_LOCATION)/sidebar-index.shtml
-
-# Main part 
-#
-shtml:		.shtml.built .shtml.images.copied $(WEB_LOCATION)/dcb.css
-.shtml.built:	$(STYLESHEETS_MAIN) Book.db.xml $(WEB_LOCATION)/sidebar-index.shtml
-	xsltproc --nonet -o $(WEB_LOCATION)/ xsl/html-dcache.org.xsl Book.db.xml
-	touch .shtml.built
-
-# Just copying the CSS
-#
-$(WEB_LOCATION)/dcb.css: xsl/dcb.css
-	mkdir -p $(WEB_LOCATION)
-	cp -f xsl/dcb.css $(WEB_LOCATION)
-
-# Just copying the images
-#
-.shtml.images.copied:	$(IMAGES)
-	mkdir -p $(WEB_LOCATION)/images
-	cp -f images/*.png $(WEB_LOCATION)/images/
-	touch .shtml.images.copied
-
-###### Printable targets
-#
-
-# XSL Formated Output target (xsltproc doesnt work together with fop)
-#
-fo:		Book.fo
-Book.fo:	Book.db.xml $(STYLESHEETS_FO)
-#	xsltproc --nonet xsl/fo.xsl Book.db.xml > Book.fo
-	$(XALAN) -in Book.db.xml -xsl xsl/fo.xsl -out Book.fo
-
-#-ENTITYRESOLVER org.apache.xml.resolver.tools.CatalogResolver -URIRESOLVER org.apache.xml.resolver.tools.CatalogResolver
-
 
 # PDF from XSL-FO
 #
-pdf:		html Book.pdf
-Book.pdf:	$(IMAGES)
-	software/fop/fop -xml Book.db.xml -xsl software/docbook-xsl/fo/docbook.xsl -pdf Book.pdf
-#	$(FOP) Book.fo Book.pdf 
-#	pdfxmltex Book.fo
+pdf: $(PDF_FILES)
 
-# PDF directly via xmlto (still broken)
-#
-Book.db2.pdf:	Book.db2.xml $(IMAGES)
-	xmlto pdf Book.db2.xml
+%-a4.fo: %.xml $(STYLESHEETS_FO) shared-entities.xml
+	$(XSLTPROC) $(XSLT_FLAGS) --output $@ --stringparam paper.type A4  xsl/fo.xsl $<
 
-# Clean all generated docs
+%-letter.fo: %.xml $(STYLESHEETS_FO) shared-entities.xml
+	$(XSLTPROC) $(XSLT_FLAGS) --output $@ --stringparam paper.type letter xsl/fo.xsl $<
+
+%.pdf: %.fo
+	$(FOP) -fo $< -pdf $@
+
+# The title page is FO-specific; the format is derived from an XML file.
+xsl/fo-titlepage.xsl: xsl/fo-titlepage.xml
+	$(XSLTPROC) $(XSLT_FLAGS) --output $@ http://docbook.sourceforge.net/release/xsl/current/template/titlepage.xsl $<
+
+###### Deployment targets
 #
+
+deploy: $(ALL_INSTALLED)
+
+%__INSTALL__: %
+	chmod a+r $<
+	scp $< $(WWW_SERVER):$(WWW_LOCATION)
+
+#  Unfortunately, we need a special case here.
+Book__INSTALL__: Book/index.$(HTML_EXT)
+	chmod -R a+Xr Book/*
+	scp -r Book/* $(WWW_SERVER):$(WWW_LOCATION)
+
+
+
+###### Cleaning targets
+#
+
 clean:
-	rm -rf $(WEB_LOCATION) $(HTML_LOCATION) Book.db.xml Book.pdf .???*
+	rm -rf *~ *.bak
 
-# Clean everything (software, generated docs)
+distclean: clean
+	rm -rf $(WEB_LOCATION) $(TXT_FILES) $(PDF_FILES) $(DEP_FILES) $(HTML_SINGLE_FILES) $(HTML_ALL_CHUNK_FILES)
+
+
+###### Create (dynamic) Makefile dependencies
 #
-cleanall: clean
-	rm -rf software/
 
-###### Utility and install targets
-#
+.%-letter.fo.d .%-a4.fo.d: %.xml
+	$(XSLTPROC) --nonet -stringparam output-file $(@:.%.d=%) --stringparam initial-file $< --stringparam graphics SVG  --stringparam dep-file $@ dependency.xsl $< > $@
 
-# Get current version
-#
-cvs:
-	$(CVS_BINARY) update -d
+.%.html.d: %.xml
+	$(XSLTPROC) --nonet -stringparam output-file $(@:.%.d=%) --stringparam initial-file $< --stringparam graphics none --stringparam dep-file $@ dependency.xsl $< > $@
 
-# Install DTD, XSL stylesheet, and FOP (xsltproc, xmllint, 
-#
-install-software:	software/db43xml/docbookx.dtd software/docbook-xsl/README software/fop/fop software/fop/lib/resolver.jar software/batik/batik-rasterizer.jar
+.%-chunk.d: %.xml
+	$(XSLTPROC) --nonet -stringparam output-file $(@:.%-chunk.d=%/index.$(HTML_EXT)) --stringparam initial-file $< --stringparam graphics none --stringparam dep-file $@ dependency.xsl $< > $@
 
-software/db43xml/docbook-xml-4.3.zip: 
-	mkdir -p software/db43xml/
-	cd software/db43xml/ && wget http://docbook.org/xml/4.3/docbook-xml-4.3.zip
+.PHONY:	all pdf html html-single html-chunked
+.PHONY: clean distclean
+.PRECIOUS: $(FO_FILES)
 
-software/db43xml/docbookx.dtd: software/db43xml/docbook-xml-4.3.zip
-	cd software/db43xml/ && unzip docbook-xml-4.3.zip
-	touch software/db43xml/docbookx.dtd
-
-software/docbook-xsl-$(DBXML_VERSION).tar.bz2:
-	mkdir -p software/
-	cd software/ && wget http://mesh.dl.sourceforge.net/sourceforge/docbook/docbook-xsl-$(DBXML_VERSION).tar.bz2
-
-software/docbook-xsl/README: software/docbook-xsl-$(DBXML_VERSION).tar.bz2
-	cd software/ && \
-	bzcat docbook-xsl-$(DBXML_VERSION).tar.bz2 | tar xf - && ln -ns docbook-xsl-$(DBXML_VERSION) docbook-xsl
-	touch software/docbook-xsl/README
-
-software/fop-current-bin.tar.gz:
-	mkdir -p software/
-	cd software/ && wget http://archive.apache.org/dist/xml/fop/binaries/$(FOP_VERSION)-bin-jdk1.4.tar.gz
-#	cd software/ && wget http://ftp.uni-erlangen.de/pub/mirrors/apache/xml/fop/fop-current-bin.tar.gz
-    
-
-software/fop/fop: software/fop-current-bin.tar.gz
-#	cd software/ && gunzip -c fop-current-bin.tar.gz | tar xf - && ln -ns fop-0* fop
-	cd software/ && gunzip -c $(FOP_VERSION)-bin-jdk1.4.tar.gz | tar xf - && ln -ns $(FOP_VERSION) fop
-	touch software/fop/fop
-
-software/xml-commons-resolver-latest.tar.gz:
-	mkdir -p software/
-	cd software/ && wget http://www.apache.org/dist/xml/commons/xml-commons-resolver-latest.tar.gz
-	touch software/xml-commons-resolver-latest.tar.gz
-
-software/xml-commons-resolver/resolver.jar: software/xml-commons-resolver-latest.tar.gz
-	cd software && gunzip -c xml-commons-resolver-latest.tar.gz | tar xf - && \
-	  ln -ns `gunzip -c xml-commons-resolver-latest.tar.gz | tar tf - | head -1` xml-commons-resolver
-	touch software/xml-commons-resolver/resolver.jar
-
-software/fop/lib/resolver.jar: software/xml-commons-resolver/resolver.jar software/fop/fop
-	cp software/xml-commons-resolver/resolver.jar software/fop/lib/resolver.jar
-
-software/batik-current.zip:
-	mkdir -p software/
-	cd software/ && wget http://www.apache.de/dist/xml/batik/batik-current.zip
-	touch batik-current.zip
-
-software/batik/batik-rasterizer.jar: software/batik-current.zip
-	cd software/ && unzip batik-current.zip && ln -ns batik-1* batik
-	touch software/batik/batik-rasterizer.jar
-
-
-.PHONY:	singlehtml html pdf fo install-software cvs dcache.org ssh-dcache.org
-
+-include $(DEP_FILES)
