@@ -1,87 +1,92 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+%sharedents;
+]>
 
 <chapter id="cf-pnfs">
-  <title>Configuration in PNFS</title>
+
+  <title>Configuration in &pnfs;</title>
   
   <para>
-    This chapter gives background information about <pnfs/>, the
-    filesystem, <dcache/> is based on. Only the aspects of <pnfs/>
-    relevant to <dcache/> will be explained here. <!-- For a complete
-    documentation, refer to the <ulink
-    url="http://www-pnfs.desy.de/"><pnfs/> homepage</ulink>. -->
+    This chapter gives background information about &pnfs;, the
+    filesystem, &dcache; is based on. Only the aspects of &pnfs;
+    relevant to &dcache; will be explained here.  A complete set of
+    documentation is available from <ulink
+    url="http://www-pnfs.desy.de/">the &pnfs; homepage</ulink>.
   </para>
 
   <section id="cf-pnfs-use">
-    <title>The Use of <pnfs/> in <dcache/></title>
+    <title>The Use of &pnfs; in &dcache;</title>
 
     <para>
-      <dcache/> uses <pnfs/> as a filesystem and for storing
-      meta-data. <pnfs/> is a filesystem not designed for storage of
-      actual files. Instead, <pnfs/> manages the filesystem hierarchy
+      &dcache; uses &pnfs; as a filesystem and for storing
+      meta-data. &pnfs; is a filesystem not designed for storage of
+      actual files. Instead, &pnfs; manages the filesystem hierarchy
       and standard meta-data of a UNIX filesystem. In addition, other
-      applications (as for example <dcache/>) can use it to store
-      their meta-data. <pnfs/> keeps the complete information in a
+      applications (as for example &dcache;) can use it to store
+      their meta-data. &pnfs; keeps the complete information in a
       database.
     </para>
 
     <para>
-      <pnfs/> implements an NFS server. All the meta-data can be
+      &pnfs; implements an NFS server. All the meta-data can be
       accessed with a standard NFS client, like the one in the Linux
       kernel. After mounting, normal filesystem operations work
-      fine. However, IO operations on the actual files in the <pnfs/>
+      fine. However, IO operations on the actual files in the &pnfs;
       will normally result in an error. 
     </para>
 
     <para>
-      As a minimum, the <pnfs/> filesystem needs to be mounted only by
-      the server running the <dcache/> core services. In fact, the
-      <pnfs/> server has to run on the same system. For details see
+      As a minimum, the &pnfs; filesystem needs to be mounted only by
+      the server running the &dcache; core services. In fact, the
+      &pnfs; server has to run on the same system. For details see
       (has to be written). 
     </para>
       
     <para>
-      The <pnfs/> filesystem may also be mounted by clients. This
+      The &pnfs; filesystem may also be mounted by clients. This
       should be done by
 
-<screen><rootprompt/>mount -o intr,hard,rw <replaceable>pnfs-server</replaceable>:/pnfs /pnfs/<replaceable>site.de</replaceable></screen>
+<screen>&prompt-root; mount -o intr,hard,rw <replaceable>pnfs-server</replaceable>:/pnfs /pnfs/<replaceable>site.de</replaceable></screen>
 
       (assuming the system is configured as described in the
       installation instructions).  Users may then access the meta-data
       with regular filesystem operations, like <command>ls
-      -l</command>, and by the <pnfs/>-specific operations described
-      in the following sections. The files themselves may then be
-      accessed with the <dcap/> protocol (see <xref
-      linkend="dCacheBook"/> Client Access and Protocols). 
+      -l</command>, and by the &pnfs;-specific operations described in
+      the following sections. The files themselves may then be
+      accessed with the &dcap; protocol (see <xref
+      linkend="dCacheBook"/> Client Access and Protocols).
     </para>
 
     <para>
-      Mounting the <pnfs/> filesystem is not necessary for client
-      access to the <dcache/> system if URLs are used to refer to
+      Mounting the &pnfs; filesystem is not necessary for client
+      access to the &dcache; system if URLs are used to refer to
       files.  In the grid context this is the preferred usage. 
     </para>
 
   </section>
 
   <section id="cf-pnfs-commands">
-    <title>Communicating with the <pnfs/> Server</title>
+    <title>Communicating with the &pnfs; Server</title>
 
     <para>
-      Many configuration parameters of <pnfs/> and the
+      Many configuration parameters of &pnfs; and the
       application-specific meta-data is accessed by reading, writing,
       or creating files of the form
       <filename>.(<replaceable>command</replaceable>)(<replaceable>para</replaceable>)</filename>.
       For example, the following prints the pnfsID of the file
       <filename>/pnfs/site.de/some/dir/file.dat</filename>:
 
-      <screen><userprompt/>cat /pnfs/site.de/any/sub/directory/'.(id)(file.dat)' 
+      <screen>&prompt-user; cat /pnfs/site.de/any/sub/directory/'.(id)(file.dat)' 
 0004000000000000002320B8
-<userprompt/></screen> 
+&prompt-user; </screen> 
 
       From the point of view of the NFS protocol, the file
       <filename>.(id)(file.dat)</filename> in the directory <filename
       class="directory">/pnfs/site.de/some/dir/</filename> is
-      read. However, <pnfs/> interprets it as the command
+      read. However, &pnfs; interprets it as the command
       <literal>id</literal> with the parameter
       <literal>file.dat</literal> executed in the directory
       <filename>/pnfs/site.de/some/dir/</filename>. The quotes are
@@ -98,7 +103,7 @@
       command-files are listed when they appear in the argument list
       of <command>ls</command> as in
 
-<screen><userprompt/><command>ls</command> -l '<filename>.(tag)(sGroup)</filename>'
+<screen>&prompt-user; <command>ls</command> -l '<filename>.(tag)(sGroup)</filename>'
 -rw-r--r--   11 root     root            7 Aug  6  2004 .(tag)(sGroup)</screen>
 
       Only a subset of file operations are allowed on
@@ -114,10 +119,10 @@
     <title>pnfsIDs</title>
 
     <para>
-      Each file in <pnfs/> has a unique 12 byte long pnfsID. This
+      Each file in &pnfs; has a unique 12 byte long pnfsID. This
       is comparable to the inode number in other filesystems. The
       pnfsID used for a file will never be reused, even if the
-      file is deleted. <dcache/> uses the pnfsID for all internal
+      file is deleted. &dcache; uses the pnfsID for all internal
       references to a file. 
     </para>
     
@@ -130,17 +135,17 @@
     </para>
     
     <para>
-      A file in <pnfs/> can be referred to by pnfsID for most
+      A file in &pnfs; can be referred to by pnfsID for most
       operations. For example, the name of a file can be obtained from
       the pnfsID with the command <literal>nameof</literal> as follows:
 
-<screen><userprompt/>cd /pnfs/site.de/any/sub/directory/
-<userprompt/>cat '.(nameof)(0004000000000000002320B8)'
+<screen>&prompt-user; cd /pnfs/site.de/any/sub/directory/
+&prompt-user; cat '.(nameof)(0004000000000000002320B8)'
 file.dat</screen>
 
       And the pnfsID of the directory it resides in is obtained by:
 
-<screen><userprompt/>cat '.(parent)(0004000000000000002320B8)'
+<screen>&prompt-user; cat '.(parent)(0004000000000000002320B8)'
 0004000000000000001DC9E8
 </screen>
 
@@ -148,10 +153,10 @@ file.dat</screen>
       from the pnfsID. Precisely this is done by the tool
       <command>pathfinder</command>:
 
-<screen><userprompt/>. /usr/etc/pnfsSetup
-<userprompt/>PATH=$PATH:$pnfs/tools
-<userprompt/>cd /pnfs/site.de/another/dir/
-<userprompt/>pathfinder 0004000000000000002320B8
+<screen>&prompt-user; . /usr/etc/pnfsSetup
+&prompt-user; PATH=$PATH:$pnfs/tools
+&prompt-user; cd /pnfs/site.de/another/dir/
+&prompt-user; pathfinder 0004000000000000002320B8
 0004000000000000002320B8 file.dat
 0004000000000000001DC9E8 directory
 000400000000000000001060 sub
@@ -164,14 +169,14 @@ file.dat</screen>
 000000000000000000000000 -
 /root/fs/usr/any/sub/directory/file.dat</screen>
 
-      The first two lines configure the <pnfs/>-tools correctly. The
+      The first two lines configure the &pnfs;-tools correctly. The
       path obtained by <command>pathfinder</command> does not agree
       with the local path, since the latter depends on the mountpoint
       (in the example <filename
       class="directory">/pnfs/site.de/</filename>). The pnfsID
       corresponding to the mountpoint may be obtained with
 
-<screen><userprompt/>cat '.(get)(cursor)'
+<screen>&prompt-user; cat '.(get)(cursor)'
 dirID=0004000000000000001DC9E8
 dirPerm=0000001400000020
 mountID=000000000000000000001080
@@ -179,7 +184,7 @@ mountID=000000000000000000001080
       
       The <literal>dirID</literal> is the pnfsID of the current
       directory and <literal>mountID</literal> that of the
-      mountpoint. In the example, the <pnfs/> server path <filename
+      mountpoint. In the example, the &pnfs; server path <filename
       class="directory">/root/fs/usr/</filename> is mounted on
       <filename class="directory">/pnfs/site.de/</filename>.
     </para>
@@ -189,28 +194,28 @@ mountID=000000000000000000001080
     <title>Directory Tags</title>
     
     <para>
-      In the <pnfs/> filesystem, each directory has a number of
+      In the &pnfs; filesystem, each directory has a number of
       tags. The existing tags may be listed with
 
-<screen><userprompt/><command>cat</command> '<filename>.(tags)()</filename>'
+<screen>&prompt-user; <command>cat</command> '<filename>.(tags)()</filename>'
 .(tag)(OSMTemplate)
 .(tag)(sGroup)</screen>
 
       and the content of a tag can be read with
 
-<screen><userprompt/><command>cat</command> '<filename>.(tag)(OSMTemplate)</filename>'
+<screen>&prompt-user; <command>cat</command> '<filename>.(tag)(OSMTemplate)</filename>'
 StoreName myStore</screen>
 
       A nice trick to list all tags with their contents is 
 
-      <screen><userprompt/><userinput><command>grep</command> "" $(cat ".(tags)()")</userinput>
+      <screen>&prompt-user; <userinput><command>grep</command> "" $(cat ".(tags)()")</userinput>
 .(tag)(OSMTemplate):StoreName myStore
 .(tag)(sGroup):STRING
 </screen>
     </para>
 
     <para>
-      Directory tags may be used within <dcache/> to control which
+      Directory tags may be used within &dcache; to control which
       pools are used for storing the files in the directory (see <xref
       linkend="cf-pm-psu"/>). They might also be used by a
       <firstterm>tertiary storage system</firstterm> for similar
@@ -220,166 +225,180 @@ StoreName myStore</screen>
 
     <para>
       Even if the directory tags are not used to control the bahaviour
-      of <dcache/>, some tags have to be set for the directories where
-      <dcache/> files are stored. The installation procedure takes
+      of &dcache;, some tags have to be set for the directories where
+      &dcache; files are stored. The installation procedure takes
       care of this: In the directory <filename
       class="directory">/pnfs/<replaceable>site.de</replaceable>/data/</filename>
       two tags are set to default values:
+    </para>
 
-<screen><userprompt/><userinput><command>cd</command> /pnfs/<replaceable>site.de</replaceable>/data/</userinput>
-<userprompt/><userinput><command>grep</command> "" $(cat ".(tags)()")</userinput>
+    <screen>&prompt-user; <userinput><command>cd</command> /pnfs/<replaceable>site.de</replaceable>/data/</userinput>
+&prompt-user; <userinput><command>grep</command> "" $(cat ".(tags)()")</userinput>
 .(tag)(OSMTemplate):StoreName myStore
-.(tag)(sGroup):STRING
-</screen>
-    </para>
+.(tag)(sGroup):STRING</screen>
 
     <para>
-      The following directory tags appear in the <dcache/> context:
-      <table>
-	<title>Directory Tags for <dcache/></title>
-	<tgroup cols="2">
-	  <colspec colnum="1" colname="tag" colwidth="130" align="left"/>
-	  <colspec colnum="2" colname="describtion" align="justify"/>
-	  <tbody>
-	    <row>
-	      <entry>OSMTemplate</entry>
-	      <entry>
-		Contains one line of the form
-		<quote><literal>StoreName
-		<replaceable>storeName</replaceable></literal></quote>
-		and specifies the name of the store which is used by
-		<dcache/> to construct the <glossterm
-		linkend="gl-storage_class">storage class</glossterm>
-		if the <glossterm linkend="gl-hsm_type">HSM
-		type</glossterm> is <literal>osm</literal>.
-	      </entry>
-	    </row>
-	    <row>
-	      <entry>sGroup</entry>
-	      <entry>
-		The storage group is also used to construct the <glossterm
-		linkend="gl-storage_class">storage Class</glossterm>
-		if the <glossterm linkend="gl-hsm_type">HSM
-		type</glossterm> is <literal>osm</literal>.
-	      </entry>
-	    </row>
-	    <row>
-	      <entry>cacheClass</entry>
-	      <entry>
-		The cache class is only used to control on which pools
-		the files in a directory may be stored, while the
-		storage class (constructed from the two above tags)
-		might also be used by the HSM. The cache class is only
-		needed if the above two tags are already fixed by HSM
-		usage and more flexibility is needed.
-	      </entry>
-	    </row>
-	    <row>
-	      <entry>hsmType</entry>
-	      <entry>
-		The <glossterm linkend="gl-hsm_type">HSM
-		type</glossterm> is normally determined from the other
-		existing tags. E.g. if the tag
-		<literal>OSMTemplate</literal> exists, HSM type
-		<literal>osm</literal> is assumed. With this tag it
-		can be set explicitly. An class implementing that HSM
-		type has to exist. Currently the only implementations
-		are <literal>osm</literal> and
-		<literal>enstore</literal>.
-	      </entry>
-	    </row>
-	    <row>
-	      <entry>hsmInstance</entry>
-	      <entry>
-		If not set, the HSM instance will be the same as the
-		HSM type. Setting this tag will only change the name
-		as used in the <glossterm
-		linkend="gl-storage_class">storage class</glossterm>
-		and in the pool commands.
-	      </entry>
-	    </row>
-	  </tbody>
-	</tgroup>
-      </table>
+      The following directory tags appear in the &dcache; context:
     </para>
 
+    <variablelist>
+      <title>Directory Tags for &dcache;</title>
+
+      <varlistentry>
+	<term>OSMTemplate</term>
+
+	<listitem>
+	  <para>
+	    Contains one line of the form
+	    <quote><literal>StoreName</literal>
+	    <replaceable>storeName</replaceable></quote> and specifies
+	    the name of the store that is used by &dcache; to
+	    construct the <glossterm
+	    linkend="gl-storage_class">storage class</glossterm> if
+	    the <glossterm linkend="gl-hsm_type">HSM type</glossterm>
+	    is <literal>osm</literal>.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+
+      <varlistentry>
+	<term>hsmType</term>
+
+	<listitem>
+	  <para>
+	    The <glossterm linkend="gl-hsm_type">HSM type</glossterm>
+	    is normally determined from the other existing tags. E.g.,
+	    if the tag <literal>OSMTemplate</literal> exists, HSM type
+	    <literal>osm</literal> is assumed. With this tag it can be
+	    set explicitly. An class implementing that HSM type has to
+	    exist. Currently the only implementations are
+	    <literal>osm</literal> and <literal>enstore</literal>.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>sGroup</term>
+
+	<listitem>
+	  <para>
+	    The storage group is also used to construct the <glossterm
+	    linkend="gl-storage_class">storage Class</glossterm> if
+	    the <glossterm linkend="gl-hsm_type">HSM type</glossterm>
+	    is <literal>osm</literal>.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>cacheClass</term>
+
+	<listitem>
+	  <para>
+	    The cache class is only used to control on which pools the
+	    files in a directory may be stored, while the storage
+	    class (constructed from the two above tags) might also be
+	    used by the HSM. The cache class is only needed if the
+	    above two tags are already fixed by HSM usage and more
+	    flexibility is needed.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>hsmInstance</term>
+
+	<listitem>
+	  <para>
+	    If not set, the &hsm; instance will be the same as the
+	    &hsm; type. Setting this tag will only change the name as
+	    used in the <glossterm linkend="gl-storage_class">storage
+	    class</glossterm> and in the pool commands.
+	  </para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+    
     <para>
-      There are more tags used by <dcache/> if the HSM type
+      There are more tags used by &dcache; if the HSM type
       <literal>enstore</literal> is used.
     </para>
 
     <para>
       When creating or changing directory tags by writing to the
       command-file as in
+    </para>
 
-<screen><userprompt/><command>echo</command> '<replaceable>content</replaceable>' > '<filename>.(tag)(<replaceable>tagName</replaceable>)</filename>'</screen>
+    <screen>&prompt-user; <command>echo</command> '<replaceable>content</replaceable>' > '<filename>.(tag)(<replaceable>tagName</replaceable>)</filename>'</screen>
 
+    <para>
       one has to take care not to treat the command-files in the
       same way as regular files, because tags are different from files
       in the following aspects:
-      <orderedlist>
-	<listitem>
-	  <para>
-	    The <replaceable>tagName</replaceable> is limited to 62
-	    characters and the <replaceable>content</replaceable> to
-	    512 bytes. Writing more to the command-file, will be
-	    silently ignored.
-	  </para>
-	</listitem>
-	<listitem>
-	  <para>
-	    If a tag which does not exist in a directory is created by
-	    writing to it, it is called a <emphasis>primary</emphasis>
-	    tag.  
-	  </para>
-	  <para>
-	    Removing a primary tag invalidates this tag. An
-	    invalidated tag behaves as if it does not exist. All
-	    filesystem IO operations on that tag produce an
-	    <quote>File not found</quote> error. However, a lookup
-	    operation ( e.g. ls) will show this tag with a 0 byte
-	    size. An invalidated tag can be revalidated with the help
-	    of the tool <command>repairTag.sh</command> in the
-	    <filename class="directory">tools/</filename> directory of
-	    the <pnfs/> distribution. It has to be called in the
-	    directory where the primary tag was with the tag name as
-	    argument.
-	  </para>
-	</listitem>
-	<listitem>
-	  <para>
-	    Tags are <emphasis>inherited</emphasis> from the parent
-	    directory by a newly created directory. Changing a primary
-	    tag in one directory will change the tags inherited from
-	    it in the same way, even if it is invalidated or
-	    revalidated. Creating a new primary tag in a directory
-	    will not create a inherited tag in its subdirectories.
-	  </para>
-	  <para>
-	    Moving a directory within the <pnfs/> filesystem will not
-	    change the inheritance. Therefore, a directory does not
-	    necessarily inherit tags from its parent
-	    directory. Removing an inherited tag does not have any
-	    effect.
-	  </para>
-	</listitem>
-	<listitem>
-	  <para>
-	    Writing to an inherited tag in the subdirectory will break
-	    the inheritance-link. A
-	    <emphasis>pseudo-primary</emphasis> tag will be created.
-	    The directories which inherited the old (inherited) tag
-	    will inherit the pseudo-primary tag.  A pseudo-primary tag
-	    behaves exactly like a primary tag, except that the
-	    original inherited tag will be restored if the
-	    pseude-primary tag is removed.
-	  </para>
-	</listitem>
-      </orderedlist>
     </para>
 
+
+    <orderedlist>
+      <listitem>
+	<para>
+	  The <replaceable>tagName</replaceable> is limited to 62
+	  characters and the <replaceable>content</replaceable> to 512
+	  bytes. Writing more to the command-file, will be silently
+	  ignored.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  If a tag which does not exist in a directory is created by
+	  writing to it, it is called a <emphasis>primary</emphasis>
+	  tag.
+	</para>
+	<para>
+	  Removing a primary tag invalidates this tag. An invalidated
+	  tag behaves as if it does not exist. All filesystem IO
+	  operations on that tag produce an <quote>File not
+	  found</quote> error. However, a lookup operation ( e.g. ls)
+	  will show this tag with a 0 byte size. An invalidated tag
+	  can be revalidated with the help of the tool
+	  <command>repairTag.sh</command> in the <filename
+	  class="directory">tools/</filename> directory of the &pnfs;
+	  distribution. It has to be called in the directory where the
+	  primary tag was with the tag name as argument.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  Tags are <emphasis>inherited</emphasis> from the parent
+	  directory by a newly created directory. Changing a primary
+	  tag in one directory will change the tags inherited from it
+	  in the same way, even if it is invalidated or
+	  revalidated. Creating a new primary tag in a directory will
+	  not create a inherited tag in its subdirectories.
+	</para>
+	<para>
+	  Moving a directory within the &pnfs; filesystem will not
+	  change the inheritance. Therefore, a directory does not
+	  necessarily inherit tags from its parent directory. Removing
+	  an inherited tag does not have any effect.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  Writing to an inherited tag in the subdirectory will break
+	  the inheritance-link. A <emphasis>pseudo-primary</emphasis>
+	  tag will be created.  The directories which inherited the
+	  old (inherited) tag will inherit the pseudo-primary tag.  A
+	  pseudo-primary tag behaves exactly like a primary tag,
+	  except that the original inherited tag will be restored if
+	  the pseude-primary tag is removed.
+	</para>
+      </listitem>
+    </orderedlist>
+
     <para>
-      If directory tags are used to control the behaviour of <dcache/>
+      If directory tags are used to control the behaviour of &dcache;
       and/or a tertiary storage system, it is a good idea to plan the
       directory structure in advance, thereby considering the
       necessary tags and how they should be set up. Moving directories
@@ -393,75 +412,77 @@ StoreName myStore</screen>
     <title>Global Configuration with <glossterm linkend="gl-wormhole">Wormholes</glossterm></title>
 
     <para>
-      <pnfs/> provides a way to distribute configuration information
-      to all directories in the <pnfs/> filesystem. It can be accessed
+      &pnfs; provides a way to distribute configuration information
+      to all directories in the &pnfs; filesystem. It can be accessed
       in a subdirectory <filename
       class="directory">.(config)()</filename> of any
-      <pnfs/>-directory. It behaves similar to a hardlink.  In the
+      &pnfs;-directory. It behaves similar to a hardlink.  In the
       default configuration this link points to <filename
       class="directory">/pnfs/fs/admin/etc/config/</filename>. In it
       are three files: <filename>'.(config)()'/serverId</filename>
       contains the domain name of the site,
       <filename>'.(config)()'/serverName</filename> the fully
-      qualified name of the <pnfs/> server, and
+      qualified name of the &pnfs; server, and
       <filename>'.(config)()'/serverRoot</filename> should contain
       <quote><literal>000000000000000000001080 .</literal></quote>.
     </para>
 
     <para>
-      The <dcache/> specific configuration can be found in
+      The &dcache; specific configuration can be found in
       <filename>'.(config)()'/dCache/dcache.conf</filename>. This file
       contains one line of the format
       <literal><replaceable>hostname</replaceable>:<replaceable>port</replaceable></literal>
-      per <dcap/> door which may be used by <dcap/> clients when not
+      per &dcap; door which may be used by &dcap; clients when not
       using URLs. The <command>dccp</command> program will choose
       randomly between the doors listed here.
     </para>
 
     <para>
-      Normally, reading from files in <pnfs/> is disabled. Therefore it
+      Normally, reading from files in &pnfs; is disabled. Therefore it
       is necessary to switch on I/O access to the files in
       <filename>'.(config)()'/</filename> by e.g.:
+    </para>
 
-      <screen><rootprompt/><command>touch</command> '.(config)()/.(fset)(serverRoot)(io)(on)'</screen>
+    <screen>&prompt-root; <command>touch</command> '.(config)()/.(fset)(serverRoot)(io)(on)'</screen>
 
+    <para>
       After that, you will notice that the file is empty. Therefore,
       take care, to rewrite the information.
     </para>
 
   </section>
-  
-  <unfinished>
+
+  <!--  TODO
 
   <section id="cf-pnfs-metadata">
-    <title>Meta Data in <pnfs/></title>
+    <title>Meta Data in &pnfs;</title>
 
     <para>
       all other command-files: fset set use puse
     </para>
 
   </section>
-  
-  </unfinished>
+
+  -->
 
   <section id="cf-pnfs-trash">
-    <title>Deleted Files in <pnfs/></title>
+    <title>Deleted Files in &pnfs;</title>
 
     <para>
-      When a file in the <pnfs/> filesystem is deleted the server
+      When a file in the &pnfs; filesystem is deleted the server
       stores information about is in the subdirectories of <filename
-      class="directory">/opt/pnfsdb/pnfs/trash/</filename>. For <dcache/>, the
+      class="directory">/opt/pnfsdb/pnfs/trash/</filename>. For &dcache;, the
       <literal>cleaner</literal> cell in the
       <literal>pnfsDomain</literal> is responsible for deleting the
       actual files from the pools asyncronously. It uses the files in
       the directory <filename
       class="directory">/opt/pnfsdb/pnfs/trash/2/</filename>. It
-      contains a file with the <pnfs/> ID of the deleted file as
+      contains a file with the &pnfs; ID of the deleted file as
       name. If a pool containing that file is down at the time the
       cleaner tries to remove it, it will retry for a while. After
       that, the file
       <filename>/opt/pnfsdb/pnfs/trash/2/current/failed.<replaceable>poolName</replaceable></filename>
-      will contain the <pnfs/> IDs which have not been removed from
+      will contain the &pnfs; IDs which have not been removed from
       that pool. The cleaner will still retry the removal with a lower
       frequency.
     </para>
@@ -476,7 +497,7 @@ StoreName myStore</screen>
       <filename>/pnfs/fs/admin/etc/exports/<replaceable>hostIP</replaceable></filename>
       and
       <filename>/pnfs/fs/admin/etc/exports/<replaceable>netMask</replaceable>..<replaceable>netPart</replaceable></filename>
-      are used to control the host-based access to the <pnfs/>
+      are used to control the host-based access to the &pnfs;
       filesystem via mount points. They have to 
       contain one line per NFS mount point. The lines are made of the  following
       four space-separated fields fields:
@@ -510,7 +531,7 @@ StoreName myStore</screen>
 
 <programlisting>/pnfs /0/root/fs/usr/ 30 nooptions</programlisting>
 
-      thereby allowing all hosts to mount the part of the <pnfs/>
+      thereby allowing all hosts to mount the part of the &pnfs;
       filesystem containing the user data. There also is a file
       <filename>/pnfs/fs/admin/etc/exports/127.0.0.1</filename>
       containing
@@ -519,18 +540,18 @@ StoreName myStore</screen>
 /admin /0/root/fs/admin 0 nooptions</programlisting>
 
       The first line is the mountpoint used by the admin node. If the
-      <pnfs/> mount is not needed for client operations (e.g. in the
+      &pnfs; mount is not needed for client operations (e.g. in the
       grid context) and if no <glossterm linkend="gl-tss">tertiary
       storage system (HSM)</glossterm> is connected, the file
       <filename>/pnfs/fs/admin/etc/exports/0.0.0.0..0.0.0.0</filename>
       may be deleted. With an HSM, the pools which write files into
-      the HSM have to mount the <pnfs/> filesystem and suitable export
+      the HSM have to mount the &pnfs; filesystem and suitable export
       files have to be created.
     </para>
 
     <para>
       In general, the user ID 0 of the <literal>root</literal> user on
-      a client mounting the <pnfs/> filesystem will be mapped to
+      a client mounting the &pnfs; filesystem will be mapped to
       nobody (not to the user <literal>nobody</literal>). For the
       hosts whose IP addresses are the file names in the directory
       <filename
@@ -542,15 +563,15 @@ StoreName myStore</screen>
   </section>
   
   <section id="cf-pnfs-db">
-    <title>The Databases of <pnfs/></title>
+    <title>The Databases of &pnfs;</title>
 
     <para>
-      <pnfs/> stores all the information in GNU dbm database
+      &pnfs; stores all the information in GNU dbm database
       files. Since each operation will lock the database file used
       globally and since GNU dbm cannot handle database files larger
       than 2GB, it is advisable to <quote>split</quote> them sutably
       to future usage. Each database stores the information of a
-      sub-tree of the <pnfs/> filesystem namespace. Which database is
+      sub-tree of the &pnfs; filesystem namespace. Which database is
       responsible for a directory and subsequent subdirectories is
       determined at creation time of the directory. The following
       procedure will create a new database and connect a new
@@ -563,18 +584,18 @@ StoreName myStore</screen>
       <varname>shmservers</varname> in file
       <filename>/usr/etc/pnfsSetup</filename>. Therefore, take care
       that this number is always higher than the number of databases
-      that will be used (restart <pnfs/> services, if changed).
+      that will be used (restart &pnfs; services, if changed).
     </para>
 
     <para>
       Prepare the environment with
 
-<screen><rootprompt/><command>.</command> /usr/etc/pnfsSetup
-<rootprompt/>PATH=${pnfs}/tools:$PATH</screen>
+<screen>&prompt-root; <command>.</command> /usr/etc/pnfsSetup
+&prompt-root; PATH=${pnfs}/tools:$PATH</screen>
 
       To get a list of currently existing databases, issue
 
-<screen><rootprompt/><command>mdb</command> show
+<screen>&prompt-root; <command>mdb</command> show
 ID Name Type Status Path
 -------------------------------
 0 admin r enabled (r) /opt/pnfsdb/pnfs/databases/admin
@@ -583,35 +604,35 @@ ID Name Type Status Path
       Choose a new database name
       <replaceable>databaseName</replaceable> and a location for the
       database file <replaceable>databaseFilePath</replaceable> (just
-      a placeholder for the PostgreSQL version of <pnfs/>) and create
+      a placeholder for the PostgreSQL version of &pnfs;) and create
       it with
 
-<screen><rootprompt/><command>mdb</command> create <replaceable>databaseName</replaceable> <replaceable>databaseFilePath</replaceable></screen>
+<screen>&prompt-root; <command>mdb</command> create <replaceable>databaseName</replaceable> <replaceable>databaseFilePath</replaceable></screen>
 	
       e.g.
 
-<screen><rootprompt/><command>mdb</command> create data2 /opt/pnfsdb/pnfs/databases/data2</screen>
+<screen>&prompt-root; <command>mdb</command> create data2 /opt/pnfsdb/pnfs/databases/data2</screen>
 
       Make sure the file
       <filename><replaceable>databaseFilePath</replaceable></filename>
       exists with
 
-<screen><rootprompt/><command>touch</command> <replaceable>databaseFilePath</replaceable></screen>
+<screen>&prompt-root; <command>touch</command> <replaceable>databaseFilePath</replaceable></screen>
 
       This might seem a little strange. The reason is that the
-      PostgreSQL version of the <pnfs/> server only uses the file as
+      PostgreSQL version of the &pnfs; server only uses the file as
       reference and stores the actual data in the PostgreSQL server.
     </para>
 
     <para>
       In order to refresh database information run
 
-<screen><rootprompt/><command>mdb</command> update
+<screen>&prompt-root; <command>mdb</command> update
 Starting data2</screen>
 
       Running command <command>mdb show</command> shows the new database:
 
-<screen><rootprompt/><command>mdb</command> show
+<screen>&prompt-root; <command>mdb</command> show
 ID Name Type Status Path
 -------------------------------
 0 admin r enabled (r) /opt/pnfsdb/pnfs/databases/admin
@@ -619,10 +640,10 @@ ID Name Type Status Path
 2 data2 r enabled (r) /opt/pnfsdb/pnfs/databases/data2</screen>
 
 
-      In the <pnfs/> filesystem tree, create the new directory in the following way
+      In the &pnfs; filesystem tree, create the new directory in the following way
 
-<screen><rootprompt/><command>cd</command> /pnfs/<replaceable>site.de</replaceable>/<replaceable>some/sub/dir</replaceable>/
-<rootprompt/><command>mkdir</command> '.(<replaceable>newDbID</replaceable>)(<replaceable>newDirectory</replaceable>)'</screen>
+<screen>&prompt-root; <command>cd</command> /pnfs/<replaceable>site.de</replaceable>/<replaceable>some/sub/dir</replaceable>/
+&prompt-root; <command>mkdir</command> '.(<replaceable>newDbID</replaceable>)(<replaceable>newDirectory</replaceable>)'</screen>
 
       where <replaceable>newDbID</replaceable> is the
       <literal>ID</literal> of the new database as listed in the
@@ -630,48 +651,48 @@ ID Name Type Status Path
       <replaceable>newDirectory</replaceable> is the name of the new
       directory. E.g.
 
-<screen><rootprompt/><command>cd</command> /pnfs/desy.de/data/zeus/
-<rootprompt/><command>mkdir</command> '.(2)(mcdata)'</screen>
+<screen>&prompt-root; <command>cd</command> /pnfs/desy.de/data/zeus/
+&prompt-root; <command>mkdir</command> '.(2)(mcdata)'</screen>
 
       The new database does not know anything about the <link
       linkend="cf-pnfs-wormholes">wormhole</link>
-      <filename>'.(config)()'</filename>, yet. For this, the <pnfs/>
+      <filename>'.(config)()'</filename>, yet. For this, the &pnfs;
       ID of the wormhole directory (<filename
       class="directory">/pnfs/fs/admin/etc/config/</filename>) has to
       be specified. It can be found out with
 
-<screen><rootprompt/><command>sclient</command> getroot ${shmkey} 0
+<screen>&prompt-root; <command>sclient</command> getroot ${shmkey} 0
 0 000000000000000000001000 <replaceable>wormholePnfsId</replaceable></screen>
 
       The last pnfsID is the one of the wormhole directory of the
       database with ID 0 (already set correctly). Now you can set this ID with
 
-<screen><rootprompt/><command>sclient</command> getroot ${shmkey} <replaceable>newDbID</replaceable> <replaceable>wormholePnfsId</replaceable>
+<screen>&prompt-root; <command>sclient</command> getroot ${shmkey} <replaceable>newDbID</replaceable> <replaceable>wormholePnfsId</replaceable>
 <replaceable>newDbID</replaceable> 000000000000000000001000 <replaceable>wormholePnfsId</replaceable></screen>
 
       For example, do the following
 
-<screen><rootprompt/><command>sclient</command> getroot ${shmkey} 0
+<screen>&prompt-root; <command>sclient</command> getroot ${shmkey} 0
 0 000000000000000000001000 0000000000000000000010E0
-<rootprompt/><command>sclient</command> getroot ${shmkey} 2 0000000000000000000010E0
+&prompt-root; <command>sclient</command> getroot ${shmkey} 2 0000000000000000000010E0
 2 000000000000000000001000 0000000000000000000010E0</screen>
 
       Finally, add directory tags for the new directories. The default tags are added by
 
-<screen><rootprompt/><command>cd</command> /pnfs/<replaceable>site.de</replaceable>/<replaceable>some/sub/dir</replaceable>/<replaceable>newDirectory</replaceable>
-<rootprompt/><command>echo</command> 'StoreName myStore' > '.(tag)(OSMTemplate)'
-<rootprompt/><command>echo</command> 'STRING' > '.(tag)(sGroup)'</screen>
+<screen>&prompt-root; <command>cd</command> /pnfs/<replaceable>site.de</replaceable>/<replaceable>some/sub/dir</replaceable>/<replaceable>newDirectory</replaceable>
+&prompt-root; <command>echo</command> 'StoreName myStore' > '.(tag)(OSMTemplate)'
+&prompt-root; <command>echo</command> 'STRING' > '.(tag)(sGroup)'</screen>
 
     </para>
     
   </section>
 
-<unfinished>
+  <!--
   <section id="cf-pnfs-details" userlevel="details">
     <title>Details</title>
     
     <section id="cf-pnfs-access">
-      <title>Access of the <dcache/> Server to <pnfs/></title>
+      <title>Access of the &dcache; Server to &pnfs;</title>
       
       <para>TODO: Which cells access PNFS how?</para>
       
@@ -682,6 +703,6 @@ ID Name Type Status Path
     </unfinished>
       
   </section>
-  </unfinished>
+  -->
 
 </chapter>

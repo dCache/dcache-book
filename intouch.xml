@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+%sharedents;
+]>
 
 <chapter id="intouch">
-  <!-- <?dbhtml dir="intouch"?> -->
+
   <title>Getting in Touch with dCache</title>
   
   <para>
-    This section is a guide for exploring a newly installed <dcache/>
+    This section is a guide for exploring a newly installed &dcache;
     system. The confidence obtained by this exploration will prove
     very helpful when encountering problems in the running
     system. This forms the basis for the more detailed stuff in the
@@ -16,33 +20,35 @@
   <para>
     The starting point is a fresh installation according to the
     installation instructions shipped with any distribution of
-    <dcache/>. All components (<pnfs/>, <dcache/>-core,
-    <dcache/>-pool, and <dcache/>-opt) are started on the same
-    host. Additional pools on other hosts may also run.
+    &dcache;. All components (<literal>pnfs</literal>,
+    <literal>dcache-core</literal>, <literal>dcache-pool</literal>,
+    and <literal>dcache-opt</literal>) are started on the same
+    host. Additional pools on other hosts may also be running.
   </para>
 
   <section id="intouch-client">
     <title>Checking the Functionality</title>
 
     <para>
-      First, we will get used to the client tools. On the <dcache/>
-      admin host, change into the <pnfs/> directory, where the users
+      First, we will get used to the client tools. On the &dcache;
+      admin host, change into the &pnfs; directory, where the users
       are going to store their data:
+    </para>
 
-<screen><userprompt/><command>cd</command> <filename class="directory">/pnfs/<replaceable>site.de</replaceable>/data/</filename>
-<userprompt/>
-</screen>
+    <screen>&prompt-user; <command>cd</command> /pnfs/<replaceable>site.de</replaceable>/data/
+&prompt-user;</screen>
 
-      Note that on the <dcache/> admin node this directory is a link
-      to <filename class="directory">/pnfs/fs/usr/</filename> and the
-      NFS export <literal>localhost:/fs</literal> is mounted to
-      <filename class="directory">/pnfs/fs</filename>. The NFS server
-      running on the <dcache/> admin node is part of the <pnfs/> system
-      which is not part of <dcache/> but heavily used by it.
+    <para>
+      Note that on the &dcache; admin node this directory is a link to
+      <filename class="directory">/pnfs/fs/usr/</filename> and the NFS
+      export <literal>localhost:/fs</literal> is mounted to <filename
+      class="directory">/pnfs/fs</filename>. The NFS server running on
+      the &dcache; admin node is part of the &pnfs; system which is
+      not part of &dcache; but heavily used by it.
     </para>
 
     <para>
-      The <pnfs/> filesystem is not intended for reading or writing
+      The &pnfs; filesystem is not intended for reading or writing
       actual data with regular file operations via the NFS
       protocol. However, <literal>localhost:/fs</literal> is a
       special, privileged NFS export that allows reading and writing
@@ -51,78 +57,93 @@
     </para>
 
     <para>
-      Reading and writing data to and from a <dcache/> instance can be
+      Reading and writing data to and from a &dcache; instance can be
       done with a number of protocols. After a standard installation,
-      these protocols are <productname>dCap</productname>,
-      <productname>gsiDCap</productname>, and
-      <productname>GridFTP</productname>. In addition <dcache/> comes
-      with an implementation of the <productname>SRM</productname>
-      which negotiates the actual data transfer protocol.
+      these protocols are &dcap;, &gsidcap;, and &gridftp;. In
+      addition &dcache; comes with an implementation of the &srm;
+      protocol which negotiates the actual data transfer protocol.
     </para>
 
     <para>
-      We will first try <productname>dCap</productname> with the
-      <command>dccp</command> command:
+      We will first try &dcap; with the <command>dccp</command>
+      command:
+    </para>
 
-<screen><userprompt/><command>cd</command> <filename class="directory">/pnfs/<replaceable>site.de</replaceable>/data/</filename>
-<userprompt/>PATH=/opt/d-cache/dcap/bin/:$PATH
-<userprompt/><command>dccp</command> /bin/sh my-test-file
+    <screen>&prompt-user; export PATH=/opt/d-cache/dcap/bin/:$PATH
+&prompt-user; <command>cd</command> /pnfs/<replaceable>site.de</replaceable>/data/
+&prompt-user; <command>dccp</command> /bin/sh my-test-file
 541096 bytes in 0 seconds</screen>
 
-      This command succeeds if the user <literal>user</literal> has
-      the unix rights to write to the current directory <filename
+    <para>
+      This command succeeds if the user <systemitem
+      class="username">user</systemitem> has the Unix rights to write
+      to the current directory <filename
       class="directory">/pnfs/<replaceable>site.de</replaceable>/data/</filename>.
-      The <productname>dCap</productname> protocol also hat a URL syntax:
+    </para>
 
-<screen><userprompt/><command>dccp</command> dcap://<replaceable>adminNode</replaceable>/pnfs/<replaceable>site.de</replaceable>/data/my-test-file /tmp/test.tmp
+    <para>
+      The dccp command also accepts URLs.  We can copy the data back
+      using the dccp command and the &dcap; protocol but this time
+      describing the location of the file using a URL.
+    </para>
+
+    <screen>&prompt-user; <command>dccp</command> dcap://<replaceable>adminNode</replaceable>/pnfs/<replaceable>site.de</replaceable>/data/my-test-file /tmp/test.tmp
 541096 bytes in 0 seconds</screen>
 
-      However, this command only succeeded because the file is world
-      readable:
+    <para>
+      However, this command only succeeds if the file is world
+      readable.  The following shows how ensure the file is
+      <emphasis>not</emphasis> world readable and illustrates dccp
+      consequently failing to copy the file.
+    </para>
 
-<screen><userprompt/><command>chmod</command> o-r my-test-file
-<userprompt/><command>dccp</command> dcap://<replaceable>adminNode</replaceable>/pnfs/<replaceable>site.de</replaceable>/data/my-test-file /tmp/test2.tmp
+    <screen>&prompt-user; <command>chmod</command> o-r my-test-file
+&prompt-user; <command>dccp</command> dcap://<replaceable>adminNode</replaceable>/pnfs/<replaceable>site.de</replaceable>/data/my-test-file /tmp/test2.tmp
 Command failed!
 Server error message for [1]: "Permission denied" (errno 2).
 Failed open file in the dCache.
 Can't open source file : "Permission denied"
 System error: Input/output error</screen>
 
-      This command did not succeed, because the dcap protocol is
+    <para>
+      This command did not succeed, because &dcap; access is
       unauthenticated and the user is mapped to a non-existent user in
       order to determine the access rights. However, you should be
       able to access the file with the NFS mount:
-
-<screen><userprompt/><command>dccp</command> my-test-file /tmp/test2.tmp
-541096 bytes in 0 seconds</screen>
     </para>
+
+    <screen>&prompt-user; <command>dccp</command> my-test-file /tmp/test2.tmp
+541096 bytes in 0 seconds</screen>
 
     <para>
       If you have a valid grid proxy with a certificate subject which
       is properly mapped in the configuration file
       <filename>/opt/d-cache/etc/dcache.kpwd</filename> you can also
-      try grid-authenticated access via GSI authenticated
-      <productname>dCap</productname>:
+      try grid-authenticated access via the GSI-authenticated version
+      of &dcap;:
+    </para>
 
-<screen><userprompt/><command>chgrp</command> <replaceable>yourVO</replaceable> my-test-file
-<userprompt/>LD_LIBRARY_PATH=/opt/d-cache/dcap/lib/:$LD_LIBRARY_PATH
-<userprompt/><command>dccp</command> gsidcap://<replaceable>adminNode</replaceable>:22128/pnfs/<replaceable>site.de</replaceable>/data/my-test-file /tmp/test3.tmp
+    <screen>&prompt-user; <command>chgrp</command> <replaceable>yourVO</replaceable> my-test-file
+&prompt-user; export LD_LIBRARY_PATH=/opt/d-cache/dcap/lib/:$LD_LIBRARY_PATH
+&prompt-user; <command>dccp</command> gsidcap://<replaceable>adminNode</replaceable>:22128/pnfs/<replaceable>site.de</replaceable>/data/my-test-file /tmp/test3.tmp
 541096 bytes in 0 seconds</screen>
 
-      Or we let the <productname>SRM</productname> negotiate the
-      protocol:
+    <para>
+      Or we let the &srm; negotiate the protocol:
+    </para>
 
-<screen><userprompt/>PATH=/opt/d-cache/srm/bin/:$PATH
-<userprompt/><command>srmcp</command> srm://<replaceable>adminNode</replaceable>:8443/pnfs/desy.de/data/my-test-file file:////tmp/test4.tmp
+    <screen>&prompt-user; export PATH=/opt/d-cache/srm/bin/:$PATH
+&prompt-user; <command>srmcp</command> srm://<replaceable>adminNode</replaceable>:8443/pnfs/desy.de/data/my-test-file file:////tmp/test4.tmp
 configuration file not found, configuring srmcp
 created configuration file in ~/.srmconfig/config.xml</screen>
 
-      If the <dcache/> instance is registered as a storage element in
+    <para>
+      If the &dcache; instance is registered as a storage element in
       the LCG/EGEE grid and the LCG user interface software is
-      available the file can be accessed via
-      <productname>SRM</productname>:
+      available the file can be accessed via &srm;:
+    </para>
 
-<screen><userprompt/><command>lcg-cp</command> -v --vo <replaceable>yourVO</replaceable> \
+    <screen>&prompt-user; <command>lcg-cp</command> -v --vo <replaceable>yourVO</replaceable> \
 srm://<replaceable>dCacheAdminFQN</replaceable>/pnfs/<replaceable>site.de</replaceable>/data/my-test-file \
 file:///tmp/test5.tmp
 Source URL: srm://<replaceable>dCacheAdminFQN</replaceable>/pnfs/<replaceable>site.de</replaceable>/data/my-test-file
@@ -132,37 +153,41 @@ Destination URL: file:///tmp/test5.tmp
 # streams: 1
 Transfer took 770 ms</screen>
 
-      and it can be deleted with the help of the <productname>SRM</productname>:
+    <para>
+      and it can be deleted with the help of the &srm; interface:
+    </para>
 
-<screen><userprompt/><command>srm-advisory-delete</command> srm://<replaceable>dCacheAdminFQN</replaceable>:8443/pnfs/<replaceable>site.de</replaceable>/data/my-test-file
+    <screen>&prompt-user; <command>srm-advisory-delete</command> srm://<replaceable>dCacheAdminFQN</replaceable>:8443/pnfs/<replaceable>site.de</replaceable>/data/my-test-file
  srmcp error :  advisoryDelete(User [name=...],pnfs/<replaceable>site.de</replaceable>/data/my-test-file) 
 Error user User [name=...] has no permission to delete 000100000000000000BAF0C0</screen>
 
+    <para>
       This works only if the grid certificate subject is mapped to a
       user which has permissions to delete the file:
-
-<screen><userprompt/><command>chown</command> <replaceable>yourVO</replaceable>001 my-test-file
-<userprompt/><command>srm-advisory-delete</command> srm://<replaceable>dCacheAdminFQN</replaceable>:8443/pnfs/<replaceable>site.de</replaceable>/data/my-test-file
-</screen>
     </para>
+
+    <screen>&prompt-user; <command>chown</command> <replaceable>yourVO</replaceable>001 my-test-file
+&prompt-user; <command>srm-advisory-delete</command> srm://<replaceable>dCacheAdminFQN</replaceable>:8443/pnfs/<replaceable>site.de</replaceable>/data/my-test-file</screen>
 
     <para>
       If the grid functionality is not required the file can be
-      deleted with the NFS mount of the <pnfs/> filesystem:
-
-<screen><userprompt/><command>rm</command> <filename>my-test-file</filename>
-</screen>
+      deleted with the NFS mount of the &pnfs; filesystem:
     </para>
+
+    <screen>&prompt-user; <command>rm</command> <filename>my-test-file</filename></screen>
 
   </section>
 
+
+
   <section id="intouch-web">
-    <title>The Web Interface for Monitoring <dcache/></title>
+    <title>The Web Interface for Monitoring &dcache;</title>
 
     <para>
-      In the standard configuration the dCache web interface is
+      In the standard configuration the &dcache; web interface is
       started on the admin node and can be reached via port
-      <literal>2288</literal>. Point a web browser to <ulink
+      <systemitem class="resource">2288</systemitem>. Point a web
+      browser to <ulink
       url="http://adminNode:2288/">http://<replaceable>adminNode</replaceable>:2288/</ulink>
       to get to the main menue of the dCache web interface.  The
       contents of the web interface are self-explanatory and are the
@@ -172,7 +197,7 @@ Error user User [name=...] has no permission to delete 000100000000000000BAF0C0<
     <para>
       The <quote>Cell Services</quote> page displays the status of
       some important <glossterm linkend="gl-cell">cells</glossterm> of
-      the <dcache/> instance. You might observe that some cells are
+      the &dcache; instance. You might observe that some cells are
       marked <quote>OFFLINE</quote> even though you know that they are
       running and fine. These might be the cells <quote>SRM</quote>,
       <quote>GFTP</quote>, and <quote>DCap-gsi</quote>. The reason is
@@ -181,8 +206,9 @@ Error user User [name=...] has no permission to delete 000100000000000000BAF0C0<
       <filename>/opt/d-cache/config/httpd.batch</filename>. However,
       the cells have other names. If you change the following section
       near the end of the file
+    </para>
 
-<programlisting>#
+    <programlisting>#
 create diskCacheV111.cells.WebCollectorV3 collector \
     "PnfsManager \
      PoolManager \
@@ -192,9 +218,11 @@ create diskCacheV111.cells.WebCollectorV3 collector \
      -replyObject"
 #</programlisting>
 
+    <para>
       such that it reads
+    </para>
 
-<programlisting>#
+    <programlisting>#
 create diskCacheV111.cells.WebCollectorV3 collector \
     "PnfsManager \
      PoolManager \
@@ -204,13 +232,15 @@ create diskCacheV111.cells.WebCollectorV3 collector \
      -replyObject"
 #</programlisting>
 
-      and restart the <literal>httpd</literal> <glossterm
+    <para>
+      and restart the &domain-http; <glossterm
       linkend="gl-domain">domain</glossterm> by executing
+    </para>
 
-<screen><rootprompt/><command>/opt/d-cache/jobs/httpd</command> stop
-<rootprompt/><command>/opt/d-cache/jobs/httpd</command> -logfile=/opt/d-cache/log/http.log start
-</screen>
+    <screen>&prompt-root; <command>/opt/d-cache/jobs/httpd</command> stop
+&prompt-root; <command>/opt/d-cache/jobs/httpd</command> -logfile=/opt/d-cache/log/http.log start</screen>
 
+    <para>
       More information about the
       <filename><replaceable>domainName</replaceable>.batch</filename>
       will follow in the next section.
@@ -218,13 +248,13 @@ create diskCacheV111.cells.WebCollectorV3 collector \
 
     <para>
       The <quote>Pool Usage</quote> page gives an good overview of the
-      current space usage of the whole <dcache/> instance. In the
+      current space usage of the whole &dcache; instance. In the
       graphs, free space is marked yellow, space occupied by
-      <glossterm linkend="gl-cached">cached files</glossterm>
-      which may be deleted when space is needed is marked green, and
-      space occupied by <glossterm linkend="gl-precious">precious
-      files</glossterm> which cannot be deleted. Other states
-      (e.g. files which are currently written) are marked purple.
+      <glossterm linkend="gl-cached">cached files</glossterm> (which
+      may be deleted when space is needed) is marked green, and space
+      occupied by <glossterm linkend="gl-precious">precious
+      files</glossterm>, which cannot be deleted. Other states
+      (e.g., files which are currently written) are marked purple.
     </para>
 
     <para>
@@ -242,37 +272,39 @@ create diskCacheV111.cells.WebCollectorV3 collector \
       current configuration of the <glossterm
       linkend="gl-pm-comp-psu">pool selection unit</glossterm> in the
       pool manager. The remaining pages are relevant only if a
-      <glossterm linkend="gl-tss">tertiary storage system (HSM)</glossterm>
-      is connected to the <dcache/> instance.
+      <glossterm linkend="gl-tss">tertiary storage system
+      (HSM)</glossterm> is connected to the &dcache; instance.
     </para>
-
   </section>
+
 
   <section id="intouch-files">
     <title>Files</title>
 
     <para>
       In this section we will have a look at the configuration and log
-      files of <pnfs/> and <dcache/>. 
+      files of &pnfs; and &dcache;. 
     </para>
 
     <para>
-      The primary configuration file for <pnfs/> is
+      The primary configuration file for &pnfs; is
       <filename>/usr/etc/pnfsSetup</filename>. For administrative
-      tasks in <pnfs/> it has to be sourced and the path to the
+      tasks in &pnfs; it has to be sourced and the path to the
       admninistration tools should be added to <varname>$PATH</varname>:
+    </para>
 
-<screen><rootprompt/>. /usr/etc/pnfsSetup
-<rootprompt/>PATH=$PATH:$pnfs/tools
-</screen>
+    <screen>&prompt-root; . /usr/etc/pnfsSetup
+&prompt-root; PATH=$PATH:$pnfs/tools</screen>
 
-      Stopping and starting the <pnfs/> server can now be done with
+    <para>
+      Stopping and starting the &pnfs; server can now be done with
+    </para>
 
-<screen><rootprompt/><command>pnfs</command> stop
-<rootprompt/><command>pnfs</command> start
-</screen>
+    <screen>&prompt-root; <command>pnfs</command> stop
+&prompt-root; <command>pnfs</command> start</screen>
 
-      The log files for the three <pnfs/> server daemons are
+    <para>
+      The log files for the three &pnfs; server daemons are
       <filename>/var/log/pmountd.log</filename>,
       <filename>/var/log/dbserver.log</filename>, and
       <filename>/var/log/pnfsd.log</filename>. The
@@ -288,7 +320,7 @@ create diskCacheV111.cells.WebCollectorV3 collector \
       area. These perform the actual operations on the database files
       which can be found in <filename
       class="directory">/opt/pnfsdb/pnfs/databases/</filename>. The
-      <pnfs/> system finds them via the information in the directory
+      &pnfs; system finds them via the information in the directory
       <filename
       class="directory">/opt/pnfsdb/pnfs/info/</filename>. 
     </para>
@@ -300,16 +332,16 @@ create diskCacheV111.cells.WebCollectorV3 collector \
       sub-tree. Similar to mounts in the UNIX filesystem, the
       filesystem tree is stitched together from several such
       sub-trees. In the standard configuration the
-      <literal>admin</literal> database contains the root of the
+      <database>admin</database> database contains the root of the
       filesystem (the one mounted on <filename
       class="directory">/pnfs/fs/</filename>) and the
-      <literal>data1</literal> database the sub-tree starting at
+      <database>data1</database> database the sub-tree starting at
       <filename class="directory">/pnfs/fs/usr/data/</filename>. <xref
       linkend="cf-pnfs-db"/> describes how to create new databases.
     </para>
 
     <para>
-      The <dcache/> software is installed in one directory, normally
+      The &dcache; software is installed in one directory, normally
       <filename class="directory">/opt/d-cache/</filename>.  All
       configuration and log files can be found here. In the following
       filenames will always be relative to this directory.
@@ -318,12 +350,13 @@ create diskCacheV111.cells.WebCollectorV3 collector \
     <para>
       In the previous section we have already seen how a <glossterm
       linkend="gl-domain">domain</glossterm> is restarted:
+    </para>
       
-<screen><rootprompt/><command>/opt/d-cache/jobs/<replaceable>domainName</replaceable></command> stop
-<rootprompt/><command>/opt/d-cache/jobs/<replaceable>domainName</replaceable></command> \
--logfile=/opt/d-cache/log/<replaceable>domainName</replaceable>.log start
-</screen>
+    <screen>&prompt-root; <command>/opt/d-cache/jobs/<replaceable>domainName</replaceable></command> stop
+&prompt-root; <command>/opt/d-cache/jobs/<replaceable>domainName</replaceable></command> \
+-logfile=/opt/d-cache/log/<replaceable>domainName</replaceable>.log start</screen>
 
+    <para>
       Listing the contents of <filename
       class="directory">jobs/</filename> you will see that these
       scripts are all in fact links to
@@ -339,7 +372,7 @@ create diskCacheV111.cells.WebCollectorV3 collector \
       will be used by the wrapper script and by the domains at
       start-up. These files are also links to
       <filename>config/dCacheSetup</filename>. This is the primary
-      configuration file of the <dcache/> system. 
+      configuration file of the &dcache; system. 
     </para>
 
     <para>
@@ -354,30 +387,31 @@ create diskCacheV111.cells.WebCollectorV3 collector \
     <para>
       Since the standard
       <filename>config/<replaceable>domainName</replaceable>.batch</filename>
-      files will be overwritten when updating to a newer version of <dcache/>
+      files will be overwritten when updating to a newer version of &dcache;
       (e.g. with RPM), it is a good idea to modify only private copies of them.
       When choosing a name like
       <filename>config/<replaceable>newDomainName</replaceable>.batch</filename> 
       you give the domain the name
       <replaceable>newDomainName</replaceable>. The necessary links can be
       created with
-
-<screen><rootprompt/><command>cd</command> /opt/d-cache/config/
-<rootprompt/><command>../jobs/initPackage.sh</command></screen>
-
-      Then the old domain can be stopped and the new one started:
-
-<screen><rootprompt/><command>/opt/d-cache/jobs/<replaceable>domainName</replaceable></command> stop
-<rootprompt/><command>/opt/d-cache/jobs/<replaceable>newDomainName</replaceable></command> \
--logfile=/opt/d-cache/log/<replaceable>newDomainName</replaceable>.log start</screen>
-
     </para>
+
+    <screen>&prompt-root; <command>cd</command> /opt/d-cache/config/
+&prompt-root; <command>../jobs/initPackage.sh</command></screen>
+
+    <para>
+      Then the old domain can be stopped and the new one started:
+    </para>
+
+    <screen>&prompt-root; <command>/opt/d-cache/jobs/<replaceable>domainName</replaceable></command> stop
+&prompt-root; <command>/opt/d-cache/jobs/<replaceable>newDomainName</replaceable></command> -logfile=/opt/d-cache/log/<replaceable>newDomainName</replaceable>.log start</screen>
+
 
     <para>
       Recall, that we did change <filename>config/httpd.batch</filename> in
       order to adjust the names of the cells which should show up in the
       <quote>Cell Services</quote> page. Since this was a minor change not
-      influencing the functionality of the <dcache/> instance, it is preferable
+      influencing the functionality of the &dcache; instance, it is preferable
       not to change the name of the domain. This way, changes to
       <filename>config/http.batch</filename> in the distribution will be
       included in your <filename>config/httpd.batch</filename>. Such a future
@@ -396,10 +430,12 @@ create diskCacheV111.cells.WebCollectorV3 collector \
       <filename>config/replica.batch</filename> to a secure one would be done
       best in copies of these <filename>.batch</filename> files. You should
       also do e.g.
+    </para>
 
-<screen><rootprompt/><command>chmod</command> 600 <filename>config/mysrm.batch</filename></screen>
+    <screen>&prompt-root; <command>chmod</command> 600 <filename>config/mysrm.batch</filename></screen>
 
-      to secure the password further. Note that future versions of <dcache/>
+    <para>
+      to secure the password further. Note that future versions of &dcache;
       will not require a plain text postgresql password in these files
       anymore. 
     </para>
@@ -410,9 +446,9 @@ create diskCacheV111.cells.WebCollectorV3 collector \
     </para>
 
     <para>
-      The most central component of a <dcache/> instance is the
-      <literal>PoolManager</literal> cell. It reads additional
-      configuration information from the file
+      The most central component of a &dcache; instance is the
+      &cell-poolmngr; cell. It reads additional configuration
+      information from the file
       <filename>config/PoolManager.config</filename> at
       start-up. However, in contrast to the
       <filename>config/<replaceable>domainName</replaceable>Setup</filename>
@@ -423,25 +459,28 @@ create diskCacheV111.cells.WebCollectorV3 collector \
     <para>
       The domains containing the pools are handled a little
       differently from the other domains. They are started by
+    </para>
 
-<screen><rootprompt/><command>/opt/d-cache/jobs/pool</command> -pool=<replaceable>pool</replaceable> \
+    <screen>&prompt-root; <command>/opt/d-cache/jobs/pool</command> -pool=<replaceable>pool</replaceable> \
 -logfile=log/<replaceable>pool</replaceable>Domain.log start</screen>
 
-      This will start the domain
-      <literal><replaceable>pool</replaceable>Domain</literal> which
-      contains a pool cell for each line in the file
-      <filename>config/<replaceable>pool</replaceable>.poollist</filename>. When
-      only one pool domain is started on a host, it is conventional to
-      use the hostname for <replaceable>pool</replaceable>. A line of
-      the
+    <para>
+      This will start the domain &domain-pool; which contains a pool
+      cell for each line in the file
+      <filename>config/<replaceable>pool</replaceable>.poollist</filename>.
+      When only one pool domain is started on a host, it is
+      conventional to use the hostname for
+      <replaceable>pool</replaceable>. A line of the
       <filename><replaceable>pool</replaceable>.poollist</filename>
       has the form
+    </para>
 
-<programlisting><replaceable>poolName</replaceable> <replaceable>poolDir</replaceable> <replaceable>options</replaceable></programlisting>
+    <programlisting><replaceable>poolName</replaceable> <replaceable>poolDir</replaceable> <replaceable>options</replaceable></programlisting>
 
-      For the pool names it is conventional to use
+    <para>
+      The convention for pool names is
       <literal><replaceable>hostname</replaceable>_<replaceable>n</replaceable></literal>
-      (where <replaceable>n</replaceable> starts at 1).
+      where the first pool has <replaceable>n</replaceable> of 1.
     </para>
 
     <para>
@@ -451,74 +490,82 @@ create diskCacheV111.cells.WebCollectorV3 collector \
       at startup.
     </para>
 
-    <unfinished>
-      <para>
-        <filename>certificate</filename>
-        <filename>CAs</filename>
-        <filename>kpwd</filename>
-      </para>
-    </unfinished>
-
+    <!--
+	TODO:
+	<para>
+	<filename>certificate</filename>
+	<filename>CAs</filename>
+	<filename>kpwd</filename>
+	</para>
+      -->
   </section>
+
+
 
   <section id="intouch-admin">
     <title>The Admin Interface</title>
 
     <para>
-      <dcache/> has a powerful administration interface. It is accessed with
-      the SSH protocol. The server is part of the <literal>adminDoor</literal>
-      domain, which is started on the admin node. Connect to it with
-
-<screen><userprompt/><command>ssh</command> -c blowfish -p 22223 -l admin <replaceable>adminNode</replaceable></screen>
-
-      The initial password is <quote>dickerelch</quote> (German for <quote>fat
-        elk</quote>) and you will be greeted by the prompt
-
-<screen>
-    dCache Admin (VII) (user=admin)
-
-
-<dcprompt select="local"/></screen>
-
+      &dcache; has a powerful administration interface. It is accessed
+      with the &ssh; protocol. The server is part of the
+      &domain-adminDoor; domain, which is started on the admin
+      node. Connect to it with
     </para>
+
+    <screen>&prompt-user; <command>ssh</command> -c blowfish -p 22223 -l admin <replaceable>adminNode</replaceable></screen>
+
+    <para>
+      The initial password is
+      <quote><literal>dickerelch</literal></quote> (which is German
+      for <quote>fat elk</quote>) and you will be greeted by the
+      prompt
+    </para>
+
+    <screen>   dCache Admin (VII) (user=admin)
+
+
+&dc-prompt-local;</screen>
+
     
     <para>
       The password can now be changed with
+    </para>
 
-<screen><dcprompt>local</dcprompt><command>cd</command> acm
-<dcprompt select="acm"/><command>create user</command> admin
-<dcprompt select="acm"/><command>set passwd</command> -user=admin <replaceable>newPasswd</replaceable> <replaceable>newPasswd</replaceable>
-<dcprompt>acm</dcprompt><command>..</command>
-<dcprompt>local</dcprompt><command>logoff</command>
-</screen>
+    <screen>&dc-prompt-local; <command>cd</command> acm
+&dc-prompt-acm; <command>create user</command> admin
+&dc-prompt-acm; <command>set passwd</command> -user=admin <replaceable>newPasswd</replaceable> <replaceable>newPasswd</replaceable>
+&dc-prompt-acm; <command>..</command>
+&dc-prompt-local; <command>logoff</command></screen>
 
-      This already illustrates how to navigate within the administration
-      interface: Starting from the local prompt (<dcprompt select="local"/>)
-      the command <command>cd</command> takes you to the specified 
-      <glossterm linkend="gl-cell">cell</glossterm> (here
-      <literal>acm</literal>, the access control manager). There two commands
-      are executed. The escape sequence <command>..</command> takes you back
-      to the local prompt and <command>logoff</command> exits the admin
-      shell. 
+    <para>
+      This already illustrates how to navigate within the
+      administration interface: Starting from the local prompt
+      (&dc-prompt-local;) the command <command>cd</command> takes you
+      to the specified <glossterm linkend="gl-cell">cell</glossterm>
+      (here &cell-acm;, the access control manager). There
+      two commands are executed. The escape sequence
+      <command>..</command> takes you back to the local prompt and
+      <command>logoff</command> exits the admin shell.
     </para>
 
     <para>
       Note that <command>cd</command> only works from the local
       prompt. If the cell you are trying to access does not exist, the
-      <command>cd</command> command will not recognise this. Trying to execute
-      any command after the <command>cd</command> will then result in an error
-      message <quote>No Route to cell...</quote>.
+      <command>cd</command> command will not complain.  However,
+      trying to execute any command subsequently will result in an
+      error message <quote>No Route to cell...</quote>.  Type
+      <literal>..</literal> to return to the &dc-prompt-local; prompt.
     </para>
 
     <para>
-      All cells know the commands <command>info</command> for general information
-      about the cell and <command>show pinboard</command> for listing the last
-      lines of the <glossterm linkend="gl-pinboard">pinboard</glossterm> of the
-      cell. The output of these commands contains useful information for
-      solving problems. It is a good idea to get aquainted with the normal
-      output in the following cells: <literal>PoolManager</literal>,
-      <literal>PnfsManager</literal>, and the pool cells
-      (e.g. <literal><replaceable>poolHostname</replaceable>_1</literal>).
+      All cells know the commands <command>info</command> for general
+      information about the cell and <command>show pinboard</command>
+      for listing the last lines of the <glossterm
+      linkend="gl-pinboard">pinboard</glossterm> of the cell. The
+      output of these commands contains useful information for solving
+      problems. It is a good idea to get aquainted with the normal
+      output in the following cells: &cell-poolmngr;, &cell-pnfsmngr;,
+      and the pool cells (e.g., &cell-pool-eg;).
     </para>
 
     <para>
@@ -526,46 +573,53 @@ create diskCacheV111.cells.WebCollectorV3 collector \
       commands the cell knows and their parameters. However, many of the
       commands are only used for debuging and 
       development purposes. Only commands described in this documentation
-      should be used for the administration of a <dcache/> system.
+      should be used for the administration of a &dcache; system.
     </para>
 
     <para>
-      Instead of using <command>ssh</command> to access the admin interface,
-      the <dcache/> graphical user interface can be used. If it is not included
-      in the <dcache/> distribution, it can be downloaded from the <ulink
-        url="http://www.dcache.org/"><dcache/> homepage</ulink>. It is started
-      by 
+      Instead of using <command>ssh</command> to access the admin
+      interface, the &dcache; graphical user interface can be used. If
+      it is not included in the &dcache; distribution, it can be
+      downloaded from the <ulink url="http://www.dcache.org/">&dcache;
+      homepage</ulink>. It is started by
+    </para>
 
-<screen><userprompt/><command>java</command> -jar org.pcells.jar</screen>
+    <screen>&prompt-user; <command>java</command> -jar org.pcells.jar</screen>
 
+    <para>
       First, a new session has to be created with
+
       <menuchoice>
-        <guimenu>Session</guimenu>
-        <guimenuitem>New...</guimenuitem>
-      </menuchoice>. 
-      After giving the session a name of your choice, a login
-      mask appears. The session is configured with the
-      <guibutton>Setup</guibutton> button. The only thing that needs to be
-      configured is the hostname. After clicking <guibutton>Apply</guibutton>
-      and <guibutton>Quit</guibutton> you are ready to log in. Pressing the
-      right mouse button clicking <guibutton>Login</guibutton> will scan the 
-      <dcache/> instance for domains. Cells can be reached by clicking on their
-      name and the same commands can be entered as in the SSH login. 
+	<guimenu>Session</guimenu>
+	<guimenuitem>New...</guimenuitem>
+      </menuchoice>.
+
+      After giving the session a name of your choice, a login mask
+      appears. The session is configured with the
+      <guibutton>Setup</guibutton> button. The only thing that needs
+      to be configured is the hostname. After clicking
+      <guibutton>Apply</guibutton> and <guibutton>Quit</guibutton> you
+      are ready to log in. Pressing the right mouse button clicking
+      <guibutton>Login</guibutton> will scan the &dcache; instance for
+      domains. Cells can be reached by clicking on their name and the
+      same commands can be entered as in the SSH login.
     </para>
 
     <para>
-      The other tabs of the GUI are very useful for monitoring the <dcache/>
-      system.
+      The other tabs of the GUI are very useful for monitoring the
+      &dcache; system.
     </para>
 
     <para>
       The most useful command of the pool cells is <xref
         linkend="cmd-rep_ls"/>. It lists the files which are stored in the pool
-      by their <pnfs/> IDs:
+      by their &pnfs; IDs:
+    </para>
 
-<screen>000100000000000000001120 &lt;-P---------(0)[0]&gt; 485212 si={myStore:STRING}
+    <screen>000100000000000000001120 &lt;-P---------(0)[0]&gt; 485212 si={myStore:STRING}
 000100000000000000001230 &lt;C----------(0)[0]&gt; 1222287360 si={myStore:STRING}</screen>
 
+    <para>
       Each file in a pool has one of the 4 primary states:
       <quote>cached</quote> (<literal>&lt;C---</literal>),
       <quote>precious</quote> (<literal>&lt;-P--</literal>),
@@ -575,42 +629,50 @@ create diskCacheV111.cells.WebCollectorV3 collector \
 
     <para>
       Two commands in the pool manager are quite useful: <xref
-        linkend="cmd-rc_ls"/> lists the requests currently handled by the pool
-      manager. A typical line of output for a read request with an error
-      condition is (all in one line):
+      linkend="cmd-rc_ls"/> lists the requests currently handled by
+      the pool manager. A typical line of output for a read request
+      with an error condition is (all in one line):
+    </para>
     
-<screen>000100000000000000001230@0.0.0.0/0.0.0.0 m=1 r=1 [&lt;unknown&gt;]
+    <screen>000100000000000000001230@0.0.0.0/0.0.0.0 m=1 r=1 [&lt;unknown&gt;]
   [Waiting 08.28 19:14:16] 
   {149,No pool candidates available or configured for 'staging'}</screen>
 
-      As the error message at the end of the line indicates, no pool was found
-      containing the file and no pool could be used for staging the file from a
-      tertiary storage system.
+    <para>
+      As the error message at the end of the line indicates, no pool
+      was found containing the file and no pool could be used for
+      staging the file from a tertiary storage system.
     </para>
 
     <para>
-      Finally, <xref linkend="cmd-cm_ls"/> with the option <option>-r</option>
-      gives the information about the pools currently stored in the cost module
-      of the pool manager. A typical output is:
+      Finally, <xref linkend="cmd-cm_ls"/> with the option
+      <option>-r</option> gives the information about the pools
+      currently stored in the cost module of the pool manager. A
+      typical output is:
+    </para>
 
-<screen><dcprompt select="PoolManager"/><command>cm ls</command> <option>-r</option>
-<replaceable>poolName1</replaceable>={R={a=0;m=2;q=0};S={a=0;m=2;q=0};M={a=0;m=100;q=0};PS={a=0;m=20;q=0};PC={a=0;m=20;q=0};SP={t=2147483648;f=924711076;p=1222772572;r=0;lru=0;{g=20000000;b=0.5}}}
+    <!-- TODO: following is too long, needs breaking up -->
+    <screen>&dc-prompt-pm; <command>cm ls</command> <option>-r</option>
+<replaceable>poolName1</replaceable>={R={a=0;m=2;q=0};S={a=0;m=2;q=0};M={a=0;m=100;q=0};PS={a=0;m=20;q=0};PC={a=0;m=20;q=0};
+    <lineannotation>(...continues...)</lineannotation>   SP={t=2147483648;f=924711076;p=1222772572;r=0;lru=0;{g=20000000;b=0.5}}}
 <replaceable>poolName1</replaceable>={Tag={{hostname=<replaceable>hostname</replaceable>}};size=0;SC=0.16221282938326134;CC=0.0;}
-<replaceable>poolName2</replaceable>={R={a=0;m=2;q=0};S={a=0;m=2;q=0};M={a=0;m=100;q=0};PS={a=0;m=20;q=0};PC={a=0;m=20;q=0};SP={t=2147483648;f=2147483648;p=0;r=0;lru=0;{g=4294967296;b=250.0}}}
-<replaceable>poolName2</replaceable>microcebus_2={Tag={{hostname=<replaceable>hostname</replaceable>}};size=0;SC=2.7939677238464355E-4;CC=0.0;}
-</screen>
+<replaceable>poolName2</replaceable>={R={a=0;m=2;q=0};S={a=0;m=2;q=0};M={a=0;m=100;q=0};PS={a=0;m=20;q=0};PC={a=0;m=20;q=0};
+    <lineannotation>(...continues...)</lineannotation>   SP={t=2147483648;f=2147483648;p=0;r=0;lru=0;{g=4294967296;b=250.0}}}
+<replaceable>poolName2</replaceable>microcebus_2={Tag={{hostname=<replaceable>hostname</replaceable>}};size=0;SC=2.7939677238464355E-4;CC=0.0;}</screen>
 
-      While the first line for each pool gives the information stored in the
-      cache of the cost module, the second line gives the costs (SC: <glossterm
-        linkend="gl-space_cost">space cost</glossterm>, CC: <glossterm
-        linkend="gl-performance_cost">performance cost</glossterm>) calculated
-      for a (hypothetical) file of zero size. For details on how these are
-      calculated and their meaning, see <xref linkend="cf-pm-cm"/>.
+    <para>
+      While the first line for each pool gives the information stored
+      in the cache of the cost module, the second line gives the costs
+      (SC: <glossterm linkend="gl-space_cost">space cost</glossterm>,
+      CC: <glossterm linkend="gl-performance_cost">performance
+      cost</glossterm>) calculated for a (hypothetical) file of zero
+      size. For details on how these are calculated and their meaning,
+      see <xref linkend="cf-pm-cm"/>.
     </para>
 
     <para>
-      The SSH admin interface can be used non-interactively by
-      scripts. For this the <dcache/>-internal SSH server uses
+      The &ssh; admin interface can be used non-interactively by
+      scripts. For this the &dcache;-internal &ssh; server uses
       public/private key pairs.
     </para>
 
@@ -620,9 +682,11 @@ create diskCacheV111.cells.WebCollectorV3 collector \
       <filename>~/.ssh/authorized_keys</filename> which is used by
       <command>sshd</command>. The keys in
       <filename>config/authorized_keys</filename> have to be of type
-      RSA1 as <dcache/> only supports SSH protocol 1. Such a key is generated with
+      RSA1 as &dcache; only supports SSH protocol 1. Such a key is
+      generated with
+    </para>
 
-      <screen><userprompt/><command>ssh-keygen</command> -t rsa1 -C 'SSH1 key of <replaceable>user</replaceable>'
+    <screen>&prompt-user; <command>ssh-keygen</command> -t rsa1 -C 'SSH1 key of <replaceable>user</replaceable>'
 Generating public/private rsa1 key pair.
 Enter file in which to save the key (/home/<replaceable>user</replaceable>/.ssh/identity): 
 Enter passphrase (empty for no passphrase):
@@ -632,30 +696,38 @@ Your public key has been saved in /home/<replaceable>user</replaceable>/.ssh/ide
 The key fingerprint is:
 c1:95:03:6a:66:21:3c:f3:ee:1b:8d:cb:46:f4:29:6a SSH1 key of <replaceable>user</replaceable></screen>
 
+    <para>
       The passphrase is used to encrypt the private key (now stored in
       <filename>/home/<replaceable>user</replaceable>/.ssh/identity</filename>). If
       you do not want to enter the passphrase every time the private
       key is used, you can use <command>ssh-add</command> to add it to
-      a running <command>ssh-agent</command>. If no agent is running start it with
+      a running <command>ssh-agent</command>. If no agent is running
+      start it with
+    </para>
 
-<screen><userprompt/>if [ -S $SSH_AUTH_SOCK ] ; then echo "Already running" ; else eval `ssh-agent` ; fi</screen>
+    <screen>&prompt-user; if [ -S $SSH_AUTH_SOCK ] ; then echo "Already running" ; else eval `ssh-agent` ; fi</screen>
 
+    <para>
       and add the key to it with
+    </para>
       
-<screen><userprompt/><command>ssh-add</command>
+    <screen>&prompt-user; <command>ssh-add</command>
 Enter passphrase for SSH1 key of <replaceable>user</replaceable>:
 Identity added: /home/<replaceable>user</replaceable>/.ssh/identity (SSH1 key of <replaceable>user</replaceable>)</screen>
 
+    <para>
       Now, insert the public key
       <filename>~/.ssh/identity.pub</filename> as a separate line into
       <filename>config/authorized_keys</filename>. The comment field
       in this line <quote>SSH1 key of
       <replaceable>user</replaceable></quote> has to be changed to the
-     <dcache/>  user name. An example file is:
+      &dcache; user name. An example file is:
+    </para>
 
-<programlisting>1024 35 141939124...15331 admin</programlisting> 
-      
-      The key manager within <dcache/> will read this file every minute.
+    <programlisting>1024 35 141939124<lineannotation>(... many more numbers ...)</lineannotation>15331 admin</programlisting> 
+
+    <para>
+      The key manager within &dcache; will read this file every minute.
     </para>
 
     <para>
@@ -663,59 +735,70 @@ Identity added: /home/<replaceable>user</replaceable>/.ssh/identity (SSH1 key of
       is still quite secure, since the unencrypted private key is only
       held in the memory of the <command>ssh-agent</command>. It can
       be removed from it with
-
-<screen><userprompt/><command>ssh-add</command> -d
-Identity removed: /home/<replaceable>user</replaceable>/.ssh/identity (RSA1 key of <replaceable>user</replaceable>)</screen>
     </para>
 
-    <para>
-      In scripts, constructs like
+    <screen>&prompt-user; <command>ssh-add</command> -d
+Identity removed: /home/<replaceable>user</replaceable>/.ssh/identity (RSA1 key of <replaceable>user</replaceable>)</screen>
 
-<programlisting>ssh -c blowfish -p 22223 admin@<replaceable>adminNode</replaceable> &lt;&lt; EOF
+    <para>
+      In scripts, one can use a <quote>Here Document</quote> to list
+      the commands, or supply them to <command>ssh</command> as
+      standard-input (stdin).  The following demonstrates using a Here
+      Document:
+    </para>
+
+      <programlisting>#!/bin/sh
+#
+#  Script to automate dCache administrative activity
+
+outfile=/tmp/$(basename $0).$$.out
+
+ssh -c blowfish -p 22223 admin@<replaceable>adminNode</replaceable> &gt; $outfile &lt;&lt; EOF
 cd PoolManager
 cm ls -r
-..
+<lineannotation>(more commands here)</lineannotation>
 logoff
 EOF</programlisting>
 
-      or
+    <para>
+      or, the equivalient as stdin.
+    </para>
 
-<programlisting>echo -e 'cd <replaceable>pool_1</replaceable>\nrep ls\n..\nlogoff' \
+    <programlisting>#!/bin/bash
+#
+#   Script to automate dCache administrative activity.
+
+echo -e 'cd <replaceable>pool_1</replaceable>\nrep ls\n<lineannotation>(more commands here)</lineannotation>\nlogoff' \
   | ssh -c blowfish -p 22223 admin@<replaceable>adminNode</replaceable> \
   | tr -d '\r' &gt; rep_ls.out</programlisting>
 
-      are quite useful. The last example also illustrates how output
-      of the commands should be treated.
-    </para>
-    
   </section>
 
 
-  <unfinished>
-    
+  <!--
+  TODO:
     <para>
       admin interface, unwatch, watch, create pool group, save, restore - intouch is getting too big
     </para>
 
     <para>
-      <pnfs/> IDs,  check wormholes and tags, wormholes have to be rewritten after fset io - see pnfs
+      &pnfs; IDs,  check wormholes and tags, wormholes have to be rewritten after fset io - see pnfs
     </para>
 
     <para>
       Check pnfs mount permissions and restrict to localhost - see pnfs
     </para>
 
-  </unfinished>
+    -->
 
 
-  <unfinished>
-
+  <!-- TODO:
     <para>
       Trash moved to pnfs
 
       -
 
-      When a file in the <pnfs/> filesystem is deleted the server
+      When a file in the &pnfs; filesystem is deleted the server
       stores information about is in the subdirectories of <filename
       class="directory">/opt/pnfsdb/pnfs/trash/</filename>. The
       <literal>cleaner</literal> cell in the
@@ -723,20 +806,19 @@ EOF</programlisting>
       actual files from the pools asyncronously. It uses the files in
       the directory <filename
       class="directory">/opt/pnfsdb/pnfs/trash/2/</filename>. It
-      contains a file with the <pnfs/> ID of the deleted file as
+      contains a file with the &pnfs; ID of the deleted file as
       name. If a pool containing that file is down at the time the
       cleaner tries to remove it, it will retry for a while. After
       that the file
       <filename>/opt/pnfsdb/pnfs/trash/2/current/failed.<replaceable>poolName</replaceable></filename>
-      will contain the <pnfs/> IDs which have not been removed from
+      will contain the &pnfs; IDs which have not been removed from
       that pool. The cleaner will still retry the removal with a lower
       frequency.
     </para>
+    -->
 
-  </unfinished>
 
-  <unfinished>
-
+  <!-- TODO:
     <para>
       garbage - not useful
 
@@ -768,7 +850,6 @@ EOF</programlisting>
       controll information. This might take a while if there are a lot
       of them.
     </para>
-
-  </unfinished>
+    -->
   
 </chapter>

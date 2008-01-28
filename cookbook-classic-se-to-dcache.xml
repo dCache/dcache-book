@@ -1,68 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+%sharedents;
+]>
 
 <chapter id="se-to-dcache">
+  
+  <title>Migration of classic SE ( nfs, disk ) to dCache</title>
 
-	<title>Migration of classic SE ( nfs, disk ) to dCache</title>
+  <para>
+    This chapter contains a guide to migrate a classic SE to dCache.
+  </para>
 
-	<para>
-		This chapter contains a guide to migrate a classic SE to dCache.
-	</para>
+  <para>
+    The convertion of a classic SE to dCache is not complicated, but
+    has to be done very carefully to prevent data losses.
+  </para>
 
-	<para>
-		The convertion of a classic SE to dCache is not complicated, but has to be done very carefully to prevent data losses.
-	</para>
+  <para>
+    We assume, that dCache is installed and configured.( <xref
+    linkend="in-install"/>). To be on the safe side, we recommend to
+    install a new pool on a different host, since there is no easy way
+    to switch back to classic SE.
+  </para>
 
-	<para>
-		WWe assume, that dCache is installed and configured.( <xref
-      linkend="in-install"/>). To be on the safe side, we recommend to install
-      a new pool on a different host, since there is no easy way to switch back
-	  to classic SE.
-	</para>
-
-	<itemizedlist>
-		<listitem>
-			<para>create a new pool.</para>
-		</listitem>
-		<listitem>
-			<para>
-				for each file in the classic SE an entry in pnfs has to be 
-				created. then the file has to be moved to data directory in 
-				the pool control directory and the owner, group and size must 
-				be set in pnfs. To avoid mistakes we recomend to use a script 
-				developed and tested by dCache developers. Run the script for 
-				each file which goes into dCache:
-			</para>
+  <itemizedlist>
+    <listitem>
+      <para>
+	create a new pool.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+	for each file in the classic SE an entry in &pnfs; has to be
+	created. then the file has to be moved to data directory in
+	the pool control directory and the owner, group and size must
+	be set in &pnfs;. To avoid mistakes we recomend to use a
+	script developed and tested by the &dcache; developers. Run
+	the script for each file which goes into &dcache;:
+      </para>
 
 
-			<screen>
-<rootprompt />find . -type f -exec file2dcache.sh {} <replaceable>/pnfs/desy.de/data/fromSE</replaceable> <replaceable>/pool/pool1</replaceable> \; </screen>
+      <screen>&prompt-root;find . -type f -exec file2dcache.sh {} <replaceable>/pnfs/desy.de/data/fromSE</replaceable> <replaceable>/pool/pool1</replaceable> \; </screen>
+    </listitem>
 
-		</listitem>
+    <listitem>
+      <para>
+	start the pool. Since the pool has to recreate the inventory,
+	the start up time will be longer than usually..
+      </para>
+    </listitem>
 
-		<listitem>
-			<para>
-				start the pool. Since the pool has to recreate the inventory,
-				the start up time will be longer than usually..
-			</para>
-		</listitem>
-		<listitem>
-			<para>
-				connect to the dCache via admin interface and register the newly created files:
+    <listitem>
+      <para>
+	connect to the dCache via admin interface and register the
+	newly created files:
+      </para>
 
-<programlisting>
-<command>cd pool1</command>
-<command>pnfs register</command>
-<command>..</command>
-<command>logoff</command>
-</programlisting>
-		</para>
-		</listitem>
-	</itemizedlist>
-	<para>The newly migrated files shall be available already.</para>
+      <programlisting><command>cd pool1</command>
+      <command>pnfs register</command>
+      <command>..</command>
+      <command>logoff</command>
+      </programlisting>
 
-<programlisting>
-#!/bin/sh
+    </listitem>
+  </itemizedlist>
+
+  <para>
+    The newly migrated files shall be available already.
+  </para>
+
+  <programlisting>#!/bin/sh
 
 if [ $# -ne 3 ]
 then
@@ -131,8 +140,7 @@ echo "precious" >  ${POOL_BASE}/control/${PNFS_ID}
 echo "Copy ${SRC} to  ${POOL_BASE}/data/${PNFS_ID}"
 cp  ${SRC}  ${POOL_BASE}/data/${PNFS_ID}
 
-exit 0
-</programlisting>
+exit 0</programlisting>
 
 
 

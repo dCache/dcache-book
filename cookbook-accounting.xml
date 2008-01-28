@@ -1,46 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
-    
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+%sharedents;
+]>
+
 <chapter id="cb-accounting">
+
   <title>Accounting</title>
   
   <!--
-
-  <para>
     TODO: There are a few loose ends in this chapter. A meta-intro might
     also be in order.
-  </para>
-
   -->
 
   <para>
     The raw information about all dCache activities can be found in
-
     <filename>billing/<replaceable>YYYY</replaceable>/<replaceable>MM</replaceable>/billing-<replaceable>YYYY.MM.DD</replaceable></filename>.<footnote>
-      <para>
-        Filenames will always be relative to the dCache installation
-        directory, which defaults to
-        <filename>/opt/d-cache/</filename>. 
-      </para>
+    <para>
+      Filenames will always be relative to the dCache installation
+      directory, which defaults to <filename>/opt/d-cache/</filename>.
+    </para>
     </footnote>
 
     A typical line looks like
+  </para>
 
-    <informalexample>
+  <informalexample>
 	
-<screen>05.31 22:35:16 [pool:<replaceable>pool-name</replaceable>:transfer] [000100000000000000001320,24675] myStore:STRING@osm 24675 474 true {GFtp-1.0 <replaceable>client-host-fqn</replaceable> 37592} {0:""}</screen>
-
-    </informalexample>
+    <screen>05.31 22:35:16 [pool:<replaceable>pool-name</replaceable>:transfer] [000100000000000000001320,24675] myStore:STRING@osm 24675 474 true {GFtp-1.0 <replaceable>client-host-fqn</replaceable> 37592} {0:""}</screen>
+  </informalexample>
     
-    The first barcket contains the pool name, the second the 
-    <glossterm linkend="gl-pnfsid">PNFS Id</glossterm> and the size
-    of the file which is transferred. Then follows the <glossterm 
-      linkend="gl-storage_class">storage class</glossterm>, the actual 
-    amount of bytes transferred, and the number of milliseconds the 
-    transfer took. The next entry is <literal>true</literal> if the 
-    transfer was a wrote data to the pool. The first braces contain the
-    protocol, client FQN, and the client host data transfer listen port. 
-    The final bracket contains the return status and a possible error message.
+  <para>
+    The first barcket contains the pool name, the second the
+    <glossterm linkend="gl-pnfsid">PNFS Id</glossterm> and the size of
+    the file which is transferred. Then follows the <glossterm
+    linkend="gl-storage_class">storage class</glossterm>, the actual
+    amount of bytes transferred, and the number of milliseconds the
+    transfer took. The next entry is <literal>true</literal> if the
+    transfer was a wrote data to the pool. The first braces contain
+    the protocol, client FQN, and the client host data transfer listen
+    port.  The final bracket contains the return status and a possible
+    error message.
   </para>
 
   <para>
@@ -52,7 +53,9 @@
   
   <para>
     The accounting information can also be redirected into a
-    database. <!-- For this the start-up configuration of the standard
+    database.
+
+<!-- For this the start-up configuration of the standard
     admin node has to be modified. (See <xref
     linkend="cf-cellpackage"/> for background information.) The
     billing information is written by the <quote>billing</quote>
@@ -70,7 +73,8 @@
 <screen><rootprompt/><replaceable>/opt/d-cache/</replaceable>jobs/httpd stop
 <rootprompt/><replaceable>/opt/d-cache/</replaceable>jobs/httpd -logfile=<replaceable>/opt/d-cache/</replaceable>log/httpd.log start</screen>-->
 
-    When interested in this feature, please contact <email>support@dcache.org</email>.
+    When interested in this feature, please contact
+    <email>support@dcache.org</email>.
   </para>
 
   <!--

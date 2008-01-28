@@ -1,51 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                 "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+%sharedents;
+]>
 
-<!-- <namespacewrapper xmlns:xi="http://www.w3.org/2001/XInclude"> -->
-<book id="dCacheBook">
-  <!-- <?dbhtml dir="dCacheBook" ?> -->
-  
-  
-  <title>dCache, the Book</title>
+<book id="dCacheBook"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+
+  <title>The dCache Book</title>
   <titleabbrev>dCache Book</titleabbrev>
   
   <bookinfo>
     <abstract>
       <para>
-	The <dcache/> Book is the guide for administrators of dCache
-	systems. The first part describes the installation of a
-	simple single-host dCache instance. The second part
-	describes the components of dCache and in what ways they can
-	be configured. This is the place for finding information
-	about the role and functionality of components in dCache as
-	needed by an administrator. The third part contains
-	solutions for several problems and tasks which might occur
-	during operating of a dCache system. Finally, the last two
-	parts contain a glossary and a parameter and command
-	reference.
+	The &dcache; Book is the guide for administrators of &dcache;
+	systems. The first part describes the installation of a simple
+	single-host &dcache; instance. The second part describes the
+	components of &dcache; and in what ways they can be
+	configured. This is the place for finding information about
+	the role and functionality of components in &dcache; as needed
+	by an administrator. The third part contains solutions for
+	several problems and tasks which might occur during operating
+	of a &dcache; system. Finally, the last two parts contain a
+	glossary and a parameter and command reference.
       </para>
-      
-      
-      
     </abstract>
+
     <date>2005-09-30</date>
 
-<!--    
-    <corpauthor>DESY Hamburg, Germany</corpauthor> -->
-    
     <author>
-<!--      <honorific>Dr</honorific> -->
       <firstname>Mathias</firstname>
       <surname>de Riese</surname>
     </author>
     
     <author>
-<!--      <honorific>Dr</honorific> -->
       <firstname>Patrick</firstname>
       <surname>Fuhrmann</surname>
     </author>
+
     <author>
-<!--      <honorific>Dr</honorific> -->
       <firstname>Tigran</firstname>
       <surname>Mkrtchyan</surname>
     </author>
@@ -89,25 +83,21 @@
       <firstname>Ted</firstname>
       <surname>Hesselroth</surname>
     </author>
-        
+
+    <mediaobject>
+      <imageobject role="fo">
+	<imagedata fileref="images/dCache-book-logo.svg"
+		   format="SVG" align="center" contentwidth="10cm"/> 
+      </imageobject>
+    </mediaobject>
+
   </bookinfo>
   
-  
-  <toc></toc>
-  <xi:include href="intro.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
-  
-  <xi:include href="install.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
-  
-  <xi:include href="intouch.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
-  
-  <xi:include href="config.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
-  
-  <xi:include href="cookbook.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
-  
-  <!-- <xi:include href="glossary.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/> now in Reference -->
-  
-  <xi:include href="reference.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
-  
+  <toc/>
+
+  <xi:include href="start.xml"/>
+  <xi:include href="config.xml"/>
+  <xi:include href="cookbook.xml"/>
+  <xi:include href="reference.xml"/>  
 </book>
-<!-- </namespacewrapper> -->
   

@@ -1,78 +1,84 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+%sharedents;
+]>
 
 <chapter id="rf-glossary">
-  <title><dcache/> Glossary</title>
 
+  <title>&dcache; Glossary</title>
+
+  <para>
+    The following terms are defined.
+  </para>
 
   <glosslist>
-      <glossentry id="gl-tss">
-	<glossterm>tertiary storage system</glossterm>
-	<glossdef>
-	  <para>
-	    A mass storage system which stores data and is connected
-	    to the dCache system. Each dCache pool will write files to
-	    it as soon as they have been completely written to the
-	    pool (if the pool is not configured as a <glossterm
-	    linkend="gl-lfs">LFS</glossterm>). The tertiary storage
-	    system is not part of dCache. However, it is possible to
-	    connect any mass storage system as tertiary storage system
-	    to <dcache/> via a simple interface.
-	  </para>
-	</glossdef>
-      </glossentry>
+    <glossentry id="gl-tss">
+      <glossterm>tertiary storage system</glossterm>
+      <glossdef>
+	<para>
+	  A mass storage system which stores data and is connected to
+	  the &dcache; system. Each &dcache; pool will write files to
+	  it as soon as they have been completely written to the pool
+	  (if the pool is not configured as a <glossterm
+	  linkend="gl-lfs">LFS</glossterm>). The tertiary storage
+	  system is not part of &dcache;. However, it is possible to
+	  connect any mass storage system as tertiary storage system
+	  to &dcache; via a simple interface.
+	</para>
+      </glossdef>
+    </glossentry>
 
+    <glossentry id="gl-tape_backend">
+      <glossterm>tape backend</glossterm>
+      <glossdef>
+	<para>
+	  A <glossterm linkend="gl-tss">tertiary storage
+	  system</glossterm> which stores data on magnetic tapes.
+	</para>
+      </glossdef>
+    </glossentry>
 
-      <glossentry id="gl-tape_backend">
-	<glossterm>tape backend</glossterm>
-	<glossdef>
-	  <para>
-	    A <glossterm linkend="gl-tss">tertiary storage
-	    system</glossterm> which stores data on magnetic tapes.
-	  </para>
-	</glossdef>
-      </glossentry>
-
-      <glossentry id="gl-hsm">
-	<glossterm>Hierachical Storage Manager (<abbrev>HSM</abbrev>)</glossterm>
-	<abbrev>HSM</abbrev>
-	<glosssee otherterm="gl-tss">tertiary storage system</glosssee>
-      </glossentry>
+    <glossentry id="gl-hsm">
+      <glossterm>Hierachical Storage Manager (&hsm;)</glossterm>
+      &hsm;
+      <glosssee otherterm="gl-tss">tertiary storage system</glosssee>
+    </glossentry>
       
-      <glossentry id="gl-hsm_type">
-	<glossterm>HSM type</glossterm>
-	<glossdef>
-	  <para>
-	    The type of HSM which is connected to <dcache/> as a
-	    <glossterm linkend="gl-tss">tertiary storage
-	    system</glossterm>. The choice of the HSM type influences
-	    the communication between <dcache/> and the HSM. Currently
-	    there are <literal>osm</literal> and
-	    <literal>enstore</literal>. <literal>osm</literal> is used
-	    for most HSMs (TSM, HPSS, ...).
-	  </para>
-	</glossdef>
-      </glossentry>
+    <glossentry id="gl-hsm_type">
+      <glossterm>HSM type</glossterm>
+      <glossdef>
+	<para>
+	  The type of &hsm; which is connected to &dcache; as a
+	  <glossterm linkend="gl-tss">tertiary storage
+	  system</glossterm>. The choice of the HSM type influences
+	  the communication between &dcache; and the &hsm;. Currently
+	  there are <literal>osm</literal> and
+	  <literal>enstore</literal>. <literal>osm</literal> is used
+	  for most HSMs (TSM, HPSS, ...).
+	</para>
+      </glossdef>
+    </glossentry>
       
-      <glossentry id="gl-lfs">
-	<glossterm>Large File Store (<abbrev>LFS</abbrev>)</glossterm>
-	<abbrev>LFS</abbrev>
-	<glossdef>
-	  <para>
-	    If a <dcache/> instance does not have a <glossterm
-	    linkend="gl-tss">tetiary storage system</glossterm>, it is
-	    not a cache but a large file store. There are two lfs
-	    modes: <glossterm>precious</glossterm> and
-	    <glossterm>transient</glossterm> mode.
-	  </para>
-	</glossdef>
-      </glossentry>
+    <glossentry id="gl-lfs">
+      <glossterm>Large File Store (<abbrev>LFS</abbrev>)</glossterm>
+      <glossdef>
+	<para>
+	  If a &dcache; instance does not have a <glossterm
+	  linkend="gl-tss">tetiary storage system</glossterm>, it is
+	  not a cache but a large file store. There are two lfs modes:
+	  <glossterm>precious</glossterm> and
+	  <glossterm>transient</glossterm> mode.
+	</para>
+      </glossdef>
+    </glossentry>
       
       <glossentry id="gl-store">
 	<glossterm>to store</glossterm>
 	<glossdef>
 	  <para>
-	    Copying a file from a dCache pool to the <glossterm
+	    Copying a file from a &dcache; pool to the <glossterm
 	    linkend="gl-tss">tertiary storage system</glossterm>.
 	  </para>
 	</glossdef>
@@ -84,7 +90,7 @@
 	  <para>
 	    Copying a file from the <glossterm
 	    linkend="gl-tss">tertiary strorage system</glossterm> to
-	    one of the dCache pools.
+	    one of the &dcache; pools.
 	  </para>
 	</glossdef>
       </glossentry>
@@ -98,11 +104,11 @@
 	<glossterm>transfer</glossterm>
 	<glossdef>
 	  <para>
-	    Any kind of transfer performed by a dCache pool. There are
-	    <glossterm linkend="gl-store">store</glossterm>,
-	    <glossterm linkend="gl-restore">restore</glossterm>, pool to pool
-          (client and server), read,
-	    and write transfers. The latter two are client transfers.
+	    Any kind of transfer performed by a &dcache; pool. There
+	    are <glossterm linkend="gl-store">store</glossterm>,
+	    <glossterm linkend="gl-restore">restore</glossterm>, pool
+	    to pool (client and server), read, and write
+	    transfers. The latter two are client transfers.
 	  </para>
 	  <glossseealso otherterm="gl-mover">mover</glossseealso>
 	</glossdef>
@@ -123,13 +129,13 @@
       <glossterm><filename>dCacheSetup</filename> File</glossterm>
       <glossdef>
         <para>
-          The primary configuration file of a <dcache/> host is
+          The primary configuration file of a &dcache; hostis
           <filename>config/dCacheSetup</filename>. Each domain uses the file
           <filename>config/<replaceable>domainName</replaceable>Setup</filename>
           which is
           in fact a link to <filename>config/dCacheSetup</filename>. The
           <filename>config/dCacheSetup</filename> file might even be the 
-          same across the hosts of a <dcache/> instance.
+          same across the hosts of a &dcache; instance.
         </para>
       </glossdef>
     </glossentry>
@@ -224,7 +230,7 @@
       </glossentry>
 
       <glossentry id="gl-pnfsid">
-	<glossterm><pnfs/> Id</glossterm>
+	<glossterm>&pnfs; Id</glossterm>
 	<glossdef>
 	  <para>
 	  </para>
@@ -278,13 +284,13 @@
       <glossdef>
 	<para>
 	  One and the same file may be found on several pools of a
-	  <dcache/> instance. While <quote>file</quote> usually
+	  &dcache; instance. While <quote>file</quote> usually
 	  denotes the abstract concept representing the data which
 	  makes up the file, we use the term <quote>replica</quote> to
-	  denote one specific copy on a <dcache/> pool. Within one
-	  <dcache/> instance a file is uniquely described by the
-	  <glossterm linkend="gl-pnfsid"><pnfs/> ID</glossterm>. In
-	  contrast, a replica is uniquely specified by the <pnfs/> ID
+	  denote one specific copy on a &dcache; pool. Within one
+	  &dcache; instance a file is uniquely described by the
+	  <glossterm linkend="gl-pnfsid">&pnfs; ID</glossterm>. In
+	  contrast, a replica is uniquely specified by the &pnfs; ID
 	  <emphasis>and</emphasis> the pool name it is stored on.
 	</para>
       </glossdef>
@@ -315,7 +321,7 @@
           certain subset of pools and makes sure this number is always within
           a specified range. This way, the system makes sure that enough
           versions of each file are present and accessible at all times. This
-          is especially useful to ensure resilience of the <dcache/> system,
+          is especially useful to ensure resilience of the &dcache; system,
           even if the hardware is not reliable. The replica manager cannot be
           used when the system is connected to a <glossterm
             linkend="gl-tss">tertiary storage system</glossterm>. The
@@ -330,27 +336,27 @@
       <glossdef>
         <para>
           An SRM provides a standard webservice interface for managing a
-          storage resouce (e.g. a <dcache/> instance). It is possible to
+          storage resouce (e.g. a &dcache; instance). It is possible to
           reserve space, retrieve or store files, and replicate files to
           another SRM. The actual transfer of data is not done via the SRM
           itself but via any protocol supported by both parties of the
           transfer. Authentication and authorisation is done with the grid
-          security infrastructure. <dcache/> comes with an implementation of an
-          SRM which can turn any <dcache/> instance into a grid storage element.
+          security infrastructure. &dcache; comes with an implementation of an
+          SRM which can turn any &dcache; instance into a grid storage element.
         </para>
       </glossdef>
     </glossentry>
 
     <glossentry id="gl-pnfscompanion">
-      <glossterm><pnfs/> Companion</glossterm>
+      <glossterm>&pnfs; Companion</glossterm>
       <glossdef>
         <para>
-          The <pnfs/> companion is a database which stores the <dcache/>
+          The &pnfs; companion is a database which stores the &dcache;
           specific information (cache info) which is normally stored within the
-          <pnfs/> namespace. Because this information is accessed very often by
+          &pnfs; namespace. Because this information is accessed very often by
           the <glossterm linkend="gl-poolmanager">pool manager</glossterm>,
           using the companion greatly improves the performance of 
-          the pool manager and the <pnfs/> server.
+          the pool manager and the &pnfs; server.
         </para>
       </glossdef>
     </glossentry>
@@ -359,10 +365,10 @@
       <glossterm>Billing/Accounting</glossterm>
       <glossdef>
         <para>
-          Accounting information is either stored in a text file or in a
-          PostgreSQL database by the billing cell usually started in the
-          <domainname>httpd</domainname> domain. This is described in <xref
-            linkend="cb-accounting"/>.
+          Accounting information is either stored in a text file or in
+          a PostgreSQL database by the &cell-billing; cell usually
+          started in the &domain-http; domain. This is described in
+          <xref linkend="cb-accounting"/>.
         </para>
       </glossdef>
     </glossentry>
@@ -371,7 +377,7 @@
       <glossterm>Pool Manager</glossterm>
       <glossdef>
         <para>
-          The pool manager is the central component of a <dcache/> system. It
+          The pool manager is the central component of a &dcache; system. It
           decides which pool is used for any kind of request...
         </para>
       </glossdef>
@@ -405,7 +411,7 @@
       <glossdef>
         <para>
           A central service which can <quote>pin</quote> files to a pool for a
-          certain time. It is used by the <srm/> to satisfy prestage requests.
+          certain time. It is used by the &srm; to satisfy prestage requests.
         </para>
       </glossdef>
     </glossentry>
@@ -415,7 +421,8 @@
       <glossdef>
         <para>
           A central service which can reserve space on pools for a
-          certain time. It is used by the <srm/> to satisfy space reservation requests.
+          certain time. It is used by the &srm; to satisfy space
+          reservation requests.
         </para>
       </glossdef>
     </glossentry>
@@ -424,65 +431,73 @@
       <glossterm>Pool</glossterm>
       <glossdef>
         <para>
-          A pool in a <dcache/> instance is responsible for storing data on
-disk. It is a <glossterm linkend="gl-cell">cell</glossterm> which manages the
-space available in a subdirectory (specified in the <glossterm
-linkend="gl-poollist-file"><filename>poollist</filename> File</glossterm>) which is
-localizes on the host on which the pool cell is running.
-        </para>
+	  A pool in a &dcache; instance is responsible for storing
+	  data on disk. It is a <glossterm
+	  linkend="gl-cell">cell</glossterm> which manages the space
+	  available in a subdirectory (specified in the <glossterm
+	  linkend="gl-poollist-file"><filename>poollist</filename>
+	  File</glossterm>) which is localizes on the host on which
+	  the pool cell is running.
+	</para>
       </glossdef>
     </glossentry>
 
-	<glossentry id="gl-cost">
-	  <glossterm>cost</glossterm>
-	  <glossdef>
-	    <para>
-	      The pool manager determines the pool used for storing a
-	      file by calculating a cost value for each available
-	      pool. The pool with the lowest cost is used. The costs
-	      are calculated by the cost module as described in <xref
-	      linkend="cf-pm-cm"/>. The total cost is a linear
-	      combination of the <glossterm
-	      linkend="gl-performance_cost">performance</glossterm>
-	      and <glossterm linkend="gl-space_cost">space
-	      cost</glossterm>.
+    
+    <glossentry id="gl-cost">
+      <glossterm>cost</glossterm>
+      <glossdef>
+	<para>
+	  The pool manager determines the pool used for storing a file
+	  by calculating a cost value for each available pool. The
+	  pool with the lowest cost is used. The costs are calculated
+	  by the cost module as described in <!-- xref
+	  linkend="cf-pm-cm"/ -->. The total cost is a linear combination
+	  of the <!-- <glossterm
+	  linkend="gl-performance_cost">performance</glossterm> and
+	  <glossterm linkend="gl-space_cost">space cost</glossterm>.--> I.e.,
+	</para>
 
-	      I.e.
+	<informalequation>
+	  <alt>
+	    <varname>cost</varname> = <varname>ccf</varname> * <varname>performance_cost</varname> + <varname>scf</varname> * <varname>space_cost</varname>
+	  </alt>
+	  
+	  <mediaobject>
+	  </mediaobject>
+	</informalequation>
 
-<screen><varname>cost</varname> = <varname>ccf</varname> * <varname>performance_cost</varname> + <varname>scf</varname> * <varname>space_cost</varname>,</screen>
+	<para>
+	  where <varname>ccf</varname> and <varname>scf</varname> are
+	  configurable with the command <xref
+	  linkend="cmd-set_pool_decision"/>.
+	</para>
+      </glossdef>
+    </glossentry>
 
-	      where <varname>ccf</varname> and <varname>scf</varname>
-	      are configurable with the command <cellcommandref
-	      linkend="cmd-set_pool_decision"/>.
-	    </para>
-	  </glossdef>
-	</glossentry>
+    <glossentry id="gl-performance_cost">
+      <glossterm>performance cost</glossterm>
+      <glossdef>
+	<para>
+	  
+	</para>
 
-	<glossentry id="gl-performance_cost">
-	  <glossterm>performance
-	  cost</glossterm>
-	  <glossdef>
-	    <para>
-	      
-	    </para>
+	<glossseealso>gl-cost</glossseealso>
 
-	    <glossseealso>gl-cost</glossseealso>
+      </glossdef>
+    </glossentry>
 
-	  </glossdef>
-	</glossentry>
+    <glossentry id="gl-space_cost">
+      <glossterm>space cost</glossterm>
+      <glossdef>
 
-	<glossentry id="gl-space_cost">
-	  <glossterm>space
-	  cost</glossterm>
-	  <glossdef>
+	<para>
+	  
+	</para>
 
-	    <para>
-	      
-	    </para>
+	<glossseealso>gl-cost</glossseealso>
+	    
+      </glossdef>
+    </glossentry>
 
-	    <glossseealso>gl-cost</glossseealso>
-
-	  </glossdef>
-	</glossentry>
   </glosslist>
 </chapter>

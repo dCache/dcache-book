@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+%sharedents;
+]>
   
 <section id="rf-cc-pnfsm">
-  <title>PnfsManager Commands</title>
+  <title>&cell-pnfsmngr; Commands</title>
   
   <refentry id="cmd-pnfsidof">        
     <refmeta><refentrytitle><command>pnfsidof</command></refentrytitle></refmeta>
     <refnamediv><refname><command>pnfsidof</command></refname>
-      <refpurpose>Print the PNFS id of a file given by its global path.</refpurpose>
+    <refpurpose>Print the &pnfs; id of a file given by its global
+    path.</refpurpose>
     </refnamediv>
     
     <refsynopsisdiv>
@@ -24,7 +29,7 @@
       <title>Description</title>
       
       <para>
-        Print the PNFS id of a file given by its global path. The
+        Print the &pnfs; id of a file given by its global path. The
         global path always starts with the
         <quote>VirtualGlobalPath</quote> as given by the
         <quote><command>info</command></quote>-command.
@@ -56,7 +61,8 @@
           <term>pnfsId</term>
           <listitem>
             <para>
-              The PNFS id of the file of which a flag will be removed.
+              The &pnfs; id of the file of which a flag will be
+              removed.
             </para>
           </listitem>
         </varlistentry>
@@ -100,7 +106,8 @@
           <term>pnfsId</term>
           <listitem>
             <para>
-              The PNFS id of the file of which a flag will be listed.
+              The &pnfs; id of the file of which a flag will be
+              listed.
             </para>
           </listitem>
         </varlistentry>
@@ -138,7 +145,7 @@
           <term>pnfsId</term>
           <listitem>
             <para>
-              The PNFS id of the file of which flags will be set.
+              The &pnfs; id of the file of which flags will be set.
             </para>
           </listitem>
         </varlistentry>
@@ -218,7 +225,7 @@
         <title>Arguments</title>
         <varlistentry>
           <term>pnfsId</term>
-          <listitem><para>The PNFS id of the file.</para></listitem>
+          <listitem><para>The &pnfs; id of the file.</para></listitem>
         </varlistentry>
         <varlistentry>
           <term>globalPath</term>
@@ -304,7 +311,7 @@
         <title>Arguments</title>
         <varlistentry>
           <term>pnfsId</term>
-          <listitem><para>The PNFS Id of the file.</para></listitem>
+          <listitem><para>The &pnfs; Id of the file.</para></listitem>
         </varlistentry>
         <varlistentry>
           <term>-global</term>
@@ -349,7 +356,8 @@
 	  <title>Arguments</title>
 	  <varlistentry>
 	    <term>pnfsId</term>
-	    <listitem><para>The PNFS id of the file.</para></listitem>
+	    <listitem><para>The &pnfs; id of the
+	    file.</para></listitem>
 	  </varlistentry>
 	  <varlistentry>
 	    <term>globalPath</term>
@@ -405,7 +413,7 @@
         <title>Arguments</title>
         <varlistentry>
           <term>pnfsId</term>
-          <listitem><para>The PNFS id of the file.</para></listitem>
+          <listitem><para>The &pnfs; id of the file.</para></listitem>
         </varlistentry>
         <varlistentry>
           <term>globalPath</term>
@@ -456,7 +464,7 @@
         <title>Arguments</title>
         <varlistentry>
           <term>pnfsId</term>
-          <listitem><para>The PNFS id of the file.</para></listitem>
+          <listitem><para>The &pnfs; id of the file.</para></listitem>
         </varlistentry>
         <varlistentry>
           <term>globalPath</term>

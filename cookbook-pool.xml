@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+%sharedents;
+]>
 
 <chapter id="cb-pool">
-  <title>Pool Operations</title>
-  
-  
-  <unfinished>
 
+  <title>Pool Operations</title>
+
+  <!-- TODO:  The following should be completed
   <section id="cb-pool-remove">
     <title>Removing a Pool</title>
     
@@ -27,173 +30,294 @@
     </section>
     
   </section>
-
-  </unfinished>
-
+  -->
 
   <section id="cb-pool-checksumming">
-  	<title>Enabling checksums</title>
-	<section id="cb-pool-checksumming-enable">
-		<title>How to enable checksums</title>
-	<para>
-	The follwing section describes how to enable checksum calculation on write transfers with maximum security. Two checksums will be computed on different points for each transfer: on the fly during file arrival and once the file was completely written to disk . Both checksums are compared with each other and (if available) with another checksum sent by the client. If, and only if, all of them match, the transfer is considered to be successful and the checksum is stored in PNFS.</para>
-	<para>
-      		To enable checksumming (independent from access protocol type), make sure the following option appears in the <filename>pool.batch</filename>-file:
+    <title>Enabling checksums</title>
 
-<programlisting>
-define context startPools endDefine
+    <section id="cb-pool-checksumming-enable">
+      <title>How to enable checksums</title>
+
+      <para>
+	The following section describes how to enable checksum
+	calculation on write transfers with maximum security. Two
+	checksums will be computed on different points for each
+	transfer: on the fly during file arrival and once the file was
+	completely written to disk . Both checksums are compared with
+	each other and (if available) with another checksum sent by
+	the client. If, and only if, all of them match, the transfer
+	is considered to be successful and the checksum is stored in
+	&pnfs;.
+      </para>
+
+      <para>
+	To enable checksumming (independent from access protocol
+	type), make sure the following option appears in the
+	<filename>pool.batch</filename>-file:
+      </para>
+
+      <programlisting>define context startPools endDefine
   create diskCacheV111.pools.MultiProtocolPool2 ${0} \
   ..
   <command>-calculate-transfer-crc \</command>
   ..
 "</programlisting>
 
-	Additionally, the checksum policy must be customized accordingly. This is done by modifying the pool-setup-file (found at <filename><replaceable>poolPath</replaceable>/pool/setup</filename>) such that it contains the following line:
+      <para>
+	Additionally, the checksum policy must be customized
+	accordingly. This is done by modifying the pool-setup-file
+	(found at
+	<filename><replaceable>poolPath</replaceable>/pool/setup</filename>)
+	such that it contains the following line:
+      </para>
 
-<programlisting>
-  csm set policy -onwrite=on -ontransfer=on -enforcecrc=on
-</programlisting>
+      <programlisting>csm set policy -onwrite=on -ontransfer=on -enforcecrc=on</programlisting>
 
-Now a restart of the pool should activate all changes. Please repeat the upper procedure on all write-pools you want to have checksum-enabled.
-    	</para>
-<warning>
-<para>
-Please note that the following policy options should NOT be touched:
+      <para>
+	Now a restart of the pool should activate all changes. Please
+	repeat the upper procedure on all write-pools you want to have
+	checksum-enabled.
+      </para>
 
-<itemizedlist>
-      <listitem>
+      <warning>
 	<para>
-		<emphasis>getcrcfromhsm</emphasis> - this option is tailored to DESY's HSM and won't work anywhere else
+	  Please note that the following policy options should
+	  <emphasis>not</emphasis> be touched:
 	</para>
-      </listitem>
-      <listitem>
-	<para>
-		<emphasis>onread</emphasis> - reserved for future use, no checksum handling on read transfers for now
-	</para>
-      </listitem>
-      <listitem>
-	<para>
-		<emphasis>frequently</emphasis> - reserved for future use (recalculating checksums for files residing in the pool on a regular basis)
-	</para>
-      </listitem>
-</itemizedlist>
-</para>
-</warning>
+
+	<variablelist>
+	  <varlistentry>
+	    <term>getcrcfromhsm</term>
+
+	    <listitem>
+	      <para>
+		this option is tailored to DESY's HSM and won't work
+		anywhere else
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  
+	  <varlistentry>
+	    <term>onread</term>
+	    
+	    <listitem>
+	      <para>
+		reserved for future use, no checksum handling on read
+		transfers for now.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>frequently</term>
+	    
+	    <listitem>
+	      <para>
+		reserved for future use (recalculating checksums for
+		files residing in the pool on a regular basis).
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </warning>
+    </section>
+
+
+    <section id="cb-pool-checksumming-default">
+      <title>The default pool behavior</title>
+
+      <para>	
+	When setting up a pool from scratch, the default policy is to
+	calculate only the checksum on the file written to disk, but
+	not on the fly upon arrival. In case there is a client
+	checksum available (always true for &dcap;), they get compared
+	and must match. Otherwise, the checksum computed on the
+	written disk file will be stored in &pnfs; instead.
+      </para>
+
+      <para>
+	To reset the default behavior, set the following line in the
+	pool-setup-file and restart the pool:
+      </para>
+
+      <programlisting>csm set policy -onwrite=on -enforcecrc=on</programlisting>
+    </section>
   </section>
 
-	<section id="cb-pool-checksumming-default">
-		<title>The default pool behavior</title>
-<para>	
-		When setting up a pool from scratch, the default policy is to calculate only the checksum on the file written to disk, but not on the fly upon arrival. In case there is a client checksum available (always true for DCap), they get compared and must match. Otherwise, the checksum computed on the written disk file will be stored in PNFS instead.
-</para>
-<para>
-		To reset the default behavior, set the following line in the pool-setup-file and restart the pool:
-<programlisting>
-  csm set policy -onwrite=on -enforcecrc=on
-</programlisting>
-</para>		
-</section>
-</section>
 
-<section id="cb-pool-advancedChecksumming">
-<title>Checksums in detail</title>
+  <section id="cb-pool-advancedChecksumming">
+    <title>Checksums in detail</title>
 
-	<section id="cb-pool-advancedChecksumming-overview">
-		<title>Overview</title>
-		<para>
-			When writing data into the dCache, and possibly later on into an HSM, checksums may be calculated at different points within this chain.
-			<itemizedlist>
-      		<listitem>
-				<para>
-					<emphasis>Client Checksum</emphasis> - The client calculates the checksum before or while the data is sent to the dCache. The checksum value, depending on when it has been calculated, may sent together with the open request to the door and stored into pnfs before the data transfer begins or it may be sent with the close operation after the data has been transferred. Though providing both alternatives, the dCap protocol is using the latter version by default. Pure ftp won't allow to use any of the possibilties above. Nevertheless, the ftp 'site' command may be misused to send the checksum prior to the actual data transfer.
-				</para>
-      		</listitem>
-      		<listitem>
-				<para>
-					<emphasis>Transfer Checksum</emphasis> - While data is coming in, the server data mover may calculate the checksum on the fly.
-				</para>
-      		</listitem>
-      		<listitem>
-				<para>
-					<emphasis>Server File Checksum</emphasis> - After all the file data has been received by the dCache server and the file has been fully written to disk, the server may calculate the checksum, based on the disk file.
-				</para>
-     		 </listitem>
-			</itemizedlist>
-			The graph below sketches the different schemes for dCap and ftp w/ and w/o client checksum calculation:
-			    <table>
-      			<title>Checksum calculation flow</title>
-      			<tgroup cols="4" align="center">
-      			<colspec colnum="1" colname="col1"/>
-				<colspec colnum="2" colname="col2"/>
-				<colspec colnum="3" colname="col3"/>
-				<colspec colnum="4" colname="col4"/>
-				<thead>
-	  				<row>
-					    <entry>Step</entry>
-					    <entry>Ftp (w/o initial CRC)</entry>
-					    <entry>Ftp (with initial CRC)</entry>
-					    <entry>Dcap</entry>
-					  </row>
-				</thead>
-	<tbody>
-	  <row>
-	    <entry>1</entry>
-	    <entry namest="col2" nameend="col4">Create Entry</entry>
-	  </row>
-	  <row>
-	    <entry>2</entry>
-	    <entry/>
-	    <entry>Store Client CRC in pnfs</entry>
-   	    <entry/>
-	  </row>
-	  <row>
-	    <entry>3</entry>
-	    <entry namest="col2" nameend="col4">Server calculates transfer CRC</entry>
-	  </row>
-	  <row>
-	    <entry>4</entry>
-	    <entry/>
-	    <entry>Get Client CRC from pnfs</entry>
-   	    <entry>Get Client CRC from mover</entry>
-	  </row>
-	  <row>
-	    <entry>5</entry>
-	    <entry/>
-	    <entry namest="col3" nameend="col4">Compare Client and Server CRC</entry>
-	  </row>
-	  <row>
-	    <entry>6</entry>
-	    <entry>Store transfer CRC in pnfs</entry>
-	    <entry/>
-	    <entry>Store client CRC in pnfs</entry>
-	  </row>
-	  <row>
-	    <entry>7</entry>
-	    <entry namest="col2" nameend="col4">Server calculates disk file CRC</entry>
-	  </row>
-        </tbody>
-      </tgroup>
-    </table>       
-			
-		</para>
-	</section>
+    <section id="cb-pool-advancedChecksumming-overview">
+      <title>Overview</title>
+
+      <para>
+	When writing data into the &dcache;, and possibly later on
+	into an &hsm;, checksums may be calculated at different points
+	within this chain.
+      </para>
+
+      <variablelist>
+	<varlistentry>
+	  <term>Client Checksum</term>
+	  <listitem>
+	    <para>
+	      The client calculates the checksum before or while the
+	      data is sent to the &dcache;. The checksum value,
+	      depending on when it has been calculated, may sent
+	      together with the open request to the door and stored
+	      into &pnfs; before the data transfer begins or it may be
+	      sent with the close operation after the data has been
+	      transferred.
+	    </para>
+
+	    <para>
+	      The &dcap; protocol providing both methods, but the
+	      &dcap; clients use the latter by default.
+	    </para>
+
+	    <para>
+	      The &ftp; protocol does not provide a mechanism to send
+	      a checksum.  Nevertheless, some &ftp; clients can
+	      (mis-)use the <quote><literal>site</literal></quote>
+	      command to send the checksum prior to the actual data
+	      transfer.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>Transfer Checksum</term>
+
+	  <listitem>
+	    <para>
+	      While data is coming in, the server data mover may
+	      calculate the checksum on the fly.
+	    </para>
+	  </listitem>
+	</varlistentry>
 	
-	  <section id="cb-pool-advancedChecksumming-mover">
-    <title>ChecksumMover Interface</title>
-    <para>
-    	As far as the server data mover is concerned, only the <emphasis>Client Checksum</emphasis> and the <emphasis>Transfer Checksum</emphasis> are of interrest. While the client checksum is just delivered to the server mover as part of the protocol (e.g. close operation for dCap), the transfer checksum has to be calcalated by the server mover on the fly. In order to communicate the different checksums to the embedding pool, the server mover has to implement the <emphasis>ChecksumMover</emphasis> interface in addition to the <emphasis>MoverProtocol</emphasis> Interface. A mover, not implementing the <emphasis>MoverProtocol</emphasis>  is assumed not to handle checksums at all. The <emphasis>Disk File Checksum</emphasis> is calculated independedly of the mover within the pool itself.
-    	<screen>
-public interface ChecksumMover {
+
+	<varlistentry>
+	  <term>Server File Checksum</term>
+
+	  <listitem>
+	    <para>
+	      After all the file data has been received by the
+	      &dcache; server and the file has been fully written to
+	      disk, the server may calculate the checksum, based on
+	      the disk file.
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+
+      <para>
+	The graph below sketches the different schemes for &dcap; and
+	&ftp; with and without client checksum calculation:
+      </para>
+
+      <table>
+	<title>Checksum calculation flow</title>
+	<tgroup cols="4" align="center">
+	  <colspec colnum="1" colname="col1" colwidth="*"/>
+	  <colspec colnum="2" colname="col2" colwidth="3*"/>
+	  <colspec colnum="3" colname="col3" colwidth="3*"/>
+	  <colspec colnum="4" colname="col4" colwidth="3*"/>
+	  <thead>
+	    <row>
+	      <entry>Step</entry>
+	      <entry>&ftp; (w/o initial CRC)</entry>
+	      <entry>&ftp; (with initial CRC)</entry>
+	      <entry>&dcap;</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry>1</entry>
+	      <entry namest="col2" nameend="col4">&pi-fo-bgcolour-item;Create Entry</entry>
+	    </row>
+
+	    <row>
+	      <entry>2</entry>
+	      <entry>&pi-fo-bgcolour-bg;</entry>
+	      <entry>&pi-fo-bgcolour-item;Store Client CRC in &pnfs;</entry>
+	      <entry>&pi-fo-bgcolour-bg;</entry>
+	    </row>
+
+	    <row>
+	      <entry>3</entry> <entry namest="col2"
+	      nameend="col4">&pi-fo-bgcolour-item;Server calculates
+	      transfer CRC</entry>
+	    </row>
+
+	    <row>
+	      <entry>4</entry>
+	      <entry>&pi-fo-bgcolour-bg;</entry>
+	      <entry>&pi-fo-bgcolour-item;Get Client CRC from &pnfs;</entry>
+	      <entry>&pi-fo-bgcolour-item;Get Client CRC from mover</entry>
+	    </row>
+
+	    <row>
+	      <entry>5</entry>
+	      <entry>&pi-fo-bgcolour-bg;</entry>
+	      <entry namest="col3" nameend="col4">&pi-fo-bgcolour-item;Compare Client and Server CRC</entry>
+	    </row>
+
+	    <row>
+	      <entry>6</entry>
+	      <entry>&pi-fo-bgcolour-item;Store transfer CRC in &pnfs;</entry>
+	      <entry>&pi-fo-bgcolour-bg;</entry>
+	      <entry>&pi-fo-bgcolour-item;Store client CRC in &pnfs;</entry>
+	    </row>
+
+	    <row>
+	      <entry>7</entry>
+	      <entry namest="col2" nameend="col4">&pi-fo-bgcolour-item;Server calculates disk file CRC</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </table>
+    </section>
+	
+    <section id="cb-pool-advancedChecksumming-mover">
+      <title>ChecksumMover Interface</title>
+
+      <para>
+	As far as the server data mover is concerned, only the
+	<emphasis>Client Checksum</emphasis> and the
+	<emphasis>Transfer Checksum</emphasis> are of interrest. While
+	the client checksum is just delivered to the server mover as
+	part of the protocol (e.g. close operation for &dcap;), the
+	transfer checksum has to be calcalated by the server mover on
+	the fly. In order to communicate the different checksums to
+	the embedding pool, the server mover has to implement the
+	<emphasis>ChecksumMover</emphasis> interface in addition to
+	the <emphasis>MoverProtocol</emphasis> Interface. A mover, not
+	implementing the <emphasis>MoverProtocol</emphasis> is assumed
+	not to handle checksums at all. The <emphasis>Disk File
+	Checksum</emphasis> is calculated independedly of the mover
+	within the pool itself.
+      </para>
+
+      <screen>public interface ChecksumMover {
 
 	public void     setDigest( Checksum transferChecksum ) ;
 	public Checksum getClientChecksum() ;
 	public Checksum getTransferChecksum() ;
 
-}
-    	</screen>
-    	The pool will or will not call the <emphasis>setDigest</emphasis> method to advise the mover which checksum algorithm to use. If <emphasis>setDigest</emphasis> is not called, the mover is not assumed to calculate the <emphasis>Transfer Checksum</emphasis>.
-    	<screen>
-	java.security.MessageDigest transferDigest = transferChecksum.getMessageDigest() ;
+}</screen>
+
+      <para>
+    	The pool will or will not call the
+    	<emphasis>setDigest</emphasis> method to advise the mover
+    	which checksum algorithm to use. If
+    	<emphasis>setDigest</emphasis> is not called, the mover is not
+    	assumed to calculate the <emphasis>Transfer
+    	Checksum</emphasis>.
+      </para>
+
+      <screen>java.security.MessageDigest transferDigest = transferChecksum.getMessageDigest() ;
 
 		***
 
@@ -204,11 +328,19 @@ public interface ChecksumMover {
 		*** 
 
 		transferDigest.update( buffer , 0 , rc ) ;
-	}
-    	</screen>
-    	<emphasis>getClientChecksum</emphasis> and <emphasis>getTransferChecksum</emphasis> are called by the pool after the MoverProtocols runIO method has been successfully processed. These routines should return null if the corresponding checksum could not be determined for whatever reason.
-    	    	<screen>
-	public void  setDigest( Checksum transferChecksum ){
+	}</screen>
+
+
+	<para>
+	  <emphasis>getClientChecksum</emphasis> and
+	  <emphasis>getTransferChecksum</emphasis> are called by the
+	  pool after the MoverProtocols runIO method has been
+	  successfully processed. These routines should return null if
+	  the corresponding checksum could not be determined for
+	  whatever reason.
+	</para>
+
+	<screen>public void  setDigest( Checksum transferChecksum ){
 
 	this.transferChecksum = transferChecksum ;
 
@@ -218,11 +350,13 @@ public interface ChecksumMover {
 			null :
 			Checksum( clientChecksumString ) ; 
 	}
-	public Checksum getTransferChecksum(){ return transferChecksum ; }
-    	</screen>
-    </para>
+	public Checksum getTransferChecksum(){ return transferChecksum ; }</screen>
+
     </section>
     
+
+<!-- TO HERE! -->
+
       <section id="cb-pool-advancedChecksumming-dcapmover">
     <title>The DCapProtocol_3_nio Mover</title>
     <para>
@@ -233,46 +367,91 @@ public interface ChecksumMover {
     <section id="cb-pool-advancedChecksumming-csm">
     <title>The ChecksumModule</title>
     <para>
-		The checksum module (as part of the Pool) and its command subset (<emphasis>csm ...</emphasis>) determines the behavious of the checksum calculation.
-		<itemizedlist>
-      		<listitem>
-				<para>
-					<filename>csm set policy -ontransfer=on</filename>  <literallayout>Movers, implementing the ChecksumMover interface, are requested to calculate the <emphasis>Transfer Checksum</emphasis>. Whether or not the mover actually 
-performance the calculation might depend on additional, mover specific flags, like the <emphasis>dCap3-calculate-transfer-crc</emphasis> flag for the 
-<emphasis>DCapProtocol_3_nio</emphasis> mover.
-
-If the mover reports the <emphasis>Transfer Checksum</emphasis> and there is a <emphasis>Client Checksum</emphasis> available, either from pnfs or from the mover protocol, the 
-<emphasis>Transfer Checksum</emphasis> and the <emphasis>Client Checksum</emphasis> are compared. A mismatch will result in a <emphasis>CRC Exception</emphasis> .
-
-If there is no <emphasis>Client Checksum</emphasis> available whatsoever, the <emphasis>Transfer Checksum</emphasis> is stored in pnfs.</literallayout> 
-				</para>
-      		</listitem>
-      		<listitem>
-				<para>
-					<filename>csm set policy -onwrite=on</filename>  <literallayout>After the dataset has been completely and successfully written to disk, the pool calculates the checksum based on the disk file 
-(<emphasis>Server File Checksum</emphasis>). The result is compared to either the <emphasis>Client Checksum</emphasis> or the <emphasis>Transfer Checksum</emphasis> and a <emphasis>CRC Exception</emphasis>  is thrown in case 
-of a mismatch.
-
-If there is neither the <emphasis>Client Checksum</emphasis> nor the <emphasis>Transfer Checksum</emphasis> available, the <emphasis>Server File Checksum</emphasis> is stored in pnfs.</literallayout> 
-				</para>
-      		</listitem>
-      		<listitem>
-				<para>
-					<filename>csm set policy -enforcecrc=on</filename>  <literallayout>In case of <emphasis>-onwrite=off</emphasis>, this options enforces the calculation of the <emphasis>Server File Checksum</emphasis> ONLY if neither the <emphasis>Client Checksum</emphasis> nor the 
-<emphasis>Transfer Checksum</emphasis>  has been sucessfully calculated. The result is stored in pnfs.</literallayout> 
-				</para>
-     		 </listitem>
-			</itemizedlist>
+      The checksum module (as part of the Pool) and its command subset
+      (<emphasis>csm ...</emphasis>) determines the behavious of the
+      checksum calculation.
     </para>
+
+    <itemizedlist>
+      <listitem>
+	<para>
+	  <filename>csm set policy -ontransfer=on</filename>
+	</para>
+
+	<para>
+	  Movers, implementing the ChecksumMover interface, are
+	  requested to calculate the <emphasis>Transfer
+	  Checksum</emphasis>. Whether or not the mover actually
+	  performance the calculation might depend on additional,
+	  mover specific flags, like the
+	  <emphasis>dCap3-calculate-transfer-crc</emphasis> flag for
+	  the <emphasis>DCapProtocol_3_nio</emphasis> mover.
+	</para>
+
+	<para>
+	  If the mover reports the <emphasis>Transfer
+	  Checksum</emphasis> and there is a <emphasis>Client
+	  Checksum</emphasis> available, either from &pnfs; or from
+	  the mover protocol, the <emphasis>Transfer
+	  Checksum</emphasis> and the <emphasis>Client
+	  Checksum</emphasis> are compared. A mismatch will result in
+	  a <emphasis>CRC Exception</emphasis> .
+	</para>
+
+	<para>
+	  If there is no <emphasis>Client Checksum</emphasis>
+	  available whatsoever, the <emphasis>Transfer
+	  Checksum</emphasis> is stored in &pnfs;.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <filename>csm set policy -onwrite=on</filename>
+	</para>
+
+	<para>
+	  After the dataset has been completely and successfully
+	  written to disk, the pool calculates the checksum based on
+	  the disk file (<emphasis>Server File
+	  Checksum</emphasis>). The result is compared to either the
+	  <emphasis>Client Checksum</emphasis> or the
+	  <emphasis>Transfer Checksum</emphasis> and a <emphasis>CRC
+	  Exception</emphasis> is thrown in case of a mismatch.
+	</para>
+
+	<para>
+	  If there is neither the <emphasis>Client Checksum</emphasis>
+	  nor the <emphasis>Transfer Checksum</emphasis> available,
+	  the <emphasis>Server File Checksum</emphasis> is stored in
+	  &pnfs;.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <filename>csm set policy -enforcecrc=on</filename>
+	</para>
+
+	<para>
+	  In case of <emphasis>-onwrite=off</emphasis>, this options
+	  enforces the calculation of the <emphasis>Server File
+	  Checksum</emphasis> ONLY if neither the <emphasis>Client
+	  Checksum</emphasis> nor the <emphasis>Transfer
+	  Checksum</emphasis> has been sucessfully calculated. The
+	  result is stored in &pnfs;.
+	</para>
+      </listitem>
+    </itemizedlist>
     </section>
-    
-</section>
+  </section>
   
+
   <section id="cb-pool-vacate">
     <title>Vacating a Pool with the Copy Manager</title>
 
     <para>
-      The <classname>CopyManager</classname> is a <dcache/> cell type
+      The <classname>CopyManager</classname> is a &dcache; cell type
       which is capable of copying the content of a pool (one to one)
       to another pool.  The mode of the files (precious or cached) are
       retained unchanged.
@@ -295,10 +474,10 @@ If there is neither the <emphasis>Client Checksum</emphasis> nor the <emphasis>T
 	</listitem>
 	<listitem>
 	  <para>
-	    A single <classname>CoypManager</classname> can only manage a
-	    single source destination pool pair at a time.
-	    But more than one CopyManager can be started to
-	    manage other pool copy pairs.
+	    A single &cell-cpymngr; can only manage a single source
+	    destination pool pair at a time.  But more than one
+	    &cell-cpymngr; can be started to manage other pool copy
+	    pairs.
 	  </para>
 	</listitem>
       </itemizedlist>
@@ -309,15 +488,15 @@ If there is neither the <emphasis>Client Checksum</emphasis> nor the <emphasis>T
       <title>Preparing the copy manager</title>
 
       <para>
-	The following is only necessary, if a copy manager cell is not
-	already started. This might already be done e.g. in the
-	<literal>utility</literal> Domain.
+	The following is only necessary, if a &cell-cpymngr; cell is
+	not already started. This might already be done e.g. in the
+	&domain-utility; Domain.
       </para>
 
       <para>
 	Create a batch file with the following content within the
-	<dcache/> config directory (preferrable on the headnode).
-	The file may be called <filename>config/copy.batch</filename>:
+	&dcache; config directory (preferable on the headnode).  The
+	file may be called <filename>config/copy.batch</filename>:
 
 <programlisting>#
 set printout default 3
@@ -353,20 +532,19 @@ create diskCacheV111.replicaManager.CopyManager copy0 \
 	Change the cwd to <filename class="directory">jobs</filename>
 	and run
 	
-<screen><rootprompt/>cd /opt/d-cache/jobs
-<rootprompt/>./initPackage.sh</screen> 
+<screen>&prompt-root; cd /opt/d-cache/jobs
+&prompt-root; ./initPackage.sh</screen> 
 	
 	(Ignore possible error message.)
 	Start the <literal>copy</literal> domain with
-
-<screen>/opt/d-cache/jobs/copy start</screen>
-
       </para>
+
+      <screen>/opt/d-cache/jobs/copy start</screen>
+
       
       <para>
-	Everything up to here only has to be done once.
-The follow procedure has to be done for
-each full pool copy.
+	Everything up to here only has to be done once.  The follow
+	procedure has to be done for each full pool copy.
       </para>
 
     </section>
@@ -378,34 +556,34 @@ each full pool copy.
 	Use the admin interface to do the following commands:
 	Change the pnfs timeout of the destination pool:
 
-<screen><dcprompt select="local"/><command>cd</command> <replaceable>destinationPool</replaceable>
-<dcprompt><replaceable>destinationPool</replaceable></dcprompt><command>pp set pnfs timeout</command> 300
-<dcprompt><replaceable>destinationPool</replaceable></dcprompt><command>save</command></screen>
+<screen>&dc-prompt-local; <command>cd</command> <replaceable>poolname</replaceable>
+&dc-prompt-pool; <command>pp set pnfs timeout</command> 300
+&dc-prompt-pool; <command>save</command></screen>
 
 	define the maximum number of pool-to-pool transfers of the
 	source pool:
 
-<screen><dcprompt><replaceable>destinationPool</replaceable></dcprompt><command>..</command>
-<dcprompt select="local"/><command>cd</command> <replaceable>sourcePool</replaceable>
+<screen>&dc-prompt-pool;  <command>..</command>
+&dc-prompt-local; <command>cd</command> <replaceable>sourcePool</replaceable>
 <!-- pool disable -strict -->
-<dcprompt><replaceable>sourcePool</replaceable></dcprompt><command>p2p set max active</command> 10</screen>
+&dc-prompt-srcpool; <command>p2p set max active</command> 10</screen>
 
 	make sure, all incoming trafic stopped:
 
-<screen><dcprompt><replaceable>sourcePool</replaceable></dcprompt><command>mover ls</command>
-<dcprompt><replaceable>sourcePool</replaceable></dcprompt><command>pp ls</command></screen>
+<screen>&dc-prompt-srcpool; <command>mover ls</command>
+&dc-prompt-srcpool; <command>pp ls</command></screen>
 
-	change to
-	<literal><replaceable>copyManagerCell</replaceable></literal>
+	change to the &cell-cpymngr; cell
+	(<literal><replaceable>copyManagerCell</replaceable></literal>)
 	and start the transfers:
 
-<screen><dcprompt><replaceable>sourcePool</replaceable></dcprompt><command>..</command>
-<dcprompt select="local"/><command>cd</command> <replaceable>copyManagerCell</replaceable>
-<dcprompt><replaceable>copyManagerCell</replaceable></dcprompt><command>copy</command> <replaceable>sourcePool</replaceable> <replaceable>destinationPool</replaceable> -max=5</screen>
+<screen>&dc-prompt-srcpool; <command>..</command>
+&dc-prompt-local; <command>cd</command> <replaceable>copyManagerCell</replaceable>
+&dc-prompt-cpymngr; <command>copy</command> <replaceable>sourcePool</replaceable> <replaceable>destinationPool</replaceable> -max=5</screen>
 
 	  check progress with
 
-<screen><dcprompt><replaceable>copyManagerCell</replaceable></dcprompt><command>info</command></screen>
+<screen>&dc-prompt-cpymngr; <command>info</command></screen>
 
 	The <option>-max</option> option allows to specify the maximum
 	number of active transfers at a time. The number in the
@@ -431,7 +609,7 @@ each full pool copy.
 	Using the <option>-precious</option> option restricts the copy process
 	to files which are <glossterm linkend="gl-precious">precious</glossterm>:
 
-<screen><dcprompt><replaceable>copyManagerCell</replaceable></dcprompt><command>copy</command> <replaceable>sourcePool</replaceable> <replaceable>destinationPool</replaceable> -max=5 <emphasis>-precious</emphasis></screen>
+<screen>&dc-prompt-cpymngr; <command>copy</command> <replaceable>sourcePool</replaceable> <replaceable>destinationPool</replaceable> -max=5 <emphasis>-precious</emphasis></screen>
       </para>
 
       <para>
@@ -465,7 +643,7 @@ create diskCacheV111.replicaManager.CopyManager <emphasis>copy2</emphasis> \
       <para>
 	Because the software is not yet suffiently tested it would be good to do a
 
-<screen><dcprompt><replaceable>poolName</replaceable></dcprompt><command>rep ls</command> -s</screen>
+<screen>&dc-prompt-pool; <command>rep ls</command> -s</screen>
 
 	on the source and destination pools before the copy process
 	started and the same on the destination pool after the process
@@ -476,8 +654,8 @@ create diskCacheV111.replicaManager.CopyManager <emphasis>copy2</emphasis> \
 	If for whatever reason, the copy process messes up, its no
 	problem to restart the copy domain with
 
-<screen><rootprompt/><command>/opt/d-cache/jobs/copy</command> stop
-<rootprompt/><command>/opt/d-cache/jobs/copy</command> start</screen>
+<screen>&prompt-root; <command>/opt/d-cache/jobs/copy</command> stop
+&prompt-root; <command>/opt/d-cache/jobs/copy</command> start</screen>
 
 	One only needs to restart the <command>copy</command> command
 	to proceed.  Files already copied will not be copied again.
@@ -497,29 +675,29 @@ create diskCacheV111.replicaManager.CopyManager <emphasis>copy2</emphasis> \
     <para>
       Disable file transfers from and to the pool with
       
-<screen><dcpoolprompt></dcpoolprompt><command>pool disable</command> <option>-strict</option></screen>
+<screen>&dc-prompt-pool; <command>pool disable</command> <option>-strict</option></screen>
       
       Then make sure, no transfers are being processed anymore.
       All the following commands should give no output:
       
-<screen><dcpoolprompt></dcpoolprompt><command>queue ls queue</command>
-<dcpoolprompt></dcpoolprompt><command>mover ls</command>
-<dcpoolprompt></dcpoolprompt><command>p2p ls</command>
-<dcpoolprompt></dcpoolprompt><command>pp ls</command>
-<dcpoolprompt></dcpoolprompt><command>st jobs ls</command>
-<dcpoolprompt></dcpoolprompt><command>rh jobs ls</command></screen>
+<screen>&dc-prompt-pool; <command>queue ls queue</command>
+&dc-prompt-pool; <command>mover ls</command>
+&dc-prompt-pool; <command>p2p ls</command>
+&dc-prompt-pool; <command>pp ls</command>
+&dc-prompt-pool; <command>st jobs ls</command>
+&dc-prompt-pool; <command>rh jobs ls</command></screen>
 
-      Now the files on the pools have to be unregistered on the 
-      PNFS server with
+      Now the files on the pools have to be unregistered on the &pnfs;
+      server with
 	
-<screen><dcpoolprompt></dcpoolprompt><command>pnfs unregister</command></screen>
+<screen>&dc-prompt-pool; <command>pnfs unregister</command></screen>
 
       Even if the pool contains precious files, this is no problem, since
       we will register them again in a moment. The files might not be available
       for a short moment, though.
       Log out of the pool, and stop the service: 
       
-<screen><rootprompt/>jobs/pool<footnote>
+<screen>&prompt-root; jobs/pool<footnote>
             <para>
               Filenames will always be relative to the dCache installation
               directory, which defaults to
@@ -531,10 +709,10 @@ create diskCacheV111.replicaManager.CopyManager <emphasis>copy2</emphasis> \
       <filename><replaceable>poolDomain</replaceable>.poollist</filename>-file.
       Restart the service:
       
-<screen><rootprompt/>jobs/pool -pool=<replaceable>poolDomainName</replaceable> -logfile=<replaceable>dCacheLocation</replaceable>/log/<replaceable>poolDomainName</replaceable>Domain.log start</screen>
+<screen>&prompt-root; jobs/pool -pool=<replaceable>poolDomainName</replaceable> -logfile=<replaceable>dCacheLocation</replaceable>/log/<replaceable>poolDomainName</replaceable>Domain.log start</screen>
       
       Register the files on the pool with
-      <screen><dcpoolprompt/><command>pnfs register</command></screen>
+      <screen>&dc-prompt-pool; <command>pnfs register</command></screen>
     </para>
     
   </section>

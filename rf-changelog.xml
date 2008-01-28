@@ -1,16 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+%sharedents;
+]>
 
 <chapter id="rf-changelog">
+
   <title>Changelog</title>
 
-  <section id="rf-changelog-1661-1663">
+  <section id="rf-changelog-1661-1663"  role="NotInToc">
     <title>Changes between Version 1.6.6 Release 1 and Release 3</title>
 
-    <para>
-      Release 2 is essentially identical to Release 3 and was not a
-      public release.
-    </para>
+    <note>
+      <para>
+	Release 2 is essentially identical to Release 3 and was not a
+	public release.
+      </para>
+    </note>
     
     <itemizedlist>
       <listitem>
@@ -72,9 +79,11 @@
 	<para>
 	  Improved performance of replica manager by adding an index
 	  to the database. This has to be done manually when upgrading:
+	</para>
 
-<screen><rootprompt/><command>psql</command> -U srmdcache -d replicas -f /opt/d-cache/etc/psql_install_replicas.sql</screen>
+	<screen>&prompt-root; <command>psql</command> -U srmdcache -d replicas -f /opt/d-cache/etc/psql_install_replicas.sql</screen>
 
+        <para>
 	  You can safely ignore the errors produced by this command.
 	</para>
       </listitem>
@@ -110,19 +119,19 @@
       </listitem>
       <listitem>
 	<para>
-	  Correct behaviour of <literal>dc_stat</literal> (<dcap/>
+	  Correct behaviour of <literal>dc_stat</literal> (&dcap;
 	  client library) in multithreaded environments.
 	</para>
       </listitem>
       <listitem>
 	<para>
-	  Fix of memory corruption in <dcap/> client library.
+	  Fix of memory corruption in &dcap; client library.
 	</para>
       </listitem>
       <listitem>
 	<para>
 	  Permissions of original file are imposed on destination file
-	  when writing with the <dcap/> protocol with URL style.
+	  when writing with the &dcap; protocol with URL style.
 	</para>
       </listitem>
       <listitem>
@@ -135,7 +144,7 @@
 	<para>
 	  When a pool has finished receiving a file from a client, it
 	  will now set the file to precious before setting the file
-	  size in <pnfs/>. Previously, a timeout in the latter
+	  size in &pnfs;. Previously, a timeout in the latter
 	  operation caused the file to stay in <quote>receiving from
 	  client</quote> state, because the filesize was set before
 	  the file was set to precious.
@@ -149,7 +158,7 @@
       </listitem>
       <listitem>
 	<para>
-	  The space manager now handles full pools in disk-only <dcache/>
+	  The space manager now handles full pools in disk-only &dcache;
 	  better.
 	</para>
       </listitem>
@@ -500,7 +509,7 @@ OK
 
   </section>
 
-  <section id="rf-changelog-1663-1664">
+  <section id="rf-changelog-1663-1664"  role="NotInToc">
     <title>Changes between Version 1.6.6 Release 3 and Release 4</title>
 
     <itemizedlist>
@@ -525,13 +534,13 @@ OK
       </listitem>
       <listitem>
 	<para>
-	  Fixed bug in <cellname>SpaceManager</cellname> which
-	  caused reservations not beeing removed.
+	  Fixed bug in &cell-spacemngr; which caused reservations not
+	  beeing removed.
 	</para>
       </listitem>
       <listitem>
 	<para>
-	  Fixed <dcap/> library to work correctly with a preload
+	  Fixed &dcap; library to work correctly with a preload
 	  library.
 	</para>
       </listitem>
@@ -544,11 +553,10 @@ OK
       <listitem>
 	<para>
 	  Fixed install script <filename>install/install.sh</filename>
-	  to work properly when the <pnfs/> server and
-	  <cellname>PnfsManager</cellname> are separated from the
-	  admin node: The code which performs the configuring within
-	  <pnfs/> is now only performed where the
-	  <cellname>PnfsManger</cellname> will be running.
+	  to work properly when the &pnfs; server and &cell-pnfsmngr;
+	  are separated from the admin node: The code which performs
+	  the configuring within &pnfs; is now only performed where
+	  the &cell-pnfsmngr; will be running.
 	</para>
       </listitem>
       <listitem>
@@ -563,7 +571,7 @@ OK
 
   </section>
 
-  <section id="rf-changelog-1664-1665">
+  <section id="rf-changelog-1664-1665"  role="NotInToc">
     <title>Changes between Version 1.6.6 Release 4 and Release 5</title>
 
     <itemizedlist>
@@ -577,18 +585,18 @@ OK
 
   </section>
 
-  <section id="rf-changelog-1665-1671">
+  <section id="rf-changelog-1665-1671"  role="NotInToc">
     <title>Changes between Version 1.6.6 Release 5 and Version 1.6.7</title>
 
     <para>
-      This release only contains changes to the <srm/> client
+      This release only contains changes to the &srm; client
       suite. See <xref linkend="rf-clients-srm"/>.
     </para>
     
     <itemizedlist>
       <listitem>
 	<para>
-	  <xref linkend="cmd-srmcp"/> now supports performance of <srm/>
+	  <xref linkend="cmd-srmcp"/> now supports performance of &srm;
 	  transfers in both <literal>SRM version 1. protocol</literal>
 	  and in <literal>SRM version 2.1.1 protocol</literal> You
 	  need to specify <option>--srm_protocol_version=2</option>
@@ -619,7 +627,7 @@ OK
       <listitem>
 	<para>
 	  Added new command <xref linkend="cmd-srmstage"/> to provide an
-	  option to the user to stage files from <hsm/> to <dcache/>
+	  option to the user to stage files from &hsm; to &dcache;
 	  and not transfer them to the user right away. This case will
 	  be useful if files are not needed right away at user end,
 	  but its good to stage them to dcache for faster access
@@ -656,7 +664,7 @@ OK
     </itemizedlist>
 
   </section>
-  <section id="rf-changelog-1665-1681">
+  <section id="rf-changelog-1665-1681"  role="NotInToc">
     <title>Changes between Version 1.6.6 Release 5 and Version 1.7.0 Releases</title>
 
     <para>
@@ -665,7 +673,8 @@ OK
     <itemizedlist>
       <listitem>
 	<para>
-           gPlazma authorization added. See 'configuration chapter' for details.
+           gPlazma authorization added. See 'configuration chapter'
+           for details.
 	</para>
       </listitem>
       <listitem>
@@ -675,38 +684,43 @@ OK
       </listitem>
       <listitem>
 	<para>
-           The maximum (default) time, a dcap/dccp request should wait for a file 'retrieve from HSM'
-           can now be set in the door as well as in the dccp command line or with the dcap API.
+           The maximum (default) time, a dcap/dccp request should wait
+           for a file 'retrieve from HSM' can now be set in the door
+           as well as in the dccp command line or with the dcap API.
 	</para>
       </listitem>
       <listitem>
 	<para>
-          GsiFtp and SRM understand extended proxies. gsiDcap will follow last week of August.
+          GsiFtp and SRM understand extended proxies. gsiDcap will
+          follow last week of August.
 	</para>
       </listitem>
       <listitem>
 	<para>
-          PUT and GET already supported by newly defined SRM-2.2 definition.
+          PUT and GET already supported by newly defined &srm; v2.2
+          definition.
 	</para>
       </listitem>
       <listitem>
 	<para>
-          dCap (client and server) now supports passive connections. (Client callback to server for
-          data connection). 
-          The server listen port can be restricted to one port per JVM. This allows for
-          CEs behind a NAT or firewall while dCache-SEs are outside. 
+          &dcap; (client and server) now supports passive
+          connections. (Client callback to server for data
+          connection).  The server listen port can be restricted to
+          one port per JVM. This allows for CEs behind a NAT or
+          firewall while dCache-SEs are outside.
 	</para>
       </listitem>
       <listitem>
 	<para>
-          xRootd protocol added. This allows to access dCache from within ROOT transparently. Token-
-          based authorization is available as well.
+          xRootd protocol added. This allows to access dCache from
+          within ROOT transparently. Token-based authorization is
+          available as well.
 	</para>
       </listitem>
       <listitem>
 	<para>
-	  A JClarence interface has been added to the information provider module. (Details need to be
-          checked with Ted).
+	  A JClarence interface has been added to the information
+	  provider module.
 	</para>
       </listitem>
       <listitem>
@@ -716,73 +730,86 @@ OK
       </listitem>
       <listitem>
 	<para>
-	   Error type <literal>Fatal</literal> added. This allows for advanced actions
-           (e-mail , sms , firealarm) in conjunction with log4j.
+	   Error type <literal>Fatal</literal> added. This allows for
+	   advanced actions (e-mail, sms, firealarm) in conjunction
+	   with log4j.
 	</para>
       </listitem>
       <listitem>
 	<para>
-	   The key value pair <literal>h=yes</literal> resp. <literal>h=no</literal> added to
-           pnfs level2 depending whether this file is supposed to go to HSM.
-	</para>
-      </listitem>
-
-      <listitem>
-	<para>
-	  dCap Mover : negative size value sent to the dCap mover by the dCap library
-          no longer causes the mover to loop. 
+	   The key value pair <literal>h=yes</literal>
+	   resp. <literal>h=no</literal> added to &pnfs; level2
+	   depending whether this file is supposed to go to &hsm;.
 	</para>
       </listitem>
 
       <listitem>
 	<para>
-	  dCap Door : improved permission handling : when checking permission, we now
-             honour the actual file permissions and the permissions of the immediate 
-             parent. (but not further, which would be posix).
+	  &mover-dcap;: negative size value sent to the &mover-dcap;
+	  by the &dcap; library no longer causes the mover to loop.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  &door-dcap;: improved permission handling : when checking
+	  permission, we now honour the actual file permissions and
+	  the permissions of the immediate parent. (but not further,
+	  which would be posix).
 	</para>
       </listitem>
       <listitem>
 	<para>
-	  FTP Door : Commands <command>chmod</command> and <command>rmdir</command> added.
+	  &door-gridftp;: Commands <command>chmod</command> and
+	  <command>rmdir</command> added.
 	</para>
       </listitem>
       <listitem>
 	<para>
-	   Increased performance of the billing cell (mainly database interface).
+	   Increased performance of the &cell-billing; (mainly
+	   database interface).
 	</para>
       </listitem>
       <listitem>
 	<para>
-	   Cleaner : cleaner can now be chained. In case of two different dCache instances
-           with just one Pnfs file system, the cleaner directories can be chained so that
-           a <command>rm</command> in pnfs removes deleted files from pools of both dCache instances.
+	   &cell-cleaner;: the &cell-cleaner; can now be chained. In
+	   case of two different &dcache; instances with just one
+	   &pnfs; file system, the &cell-cleaner; directories can be
+	   chained so that a <command>rm</command> in &pnfs; removes
+	   deleted files from pools of both &dcache; instances.
 	</para>
       </listitem>
       <listitem>
 	<para>
-	   Cleaner : a pool can (optionally) delete precious files if those files have been removed
-           from pnfs even if there is an HSM attached. For security reasons, the default is 
-           to never remove precious files if there is an HSM attached to a pool.
+	   &cell-cleaner;: a pool can (optionally) delete precious
+	   files if those files have been removed from &pnfs; even if
+	   there is an &hsm; attached. For security reasons, the
+	   default is to never remove precious files if there is an
+	   &hsm; attached to a pool.
 	</para>
       </listitem>
       <listitem>
 	<para>
-	   <cellname>PoolManager</cellname> and read only pools : Pools can be declared rdOnly by a command in the
-           PoolManager command set. This disallows all actions which would write data into this
-           particular pool. (write from client, restore from HSM and p2p destination). This
-           pool state is not persistent. (is not saved in the PoolManger.conf file).
+	   &cell-poolmngr; and read only pools : pools can be declared
+	   rdOnly by a command in the PoolManager command set. This
+	   disallows all actions which would write data into this
+	   particular pool. (write from client, restore from &hsm; and
+	   p2p destination). This pool state is not persistent. (is
+	   not saved in the <filename>PoolManger.conf</filename>
+	   file).
 	</para>
       </listitem>
       <listitem>
 	<para>
-	   Cost calcuation for multi I/O queues : fast cost prediction was added for
-           multi I/O queues.
+	   Cost calcuation for multi I/O queues : fast cost prediction
+	   was added for multi I/O queues.
 	</para>
       </listitem>
       <listitem>
 	<para>
-	   Files can be automatically replicated on arrival in the dCache. See chapter 
-           "File Hopping" for more information.
+	   Files can be automatically replicated on arrival in the
+	   &dcache;. See chapter "File Hopping" <!-- TODO: XLink
+	   needed --> for more information.
 	</para>
       </listitem>
       <listitem>
@@ -792,18 +819,21 @@ OK
       </listitem>
       <listitem>
 	<para>
-	   Pool to pool transfers pool destinations are treated seperately from 'read' pool selection.
+	   Pool to pool transfers: pool destinations are treated
+	   seperately from 'read' pool selection.
 	</para>
       </listitem>
       <listitem>
 	<para>
-	   A set of important parameters can be now be defined 'per dCache partition'. DCache partitions
-           a assigned to PoolManager links. (See chapter 'dCache Partitioning' in the configuration section).
+	   A set of important parameters can be now be defined 'per
+	   &dcache; partition'. &dcache; partitions are assigned to
+	   PoolManager links. (See chapter 'dCache Partitioning' <!--
+	   TODO XLink needed --> in the configuration section).
 	</para>
       </listitem>
       <listitem>
 	<para>
-	   Introduction of a central HSM flush system.
+	   Introduction of a central &hsm; flush system.
 	</para>
       </listitem>
     </itemizedlist>
@@ -813,111 +843,127 @@ OK
     <itemizedlist>
       <listitem>
 	<para>
-	   BUG FIX : Pathfinder reported .(access)(pnfsid) (using PnfsManagerV3).
+	   BUG FIX : Pathfinder reported
+	   <filename>.(access)(pnfsid)</filename> (using
+	   &cell-pnfsmngr; v3).
 	</para>
       </listitem>
       <listitem>
 	<para>
-	   BUG FIX : It eventually happened that 'precious' files have been removed from write
-           pools while the pool was shut down.
+	   BUG FIX : It eventually happened that
+	   <quote>precious</quote> files have been removed from write
+	   pools while the pool was shut down.
 	</para>
       </listitem>
       <listitem>
 	<para>
-	   BUG FIX : After a 'flush storage class' the corresponding pool does no longer
-           appear dead for awhile.
+	   BUG FIX : After a <quote>flush storage class</quote> the
+	   corresponding pool does no longer appear dead for awhile.
 	</para>
       </listitem>
       <listitem>
 	<para>
-	   BUG FIX : <cellname>PoolManager</cellname> restore handler : a retry in the restore handler, either automatically
-           or manually will now always refetch the <literal>StorageInfo</literal> from the <cellname>PnfsManager</cellname>.
+	   BUG FIX : &cell-poolmngr; restore handler : a retry in the
+	   restore handler, either automatically or manually will now
+	   always refetch the <literal>StorageInfo</literal> from the
+	   &cell-pnfsmngr;.
 	</para>
       </listitem>
       <listitem>
 	<para>
-	   BUG FIX : Files are not longer requested from HSM if they are not yet flushed to the HSM.
+	   BUG FIX : Files are not longer requested from &hsm; if they
+	   are not yet flushed to the &hsm;.
 	</para>
       </listitem>
       <listitem>
 	<para>
-	   Pnfs proxy : we now support multiple pnfs instances connected to a single dCache instance.
-           (performance improvement).
+	   &pnfs; proxy : we now support multiple &pnfs; instances
+	   connected to a single &dcache; instance.  This gives a
+	   performance improvement.
 	</para>
       </listitem>
       <listitem>
 	<para>
-	   BUG FIX : dCap library : <command>fstat</command> in preload dCap lib fixed.
+	   BUG FIX : &dcap; library : <command>fstat</command> in
+	   preload &dcap; library fixed.
 	</para>
       </listitem>
       <listitem>
 	<para>
-	  BUG FIX : dCap library : SEGV on more than 65 CA fixed.
+	  BUG FIX : &dcap; library : SEGV on more than 65 CA fixed.
 	</para>
       </listitem>
       <listitem>
 	<para>
-	   BUG FIX : cells : In case of ssh kerberos clients, the id string exceeded the
-           maximum defined value in cells. This caused a protocol exception.
+	   BUG FIX : cells : In case of &ssh; kerberos clients, the id
+	   string exceeded the maximum defined value in cells. This
+	   caused a protocol exception.
 	</para>
       </listitem>
       <listitem>
 	<para>
-	   BUG FIX : dCap : setting/sending file permissions with url-like syntax (on write).
+	   BUG FIX : &dcap; : setting/sending file permissions with
+	   URL-like syntax (on write).
 	</para>
       </listitem>
       <listitem>
 	<para>
-	   BUG FIX : dCap : large file problem fixed. dCap lib always opens local files with O_LARGEFILE.
+	   BUG FIX : &dcap; : large file problem fixed. &dcap; library
+	   always opens local files with O_LARGEFILE.
 	</para>
       </listitem>
       <listitem>
 	<para>
-	   BUG FIX : FTP door removes file entry if transfer fails.
+	   BUG FIX : &door-gridftp; removes file entry if transfer
+	   fails.
 	</para>
       </listitem>
       <listitem>
 	<para>
-	  BUG FIX : dCap Mover : dCap mover disables pool for all I/O errors.
+	  BUG FIX : &mover-dcap;: &mover-dcap; disables pool for all
+	  I/O errors.
 	</para>
       </listitem>
 
     </itemizedlist>
     <para>
-    Developer corner :
+      Developer corner :
     </para>
     <itemizedlist>
 
       <listitem>
 	<para>
-	  (DEVELOPER) Dump utility for the <filename>config/SI-*</filename> files in the pools.
+	  (DEVELOPER) Dump utility for the
+	  <filename>config/SI-*</filename> files in the pools.
 	</para>
       </listitem>
       <listitem>
 	<para>
-	  (DEVELOPER) <cellname>PnfsManager</cellname> pnfs manager queue can be dumped to disk.
+	  (DEVELOPER) &cell-pnfsmngr; queue can be dumped to disk.
 	</para>
       </listitem>
       <listitem>
 	<para>
-	  (DEVELOPER) Specific Exception introduced for PnfsManger FileNotFound. Makes pool
-          code cleaner.
+	  (DEVELOPER) Specific Exception introduced for PnfsManger
+	  FileNotFound. Makes pool code cleaner.
 	</para>
       </listitem>
       <listitem>
 	<para>
-	  (DEVELOPER) <command>isLink()</command> added to <literal>PnfsFile</literal>
+	  (DEVELOPER) <command>isLink()</command> added to
+	  <literal>PnfsFile</literal>
 	</para>
       </listitem>
       <listitem>
 	<para>
-	  (DEVELOPER) Pool Manager query message (file in pool ?) can be suppressed by
-          flag in ProtocolInfo.
+	  (DEVELOPER) Pool Manager query message (file in pool ?) can
+	  be suppressed by flag in ProtocolInfo.
 	</para>
       </listitem>
       <listitem>
 	<para>
-	  (DEVELOPER) new method in repository : contains( PnfsId pnfsid);
+	  (DEVELOPER) new method in repository : contains( PnfsId
+	  pnfsid);
 	</para>
       </listitem>
 

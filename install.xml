@@ -1,38 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+%sharedents;
+]>
 
 <chapter id="in">
-  <!-- <?dbhtml dir="install"?> -->
-  <title>Installation Manual</title>
-  
-  <partauthors>Michael Ernst, Patrick Fuhrmann, Mathias de Riese</partauthors>
-  
+
+  <title>Installing &dcache;</title>
+
+  <chapterinfo>
+    <author>
+      <firstname>Michael</firstname>
+      <surname>Ernst</surname>
+      <affiliation>
+        <shortaffil>FNAL</shortaffil>
+      </affiliation>
+    </author>
+
+    <author>
+      <firstname>Patrick</firstname>
+      <surname>Fuhrmann</surname>
+      <affiliation>
+        <shortaffil>DESY</shortaffil>
+      </affiliation>
+    </author>
+
+    <author>
+      <firstname>Mathias</firstname>
+      <surname>de Riese</surname>
+      <affiliation>
+        <shortaffil>DESY</shortaffil>
+      </affiliation>
+    </author>
+  </chapterinfo>
+
   <para>
-    The first section describes the installation of a fresh <dcache/>
+    The first section describes the installation of a fresh &dcache;
     instance using RPM files downloaded from <ulink
-    url="http://www.dcache.org">the <dcache/> homepage</ulink>. It
+    url="http://www.dcache.org">the &dcache; homepage</ulink>. It
     follows a guide to upgrading an existing installation. In both
     cases we assume standard requirements of a small to medium sized
-    <dcache/> instance without an attached <glossterm
+    &dcache; instance without an attached <glossterm
     linkend="gl-tss">tertiary storage system</glossterm>. The third
     section contains some pointers on extended features.
   </para>
   
   <section id="in-install">
-    <title>Installation of a Basic <dcache/> Instance</title>
+    <title>Installation of a Basic &dcache; Instance</title>
 
     <para>
       In the following the installation of a central admin node of a
-      <dcache/> instance and of an arbitrary number of <dcache/> nodes
+      &dcache; instance and of an arbitrary number of &dcache; nodes
       will be described. These nodes may each contain several
-      <glossterm linkend="gl-pool"><dcache/> pools</glossterm> and
-      optionally one <srm/>, one GridFTP door, and/or one GSIdCap
-      door. On the admin node, a <pnfs/> server and several central
-      <dcache/> components are installed. The <pnfs/> server, some
-      central components, and each <srm/> need an PostgreSQL server
+      <glossterm linkend="gl-pool">&dcache; pools</glossterm> and
+      optionally one &srm;, one GridFTP door, and/or one GSIdCap
+      door. On the admin node, a &pnfs; server and several central
+      &dcache; components are installed. The &pnfs; server, some
+      central components, and each &srm; need an PostgreSQL server
       installed locally on the node. The first section describes the
       configuration of a PostgreSQL server. After that the
-      installation of the <pnfs/> server and of the <dcache/>
+      installation of the &pnfs; server and of the &dcache;
       components will follow. During the whole installation process
       root access is required.
     </para>
@@ -40,173 +68,194 @@
     <section>
       <title>Prerequisites</title>
       
-	<para>
- 	
-	In order to install dCache the following requirements must be met:
-
-	<itemizedlist>
-	<listitem>
-	<para>
-	A RPM-based Linux distribution is required.
-	</para>
-	</listitem>
-	<listitem>
-	<para>
-	Java 1.4.2, either SDK or JRE, needs to be installed.
-	</para>
-	</listitem>
-	<listitem>
-	<para>
-	PostgreSQL must be installed and running. See <xref
-	linkend="cb-postgres-install"/> for more details. It is
-	strongly recommended to use version 8 or higher.
-	</para>
-	</listitem>
-	</itemizedlist>       
-	
-	</para>
-	</section>
-
-<section>
-<title>Installation of the <dcache/> Software</title>
-    <para>
-      The RPM packages may be installed right away on each node:
-
-<screen><rootprompt/><command>rpm</command> -ivh dcache-server-<replaceable>version</replaceable>-<replaceable>release</replaceable>.i386.rpm
-<rootprompt/><command>rpm</command> -ivh dcache-client-<replaceable>version</replaceable>-<replaceable>release</replaceable>.i386.rpm</screen>
-
-      and the <pnfs/> server software on the admin node:
-
-<screen><rootprompt/><command>rpm</command> -ivh pnfs-postgresql-<replaceable>version</replaceable>-<replaceable>release</replaceable>.i386.rpm</screen>
-
-    </para>
-</section>
-
-
-<section>
-<title>Configuring the PostgreSQL Server</title>
-
-      
       <para>
-	For <dcache/> version 1.6.6 release 1, please make sure the file
+	In order to install dCache the following requirements must be met:
+      </para>
+
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    A RPM-based Linux distribution is required.
+	  </para>
+	</listitem>
+
+	<listitem>
+	  <para>
+	    Java 1.4.2, either SDK or JRE, needs to be installed.
+	  </para>
+	</listitem>
+
+	<listitem>
+	  <para>
+	    PostgreSQL must be installed and running. See <xref
+	    linkend="cb-postgres-install"/> for more details. It is
+	    strongly recommended to use version 8 or higher.
+	  </para>
+	</listitem>
+      </itemizedlist>       
+    </section>
+
+    <section>
+      <title>Installation of the &dcache; Software</title>
+
+      <para>
+	The RPM packages may be installed right away on each node:
+      </para>
+
+      <screen>&prompt-root; <command>rpm</command> -ivh dcache-server-<replaceable>version</replaceable>-<replaceable>release</replaceable>.i386.rpm
+&prompt-root; <command>rpm</command> -ivh dcache-client-<replaceable>version</replaceable>-<replaceable>release</replaceable>.i386.rpm</screen>
+
+      <para>
+	and the &pnfs; server software on the admin node:
+      </para>
+
+      <screen>&prompt-root; <command>rpm</command> -ivh pnfs-postgresql-<replaceable>version</replaceable>-<replaceable>release</replaceable>.i386.rpm</screen>
+    </section>
+
+
+    <section>
+      <title>Configuring the PostgreSQL Server</title>
+
+      <para>
+	For &dcache; version 1.6.6 release 1, please make sure the file
 	<filename>/var/lib/pgsql/data/postgresql.conf</filename>
 	contains
+      </para>
 
-<programlisting>...
+      <programlisting>...
 add_missing_from = on
 ...</programlisting>
 
+      <para>
 	This will not be necessary in future releases.
-	
       </para>
 
       <para>
 	The file <filename>/var/lib/pgsql/data/pg_hba.conf</filename>
 	should contain
+      </para>
 	
-<programlisting>...
+      <programlisting>...
 local   all         all                        trust
 host    all         all         127.0.0.1/32   trust
 host    all         all         ::1/128        trust</programlisting>
 
+      <para>
 	For these changes to take effect, restart the server, e.g. with
-      
-<screen><rootprompt/><command>/etc/init.d/postgresql</command> restart</screen>
-	
       </para>
       
+      <screen>&prompt-root; <command>/etc/init.d/postgresql</command> restart</screen>
+      
       <para>
-        Prepare the PostgreSQL users and databases as they are needed
-        for the components of <dcache/> and/or the <pnfs/> server: The <pnfs/>
-        server only needs a database user. We suggest to call it
-        <quote>pnfsserver</quote>. Create it with
+	Prepare the PostgreSQL users and databases as they are needed
+	for the components of &dcache; and/or the &pnfs; server: The
+	&pnfs; server only needs a database user. We suggest to call
+	it <database class="user">pnfsserver</database>. Create it
+	with:
+      </para>
 
-<screen><rootprompt/><command>createuser</command> -U postgres --no-superuser --no-createrole --createdb --pwprompt pnfsserver</screen>
+      <screen>&prompt-root; <command>createuser</command> -U postgres --no-superuser --no-createrole --createdb --pwprompt pnfsserver</screen>
 
-        Several databases will be created by this user. At initial installation,
-        as described below, two databases will be created:
-        <quote>admin</quote> and <quote>data1</quote>. These databases
-        will contain the information about the namespace of the <pnfs/>
-        filesystem. If the information in these databases is lost, the whole
-        data in the <dcache/> instance is not accessible anymore. Therefore,
-        make sure these databases are backed up regularly and also stored on
-        appropriately reliable hardware. Further advice may be found in <xref
-          linkend="cb-postgres"/> of the <dcache/> book.
+      <para>
+	Several databases will be created by this user. At initial
+	installation, as described below, two databases will be
+	created: <database>admin</database> and
+	<database>data1</database>. These databases will contain the
+	information about the namespace of the &pnfs; filesystem. If
+	the information in these databases is lost, the whole data in
+	the &dcache; instance is not accessible anymore. Therefore,
+	make sure these databases are backed up regularly and also
+	stored on appropriately reliable hardware. Further advice may
+	be found in <xref linkend="cb-postgres"/>.
       </para>
 
       <para>
-        The <dcache/> components will access the database server with the user
-        <quote>srmdcache</quote>:
+        The &dcache; components will access the database server with
+        the user <database class="user">srmdcache</database>:
+      </para>
 
-<screen><rootprompt/><command>createuser</command> -U postgres --no-superuser --no-createrole --createdb --pwprompt srmdcache</screen>
+      <screen>&prompt-root; <command>createuser</command> -U postgres --no-superuser --no-createrole --createdb --pwprompt srmdcache</screen>
 
-        Several central components running on the admin node as well as each
-        <srm/> will use the database <quote>dcache</quote> for state
-        information:
+      <para>
+	Several central components running on the admin node as well
+	as each &srm; will use the database
+	<database>dcache</database> for state information:
+      </para>
 
-<screen><rootprompt/><command>createdb</command> -U srmdcache dcache</screen>
+      <screen>&prompt-root; <command>createdb</command> -U srmdcache dcache</screen>
 
-        There might be several of these on several hosts. Each is used by the
-        <dcache/> components running on the respective host.
+      <para>
+	There might be several of these on several hosts. Each is used
+	by the &dcache; components running on the respective host.
       </para>
 
       <para>
-        The <pnfs/> companion uses the database <quote>companion</quote> to
-        store the pools all files are located on. On the admin node create and 
-        initialize it with
+        The &pnfs; companion uses the database
+        <database>companion</database> to store the pools all files
+        are located on. On the admin node create and initialize it
+        with
+      </para>
 
-<screen><rootprompt/><command>createdb</command> -U srmdcache companion
-<rootprompt/><command>psql</command> -U srmdcache companion -f /opt/d-cache/etc/psql_install_companion.sql</screen>
+      <screen>&prompt-root; <command>createdb</command> -U srmdcache companion
+&prompt-root; <command>psql</command> -U srmdcache companion -f /opt/d-cache/etc/psql_install_companion.sql</screen>
 
-        (It has to be located on the same host as the <pnfs/> server.)
+      <para>
+        (It has to be located on the same host as the &pnfs; server.)
       </para>
 
       <para>
-        If the resilience feature provided by the <glossterm
+	If the resilience feature provided by the <glossterm
           linkend="gl-replicamanager">replica manager</glossterm> is used, the
         database <quote>replicas</quote> has to be prepared on the admin node
+      </para>
 
-<screen><rootprompt/><command>createdb</command> -U srmdcache replicas
-<rootprompt/><command>psql</command> -U srmdcache replicas -f /opt/d-cache/etc/psql_install_replicas.sql</screen>
+<screen>&prompt-root; <command>createdb</command> -U srmdcache replicas
+&prompt-root; <command>psql</command> -U srmdcache replicas -f /opt/d-cache/etc/psql_install_replicas.sql</screen>
         
-        Note that the disk space will at least be cut in half if the replica
-        manager is used.
+      <para>
+	Note that the disk space will at least be cut in half if the
+	replica manager is used.
       </para>
 
       <para>
         If the billing information should also be stored in a database
-        (in addition to files) the database <quote>billing</quote> has
-        to be created:
-
-<screen><rootprompt/><command>createdb</command> -U srmdcache billing</screen>
-        
-	However, we strongly advise against using the same database
-	server for the <pnfs/> server and the billing information.
-	For how to configure the billing cell to write into this database, see below. <!-- <xref linkend="cb-accounting"/>. -->
+        (in addition to files) the database
+        <database>billing</database> has to be created:
       </para>
 
+      <screen>&prompt-root; <command>createdb</command> -U srmdcache billing</screen>
+     
+      <para>
+	However, we strongly advise against using the same database
+	server for the &pnfs; server and the billing information.
+	For how to configure the billing cell to write into this
+	database, see below.
+      </para>
     </section>
-
+    
     <section>
-      <title>Installing the <pnfs/> Server</title>
+      <title>Installing the &pnfs; Server</title>
 
       <para>
-	The <pnfs/> server software is installed in the directory
+	The &pnfs; server software is installed in the directory
 	<filename class="directory">/opt/pnfs/</filename>. For the
 	installation copy the file
 	<filename>/opt/pnfs/etc/pnfs_config.template</filename> to
 	<filename>/opt/pnfs/etc/pnfs_config</filename>. It contains
+      </para>
 
-<programlisting>PNFS_INSTALL_DIR = /opt/pnfs
+      <programlisting>PNFS_INSTALL_DIR = /opt/pnfs
 PNFS_ROOT = /pnfs
 PNFS_DB = /opt/pnfsdb
 PNFS_LOG = /var/log
 PNFS_OVERWRITE = no
 PNFS_PSQL_USER = pnfsserver</programlisting>
 
+      <para>
 	and should be suitable for most installations. Next, run
+      </para>
 
-<screen><rootprompt/><command>/opt/pnfs/install/pnfs-install.sh</command>
+      <screen>&prompt-root; <command>/opt/pnfs/install/pnfs-install.sh</command>
 PNFS_PSQL_USER = pnfsserver
  Checking nfs servers : Ok
       Preparing setup : Ok
@@ -235,9 +284,9 @@ Installation of PNFS completed - stop PNFS
  Killing dbserver . Done
  Removing 8 Clients  0+ 1+ 2+ 3+ 4+ 5+ 6+ 7+
  Removing 8 Servers  0+ 1+ 2+ 3+ 4+ 5+ 6+ 7+
- Removing main switchboard ... O.K.
-</screen>
+ Removing main switchboard ... O.K.</screen>
 
+      <para>
 	This will write the central configuration file
 	<filename>/usr/etc/pnfsSetup</filename> and initialize the
 	databases in the PostgreSQL server as well as configuration
@@ -248,33 +297,34 @@ Installation of PNFS completed - stop PNFS
       </para>
 
       <para>
-	The <pnfs/> server may now be started with
+	The &pnfs; server may now be started with
+      </para>
 
-<screen><rootprompt/><command>/opt/pnfs/bin/pnfs</command> start
+      <screen>&prompt-root; <command>/opt/pnfs/bin/pnfs</command> start
 Starting dcache services:  Shmcom : Installed 8 Clients and 8 Servers
 Starting database server for admin (/opt/pnfsdb/pnfs/databases/admin) ... O.K.
 Starting database server for data1 (/opt/pnfsdb/pnfs/databases/data1) ... O.K.
 Waiting for dbservers to register ... Ready
 Starting Mountd : pmountd
-Starting nfsd : pnfsd
-</screen>
+Starting nfsd : pnfsd</screen>
 
+      <para>
 	This script may be copied to <filename
-	class="directory">/etc/init.d/</filename> and the <pnfs/> may be
-	configured to start at boot time with
-
-<screen><rootprompt/><command>chkconfig</command> --add pnfs
-<rootprompt/><command>chkconfig</command> pnfs on</screen>
-
+	class="directory">/etc/init.d/</filename> and the &pnfs; may
+	be configured to start at boot time with
       </para>
+
+      <screen>&prompt-root; <command>chkconfig</command> --add pnfs
+&prompt-root; <command>chkconfig</command> pnfs on</screen>
 
     </section>
 
+
     <section>
-      <title>Installing <dcache/> Components</title>
+      <title>Installing &dcache; Components</title>
 
       <para>
-	Quick <dcache/> installation:
+	Quick &dcache; installation:
       </para>
 
       <para>
@@ -284,7 +334,7 @@ Starting nfsd : pnfsd
       </para>
 
       <para>
-	The central configuration file of a <dcache/> instance is
+	The central configuration file of a &dcache; instance is
 	<filename>/opt/d-cache/config/dCacheSetup</filename>. For most
 	installation it is only necessary to set the variable
 	<varname>java</varname> to the binary of the java VM and the
@@ -310,16 +360,18 @@ Starting nfsd : pnfsd
 	node is configured by
 	<filename>/opt/d-cache/etc/pool_path</filename>. Each line in
 	this file describes one pool. The format is as follows:
+      </para>
 
-<programlisting><replaceable>poolDataDirectory</replaceable> <replaceable>poolSizeInGB</replaceable> <replaceable>reinstallPoolYesNo</replaceable></programlisting>
+      <programlisting><replaceable>poolDataDirectory</replaceable> <replaceable>poolSizeInGB</replaceable> <replaceable>reinstallPoolYesNo</replaceable></programlisting>
 
+      <para>
 	where <replaceable>poolDataDirectory</replaceable> is the full
 	path to the directory which will contain the data files as
 	well as some of the configuration of the pool,
 	<replaceable>poolSizeInGB</replaceable> is the size of the
 	pool. Make shure that there is always enough space under
 	<replaceable>poolDataDirectory</replaceable>. Be aware that
-	only pure data content is counted by <dcache/>. Leave enough
+	only pure data content is counted by &dcache;. Leave enough
 	room for configuration files and filesystem overhead.
      </para>
 
@@ -334,8 +386,9 @@ Starting nfsd : pnfsd
 
       <para>
 	When all configuration files are prepared configure the system with
+      </para>
 
-<screen><rootprompt/><command>/opt/d-cache/install/install.sh</command>
+      <screen>&prompt-root; <command>/opt/d-cache/install/install.sh</command>
 
 [INFO]  No 'SERVER_ID' set in 'node_config'. Using SERVER_ID=<replaceable>your.domain</replaceable>.
 
@@ -361,12 +414,13 @@ e3:4a:13:d5:33:45:e0:cd:69:a3:fb:d7:a8:64:df:73 root@grid-se3.desy.de
 
 
 [INFO]  Creating Pool <replaceable>hostname</replaceable>_1
-[INFO]  Creating Pool <replaceable>hostname</replaceable>_2
-</screen>
+[INFO]  Creating Pool <replaceable>hostname</replaceable>_2</screen>
 
+      <para>
 	and start the central components (only on the admin node) with
+      </para>
 
-<screen><rootprompt/><command>/opt/d-cache/bin/dcache-core</command> start
+      <screen>&prompt-root; <command>/opt/d-cache/bin/dcache-core</command> start
 Starting dcache services:
 Starting lmDomain  6 5 4 3 2 1 0 Done (pid=6802)
 Starting dCacheDomain  6 5 4 3 2 1 0 Done (pid=6875)
@@ -378,31 +432,31 @@ Starting utilityDomain  6 5 4 3 2 1 0 Done (pid=7330)
 Starting pnfsDomain  6 5 4 3 2 1 0 Done (pid=7436)
 Starting gridftp-clintonDomain  6 5 4 3 2 1 0 Done (pid=7569)
 Starting gsidcap-clintonDomain  6 5 4 3 2 1 0 Done (pid=7672)
-Starting srm-clintonDomain  6 5 4 3 2 1 0 Done (pid=7777)
-</screen>
+Starting srm-clintonDomain  6 5 4 3 2 1 0 Done (pid=7777)</screen>
 
+      <para>
 	the configured pools are started with
-
-<screen><rootprompt/><command>/opt/d-cache/bin/dcache-pool</command> start
-Starting dcache pool: Starting clintonDomain  6 5 4 3 2 1 0 Done (pid=7990)
-</screen>
-
-	These scripts may be copied to <filename
-	class="directory">/etc/init.d/</filename> and <dcache/> is
-	configured to start at boot-time with 
-
-<screen><rootprompt/><command>chkconfig</command> --add dcache-core
-<rootprompt/><command>chkconfig</command> --add dcache-pool
-<rootprompt/><command>chkconfig</command> dcache-core on
-<rootprompt/><command>chkconfig</command> dcache-pool on</screen>
-
       </para>
+
+      <screen>&prompt-root; <command>/opt/d-cache/bin/dcache-pool</command> start
+Starting dcache pool: Starting clintonDomain  6 5 4 3 2 1 0 Done (pid=7990)</screen>
+
+      <para>
+	These scripts may be copied to <filename
+	class="directory">/etc/init.d/</filename> and &dcache; is
+	configured to start at boot-time with
+      </para>
+
+      <screen>&prompt-root; <command>chkconfig</command> --add dcache-core
+&prompt-root; <command>chkconfig</command> --add dcache-pool
+&prompt-root; <command>chkconfig</command> dcache-core on
+&prompt-root; <command>chkconfig</command> dcache-pool on</screen>
 
       <para>
 	It is advisable to create a basic directory structure in the
-	<pnfs/> namespace where each directory uses a separate <pnfs/>
+	&pnfs; namespace where each directory uses a separate &pnfs;
 	database. This is still true for the PostgreSQL version of
-	<pnfs/> since the <pnfs/> server uses global locks on each
+	&pnfs; since the &pnfs; server uses global locks on each
 	database. <xref linkend="cf-pnfs-db"/> describes how it is
 	done. LCG sites should use at least two databases for each VO
 	they support: One for the directory
@@ -416,27 +470,25 @@ Starting dcache pool: Starting clintonDomain  6 5 4 3 2 1 0 Done (pid=7990)
 	new info provider included since version 1.6.6-2 based on an
 	earlier LCG installation.
       </para>
-
     </section>
-    
   </section>
 
   <section>
-    <title>Upgrading a <dcache/> Instance</title>
+    <title>Upgrading a &dcache; Instance</title>
 
     <para>
       Upgrading to bugfix releases within one version (e.g. from
       1.6.6-1 to 1.6.6-3) may be done by shutting down the server and
       upgrading the packages with
 
-<screen><rootprompt/><command>rpm</command> -Uvh <replaceable>packageName</replaceable></screen>
+<screen>&prompt-root; <command>rpm</command> -Uvh <replaceable>packageName</replaceable></screen>
 
       For details on the changes, pease refer to the <link
       linkend="rf-changelog">change log</link>.
     </para>
 
     <para>
-      This section describes the upgrade of <dcache/> instances
+      This section describes the upgrade of &dcache; instances
       installed with the previous version (currently version 1.6.5)
       and also some earlier versions - notably the one distributed
       with the previous or current LCG software. The first
@@ -447,25 +499,25 @@ Starting dcache pool: Starting clintonDomain  6 5 4 3 2 1 0 Done (pid=7990)
     </para>
 
     <para>
-      Note that the upgrade of <dcache/> is independent of a
-      conversion of the <pnfs/> database from GDBM to PostgreSQL. The
-      conversion and upgrade to the PostgreSQL version of <pnfs/> may
+      Note that the upgrade of &dcache; is independent of a
+      conversion of the &pnfs; database from GDBM to PostgreSQL. The
+      conversion and upgrade to the PostgreSQL version of &pnfs; may
       be performed any time before or after the upgrade of
-      <dcache/>. Do not perform the <dcache/> upgrade and the <pnfs/>
+      &dcache;. Do not perform the &dcache; upgrade and the &pnfs;
       database conversion simultaneously. It is better to do them one
       after the other, and test the system inbetween. Do not be
-      mislead by the fact the <dcache/> release only contains the
-      PostgreSQL version of <pnfs/> (since version 1.6.6). See <xref
+      mislead by the fact the &dcache; release only contains the
+      PostgreSQL version of &pnfs; (since version 1.6.6). See <xref
       linkend="cb-pnfs-postgres"/> for a guide to convert and upgrade
-      the <pnfs/> server.
+      the &pnfs; server.
     </para>
 
     <para>
-      In case you are already using PostgreSQL (e.g. for the <srm/>),
+      In case you are already using PostgreSQL (e.g. for the &srm;),
       it is a good idea to upgrade to version 8 now, because prior to
       dCache Version 1.6.6 no precious data is stored and therefore
       can be wiped off, allowing a PostgreSQL 8 installation from
-      scratch. Starting from <dcache/> version 1.6.6 PostgreSQL will
+      scratch. Starting from &dcache; version 1.6.6 PostgreSQL will
       be utilized more heavily, making migration a complex
       task. Another advantage of PostgreSQL 8 is an integrated
       mechanism for automatic backups.
@@ -475,29 +527,32 @@ Starting dcache pool: Starting clintonDomain  6 5 4 3 2 1 0 Done (pid=7990)
       <title>Quick Upgrade Guide</title>
 
       <para>
-	Stop the <dcache/> services on all nodes of the
+	Stop the &dcache; services on all nodes of the
 	instance:
+      </para>
 
-<screen><rootprompt/><command>/opt/d-cache/bin/dcache-pool</command> stop
-<rootprompt/><command>/opt/d-cache/bin/dcache-opt</command> stop
-<rootprompt/><command>/opt/d-cache/bin/dcache-core</command> stop
-</screen>
+      <screen>&prompt-root; <command>/opt/d-cache/bin/dcache-pool</command> stop
+&prompt-root; <command>/opt/d-cache/bin/dcache-opt</command> stop
+&prompt-root; <command>/opt/d-cache/bin/dcache-core</command> stop</screen>
 
-	Leave the <pnfs/> server running. In LCG installations, there
+      <para>
+	Leave the &pnfs; server running. In LCG installations, there
 	might be a <quote>meta-package</quote> installed which can
 	prevent the update to the current version. It should be
 	deinstalled. The following command will do that and will not
 	harm if the metapackage is not installed. Therefore, go ahead
 	and do it anyway:
+      </para>
 
-<screen><rootprompt/><command>rpm</command> -e lcg-SE_dcache
-</screen>
+      <screen>&prompt-root; <command>rpm</command> -e lcg-SE_dcache</screen>
 
-	Upgrade the <dcache/> RPM packages with
+      <para>
+	Upgrade the &dcache; RPM packages with
+      </para>
 
-<screen><rootprompt/><command>rpm</command> -Uvh dcache-server-1.6.6-1.i386.rpm dcache-client-1.6.6-1.i386.rpm
-</screen>
+      <screen>&prompt-root; <command>rpm</command> -Uvh dcache-server-1.6.6-1.i386.rpm dcache-client-1.6.6-1.i386.rpm</screen>
 
+      <para>
 	For this quick upgrade you have to keep your old configuration
 	files (i.e. <filename>config/dCacheSetup</filename>,
 	<filename>config/PoolManager.conf</filename>
@@ -510,9 +565,11 @@ Starting dcache pool: Starting clintonDomain  6 5 4 3 2 1 0 Done (pid=7990)
       <para>
 	However, make sure that <filename>etc/node_config</filename>
 	contains
+      </para>
 
-<programlisting>PNFS_OVERWRITE=no</programlisting>
+      <programlisting>PNFS_OVERWRITE=no</programlisting>
 
+      <para>
 	and that a single value is assigned to
 	<varname>NODE_TYPE</varname>.  Check that
 	<filename>etc/pool_path</filename> contains
@@ -523,24 +580,25 @@ Starting dcache pool: Starting clintonDomain  6 5 4 3 2 1 0 Done (pid=7990)
 
       <para>
 	Run the install script:
+      </para>
 
-<screen><rootprompt/><command>/opt/d-cache/install/install.sh</command>
-</screen>
+      <screen>&prompt-root; <command>/opt/d-cache/install/install.sh</command></screen>
 
+      <para>
 	And start the server again with
+      </para>
 
-<screen><rootprompt/><command>/opt/d-cache/bin/dcache-core</command> start
-<rootprompt/><command>/opt/d-cache/bin/dcache-pool</command> start</screen>
+      <screen>&prompt-root; <command>/opt/d-cache/bin/dcache-core</command> start
+&prompt-root; <command>/opt/d-cache/bin/dcache-pool</command> start</screen>
 
+      <para>
 	Note that the start-up script for the optional components is
 	not needed anymore. Therefore, it is probably best to remove them:
+      </para>
 
-<screen><rootprompt/><command>rm</command> /opt/d-cache/bin/dcache-opt /etc/init.d/dcache-opt
-</screen>
-
-</para>
-
+      <screen>&prompt-root; <command>rm</command> /opt/d-cache/bin/dcache-opt /etc/init.d/dcache-opt</screen>
     </section>
+
 
     <section>
       <title>After The Upgrade</title>
@@ -579,11 +637,11 @@ Starting dcache pool: Starting clintonDomain  6 5 4 3 2 1 0 Done (pid=7990)
 	If, prior to the upgrade, you changed anything in a batch file
 	(<filename>config/<replaceable>domainName</replaceable>.batch</filename>)
 	these changes will be moved to files with names
-	<filename>config/<replaceable>domainName</replaceable>.batch.rpmsave</filename>. There
-	have been major changes to the batch files. Therefore it is
-	necessary to reapply your changes. However, keep in mind that
-	the batch files are considered to be part of the software and
-	not configuration files. 
+	<filename>config/<replaceable>domainName</replaceable>.batch.rpmsave</filename>.
+	There have been major changes to the batch files. Therefore it
+	is necessary to reapply your changes. However, keep in mind
+	that the batch files are considered to be part of the software
+	and not configuration files.
       </para>
 
       <para>
@@ -603,45 +661,55 @@ Starting dcache pool: Starting clintonDomain  6 5 4 3 2 1 0 Done (pid=7990)
 	change. Therefore, it is fine to keep your old one. In case
 	you did not customize the pool manager configuration, make
 	sure that the <literal>set costcuts</literal> line reads
+      </para>
 
-<programlisting>set costcuts -idle=0.0 -p2p=2.0 -alert=0.0 -halt=0.0 -fallback=0.0</programlisting>
+      <programlisting>set costcuts -idle=0.0 -p2p=2.0 -alert=0.0 -halt=0.0 -fallback=0.0</programlisting>
 
+      <para>
 	Prior versions installed a
 	<filename>config/PoolManager.conf</filename> with
 	<literal>-idle=1.0</literal> which will lead to undesired
-	behaviour of the pool manager. 
+	behaviour of the pool manager.
       </para>
 
       <para>
 	Before switching on the companion in
 	<filename>config/dCacheSetup</filename> with the line
+      </para>
 
-<programlisting>cacheInfo=companion</programlisting>
+      <programlisting>cacheInfo=companion</programlisting>
 
+      <para>
 	you have to be aware of the following: 
       </para>
 
       <para>
 	For each file the list of pools the file is stored on (the
-	cache info) is now stored within the <pnfs/> namespace
-	metadata. When switching on the companion, the <dcache/>
+	cache info) is now stored within the &pnfs; namespace
+	metadata. When switching on the companion, the &dcache;
 	system expects it to be stored in a PostgreSQL database. You
 	should first create this database:
+      </para>
 
-<screen><rootprompt/><command>createdb</command> -U srmdcache companion
-<rootprompt/><command>psql</command> -U srmdcache companion -f /opt/d-cache/etc/psql_install_companion.sql</screen>
+      <screen>&prompt-root; <command>createdb</command> -U srmdcache companion
+&prompt-root; <command>psql</command> -U srmdcache companion -f /opt/d-cache/etc/psql_install_companion.sql</screen>
 
+      <para>
 	on the node where the PnfsManager will run (normally the
-	admin node). Now, put 
+	admin node). Now, put
+      </para>
 
-<programlisting>cacheInfo=companion</programlisting>
+      <programlisting>cacheInfo=companion</programlisting>
 
+      <para>
 	into <filename>config/dCacheSetup</filename> and restart the
 	PnfsManager:
+      </para>
 
-<screen><command>/opt/d-cache/bin/dcache-core</command> restart</screen>
+      <screen><command>/opt/d-cache/bin/dcache-core</command> restart</screen>
 
-	Now the <dcache/> system will not be aware of any files stored
+      <para>
+	Now the &dcache; system will not be aware of any files stored
 	on the pools. To make it aware again, you have to go through
 	the following steps: Since this will take a while and will put
 	a considerable load on the PnfsManager, take care that this is
@@ -652,22 +720,29 @@ Starting dcache pool: Starting clintonDomain  6 5 4 3 2 1 0 Done (pid=7990)
       <para>
 	In the admin interface (see <xref linkend="intouch-admin"/>)
 	go to a pool, e.g.
+      </para>
 
-<screen><dcprompt select="local"/><command>cd</command> <replaceable>hostname</replaceable>_1</screen>
+      <screen>&dc-prompt-local; <command>cd</command> <replaceable>hostname</replaceable>_1</screen>
 
+      <para>
 	and issue the command
+      </para>
 
-<screen><dcpoolprompt/><command>pnfs register</command></screen>
+      <screen>&dc-prompt-pool; <command>pnfs register</command></screen>
 
+      <para>
 	Then go to the pnfs manager:
+      </para>
 
-<screen><dcpoolprompt/><command>..</command>
-<dcprompt select="local"/><command>cd</command> PnfsManager</screen>
+      <screen>&dc-prompt-pool; <command>..</command>
+&dc-prompt-local; <command>cd</command> PnfsManager</screen>
 
+      <para>
 	Check the output of the <quote><command>info</command></quote>
 	command repeatedly:
+      </para>
 
-<screen><dcprompt select="PnfsManager"/>info
+      <screen>&dc-prompt-pnfsmngr; info
 ...
 Threads (4) Queue
     [0] 10
@@ -676,21 +751,20 @@ Threads (4) Queue
     [3] 13
 ...</screen>
 
+      <para>
 	and wait till the value for all four queues is zero. Then go
 	to the next pool and repeat the process.
       </para>
       
     </section>
-
-    
-    
   </section>
+
 
   <section>
     <title>Additional Components</title>
 
     <para>
-      Some features of <dcache/> are switched off by default after an
+      Some features of &dcache; are switched off by default after an
       installation. The following describes how to put them to use: 
     </para>
 
@@ -702,38 +776,39 @@ Threads (4) Queue
 	class="directory">/opt/d-cache/billing/</filename> on the
 	admin node will also be written to a database if
 	<filename>config/dCacheSetup</filename> contains
+      </para>
 
-<programlisting>billingToDb=yes</programlisting>
+      <programlisting>billingToDb=yes</programlisting>
 
+      <para>
 	A PostgreSQL server is expected to run on the admin node with
 	a database user <quote><literal>srmdcache</literal></quote>
 	and a database <quote><literal>billing</literal></quote> with
-
-<screen><rootprompt/><command>createuser</command> -U postgres --no-superuser --no-createrole --createdb --pwprompt srmdcache
-<rootprompt/><command>createdb</command> -U srmdcache billing</screen>
       </para>
 
+      <screen>&prompt-root; <command>createuser</command> -U postgres --no-superuser --no-createrole --createdb --pwprompt srmdcache
+&prompt-root; <command>createdb</command> -U srmdcache billing</screen>
     </section>
+
 
     <section>
       <title>Space Reservation</title>
 
       <para>
-	The space reservation feature between the <srm/> and the
+	The space reservation feature between the &srm; and the
 	GridFTP door may be switched on with
-
-<programlisting>spaceReservation=true</programlisting>
-
       </para>
+
+      <programlisting>spaceReservation=true</programlisting>
 
     </section>
 
   </section>
   
-  <section id="in-rpm">
-  <title>Old Installation Manual</title>
-  <screen>
-The latest release of the dCache distribution is version 1-6-5.
+  <section id="in-rpm" role="NotInToc">
+    <title>Old Installation Manual</title>
+
+    <screen>The latest release of the dCache distribution is version 1-6-5.
 Release notes describing new features and bug fixes can be found at
 
 http://www.dcache.org/manuals/experts_docs/rel-dcache-1-6-5.html 
@@ -1620,114 +1695,34 @@ Note: The following is supported in version 1.2.2-1 for the
 
   Note: When setting the password string in the shell one can
         disable the echo by typing "ctrl I" following "set
-        password".
+        password".</screen>
+      
+      </section>
 
-</screen>
-    
-<!--
-  <section id="in-rpm-deinstall">
-    <title>Deinstallation (for New Install on Testsystems)<replaceable/title>
 
-    <section id="in-rpm-deinstall-pnfs">
-      <title>Deinstallation of PNFS</title>
+    <section id="in-other-os">
+    <title>Running dCache on non Linux OS'es</title>
 
-      <orderedlist>
-        <listitem>
-          <para>The <application>pnfs</application>-services are stopped with
-          <screen><prompt>[root@machine ~ ] # </prompt><userinput><command>/opt/pnfs.3.1.10/pnfs/bin/pnfs</command> stop</userinput></screen></para>
-        </listitem>
+    <para>
+      Because of the wide spread usage of dCache in the grid word, we
+      provide the dCache binary packages mainly for a certain Linux
+      flavour complaint to the rest of the LCG, gLite or OSG software.
+      The dCache system itself is, except for the filesystem engine
+      (pnfs) and the dCap client, 100% java, so that a port should be
+      easy as long as the OS is coming with a resonably modern java
+      virtual machine.  For now dCache is fine with java 1.4 but very
+      soon we will move to 1.5. This chapter should give an estimate
+      on how much effort is necessary to do the porting to other
+      OS'es.
+    </para>
 
-        <listitem>
-          <para>To remove the installation of PNFS in
-          <filename>/opt/pnfs.3.1.10/</filename> type <screen><prompt>[root@machine ~ ] # </prompt><userinput><command>rpm</command> -e pnfs</userinput></screen></para>
-        </listitem>
+    <section>
+      <title>dCache Pools</title>
 
-        <listitem>
-          <para>If the logfile has been created, delete it with <screen><prompt>[root@machine ~ ] # </prompt><userinput><command>rm</command> /var/log/pnfsd.log</userinput></screen>
-          It is not always there (When is it created?)</para>
-        </listitem>
-
-        <listitem>
-          <para>Remove the database directory, so that a new installation does
-          not use it: <screen><prompt>[root@machine ~ ] # </prompt><userinput><command>rm</command> -r /opt/pnfsdb</userinput></screen></para>
-        </listitem>
-
-        <listitem>
-          <para>Next, emove the mount point directory: <screen><prompt>[root@machine ~ ] # </prompt> <userinput><command>rm</command> -r /pnfs</userinput></screen>
-          It might be better to only remove the directory
-          <filename>/pnfs/fs</filename>, if the mount point is needed later
-          for installation of a POOL-node.</para>
-        </listitem>
-
-        <listitem>
-          <para>Since at least the configuration file
-          <filename>/opt/pnfs.3.1.10/pnfs/etc/pnfs_config</filename> will not
-          be removed by the <quote><userinput><command>rpm</command> -e
-          pnfs</userinput></quote>-command, it is necessary to remove
-          <filename>/opt/pnfs.3.1.10/</filename> manually: <screen><prompt>[root@machine ~ ] # </prompt> <userinput><command>rm</command> -r /opt/pnfs.3.1.10</userinput></screen>
-          This should be done last, so that we are always able to check in the
-          configuration file for the configured paths.</para>
-        </listitem>
-      </orderedlist>
-    </section>
-
-    <section id="in-rpm-deinstall-dcache">
-      <title>Deinstallation of dCache</title>
-
-      <orderedlist>
-        <listitem>
-          <para>Deinstall the old packages with rpm: <screen><prompt>[root@machine ~ ] # </prompt> <userinput><command>rpm</command> -e d-cache-core</userinput>
-<prompt>[root@machine ~ ] # </prompt> <userinput><command>rpm</command> -e d-cache-opt</userinput>
-<prompt>[root@machine ~ ] # </prompt> <userinput><command>rpm</command> -e d-cache-client</userinput></screen></para>
-        </listitem>
-
-        <listitem>
-          <para>Remove the POOL-directories as listed in
-          <filename>/opt/d-cache/etc/pool_path</filename>: <screen><prompt>[root@machine ~ ] # </prompt> <userinput><command>rm</command> -r /where/ever/the/pool/path/is</userinput></screen></para>
-        </listitem>
-
-        <listitem>
-          <para>For the same reason as with NFS, the directory
-          <filename>/opt/d-cache/</filename> has to be removed: <screen><prompt>[root@machine ~ ] # </prompt> <userinput><command>rm</command> -r /opt/d-cache/</userinput></screen></para>
-        </listitem>
-      </orderedlist>
+      <para>
+	The dCache pool code is certainly the easiest part to port.
+      </para>
     </section>
   </section>
 
-  <section id="in-rpm-pool">
-    <title>Installation of a Pool Node</title>
-
-    <orderedlist>
-      <listitem>
-        <para>Mount the PNFS (needed?) <screen><prompt>[root@machine ~ ] # </prompt> <userinput>mkdir -p /pnfs/<replaceable>domain</replaceable></userinput>
-<prompt>[root@machine ~ ] # </prompt> <userinput><command>mount</command> -o intr,rw,noac,hard  <replaceable>server</replaceable>:/pnfs /pnfs/<replaceable>doma</replaceable></userinput></screen></para>
-      </listitem>
-
-      <listitem>
-        <para>q<screen><prompt>[root@machine ~ ] # </prompt> <userinput>mkdir -p /pnfs/<replaceable>domain</replaceable></userinput>
-<prompt>[root@machine ~ ] # </prompt> <userinput><command>mount</command> -o intr,rw,noac,hard  <replaceable>server</replaceable>:/pnfs /pnfs/<replaceable>doma</replaceable></userinput></screen></para>
-      </listitem>
-    </orderedlist>
-  </section>
--->
-  </section>
-<unfinished>
-  <section id="in-other-os">
-  <title>Running dCache on non Linux OS'es</title>
-  <para>
-  Because of the wide spread usage of dCache in the grid word, we provide the dCache binary packages
-  mainly for a certain Linux flavour complaint to the rest of the LCG, gLite or OSG software.
-  The dCache system itself is, except for the filesystem engine (pnfs) and the dCap client, 100% java,
-  so that a port should be easy as long as the OS is coming with a resonably modern java virtual machine. 
-  For now dCache is fine with java 1.4 but very soon we will move to 1.5. This chapter should give an
-  estimate on how much effort is necessary to do the porting to other OS'es.
-  </para>
-  <section>
-  <title>dCache Pools</title>
-  <para>
-  The dCache pool code is certainly the easiest part to port.
-  </para>
-  </section>
-  </section>
-</unfinished>
 </chapter>

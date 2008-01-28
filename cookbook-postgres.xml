@@ -1,55 +1,76 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+%sharedents;
+]>
     
 <chapter id="cb-postgres">
-  <title>PostgreSQL and <dcache/></title>
-  
-  <partauthors>Vladimir Podstavkov, Mathias de Riese, Martin Radicke</partauthors>
+
+  <title>&psql; and &dcache;</title>
+
+  <chapterinfo>
+    <author>
+      <firstname>Vladimir</firstname>
+      <surname>Podstavkov</surname>
+    </author>
+
+    <author>
+      <firstname>Mathias</firstname>
+      <surname>de Riese</surname>
+    </author>
+
+    <author>
+      <firstname>Martin</firstname>
+      <surname>Radicke</surname>
+    </author>
+  </chapterinfo>
 
   <para>
-    PostgreSQL is used for various things in a <dcache/> system: The
-    <glossterm linkend="gl-srm">SRM</glossterm>, the <glossterm
+    &psql; is used for various things in a &dcache; system: The
+    <glossterm linkend="gl-srm">&srm;</glossterm>, the <glossterm
     linkend="gl-pinmanager">pin manager</glossterm>, the <glossterm
     linkend="gl-spacemanager">space manager</glossterm>, the
-    <glossterm linkend="gl-replicamanager">replica manager</glossterm>, the
-    <glossterm linkend="gl-pnfscompanion"><pnfs/>
-    companion</glossterm>, the <glossterm linkend="gl-billing">billing
-    cell</glossterm>, and the <pnfs/> server might make use of one or
-    more databases in a single or several separate PostgreSQL servers.
+    <glossterm linkend="gl-replicamanager">replica
+    manager</glossterm>, the <glossterm
+    linkend="gl-pnfscompanion">&pnfs; companion</glossterm>, the
+    <glossterm linkend="gl-billing">billing cell</glossterm>, and the
+    &pnfs; server might make use of one or more databases in a single
+    or several separate &psql; servers.
   </para>
   
   <para>
-    The SRM, the pin manager, the space manager, the replica manager,
-    and the <pnfs/> companion will use the PostgreSQL database as
+    The &srm;, the pin manager, the space manager, the replica
+    manager, and the &pnfs; companion will use the &psql; database as
     configured at cell start-up in the corresponding batch files. The
     billing cell will only write the accounting information into a
     database if it is configured with the option
-    <option>-useSQL</option>. The <pnfs/> server will use a PostgreSQL
+    <option>-useSQL</option>. The &pnfs; server will use a &psql;
     server if the <literal>pnfs-posgresql</literal> version is
-    used. It will use several databases in the PostgreSQL server, just
-    as the gdbm version of the <pnfs/> server uses serveral database
-    files. How to convert the gdbm files of an existing <pnfs/> server
-    into PostgreSQL databases is described in <xref
+    used. It will use several databases in the &psql; server, just as
+    the gdbm version of the &pnfs; server uses serveral database
+    files. How to convert the gdbm files of an existing &pnfs; server
+    into &psql; databases is described in <xref
     linkend="cb-pnfs-postgres"/>.
   </para>
 
   <section id="cb-postgres-install">
-    <title>Installing a PostgreSQL Server</title>
+    <title>Installing a &psql; Server</title>
 
     <para>
-      The preferred way to set up a PostgreSQL server should be the
+      The preferred way to set up a &psql; server should be the
       installation of the version provided by your OS
       distribution. It is strongly recommended to use version 8 or
       higher.
     </para>
 
     <para>
-      Install the PostgreSQL server, client and JDBC support with the
+      Install the &psql; server, client and JDBC support with the
       tools of the operating system. 
 <!--
       For example, use
 
-<screen><rootprompt/><command>apt-get</command> install postgresql postgresql-server postgresql-jdbc</screen>
+<screen>&prompt-root; <command>apt-get</command> install postgresql postgresql-server postgresql-jdbc</screen>
 -->
       You can download a suitable package from <ulink
       url="http://www.postgresql.org/ftp/">http://www.postgresql.org/ftp/</ulink>. A
@@ -64,23 +85,23 @@
         start the database server, and make sure that it is started 
         at system start-up. This may be done with
 
-<screen><rootprompt/><command>/etc/init.d/postgresql</command> start
-<rootprompt/><command>chkconfig</command> postgresql on</screen>
+<screen>&prompt-root; <command>/etc/init.d/postgresql</command> start
+&prompt-root; <command>chkconfig</command> postgresql on</screen>
 
         If the start-up script does not perform the initialization
         automatically, it might have to be done with
 
-<screen><rootprompt/><command>initdb</command> -D <filename class="directory">/var/lib/pgsql/data/</filename></screen>
+<screen>&prompt-root; <command>initdb</command> -D <filename class="directory">/var/lib/pgsql/data/</filename></screen>
 
         and the server is started manually with
 
-<screen><rootprompt/><command>postmaster</command> -i -D <filename class="directory">/var/lib/pgsql/data/</filename> >logfile 2>&amp;1 &amp;</screen>
+<screen>&prompt-root; <command>postmaster</command> -i -D <filename class="directory">/var/lib/pgsql/data/</filename> >logfile 2>&amp;1 &amp;</screen>
     </para>
 
     <para>
       The server has to be configured to admit TCP/IP connections from
       <literal>localhost</literal>. This is the default for version 8
-      of PostgreSQL. 
+      of &psql;. 
 
 <!--  For earlier versions make sure,
       <filename>/var/lib/pgsql/data/postgresql.conf</filename>
@@ -95,7 +116,7 @@ tcpip_socket = true
     </para>
 
     <para>
-      For <dcache/> version 1.6.6 release 1, please make sure the file
+      For &dcache; version 1.6.6 release 1, please make sure the file
       <filename>/var/lib/pgsql/data/postgresql.conf</filename>
       contains
     </para>
@@ -117,7 +138,7 @@ local   all         all                        trust
 host    all         all         127.0.0.1/32   trust
 host    all         all         ::1/128        trust</programlisting>
 
-      <!-- for PostgreSQL version 8. -->
+      <!-- for &psql; version 8. -->
 
 <!-- and
 
@@ -134,21 +155,21 @@ host    all         all         ::1/128   ffff:ffff:ffff:ffff:ffff:ffff:ffff:fff
       Restart the server, e.g. with
     </para>
       
-<screen><rootprompt/><command>/etc/init.d/postgresql</command> restart</screen>
+<screen>&prompt-root; <command>/etc/init.d/postgresql</command> restart</screen>
 
     <para>
       The configuration of the access rights in
       <filename>/var/lib/pgsql/data/pg_hba.conf</filename> is rather
       liberal: Any user on the local machine may connect to the
-      PostgreSQL server as any database user without specifying a
+      &psql; server as any database user without specifying a
       password. This way, you can be sure that problems will not be
       due to wrong access rights or passwords. See <xref
-      linkend="cb-postgres-configure"/> of the <dcache/> book for more
-      advice on configuring PostgreSQL.
+      linkend="cb-postgres-configure"/> of the &dcache; book for more
+      advice on configuring &psql;.
     </para>
 
     <para>
-      If a current version of PostgreSQL is not available for the
+      If a current version of &psql; is not available for the
       distribution, it can be compiled as follows:
       You can download the source code from the official web site: <ulink
         url="http://www.postgresql.org/download">http://www.postgresql.org/download</ulink> and
@@ -182,11 +203,11 @@ su - postgres
   </section>
 
   <section id="cb-postgres-configure">
-    <title>Configuring Access to PostgreSQL</title>
+    <title>Configuring Access to &psql;</title>
 
     <para>
       In the installation guide instructions are given for configuring one
-      PostgreSQL server on the admin node for all the above described purposes 
+      &psql; server on the admin node for all the above described purposes 
       with generous access rights. This is done to make the installation as easy as
       possible. The access rights are configured in the file
       <filename><replaceable>database_directory_name</replaceable>/data/pg_hba.conf</filename>.
@@ -200,7 +221,7 @@ host    all         all         ::1/128                             trust
 host    all         all         <replaceable>HostIP</replaceable>/32          trust</programlisting>
 <!-- host    all         all   <replaceable>srmHostIP</replaceable>      255.255.255.255   trust -->
 
-      This gives access to all databases in the PostgreSQL server to all users
+      This gives access to all databases in the &psql; server to all users
       on the admin host.
     </para>
     
@@ -218,18 +239,18 @@ host    all         all         <replaceable>HostIP</replaceable>/32          md
 
       The server is made aware of this with
 
-<screen><rootprompt/><command>pg_ctl</command> reload</screen>
+<screen>&prompt-root; <command>pg_ctl</command> reload</screen>
 
       It can still be configured with the user <literal>postgres</literal>:
 
-<screen><rootprompt/><command>su</command> - postgres</screen>
+<screen>&prompt-root; <command>su</command> - postgres</screen>
       
       And the password for e.g. the user <literal>pnfsserver</literal> can be
       set with
 
-<screen><userprompt/><command>psql</command> template1 -c "ALTER USER pnfsserver WITH PASSWORD '<replaceable>yourPassword</replaceable>'"</screen>
+<screen>&prompt-user; <command>psql</command> template1 -c "ALTER USER pnfsserver WITH PASSWORD '<replaceable>yourPassword</replaceable>'"</screen>
 
-      The <pnfs/> server is made aware of this password by changing the variable
+      The &pnfs; server is made aware of this password by changing the variable
       <varname>dbConnectString</varname> in the file
       <filename>/usr/etc/pnfsSetup</filename>:
 
@@ -238,50 +259,53 @@ export dbConnectString="user=pnfsserver password=<replaceable>yourPassword</repl
 
       User access should be prohibited to this file with
 
-<screen><rootprompt/><command>chmod</command> go-rwx /usr/etc/pnfsSetup</screen>
+<screen>&prompt-root; <command>chmod</command> go-rwx /usr/etc/pnfsSetup</screen>
 
     </para>
   </section>
 
   <section>
-    <title>Performance of the PostgreSQL Server</title>
+    <title>Performance of the &psql; Server</title>
 
     <para>
       On small systems it should never be a problem to use one single
-      PostgreSQL server for all the functions listed above. In the
-      standard installation, the replica manager, the <pnfs/>
+      &psql; server for all the functions listed above. In the
+      standard installation, the replica manager, the &pnfs;
       companion are not activated by default. The billing cell will
       only write to a file by default. Also, prior to version 1.6.6 of
-      <dcache/> only the pnfs server which does not use PostgreSQL was
-      shipped. In this case, PostgreSQL will only be used if the
+      &dcache; only the pnfs server which does not use &psql; was
+      shipped. In this case, &psql; will only be used if the
       conversion described in <xref linkend="cb-pnfs-postgres"/> was done.
     </para>
 
     <para>
-      Whenever the PostgreSQL server is going to be used for another
+      Whenever the &psql; server is going to be used for another
       functionality, the impact on performance should be checked
       carefully. To improve the performance, the functionality should
-      be installed on a separate host. Generally, a PostgreSQL server
+      be installed on a separate host. Generally, a &psql; server
       for a specific funcionality should be on the same host as the
-      <dcache/> cell accessing that PostgreSQL server, and the
-      PostgreSQL server containing the databases for the <pnfs/>
-      server should run on the same host as the <pnfs/> server and the
-      <cellname>PnfsManager</cellname> cell of the <dcache/> system
-      accessing it. Accordingly, the <pnfs/> companion and the <pnfs/>
-      server itself will use the same PostgreSQL server.
+      &dcache; cell accessing that &psql; server, and the
+      &psql; server containing the databases for the &pnfs; server
+      should run on the same host as the &pnfs; server and the
+      &cell-pnfsmngr; cell of the &dcache; system accessing
+      it. Accordingly, the &pnfs; companion and the &pnfs; server
+      itself will use the same &psql; server.
     </para>
 
     <para>
-      It is especially useful to use a separate PostgreSQL server for
-      the billing cell.
+      It is especially useful to use a separate &psql; server for the
+      &cell-billing; cell.
     </para>
     
   </section>
 
-  <unfinished>
+  <note>
+    <para>
+      The following is <emphasis>work-in-progress</emphasis>.
+    </para>
+  </note>
 
-    <screen>
-
+  <screen>
 2. Create postgres user with the name you will be using to run pnfs server.
    Make sure it has "CREATEDB" privilege.
 
@@ -292,7 +316,7 @@ export dbConnectString="user=pnfsserver password=<replaceable>yourPassword</repl
       createuser --no-adduser --createdb --pwprompt pnfsserver
 
 
-PostgreSQL in <dcache/>:
+&psql; in &dcache;:
 
 component  |    Database Host               | Database Name | Database User / Pw
 --------------------------------------------------------------------------------
@@ -319,14 +343,6 @@ pnfs server| localhost                      | admin, data1, | pnfsserver
 --------------------------------------------------------------------------------
 billing    | ${billingDatabaseHost}         | billing       | srmdcache
            |   or if not set: localhost     |               | srmdcache
-
-
-
-
-    </screen>
-
-  </unfinished>
-  
-  
+  </screen>
   
 </chapter>

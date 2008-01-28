@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+%sharedents;
+]>
 
-<chapter id="cb-adv">
+<chapter id="cb-tuning">
+
   <title>Advanced Tuning</title>
   
   <para>
     The use cases described in this chapter are only relevant for
-    large-scale dCache Instances which require special tuning
+    large-scale &dcache; instances which require special tuning
     according to a longer experience with client behaviour.
   </para>
   
@@ -18,54 +23,54 @@
       <title>Description</title>
       
       <para>
-        Client requests to a dCache system may have rather diverse
+        Client requests to a &dcache; system may have rather diverse
         bahaviour. Sometimes it is possible to classify them into
         several typical usage patterns. An example are the following
-        two usage patterns: 
+        two usage patterns:
+      </para>
 
-        <example>
-          <title>To Concurrent Usage Patterns</title>
+      <example>
+	<title>To Concurrent Usage Patterns</title>
 
-          <para>
-            Data is copied with a high transfer rate to the dCache
-            system from an external source. This is done via the
-            GridFTP protocol. At the same time batch jobs on a local
-            farm process data. Since they only need a small part of
-            each file, they use the dCap protocol via the dCap
-            library and seek to the position in the file they are
-            interested in, read a few bytes, do a few hours of
-            calculations, and finally read some more data.
-          </para>
+	<para>
+	  Data is copied with a high transfer rate to the &dcache;
+	  system from an external source. This is done via the
+	  &gridftp; protocol. At the same time batch jobs on a local
+	  farm process data. Since they only need a small part of each
+	  file, they use the &dcap; protocol via the &dcap; library
+	  and seek to the position in the file they are interested in,
+	  read a few bytes, do a few hours of calculations, and
+	  finally read some more data.
+	</para>
+      </example>
 
-        </example>
-
+      <para>
         As long as the number of active requests do not exceed the
         maximum number of allowed active requests, the two types of
-        requests are processed concurrently. The GridFTP transfers
+        requests are processed concurrently. The &gridftp; transfers
         complete at a high rate while the processing jobs take hours
-        to finish. This maximum number of allowed requests is set
-        with <cellcommandref linkend="cmd-mover_set_max_active"/>
-        and should be tuned according to capabilities of the pool
-        host.
+        to finish. This maximum number of allowed requests is set with
+        <xref linkend="cmd-mover_set_max_active"/> and
+        should be tuned according to capabilities of the pool host.
       </para>
       
       <para>
         However, if requests are queued, the slow processing jobs
-        might clog up the queue and not let the fast GridFTP request
-        through, even though the pool just sits there waiting for
-        the processing jobs to request more data. While this could
-        be temporarily remedied by setting the maximum active
-        requests to a higher value, then in turn GridFTP request
-        would put a very high load on the pool host.
+        might clog up the queue and not let the fast &gridftp; request
+        through, even though the pool just sits there waiting for the
+        processing jobs to request more data. While this could be
+        temporarily remedied by setting the maximum active requests to
+        a higher value, then in turn &gridftp; request would put a
+        very high load on the pool host.
       </para>
       
       <para>
         The above example is pretty realistic: As a rule of thumb,
-        GridFTP requests are fastest, dCap requests with the
-        <command>dccp</command> program are a little slower and dCap
-        requests with the dCap library are very slow. However, the
-        usage patterns might be different at other sites and also
-        might change over time.
+        &gridftp; requests are fastest, &dcap; requests with the
+        &prog-dccp; program are a little slower and &dcap; requests
+        with the &dcap; library are very slow. However, the usage
+        patterns might be different at other sites and also might
+        change over time.
       </para>
 
     </section>
@@ -77,30 +82,30 @@
         Use separate queues for the movers, depending on the door
         initiating them. This easily allows for a separation of
         requests of separate protocols. Up to 10 mover queues for
-        client transfers are available since dCache version
+        client transfers are available since &dcache; version
         1.6.6. Earlier versions support only one queue. (Transfers
         from an to a <glossterm linkend="gl-tape_backend">tape
-	  backend</glossterm> and <glossterm
-	  linkend="gl-p2p">pool-to-pool transfers</glossterm> are
+        backend</glossterm> and <glossterm
+        linkend="gl-p2p">pool-to-pool transfers</glossterm> are
         handled by separate queues, one for each of these transfers.)
       </para>
       
       <para>
         A finer grained queue selection mechanism based on, e.g. the
-        IP of the client or the file which has been requested, is
-        not possible with this mechanism. However, the <glossterm
-	  linkend="gl-pm-comp-psu">pool selection unit
-	  (PSU)</glossterm> may provide a separation onto separate
-        pools using those criteria.
+        &ip; address of the client or the file which has been
+        requested, is not possible with this mechanism. However, the
+        <glossterm linkend="gl-pm-comp-psu">pool selection unit
+        (PSU)</glossterm> may provide a separation onto separate pools
+        using those criteria.
       </para>
       
       <para>
-        In the above example, two separate queues for fast GridFTP
-        transfers and slow dCap library access would solve the
-        problem. The maximum number of active movers for the GridFTP
-        queue should be set to a lower value compared to the dCap
-        queue since the fast GridFTP transfers will put a high load
-        on the system while the dCap requests will be mostly idle.
+        In the above example, two separate queues for fast &gridftp;
+        transfers and slow &dcap; library access would solve the
+        problem. The maximum number of active movers for the &gridftp;
+        queue should be set to a lower value compared to the &dcap;
+        queue since the fast &gridftp; transfers will put a high load
+        on the system while the &dcap; requests will be mostly idle.
       </para>
 
     </section>
@@ -109,17 +114,18 @@
       <title>Configuration</title>
       
       <para>
-        For a multi mover queue setup, the pools have to be told to
-        start several queues and the doors have to be configured to
-        use one of these. It makes sense to create the same queues
-        on all pools. This is done by the following change to the
-        <filename>config/pool.batch</filename> file:
+	For a multi mover queue setup, the pools have to be told to
+	start several queues and the doors have to be configured to
+	use one of these. It makes sense to create the same queues on
+	all pools. This is done by the following change to the
+	<filename>config/pool.batch</filename> file:
+      </para>
         
-        <example>
-          <title>Modified <filename>config/pool.batch</filename> file for
-multiple mover queues</title>
+      <example>
+	<title>Modified <filename>config/pool.batch</filename> file
+	for multiple mover queues</title>
           
-<programlisting>...
+	<programlisting>...
 define context startPools endDefine
   create diskCacheV111.pools.MultiProtocolPool2 ${0} \
          "!MoverMap \
@@ -134,52 +140,53 @@ define context startPools endDefine
 endDefine
 ...</programlisting>
 
-        </example>
-        
+      </example>
+
+      <para>        
         The same can be achived by appending
         <literal>-io-queues=<replaceable>queueName-1</replaceable>,...,<replaceable>queueName-n</replaceable></literal>
         to each line in the <glossterm
-	  linkend="gl-poollist-file"><literal>poollist</literal>
-	  file</glossterm>. However, this only makes sense if the
-        pools should not all have the same queues.
+        linkend="gl-poollist-file"><literal>poollist</literal>
+        file</glossterm>. However, this only makes sense if the pools
+        should not all have the same queues.
       </para>
       
       <para>
         The first in this list of queues
-        (<literal><replaceable>queueName-1</replaceable></literal>)
-        is the <glossterm linkend="gl-default-mover-queue">default
-	  mover queue</glossterm>. Transfers not requesting a
-        particular mover queue or requesting a mover queue not
-        existing on the selected pool, are handled by this default
-        queue.
+        (<literal><replaceable>queueName-1</replaceable></literal>) is
+        the <glossterm linkend="gl-default-mover-queue">default mover
+        queue</glossterm>. Transfers not requesting a particular mover
+        queue or requesting a mover queue not existing on the selected
+        pool, are handled by this default queue.
       </para>
       
       <para>
-        The pool cell commands <cellcommandref
-	  linkend="cmd-mover_ls"/> and <cellcommandref
-	  linkend="cmd-mover_set_max_active"/> have an
-        <option>-queue</option> option to select the mover queue to
-        operate on. Without this option, <cellcommandref
-	  linkend="cmd-mover_set_max_active"/> will act on the default
-        queue while <cellcommandref linkend="cmd-mover_ls"/> will
-        list the requests of all pools for backward compatibility.
+	The pool cell commands <xref
+	linkend="cmd-mover_ls"/> and <xref
+	linkend="cmd-mover_set_max_active"/> have an
+	<option>-queue</option> option to select the mover queue to
+	operate on. Without this option, <xref
+	linkend="cmd-mover_set_max_active"/> will act on the default
+	queue while <xref linkend="cmd-mover_ls"/> will list
+	the requests of all pools for backward compatibility.
       </para>
       
       <para>
-        Each door may be configured to use a particular mover
-        queue. The pool, selected for this request, doesn't depend
-        on the selected mover queue. So a request may go to a pool
-        which doesn't have the particular mover queue configured and
-        will consequently end up in the default mover queue of that
-        pool. 
+	Each door may be configured to use a particular mover
+	queue. The pool, selected for this request, doesn't depend on
+	the selected mover queue. So a request may go to a pool which
+	doesn't have the particular mover queue configured and will
+	consequently end up in the default mover queue of that pool.
       </para>
       
       <para>
-        The doors are configured to use a particular mover queue as
-        in the following example:
+	The doors are configured to use a particular mover queue as in
+	the following example:
+      </para>
 
-        <example>
-          <title>Batch file for a GridFTP door using a mover queue</title>
+      <example>
+	<title>Batch file for a GridFTP door using a mover
+	queue</title>
           
 <programlisting>...
 create dmg.cells.services.login.LoginManager GFTP \
@@ -189,28 +196,30 @@ create dmg.cells.services.login.LoginManager GFTP \
        ... \
 "</programlisting>
           
-        </example>
+      </example>
 
+      <para>
         All requests send from this door will ask to be scheduled to
         the given mover queue. The selection of the pool is not
         affected.
       </para>
 
       <para>
-        For the dCap protocol, the corresponding door may be
+        For the &dcap; protocol, the corresponding door may be
         configured to allow the client to determine the mover queue
         name. In that case the client may use the extra option
-        facility to specify a mover queue. Whether the the dCap door
+        facility to specify a mover queue. Whether the the &dcap; door
         allows the client to request a particular mover queue or not
         is configured with the
         <option>-io-queue={allowed|denied}</option> option as in the
         following example:
-
-        <example>
-          <title>Batch file for a dCap door for allowing the client to select
+      </para>
+      
+      <example>
+	<title>Batch file for a dCap door for allowing the client to select
 the mover queue</title>
-	    
-<programlisting>...
+  
+        <programlisting>...
 create dmg.cells.services.login.LoginManager DCap \
        "${dCapPort} \
        diskCacheV111.doors.DCapDoor \
@@ -219,137 +228,368 @@ create dmg.cells.services.login.LoginManager DCap \
        ... \
 "</programlisting>
 
-        </example>
+      </example>
+     
+      <para>
+	With the &prog-dccp; command the queue can now be specified as
+	follows:
+      </para>
         
-        With the <command>dccp </command> command the queue can now
-        be specified as follows: 
-        
-<screen>dccp -X-io-queue=queueName <replaceable>source</replaceable> <replaceable>destination</replaceable></screen> 
-        
-        Since <command>dccp</command> requests may be quite
-        different from other requests with the dCap protocol, this
-        feature may be used to use separate queues for
-        <command>dccp</command> requests and other dCap library
-        requests. Therefore, the <command>dccp</command> command may
-        me changed in future releases to request a special
+      <screen>dccp -X-io-queue=queueName <replaceable>source</replaceable> <replaceable>destination</replaceable></screen>
+
+      <para>
+        Since &prog-dccp; requests may be quite different from other
+        requests with the &dcap; protocol, this feature may be used to
+        use separate queues for &prog-dccp; requests and other &dcap;
+        library requests. Therefore, the &prog-dccp; command may be
+        changed in future releases to request a special
         <command>dccp</command>-queue by default.
       </para>
       
     </section>
     
   </section>
+
+
   <section id="cb-tuning-parameters">
     <title>Tunable Parameters</title>
-    
-    
+        
     <section id="cb-tuning-parameters-dcap">
       <title>gridftp</title>
-      <blockquote>
-      <table tabstyle="cellattributes">
-        <title>Variable Overview</title>
+      
+      <table tabstyle="small">
+	<title>Variable Overview</title>
 
-        <tgroup cols="3" align="center">
-          <colspec colnum="1" colname="Variable" colwidth="70"/>
-          <colspec colnum="2" colname="Default Value" colwidth="70"/>
-          <colspec colnum="3" colname="Description" colwidth="120"/>
-          <thead>
-             <row><entry>Variable</entry><entry>Default Value</entry><entry>Description</entry></row>
-          </thead>
+	<tgroup cols="3" align="center">
+	  <colspec colnum="1" colname="Variable" colwidth="*" align="left"/>
+	  <colspec colnum="2" colname="Default Value" colwidth="*"/>
+	  <colspec colnum="3" colname="Description" colwidth="2*" align="left"/>
+	  <thead>
+	    <row>
+	      <entry align="center">Variable</entry>
+	      <entry>Default Value</entry>
+	      <entry align="center">Description</entry>
+	    </row>
+	  </thead>
           <tbody>
-            <row><entry>gsidcapIoQueue</entry><entry>Not set</entry><entry>gsidCap I/O queue name</entry></row>
-            <row><entry>dcapIoQueue</entry><entry>Not set</entry><entry>insecure dCap I/O queue name</entry></row>
-            <row><entry>gsidcapIoQueueOverwrite</entry><entry>denied</entry><entry>Is application allowed to overwrite queue name</entry></row>
-            <row><entry>dcapIoQueueOverwrite</entry><entry>denied</entry><entry>Is application allowed to overwrite queue name</entry></row>
+	    <row>
+	      <entry>gsidcapIoQueue</entry>
+	      <entry>&no-default;</entry>
+	      <entry>&gsidcap; I/O queue name</entry>
+	    </row>
+            <row>
+	      <entry>dcapIoQueue</entry>
+	      <entry>&no-default;</entry>
+	      <entry>Insecure &dcap; I/O queue name</entry>
+	    </row>
+            <row>
+	      <entry>gsidcapIoQueueOverwrite</entry>
+	      <entry>denied</entry>
+	      <entry>Is application allowed to overwrite queue name?</entry>
+	    </row>
+            <row>
+	      <entry>dcapIoQueueOverwrite</entry>
+	      <entry>denied</entry>
+	      <entry>Is application allowed to overwrite queue name?</entry>
+	    </row>
           </tbody>
         </tgroup>
       </table>
-      </blockquote>
+
+      <!-- Dirty hack to introduce a potential page-break -->
+      <para/>
+
     </section>
+
     <section id="cb-tuning-parameters-gsiftp">
-      <title>gridftp</title>
-      <blockquote>
-      <table tabstyle="cellattributes">
-        <title>Variable Overview</title>
+      <title>&gridftp;</title>
 
-        <tgroup cols="3" align="center">
-          <colspec colnum="1" colname="Variable" colwidth="70"/>
-          <colspec colnum="2" colname="Default Value" colwidth="70"/>
-          <colspec colnum="3" colname="Description" colwidth="120"/>
-          <thead>
-             <row><entry>Variable</entry><entry>Default Value</entry><entry>Description</entry></row>
+      <table tabstyle="small">
+	<title>Variable Overview</title>
+
+	<tgroup cols="3" align="center">
+          <colspec colnum="1" colname="Variable" colwidth="*" align="left"/>
+          <colspec colnum="2" colname="Default Value" colwidth="*"/>
+          <colspec colnum="3" colname="Description" colwidth="2*" align="left"/>
+	  <thead>
+             <row>
+	       <entry align="center">Variable</entry>
+	       <entry>Default Value</entry>
+	       <entry align="center">Description</entry>
+	     </row>
           </thead>
           <tbody>
-            <row><entry>gsiFtpPortNumber</entry><entry>2811</entry><entry>gsi ftp port listen port</entry></row>
-            <row><entry>spaceReservation</entry><entry>false</entry><entry>Use the space reservation service</entry></row>
-            <row><entry>spaceReservationStrict</entry><entry>false</entry><entry>Use the space reservation service</entry></row>
-            <row><entry>performanceMarkerPeriod</entry><entry>180</entry><entry>Performance markers in seconds</entry></row>
-            <row><entry>gplazmaPolicy</entry><entry>${ourHomeDir}/etc/dcachesrm-gplazma.policy</entry><entry>Location of the gPlazma Policy File</entry></row>
-            <row><entry>useGPlazmaAuthorizationModule</entry><entry>false</entry><entry>Use the gPlazma module</entry></row>
-            <row><entry>useGPlazmaAuthorizationCell</entry><entry>true</entry><entry>Use the gPlazma cell</entry></row>
-            <row><entry>gsiftpPoolManagerTimeout</entry><entry>5400</entry><entry>Pool Manager timeout in seconds</entry></row>
-            <row><entry>gsiftpPoolTimeout</entry><entry>600</entry><entry>Pool timeout in seconds</entry></row>
-            <row><entry>gsiftpPnfsTimeout</entry><entry>300</entry><entry>Pnfs timeout in seconds</entry></row>
-            <row><entry>gsiftpMaxRetries</entry><entry>80</entry><entry>Number of PUT/GET retries</entry></row>
-            <row><entry>gsiftpMaxStreamsPerClient</entry><entry>10</entry><entry>Number of parallel streams per ftp PUT/GET</entry></row>
-            <row><entry>gsiftpDeleteOnConnectionClosed</entry><entry>true</entry><entry>Delete file on connection closed</entry></row>
-            <row><entry>gsiftpMaxLogin</entry><entry>100</entry><entry>Maximum number of concurrently logged in users</entry></row>
-            <row><entry>gsiftpAdapterInternalInterface</entry><entry>Not set</entry><entry>In case of two interfaces</entry></row>
-            <row><entry>clientDataPortRange</entry><entry>20000:25000</entry><entry>The client data port range</entry></row>
-            <row><entry>kpwdFile</entry><entry>${ourHomeDir}/etc/dcache.kpwd</entry><entry>Legacy authorization</entry></row>
+            <row>
+	      <entry>gsiFtpPortNumber</entry>
+	      <entry>2811</entry>
+	      <entry>&gsiftp; port listen port</entry>
+	    </row>
+            <row>
+	      <entry>spaceReservation</entry>
+	      <entry>&false;</entry>
+	      <entry>Use the space reservation service</entry>
+	    </row>
+            <row>
+	      <entry>spaceReservationStrict</entry>
+	      <entry>&false;</entry>
+	      <entry>Use the space reservation service</entry>
+	    </row>
+            <row>
+	      <entry>performanceMarkerPeriod</entry>
+	      <entry>180</entry>
+	      <entry>Performance markers in seconds</entry>
+	    </row>
+            <row>
+	      <entry>gplazmaPolicy</entry>
+	      <entry>${ourHomeDir}/etc/dcachesrm-gplazma.policy</entry>
+	      <entry>Location of the gPlazma Policy File</entry>
+	    </row>
+            <row>
+	      <entry>useGPlazmaAuthorizationModule</entry>
+	      <entry>&false;</entry>
+	      <entry>Use the gPlazma module</entry>
+	    </row>
+            <row>
+	      <entry>useGPlazmaAuthorizationCell</entry>
+	      <entry>&true;</entry>
+	      <entry>Use the &cell-gplazma; cell</entry>
+	    </row>
+            <row>
+	      <entry>gsiftpPoolManagerTimeout</entry>
+	      <entry>5400</entry>
+	      <entry>Pool Manager timeout in seconds</entry>
+	    </row>
+            <row>
+	      <entry>gsiftpPoolTimeout</entry>
+	      <entry>600</entry>
+	      <entry>Pool timeout in seconds</entry>
+	    </row>
+            <row>
+	      <entry>gsiftpPnfsTimeout</entry>
+	      <entry>300</entry>
+	      <entry>Pnfs timeout in seconds</entry>
+	    </row>
+            <row>
+	      <entry>gsiftpMaxRetries</entry>
+	      <entry>80</entry>
+	      <entry>Number of PUT/GET retries</entry>
+	    </row>
+            <row>
+	      <entry>gsiftpMaxStreamsPerClient</entry>
+	      <entry>10</entry>
+	      <entry>Number of parallel streams per &ftp; PUT/GET</entry>
+	    </row>
+            <row>
+	      <entry>gsiftpDeleteOnConnectionClosed</entry>
+	      <entry>&true;</entry>
+	      <entry>Delete file on connection closed</entry>
+	    </row>
+            <row>
+	      <entry>gsiftpMaxLogin</entry>
+	      <entry>100</entry>
+	      <entry>Maximum number of concurrently logged in users</entry>
+	    </row>
+            <row>
+	      <entry>gsiftpAdapterInternalInterface</entry>
+	      <entry>&no-default;</entry>
+	      <entry>In case of two interfaces</entry>
+	    </row>
+            <row>
+	      <entry>clientDataPortRange</entry>
+	      <entry>20000:25000</entry>
+	      <entry>The client data port range</entry>
+	    </row>
+            <row>
+	      <entry>kpwdFile</entry>
+	      <entry><filename>${ourHomeDir}/etc/dcache.kpwd</filename></entry>
+	      <entry>Legacy authorization</entry>
+	    </row>
           </tbody>
         </tgroup>
       </table>
-      </blockquote>
+
+      <!-- Dirty hack to introduce a potential page-break -->
+      <para/>
+
     </section>
+
     <section id="cb-tuning-parameters-srm">
-      <title>SRM</title>
-      <blockquote>
-      <table tabstyle="cellattributes">
+      <title>&srm;</title>
+
+      <table tabstyle="small">
         <title>Variable Overview</title>
 
         <tgroup cols="3" align="center">
-          <colspec colnum="1" colname="Variable" colwidth="70"/>
-          <colspec colnum="2" colname="Default Value" colwidth="70"/>
-          <colspec colnum="3" colname="Description" colwidth="120"/>
-          <thead>
-             <row><entry>Variable</entry><entry>Default Value</entry><entry>Description</entry></row>
+          <colspec colnum="1" colname="Variable" colwidth="3*" align="left"/>
+          <colspec colnum="2" colname="Default Value" colwidth="2*"/>
+          <colspec colnum="3" colname="Description" colwidth="3*" align="left"/>
+	  <thead>
+	    <row>
+	      <entry align="center">Variable</entry>
+	      <entry>Default Value</entry>
+	      <entry align="center">Description</entry>
+	    </row>
           </thead>
-          <tbody>
-              <row><entry>srmPort</entry><entry>8443</entry><entry>srmPort</entry></row>
-              <row><entry>srmDatabaseHost</entry><entry>localhost</entry><entry>srmDatabaseHost</entry></row>
-              <row><entry> srmTimeout</entry><entry>3600</entry><entry> srmTimeout</entry></row>
-              <row><entry> srmVacuum</entry><entry>true</entry><entry> srmVacuum</entry></row>
-              <row><entry> srmVacuumPeriod</entry><entry>21600</entry><entry> srmVacuumPeriod</entry></row>
-              <row><entry> srmProxiesDirectory</entry><entry>/tmp</entry><entry> srmProxiesDirectory</entry></row>
-              <row><entry> srmBufferSize</entry><entry>1048576</entry><entry> srmBufferSize</entry></row>
-              <row><entry> srmTcpBufferSize</entry><entry>1048576</entry><entry> srmTcpBufferSize</entry></row>
-              <row><entry> srmDebug</entry><entry>true</entry><entry> srmDebug</entry></row>
-              <row><entry> srmGetReqThreadQueueSize</entry><entry>1000</entry><entry> srmGetReqThreadQueueSize</entry></row>
-              <row><entry> srmGetReqThreadPoolSize</entry><entry>100</entry><entry> srmGetReqThreadPoolSize</entry></row>
-              <row><entry> srmGetReqMaxWaitingRequests</entry><entry>1000</entry><entry> srmGetReqMaxWaitingRequests</entry></row>
-              <row><entry> srmGetReqReadyQueueSize</entry><entry>1000</entry><entry> srmGetReqReadyQueueSize</entry></row>
-              <row><entry> srmGetReqMaxReadyRequests</entry><entry>100</entry><entry> srmGetReqMaxReadyRequests</entry></row>
-              <row><entry> srmGetReqMaxNumberOfRetries</entry><entry>10</entry><entry> srmGetReqMaxNumberOfRetries</entry></row>
-              <row><entry> srmGetReqRetryTimeout</entry><entry>60000</entry><entry> srmGetReqRetryTimeout</entry></row>
-              <row><entry> srmGetReqMaxNumOfRunningBySameOwner</entry><entry>10</entry><entry> srmGetReqMaxNumOfRunningBySameOwner</entry></row>
-              <row><entry> srmPutReqThreadQueueSize</entry><entry>1000</entry><entry> srmPutReqThreadQueueSize</entry></row>
-              <row><entry> srmPutReqThreadPoolSize</entry><entry>100</entry><entry> srmPutReqThreadPoolSize</entry></row>
-              <row><entry> srmPutReqMaxWaitingRequests</entry><entry>1000</entry><entry> srmPutReqMaxWaitingRequests</entry></row>
-              <row><entry> srmPutReqReadyQueueSize</entry><entry>1000</entry><entry> srmPutReqReadyQueueSize</entry></row>
-              <row><entry> srmPutReqMaxReadyRequests</entry><entry>100</entry><entry> srmPutReqMaxReadyRequests</entry></row>
-              <row><entry> srmPutReqMaxNumberOfRetries</entry><entry>10</entry><entry> srmPutReqMaxNumberOfRetries</entry></row>
-              <row><entry> srmPutReqRetryTimeout</entry><entry>60000</entry><entry> srmPutReqRetryTimeout</entry></row>
-              <row><entry> srmPutReqMaxNumOfRunningBySameOwner</entry><entry>10</entry><entry> srmPutReqMaxNumOfRunningBySameOwner</entry></row>
-              <row><entry> srmCopyReqThreadQueueSize</entry><entry>1000</entry><entry> srmCopyReqThreadQueueSize</entry></row>
-              <row><entry> srmCopyReqThreadPoolSize</entry><entry>100</entry><entry> srmCopyReqThreadPoolSize</entry></row>
-              <row><entry> srmCopyReqMaxWaitingRequests</entry><entry>1000</entry><entry> srmCopyReqMaxWaitingRequests</entry></row>
-              <row><entry> srmCopyReqMaxNumberOfRetries</entry><entry>30</entry><entry> srmCopyReqMaxNumberOfRetries</entry></row>
-              <row><entry> srmCopyReqRetryTimeout</entry><entry>60000</entry><entry> srmCopyReqRetryTimeout</entry></row>
-              <row><entry> srmCopyReqMaxNumOfRunningBySameOwner</entry><entry>10</entry><entry> srmCopyReqMaxNumOfRunningBySameOwner</entry></row>
+
+	  <tbody>
+	    <row>
+	      <entry>srmPort</entry>
+	      <entry>8443</entry>
+	      <entry>srmPort</entry>
+	    </row>
+	    <row>
+	      <entry>srmDatabaseHost</entry>
+	      <entry><systemitem class="systemname">localhost</systemitem></entry>
+	      <entry>srmDatabaseHost</entry>
+	    </row>
+	    <row>
+	      <entry>srmTimeout</entry>
+	      <entry>3600</entry>
+	      <entry>srmTimeout</entry>
+	    </row>
+	    <row>
+	      <entry>srmVacuum</entry>
+	      <entry>&true;</entry>
+	      <entry>srmVacuum</entry>
+	    </row>
+	    <row>
+	      <entry>srmVacuumPeriod</entry>
+	      <entry>21600</entry>
+	      <entry>srmVacuumPeriod</entry>
+	    </row>
+	    <row>
+	      <entry>srmProxiesDirectory</entry>
+	      <entry><filename class="directory">/tmp</filename></entry>
+	      <entry>srmProxiesDirectory</entry>
+	    </row>
+	    <row>
+	      <entry>srmBufferSize</entry>
+	      <entry>1048576</entry>
+	      <entry>srmBufferSize</entry>
+	    </row>
+	    <row>
+	      <entry>srmTcpBufferSize</entry>
+	      <entry>1048576</entry>
+	      <entry>srmTcpBufferSize</entry>
+	    </row>
+	    <row>
+	      <entry>srmDebug</entry>
+	      <entry>&true;</entry>
+	      <entry>srmDebug</entry>
+	    </row>
+	    <row>
+	      <entry>srmGetReqThreadQueueSize</entry>
+	      <entry>1000</entry>\
+	      <entry>srmGetReqThreadQueueSize</entry>
+	    </row>
+	    <row>
+	      <entry>srmGetReqThreadPoolSize</entry>
+	      <entry>100</entry>
+	      <entry>srmGetReqThreadPoolSize</entry>
+	    </row>
+	    <row>
+	      <entry>srmGetReqMaxWaitingRequests</entry>
+	      <entry>1000</entry>
+	      <entry>srmGetReqMaxWaitingRequests</entry>
+	    </row>
+	    <row>
+	      <entry>srmGetReqReadyQueueSize</entry>
+	      <entry>1000</entry>
+	      <entry>srmGetReqReadyQueueSize</entry>
+	    </row>
+	    <row>
+	      <entry>srmGetReqMaxReadyRequests</entry>
+	      <entry>100</entry>
+	      <entry>srmGetReqMaxReadyRequests</entry>
+	    </row>
+	    <row>
+	      <entry>srmGetReqMaxNumberOfRetries</entry>
+	      <entry>10</entry>
+	      <entry>srmGetReqMaxNumberOfRetries</entry>
+	    </row>
+	    <row>
+	      <entry>srmGetReqRetryTimeout</entry>
+	      <entry>60000</entry>
+	      <entry>srmGetReqRetryTimeout</entry>
+	    </row>
+	    <row>
+	      <entry>srmGetReqMaxNumOfRunningBySameOwner</entry>
+	      <entry>10</entry>
+	      <entry>srmGetReqMaxNumOfRunningBySameOwner</entry>
+	    </row>
+	    <row>
+	      <entry>srmPutReqThreadQueueSize</entry>
+	      <entry>1000</entry>
+	      <entry>srmPutReqThreadQueueSize</entry>
+	    </row>
+	    <row>
+	      <entry>srmPutReqThreadPoolSize</entry>
+	      <entry>100</entry>
+	      <entry>srmPutReqThreadPoolSize</entry>
+	    </row>
+	    <row>
+	      <entry>srmPutReqMaxWaitingRequests</entry>
+	      <entry>1000</entry>
+	      <entry>srmPutReqMaxWaitingRequests</entry>
+	    </row>
+	    <row>
+	      <entry>srmPutReqReadyQueueSize</entry>
+	      <entry>1000</entry>
+	      <entry>srmPutReqReadyQueueSize</entry>
+	    </row>
+	    <row>
+	      <entry>srmPutReqMaxReadyRequests</entry>
+	      <entry>100</entry>
+	      <entry>srmPutReqMaxReadyRequests</entry>
+	    </row>
+	    <row>
+	      <entry>srmPutReqMaxNumberOfRetries</entry>
+	      <entry>10</entry>
+	      <entry>srmPutReqMaxNumberOfRetries</entry>
+	    </row>
+	    <row>
+	      <entry>srmPutReqRetryTimeout</entry>
+	      <entry>60000</entry>
+	      <entry>srmPutReqRetryTimeout</entry>
+	    </row>
+	    <row>
+	      <entry>srmPutReqMaxNumOfRunningBySameOwner</entry>
+	      <entry>10</entry>
+	      <entry>srmPutReqMaxNumOfRunningBySameOwner</entry>
+	    </row>
+	    <row>
+	      <entry>srmCopyReqThreadQueueSize</entry>
+	      <entry>1000</entry>
+	      <entry>srmCopyReqThreadQueueSize</entry>
+	    </row>
+	    <row>
+	      <entry>srmCopyReqThreadPoolSize</entry>
+	      <entry>100</entry>
+	      <entry>srmCopyReqThreadPoolSize</entry>
+	    </row>
+	    <row>
+	      <entry>srmCopyReqMaxWaitingRequests</entry>
+	      <entry>1000</entry>
+	      <entry>srmCopyReqMaxWaitingRequests</entry>
+	    </row>
+	    <row>
+	      <entry>srmCopyReqMaxNumberOfRetries</entry>
+	      <entry>30</entry>
+	      <entry>srmCopyReqMaxNumberOfRetries</entry>
+	    </row>
+	    <row>
+	      <entry>srmCopyReqRetryTimeout</entry>
+	      <entry>60000</entry>
+	      <entry>srmCopyReqRetryTimeout</entry>
+	    </row>
+	    <row>
+	      <entry>srmCopyReqMaxNumOfRunningBySameOwner</entry>
+	      <entry>10</entry>
+	      <entry>srmCopyReqMaxNumOfRunningBySameOwner</entry>
+	    </row>
           </tbody>
         </tgroup>
       </table>
-      </blockquote>
     </section>
   </section>
 </chapter>

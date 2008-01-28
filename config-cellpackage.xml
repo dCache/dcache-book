@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+%sharedents;
+]>
 
 <chapter id="cf-cellpackage">
+
   <title>The Cell Package</title>
   
   <para>
-    Apart from the PNFS server, all of dCache makes use of the cell
-    package. It is a framework for a distributed and scalable server
-    system in Java. The dCache system divided into cells which
-    communicate with each other via messages. Several cells run
+    Apart from the &pnfs; server, all of &dcache; makes use of the
+    cell package. It is a framework for a distributed and scalable
+    server system in Java. The &dcache; system divided into cells
+    which communicate with each other via messages. Several cells run
     simultaneously in one domain.
   </para>
   
@@ -17,7 +22,7 @@
     cell is run as a separate thread therein. The domains
     communicate with each other via TCP connections which are
     established at start-up. In the standard setup all domains
-    connect with the <quote>dCacheDomain</quote> which routes all
+    connect with the &domain-dcache; which routes all
     messages to the appropriate domains. Note, that actual data
     transfers are not done via these established connections.
   </para>
@@ -154,7 +159,7 @@ create dmg.cells.services.login.LoginManager GFTP \
     addition to them.
   </para>
   
-  <unfinished>
+  <!-- TODO:
     
     <para>
       Correct above: standard batch are good. RPM update might
@@ -186,8 +191,7 @@ changed to <quote>admin</quote>.
 </screen>
 
     </para>
-  </unfinished>
-  
+    --> 
   
 </chapter>
 

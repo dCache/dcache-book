@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+%sharedents;
+]>
 
-<namespacewrapper xmlns:xi="http://www.w3.org/2001/XInclude">
-<chapter id="rf-dvl">
+<chapter id="rf-dvl" xmlns:xi="http://www.w3.org/2001/XInclude">
+
   <title>Developer Reference</title>
   
   <section id="rf-dvl-cells">
     <title>Cells</title>
     
-    <xi:include href="rf-dvl/cell-cleaner.xml"/>
-    
+    <xi:include href="rf-dvl/cell-cleaner.xml"/>  
     <xi:include href="rf-dvl/cell-dmg.cells.services.multicaster.BroadcastCell.xml"/>
-    
   </section>
   
-    <section id="rf-dvl-modules">
-	<title>Modules</title>
-	
-	<para></para>
+  <section id="rf-dvl-modules">
+    <title>Modules</title>
     
-  </section>
-  
+    <para></para>
+    
+  </section>  
 </chapter>
-</namespacewrapper>

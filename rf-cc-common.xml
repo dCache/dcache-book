@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+%sharedents;
+]>
 
 <section id="rf-cc-common">
   <title>Common Cell Commands</title>
@@ -133,7 +137,8 @@
         <title>Arguments</title>
         <varlistentry>
           <term>filename</term>
-          <listitem><para>The file the current content of the pinboard is stored in.</para></listitem>
+          <listitem><para>The file the current content of the pinboard
+          is stored in.</para></listitem>
         </varlistentry>
       </variablelist>
     </refsynopsisdiv>
@@ -164,15 +169,17 @@
         <title>Arguments</title>
         <varlistentry>
           <term>lines</term>
-          <listitem><para>The number of lines which are displayed. Default: all.</para></listitem>
+          <listitem><para>The number of lines which are
+          displayed. Default: all.</para></listitem>
         </varlistentry>
       </variablelist>
-	</refsynopsisdiv>
+    </refsynopsisdiv>
 
     <refsection>
       <title>Description</title>
       
       <para>
+	<!-- TODO! -->
       </para>
       
     </refsection>

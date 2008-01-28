@@ -1,19 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+%sharedents;
+]>
 
 <chapter id="cf-repman">
+
   <title>Resilience with the Replica Manager</title>
   
-  <partauthors>Alex Kulyavtsev, Mathias de Riese</partauthors>
+  <chapterinfo>
+    <author>
+      <firstname>Alex</firstname>
+      <surname>Kulyavtsev</surname>
+      <affiliation>
+	<shortaffil>FNAL</shortaffil>
+      </affiliation>
+    </author>
+
+    <author>
+      <firstname>Mathias</firstname>
+      <surname>de Riese</surname>
+      <affiliation>
+        <shortaffil>DESY</shortaffil>
+      </affiliation>
+    </author>
+  </chapterinfo>
+
 
   <para>
     If no <glossterm linkend="gl-tss">tertiary storage
-    system</glossterm> is connected to a <dcache/> instance (i.e. it
+    system</glossterm> is connected to a &dcache; instance (i.e., it
     is configured as a <glossterm linkend="gl-lfs">large file
     store</glossterm>), there might be only one copy of each file on
     disk. (At least the <glossterm linkend="gl-precious">precious
     replica</glossterm>.) If a higher security and/or availability is
-    required, the resilience feature of <dcache/> can be used: If
+    required, the resilience feature of &dcache; can be used: If
     running in the default configuration, the replica manager will
     make sure that the number of <glossterm
     linkend="gl-replica">replicas</glossterm> of a file will be at
@@ -98,51 +120,51 @@
     <title>Starting the Replica Manager</title>
 	
     <para>
-      Beginning with version 1.6.6 of <dcache/> the replica manager
+      Beginning with version 1.6.6 of &dcache; the replica manager
       can be started as follows:
     </para>
 	
     <para>
       The replica manager will use the same postgresql database and
-      database user <literal>srmdcache</literal> as the <srm/>. The
+      database user <literal>srmdcache</literal> as the &srm;. The
       standard configuration assumes that the database server is
       installed on the same machine as the replica manager - usually
-      the admin node of the <dcache/> instance. To create and
+      the admin node of the &dcache; instance. To create and
       configure the database <literal>replicas</literal> used by the
       replica manager in the database server do:
-
-<screen>
-<userprompt/>createdb -U srmdcache replicas
-<userprompt/>psql -U srmdcache -d replicas -f /opt/d-cache/etc/psql_install_replicas.sql
-</screen>
-      
     </para>
 
+    <screen>&prompt-root; su postgres
+&prompt-user; createdb -U srmdcache replicas
+&prompt-user; psql -U srmdcache -d replicas -f /opt/d-cache/etc/psql_install_replicas.sql
+&prompt-user; exit</screen>
+      
     <para>
       The start-up script <filename>bin/dcache-core</filename> already
       contains the correct lines to start and stop the domain
       containing the replica manager as comments. Just remove the two
-      hash (<quote>#</quote>) signs and restart the <dcache/> instance.
+      hash (<quote>#</quote>) signs and restart the &dcache; instance.
       The replica manager may also be started separately by 
-
-<screen><rootprompt/>/opt/d-cache/jobs/replica -logfile=/opt/d-cache/log/replica.log start</screen>
-
-      and stopped by
-
-<screen><rootprompt/>/opt/d-cache/jobs/replica stop</screen>
-
     </para>
 
+    <screen>&prompt-root; /opt/d-cache/jobs/replica -logfile=/opt/d-cache/log/replica.log start</screen>
+
     <para>
-      In the default configuration, all pools of the <dcache/>
+      and stopped by
+    </para>
+
+    <screen>&prompt-root; /opt/d-cache/jobs/replica stop</screen>
+
+    <para>
+      In the default configuration, all pools of the &dcache;
       instance will be managed. The replica manager will keep the
       number of replicas between 2 and 3 (including). At each restart
       of the replica manager the pool configuration in the database
       will be recreated.
     </para>
-
   </section> 
 
+  <!-- TODO:
   <section>
     <title>Operation</title>
 	<simplesect>
@@ -535,6 +557,7 @@ For normal operation you may want to chose '-ColdStart' or '-hotRestart' (is def
 	
 	</simplesect>
   </section>
+  -->
 
   <section id="cf-repman-monitoring-install">
     <title>Monitoring Installation</title>

@@ -1,20 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE part PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
+<!DOCTYPE part PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                      "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+%sharedents;
+]>
 
-<!-- <namespacewrapper xmlns:xi="http://www.w3.org/2001/XInclude"> -->
-<part id="rf">
-  <!-- <?dbhtml dir="reference" ?> -->
+<part id="rf" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <?dbhtml dir="reference" ?>
+
   <title>Reference</title>
 
-  <chapter id="rf-clients">
-    <title>dCache Clients</title>
+  <xi:include href="rf-clients-srm.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
 
-    <xi:include href="rf-clients-srm.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
-
-  </chapter>
-  
 <!--
-
   <chapter id="rf-setup">
     <title>dCache Start-Up Parameters</title>
     
@@ -27,13 +25,13 @@
     
   </chapter>
 -->
-  
+
   <chapter id="rf-cc">
-    <title>dCache Cell Commands</title>
+    <title>&dcache; Cell Commands</title>
     
     <para>
       This is the reference to all (important) cell commands in
-      dCache. You should not use any command not documented here,
+      &dcache;. You should not use any command not documented here,
       unless you really know what you are doing. Commands not in this
       reference are used for debugging by the developers.
     </para>
@@ -44,30 +42,31 @@
       administrator may check here, if he wonders what a command does.
     </para>
 
-    <xi:include href="rf-cc-common.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
-  
-    <xi:include href="rf-cc-pnfsm.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
-
-    <xi:include href="rf-cc-pool.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
-
-    <xi:include href="rf-cc-pm.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
-    
+    <xi:include href="rf-cc-common.xml" />
+    <xi:include href="rf-cc-pnfsm.xml"/>
+    <xi:include href="rf-cc-pool.xml"/>
+    <xi:include href="rf-cc-pm.xml"/>    
   </chapter>
-  <!--       Devopers corner -->
+
+
+
+  <!-- Devopers corner -->
+
   <chapter id="rf-dc">
     <title>dCache Developers Corner</title>
     
     <para>
-      This chapter is meant to provide useful informatiom for dCache developers only.
+      This chapter provides useful informatiom for &dcache; developers
+      and is included as reference material and theory of operation.
     </para>
-    <xi:include href="rf-dc-StorageInfoQuotaObserver.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+
+    <xi:include href="rf-dc-StorageInfoQuotaObserver.xml"/>
   </chapter>
 
-  <!-- <xi:include href="rf-dvl.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/> -->
-
-  <xi:include href="rf-glossary.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
-
-  <xi:include href="rf-changelog.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
-
+  <!--
+  <xi:include href="rf-dvl.xml"/>
+  -->
+  <xi:include href="rf-glossary.xml"/>
+  <xi:include href="rf-changelog.xml"/>
 </part>
-<!-- </namespacewrapper> -->
+

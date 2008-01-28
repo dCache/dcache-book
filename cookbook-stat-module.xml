@@ -1,136 +1,178 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+%sharedents;
+]>
 
 <chapter id="cb-stat-module">
+
   <title>Statistics Module for pre 1.6.7 releases</title>
-  <blockquote><para>Author: Patrick Fuhrmann</para></blockquote>
   
+
+  <chapterinfo>
+    <author>
+      <firstname>Patrick</firstname>
+      <surname>Fuhrmann</surname>
+    </author>
+  </chapterinfo>
+
   <section id="cb-stat-module-intro">
     <title>General remarks</title>
-
+    
     <section>
       <title>Purpose</title>
+      
       <para>
-        The dCache statistics module collects information on the amount of data 
-        stored on all pools and the total data flow including streams from and to 
-        tertiary storage systems. The module produces an ascii file once per hour, containing
-        a table with information on the amount of used disk space and the data transferred starting
-        midnight up the this point in time. Data is sorted per pool and storage class.
-        In addition to the hourly statistics, files are produced reporting on the
-        daily, monthly and yearly dCache activities.
-
-        If enabled, a 'html' tree is produced and updated once per hour allowing to
-        navigate through the collected statistics information.      
+	The &dcache; statistics module collects information on the
+	amount of data stored on all pools and the total data flow
+        including streams from and to tertiary storage systems. The
+        module produces an &ascii; file once per hour, containing a
+        table with information on the amount of used disk space and
+        the data transferred starting midnight up the this point in
+        time. Data is sorted per pool and storage class.  In addition
+        to the hourly statistics, files are produced reporting on the
+        daily, monthly and yearly &dcache; activities.  If enabled, a
+        'html' tree is produced and updated once per hour allowing to
+        navigate through the collected statistics information.
       </para>
     </section>
     <section>
       <title>Availability</title>
       <para>
-        The <dcache/> statistics module will be part of dCache releases 1.6.7 and higher.
-        The code is part of 1.6.6 but needs to be enabled. At the end of this 
-        chapter some advise is given on how to do that.
+        The &dcache; statistics module will be part of &dcache;
+        releases 1.6.7 and higher.  The code is part of 1.6.6 but
+        needs to be enabled. At the end of this chapter some advise is
+        given on how to do that.
       </para>
     </section>
   </section>
-
+  
   <section id="cb-stat-module-formats">
     <title>Directory and File formats</title>
     <section>
-       <title>Directory Structure</title>
-       <para>
-         The statistics module automatically creates a directory tree, structured according
-         to years, months and days. Once per hour, a 'total.raw' file is produced underneath 
-         the active year, month and day directories, containing the sum over all pools and storage
-         classes of the corresponding time interval.
-         A 'days directory' contains detailed statistics per hour and 
-         for the whole day.
-         <screen>
-           /<replaceable>StatBase</replaceable>/YYYY/total.raw
+      <title>Directory Structure</title>
+      <para>
+	The statistics module automatically creates a directory tree,
+	structured according to years, months and days. Once per hour,
+	a <filename>total.raw</filename> file is produced underneath
+	the active <filename class="directory">year</filename>,
+	<filename class="directory">month</filename> and <filename
+	class="directory">day</filename> directories, containing the
+	sum over all pools and storage classes of the corresponding
+	time interval.  A <filename class="directory">days</filename>
+	directory contains detailed statistics per hour and for the
+	whole day.
+      </para>
+      <screen>           /<replaceable>StatBase</replaceable>/YYYY/total.raw
            /<replaceable>StatBase</replaceable>/YYYY/MM/total.raw
            /<replaceable>StatBase</replaceable>/YYYY/MM/DD/total.raw
            /<replaceable>StatBase</replaceable>/YYYY/MM/DD/YYYY-MM-DD-day.raw
-           /<replaceable>StatBase</replaceable>/YYYY/MM/DD/YYYY-MM-DD-HH.raw
-         </screen>
-       </para>
+           /<replaceable>StatBase</replaceable>/YYYY/MM/DD/YYYY-MM-DD-HH.raw</screen>
     </section>
-    <section>
-       <title>File Format</title>
-       <para>
-         Format of <literal>YYYY-MM-DD-HH.raw</literal> or <literal>YYYY-MM-DD-day.raw</literal> files.
-         <table>
-         <title>File Format</title>
-         <tgroup cols="2">
-           <colspec colnum="1" colname="Column" align="center"/>
-           <colspec colnum="2" colname="Description" align="center"/>
-           <thead>
-             <row>
-               <entry>Column Number</entry>
-               <entry>Column Description</entry>
-             </row>
-           </thead>
-           <tbody>
-             <row> <entry>0</entry> <entry>Pool Name</entry> </row>
-             <row> <entry>1</entry> <entry>Storage Class</entry> </row>
-             
-             <row> <entry>2</entry> <entry>Bytes stored on this pool for this storage class at beginning of day</entry> </row>
-             <row> <entry>3</entry> <entry>Number of files stored on this pool for this storage class at beginning of day</entry> </row>
-             <row> <entry>4</entry> <entry>Bytes stored on this pool for this storage class at this hour or end of day</entry> </row>
-             <row> <entry>5</entry> <entry>Number of files stored on this pool for this storage class at this hour or end of day</entry> </row>
-             
-             <row> <entry>6</entry> <entry>Total Number of transfers (in and out, dCache-client)</entry> </row>
-             <row> <entry>7</entry> <entry>Total Number of restores (HSM to dCache)</entry> </row>
-             <row> <entry>8</entry> <entry>Total Number of stores (dCache to HSM)</entry> </row>
-             <row> <entry>9</entry> <entry>Total Number errors</entry> </row>
-             
-             <row> <entry>10</entry> <entry>Total Number of bytes transferred into dCache (from clients)</entry> </row>
-             <row> <entry>11</entry> <entry>Total Number of bytes transferred out of dCache (to clients)</entry> </row>
-             <row> <entry>12</entry> <entry>Total Number of tranferred from HSM to dCache</entry> </row>
-             <row> <entry>13</entry> <entry>Total Number of tranferred from dCache to HSM</entry> </row>
-           </tbody>
-         </tgroup>
-         </table>
 
-       </para>
-    </section>
     <section>
-       <title>HTML Directory Structure</title>
-       <para>
-       In case the 'html' functionallity is enabled, which is the default, the statistics modules creates an 'html' tree 
-       allowing to navigate between the different statistics views. Those files populate the same directory structure
-       as the 'xxx.raw' files. The html root is at 
-       <screen>
-       /<replaceable>StatBase</replaceable>/index.html</screen> and may be accessed via the
-       dCache http services using 
-       <screen>http://<replaceable>headnode</replaceable>:2288/statistics/</screen>
-       (Don't forget the trailing slash)
-       </para>
+      <title>File Format</title>
+
+      <para>
+	Format of <filename>YYYY-MM-DD-HH.raw</filename> or
+	<filename>YYYY-MM-DD-day.raw</filename> files.
+      </para>
+
+      <table>
+	<title>File Format</title>
+	<tgroup cols="2">
+	  <colspec colnum="1" colname="Column" align="center" colwidth="*"/>
+	  <colspec colnum="2" colname="Description" align="center" colwidth="3*"/>
+	  <thead>
+	    <row>
+	      <entry>Column Number</entry>
+	      <entry>Column Description</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row> <entry>0</entry> <entry>Pool Name</entry> </row>
+	    <row> <entry>1</entry> <entry>Storage Class</entry> </row>             
+	    <row> <entry>2</entry> <entry>Bytes stored on this pool for this storage class at beginning of day</entry> </row>
+	    <row> <entry>3</entry> <entry>Number of files stored on this pool for this storage class at beginning of day</entry> </row>
+	    <row> <entry>4</entry> <entry>Bytes stored on this pool for this storage class at this hour or end of day</entry> </row>
+	    <row> <entry>5</entry> <entry>Number of files stored on this pool for this storage class at this hour or end of day</entry> </row>
+	    
+	    <row> <entry>6</entry> <entry>Total Number of transfers (in and out, dCache-client)</entry> </row>
+	    <row> <entry>7</entry> <entry>Total Number of restores (HSM to dCache)</entry> </row>
+	    <row> <entry>8</entry> <entry>Total Number of stores (dCache to HSM)</entry> </row>
+	    <row> <entry>9</entry> <entry>Total Number errors</entry> </row>
+	    
+	    <row> <entry>10</entry> <entry>Total Number of bytes transferred into dCache (from clients)</entry> </row>
+	    <row> <entry>11</entry> <entry>Total Number of bytes transferred out of dCache (to clients)</entry> </row>
+	    <row> <entry>12</entry> <entry>Total Number of tranferred from HSM to dCache</entry> </row>
+	    <row> <entry>13</entry> <entry>Total Number of tranferred from dCache to HSM</entry> </row>
+	  </tbody>
+	</tgroup>
+      </table>
+    </section>
+
+    <section>
+      <title>HTML Directory Structure</title>
+
+      <para>
+	In case the &html; functionality is enabled, which is the
+	default, the statistics modules creates an <filename
+	class="directory">html</filename> tree allowing to navigate
+	between the different statistics views. Those files populate
+	the same directory structure as the
+	<filename>xxx.raw</filename> files. The &html; root is at:
+      </para>
+
+      <screen>/<replaceable>StatBase</replaceable>/index.html</screen>
+
+      <para>
+	and may be accessed via the &dcache; &http; services using
+      </para>
+
+      <!-- TODO: Urgh! mark this up better! -->
+      <screen>http://<replaceable>headnode</replaceable>:2288/statistics/</screen>
+       
+      <para>
+	(Don't forget the trailing slash)
+      </para>
     </section>
   </section>
   
+  
   <section id="cb-stat-module-activate">
+    
     <title>How to activate the statistics module in 1.6.6</title>
-     <section>
-       <title>General remarks</title>
-       <para>
-         The statistics module collects parts of its information in memory of cells within
-         the <literal>httpdDomain</literal> and the <literal>statisticsDomain</literal>.
-         Consequently this information is lost if one or all of those
-         components are restarted. As a result, the day statistics may be significantly wrong
-         if the restart happens at the end of the day. We hope to overcome this problem with
-         1.6.7 and higher.
-       </para>
-       <para>
-         Moreover, because the module
-         can only add up pool space for those pools which are up during the inquery phase,
-         disk space of pools which are down during that time is not counted.
-       </para>
-     </section>
-     <section>
-       <title>How to activate the statistics module in 1.6.6</title>
-       <para>
-         Create a file in the dCache config directory with the following content :
-         <screen>
-set printout default 2
+    
+    <section>
+      <title>General remarks</title>
+
+      <para>
+	The statistics module collects parts of its information in
+	memory of cells within the &domain-http; and the
+	&domain-stats;.  Consequently this information is lost if one
+	or all of those components are restarted. As a result, the day
+	statistics may be significantly wrong if the restart happens
+	at the end of the day. We hope to overcome this problem with
+	1.6.7 and higher.
+      </para>
+
+      <para>
+	Moreover, because the module can only add up pool space for
+	those pools which are up during the inquery phase, disk space
+	of pools which are down during that time is not counted.
+      </para>
+    </section>
+
+    <section>
+      <title>How to activate the statistics module in 1.6.6</title>
+      
+      <para>
+	Create a file in the dCache config directory with the
+	following content:
+      </para>
+
+      <screen>set printout default 2
 set printout CellGlue none
 
 onerror shutdown
@@ -161,59 +203,89 @@ create diskCacheV111.services.PoolStatisticsV0 PoolStatistics  \
     -export \
 #      -create  \
 #      -htmlBase=${statistics}  \
-    -domain=${thisFqHostname}"     
-         </screen>
-         The name of the file should be <literal>statistics.batch</literal>. Switch to the
-         dCache jobs directory and run
-         <screen>
-            ./initPackage.sh</screen>
-         Ignore possible error messages. All necessary links will be created.
-       </para>
+    -domain=${thisFqHostname}"</screen>
 
-       <para>
-         Find a local disk area with sufficient space available to store the statistics data.
-         The subdirectory should be empty and will be subsequently called
-         (/<replaceable>StatBase</replaceable>). 
-       </para>
+      <para>
+	The name of the file should be
+	<literal>statistics.batch</literal>. Switch to the dCache jobs
+	directory and run
+      </para>
+    
+      <screen>./initPackage.sh</screen>
+    
+      <para>
+	Ignore possible error messages. All necessary links will be
+	created.
+      </para>
 
-       <para>
-        Add the following line to the <literal>context httpdSetup</literal> section of
-        the <literal>config/httpd.batch</literal> file.
-        <screen>
-           set alias statistics directory /<replaceable>StatBase</replaceable></screen>
-       </para>
+      <para>
+	Find a local disk area with sufficient space available to
+	store the statistics data.  The subdirectory should be empty
+	and will be subsequently called
+	(/<replaceable>StatBase</replaceable>).
+      </para>
+    
+      <para>
+	Add the following line to the <literal>context
+	httpdSetup</literal> section of the
+	<literal>config/httpd.batch</literal> file.
+      </para>
 
-       <para>
-       Add the following line to the <literal>config/dCacheSetup</literal> file :
-       <screen>
-       statistics=/<replaceable>StatBase</replaceable></screen>
-       Make sure there is no other <literal>statistics=..</literal> entry.
-       </para>
-       <para>
-       
-       Edit the file <literal>docs/skins/home-skin-basic.html</literal> : At two locations within this file,
-       the statistics link is commented out. Undo this.
-       
-       IMPORTANT : The statistics link has to be called <literal>href="/statistics/"</literal>. 
-       Make sure the trailing
-       <literal>/</literal> (slash) is present. This is not correcty done in the 
-       <literal>docs/skins/home-skin-basic.html</literal> file.
-       Finally restart the <literal>httpd</literal> and start the <literal>statistics module</literal>.
-       <screen>
-         cd /opt/d-cache/jobs
-         ./httpd stop
-         ./httpd start
-         ./statistics start</screen>
-         
-       Statistics is calculated once per hour at <replaceable>HH</replaceable>:55. 
-       The daily stuff is calculated at 23:55. 
-       Without manual intervention, it takes two midnights before all html statistics pages are available.
-       There is a way to get this done after just one midnight. After the first midnight following the
-       first startup of the statistics module, log into the <literal>PoolStatistics</literal> cell and
-       run the following commands in the given sequence. The specified date has to  be the
-       Year/Month/Day of <literal>today</literal>.
-       <screen>
-create html <replaceable>Year</replaceable> <replaceable>Month</replaceable> <replaceable>Day</replaceable>
+      <screen>set alias statistics directory /<replaceable>StatBase</replaceable></screen>
+
+      <para>
+	Add the following line to the
+	<literal>config/dCacheSetup</literal> file:
+      </para>
+
+      <screen>statistics=/<replaceable>StatBase</replaceable></screen>
+
+      <para>
+	Make sure there is no other <literal>statistics=..</literal>
+	entry.
+      </para>
+
+      <para>
+	Edit the file
+	<literal>docs/skins/home-skin-basic.html</literal> : At two
+	locations within this file, the statistics link is commented
+	out. Undo this.
+      </para>
+
+      <important>
+        <para>
+	  The statistics link has to be called
+	  <literal>href="/statistics/"</literal>.  Make sure the
+	  trailing <literal>/</literal> (slash) is present. This is
+	  not correcty done in the
+	  <literal>docs/skins/home-skin-basic.html</literal> file.
+	</para>
+      </important>
+	 
+      <para>
+	Finally restart the <literal>httpd</literal> and start the
+	<literal>statistics module</literal>.
+      </para>
+
+      <screen>&prompt-root; cd /opt/d-cache/jobs
+&prompt-root; ./httpd stop
+&prompt-root; ./httpd start
+&prompt-root; ./statistics start</screen>
+
+      <para>
+	Statistics is calculated once per hour at
+	<replaceable>HH</replaceable>:55.  The daily stuff is
+	calculated at 23:55.  Without manual intervention, it takes
+	two midnights before all html statistics pages are available.
+	There is a way to get this done after just one midnight. After
+	the first midnight following the first startup of the
+	statistics module, log into the
+	<literal>PoolStatistics</literal> cell and run the following
+	commands in the given sequence. The specified date has to be
+	the Year/Month/Day of <literal>today</literal>.
+      </para>
+
+      <screen>create html <replaceable>Year</replaceable> <replaceable>Month</replaceable> <replaceable>Day</replaceable>
 create html <replaceable>Year</replaceable> <replaceable>Month</replaceable>
 create html <replaceable>Year</replaceable>
 create html
@@ -224,17 +296,19 @@ create html 2006 04 11
 create html 2006 04
 create html 2006
 create html</screen>
-       
-       The statistics URL is 
-       <screen>http://<replaceable>headnode</replaceable>:2288/statistics/</screen>
-       (Don't forget the trailing slash)
-       </para>
-       <para>
-       
-       </para>
-     </section>
-  </section>
 
+      <para>
+	The statistics URL is
+      </para>
+
+      <screen>http://<replaceable>headnode</replaceable>:2288/statistics/</screen>
+
+      <para>
+	(Don't forget the trailing slash)
+      </para>
+    </section>
+  </section>
+   
 </chapter>
   
   

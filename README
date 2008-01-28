@@ -1,132 +1,168 @@
-#
-# dCache Book Compliling Instructions
-#
-# (C) 2005 DESY, Germany
-#
-# Maintainer: Mathias de Riese <mathias.de.riese@desy.de>
-#
 
-###### Some simple make commands
-#
+ dCache Book Compiling Instructions
 
-# Install most of the necessary software in directory software/
-#
-make install-software
+ (c) 2008 DESY, Germany
 
-# Chunked HTML output in built/index.html
-#
-make html
+ Maintainer: Paul Millar <paul.millar@desy.de>
 
-# One-File HTML in built/Book.html (built/dcb.css also needed)
-#
-make singlehtml
-
-# PDF in Book.pdf (still miserable quality)
-#
-make pdf
-
-# Update Book on www.dcache.org via SSH (Includes html, singlehtml for printing and pdf targets)
-#
-make ssh-dcache.org
-
-# or
-make ssh-dcache.org WEB_USER=radicke@
-
-# Or for a draft version at http://www.dcache.org/manuals/Book-draft/
-#
-make ssh-draft
-
-# or
-make ssh-draft WEB_USER=radicke@
-
-# Update Book on www.dcache.org (Doesnt work, too unfriendly system)
-#
-JAVA_HOME=/usr/java CVS_BINARY=/opt/sfw/bin/cvs WEB_LOCATION=/home/dcache.org/manuals/Book make dcachedotorg
+  Based on original work by:
+         Mathias de Riese <mathias.de.riese@desy.de>
 
 
+Introduction:
+
+The dCache Book is based on the DocBook/XML vocabulary and Norman
+Walsh's XSLT Stylesheets.  For some output, the stylesheets transform
+the source XML files either directly to the final format (HTML,
+Man-pages).  The PDF output uses an intermediate format (XSLT-FO) and
+the text output is generated from the single-page HTML.
+
+XSLT-FO (.fo) files are still XML, but more closely represent the
+final output.  Software is needed to convert the XSLT-FO files into
+the final output (e.g., PDF, PostScript).  Amongst other things, this
+software does the text-layout, pagination, laying out tables, etc.
+The recommended software is fop, from the Apache foundation.
+
+To generate the text output, the single-page HTML file is converted to
+text.  There is no support for converting DocBook directly to text and
+support for converting XSLT-FO files to text (using fop) is currently
+not very good.
+
+FOP can use LaTeX-derived hyphenation patterns to break words at the
+end-of-line.  However, due to a licensing issue wringle, these rules
+are not include with FOP.  Instead, the rules are available from the
+Objects For Formatting Objects (OFFO) SourceForge project.  A single
+.jar file must be installed for hyphenation to work; this
+staight-forward process is described below.
 
 
+What you will need:
+
+To build the dCache Book you will need:
+  1.  a copy of the DocBook stylesheets (a set of XSLT files)
+  2.  an XSLT processor (xsltproc is used in the Makefile)
+  3.  an XSLT-FO processor (the latest version of fop should be used.)
+  4.  a text-based web-browser: any of (w3m, links, lynx) should work.
+      w3m is the default.
+
+You are recommended to get:
+  1.  the hyphenation rules.
 
 
-
-
-
-
-
-
-
+Currently, you must install these packages manually.  The previous
+system (that downloaded and installed the XSLT files, a version of
+fop, etc) is not supported.  Hopefully we can document this process so
+it's easy.
 
 
 
-############### Old stuff -- might be useful ######################
+Where to get things:
+
+  Many distributions package the bare essencials.  Some caveats: make
+  sure the version of FOP is fairly recent: 0.9x is a requirement.
+  For DocBook, make sure you get DocBookXML support (i.e., the
+  stylesheets).  DocBook is (or "used to") come with SGML support, but
+  we're using pure XML so the SGML version of DocBook is of no use.
+
+  o  SF download page for DocBook XSLT (you want "docbook-xsl" package)
+     	http://sourceforge.net/project/showfiles.php?group_id=21935
+
+  o  FOP download mirror selection (get latest version):
+        http://www.apache.org/dyn/closer.cgi/xmlgraphics/fop
+
+  o  Download page for OFFO hyphenation rules.  You will want the
+     offo-hyphenation-fop-stable.zip file:
+        http://sourceforge.net/project/showfiles.php?group_id=116740
+
+  o  Download page for the w3m text-mode web browser:
+     	http://sourceforge.net/project/showfiles.php?group_id=39518
 
 
 
-###### Transforming dCache-Book-extended Docbook to Docbook
-#
-xsltproc --nonet --xinclude -o Book.db.xml xsl/docbook-from-dcb-extensions.xsl Book.xml
+Installing the hyphenation rules:
+
+Here's a step-by-step method of installing the fop hyphenation rules
+for all users (requires root access).
+
+  unzip offo-hyphenation-fop-stable.zip
+  sudo mkdir -p /usr/local/share/java
+  sudo cp offo-hyphenation-fop-stable/fop-hyph.jar /usr/local/share/java
+  cat > /etc/fop.conf << EOF
+FOP_HYPHENATION_PATH=/usr/local/share/java/fop-hyph.jar
+EOF
+
+A guide to installing the hyphenation rules as a normal user:
+
+  unzip offo-hyphenation-fop-stable.zip
+  mkdir -p ~/local/share/java
+  cp offo-hyphenation-fop-stable/fop-hyph.jar ~/local/share/java
+  cat > ~/.foprc << EOF
+FOP_HYPHENATION_PATH=$HOME/local/share/java/fop-hyph.jar
+EOF
+
+ N.B. we assume that $HOME is expanded to your home directory by the
+      shell; if this doesn't happen, it should happen within the fop
+      wrapper shell.  If it doesn't happen in either place, you're
+      very unlucky and must substitute the value in ~/.foprc yourself.
 
 
 
-###### Catalog inclusion
-#
-# docbook-xsl has to be installed and found via /etc/xml/catalog
-# If this is not feasible, use 
-#
+Using the Makefile rules
+
+  Do "make" (equiv. to "make info") to see a summary of what's
+  available
+
+  make all              builds everything,
+  make pdf              builds all PDF,
+  make Book-a4.pdf      builds just the A4 PDF version of the Book,
+  make Book.html        build just the single-page HTML,
+  make Book/index.shtml build the chunked HTML output,
+  make deploy           build and deploy on the web-server,
+  make clean            remove backup files,
+  make distclean        remove all generated files.
+
+
+The HTML output has .shtml and contains the server-side includes
+needed for integration within www.dcache.org.  However, the HTML
+should be valid, so you can view the web-pages without having to
+deploying them.
+
+Deploying to the webserver will try to copy the files using scp.  If
+you account on www.dcache.org is not the same as your local account,
+use your ~/.ssh/config file to specify this.  For example:
+
+  Host www.dcache.org
+    User fred
+
+
+
+
+Some notes on XML catalogs.
+
+XML Catalogs are how a global reference (e.g.,
+http://docbook.sourceforge.net/release/xsl/current/fo/docbook.xsl) is
+redirected to a local file.
+
+If you want an easy life, use an RPM installation.  If the stylesheets
+have been properly packages, they will register themselves with the
+machine's global catalogue (which usually starts at /etc/xml/catalog)
+and the Makefile will just work.
+
+If you do not (or cannot) install the catalogues, the next best option
+is the provide your own (private) XML catalog, which includes your
+locally-installed DocBook stylesheets.  This allows you to process the
+dCache book (and generating output) without editing the location of
+DocBook stylesheets within the dCache book.
+
+The XML_CATALOG_FILES environment variable controls this behaviour:
+
 export XML_CATALOG_FILES=/some/suitable/catalog
 
-# on solaris with docbook-xsl installed in /usr/local/share/...
-# 
+E.g., on Solaris with docbook-xsl installed in /usr/local/share/...
+
 XML_CATALOG_FILES=/usr/local/share/docbook-xsl-1.68.1/catalog.xml
 export XML_CATALOG_FILES
 
-
-
-###### Static HTML into ./build/
-#
-rm -rf build
-mkdir build
-cp xsl/dcb.css build/dcb.css
-xsltproc --nonet --xinclude -o build/ xsl/html-chunk.xsl Book.db.xml
-
-
-
-###### SHTML for webserver with SSI enabled (dcache.org style)
-#
-# Several steps:
-#
-
-# 1. Copy header/footer/css files to the appropriate locations
-#
-DOCUMENT_ROOT=/var/www/html                     # Example
-DCB_SUBDIR=dCache                               # Example (has to be at least one dir)
-cp xsl/header.shtml ${DOCUMENT_ROOT}/
-cp xsl/footer.shtml ${DOCUMENT_ROOT}/
-cp xsl/manual_body.shtml ${DOCUMENT_ROOT}/${DCB_SUBDIR}/../
-cp xsl/manual_end.shtml ${DOCUMENT_ROOT}/${DCB_SUBDIR}/../
-cp xsl/dcb.css ${DOCUMENT_ROOT}/${DCB_SUBDIR}/
-
-# 2. Compile sidebar TOC and copy to the right location:
-#
-rm -rf build
-mkdir build
-xsltproc --nonet --xinclude -o build/ xsl/html-dcache.org-sidebar.xsl Book.db.xml
-cp build/index.shtml ${DOCUMENT_ROOT}/${DCB_SUBDIR}/sidebar-index.shtml
-
-# 3. Compile acutal document
-#
-xsltproc --nonet --xinclude -o ${DOCUMENT_ROOT}/${DCB_SUBDIR}/ xsl/html-dcache.org.xsl Book.db.xml
-
-
-
-###### Customization of the TOC in the sidebar
-#
-# After editing xsl/dcb-dcache.org-sidebar-title-tpl.xml
-# the stylesheet  xsl/dcb-dcache.org-sidebar-title.xsl
-# has to be regenerated with
-
-xsltproc -nonet -output xsl/dcb-dcache.org-sidebar-title.xsl \
-    http://docbook.sourceforge.net/release/xsl/current/template/titlepage.xsl \
-    xsl/dcb-dcache.org-sidebar-title-tpl.xml
-
+[TODO: a quick how-to on writing your own catalog files.  In the
+mean-time, just Google and/or read the spec.]
 

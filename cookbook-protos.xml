@@ -1,173 +1,231 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+%sharedents;
+]>
 
-<chapter id="cb-proto">
+<chapter id="cb-protocols">
+
   <title>Protocols</title>
 
   <section id="cb-proto-dcap">
-    <title>dCap options mover and client options</title>
-    <partauthors>Patrick Fuhrmann, Tigran Mkrtchyan</partauthors>
+    <title>&dcap; options mover and client options</title>
+
+    <sectioninfo>
+      <authorgroup>
+	<author>
+	  <firstname>Patrick</firstname>
+	  <surname>Fuhrmann</surname>
+	</author>
+	<author>
+	  <firstname>Tigran</firstname>
+	  <surname>Mkrtchyan</surname>
+	</author>
+      </authorgroup>
+    </sectioninfo>
+
     <para>
-      dCap is the native random access I/O protocol for files within dCache.
-      In additition to the usual data transfer mechanisms, it supports all necessary
-      file metadata and name space manipulation operations.
+      &dcap; is the native random access I/O protocol for files within
+      &dcache;.  In additition to the usual data transfer mechanisms,
+      it supports all necessary file metadata and name space
+      manipulation operations.
     </para>
+
     <para>
-     In order to optimize I/O transferrates and memory consumption dCap allows
-     to configure parameters within the client and the server. e.g:
-	<itemizedlist>
-	  <listitem>
-	    <para>
-	      TCP Socket send and receive buffer sizes.
-	    </para>
-	  </listitem>
-	  <listitem>
-	    <para>
-	      I/O buffers sizes.
-	    </para>
-	  </listitem>
-	</itemizedlist>
+      In order to optimize I/O transferrates and memory consumption
+      &dcap; allows to configure parameters within the client and the
+      server. e.g:
     </para>
+
+    <itemizedlist>
+      <listitem>
+	<para>
+	  TCP Socket send and receive buffer sizes.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  I/O buffers sizes.
+	</para>
+      </listitem>
+    </itemizedlist>
+
+
     <section>
+    
       <title>TCP send/recv buffer sizes from the servers point of view</title>
+      
       <para>
-         There are two parameters per I/O direction, determining the actual
-         TCP send/recv buffer size used for each transfer. Those values can
-         be set within the <filename>config/pool.batch</filename> file on the pool nodes.
-	<itemizedlist>
-	  <listitem>
-	    <para>
-	      <option>defaultSend/RecvBufferSize</option> : this value is used if the dCap client
-              doesn't try to set this value. The default value for this parameter
-              is 256K Bytes.
-	    </para>
-	  </listitem>
-	  <listitem>
-	    <para>
-	      <option>maxSend/RecvBufferSize</option> : this value is the maximum value,
-              the mover is allowed to use. It's used if either the
-              <option>defaultSend/RecvBufferSize</option> is larger or the client asks
-              for a larger value. The default value for this parameter is 1MBytes.
-	    </para>
-	  </listitem>
-	</itemizedlist>
+	There are two parameters per I/O direction, determining the
+	actual TCP send/recv buffer size used for each transfer. Those
+	values can be set within the
+	<filename>config/pool.batch</filename> file on the pool nodes.
       </para>
+
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    <option>defaultSend/RecvBufferSize</option> : this value
+	    is used if the dCap client doesn't try to set this
+	    value. The default value for this parameter is 256K Bytes.
+	  </para>
+	</listitem>
+
+	<listitem>
+	  <para>
+	    <option>maxSend/RecvBufferSize</option> : this value is
+	    the maximum value, the mover is allowed to use. It's used
+	    if either the <option>defaultSend/RecvBufferSize</option>
+	    is larger or the client asks for a larger value. The
+	    default value for this parameter is 1MBytes.
+	  </para>
+	</listitem>
+      </itemizedlist>
+
       <para>
-        On the server side, the max/defaultSend/RecvBuffer value can either be set in the
-        <filename>config/pool.batch</filename> file or in the <filename>config/*.poollist</filename> files. 
+	On the server side, the max/defaultSend/RecvBuffer value can
+	either be set in the <filename>config/pool.batch</filename>
+	file or in the <filename>config/*.poollist</filename> files.
       </para>
+
       <para>
-        Using the batch context :
-        <screen>
-set context dCap3-maxSendBufferSize <option>value in bytes</option>
+	Using the batch context :
+      </para>
+
+      <screen>set context dCap3-maxSendBufferSize <option>value in bytes</option>
 set context dCap3-maxRecvBufferSize <option>value in bytes</option>
 set context dCap3-defaultSendBufferSize <option>value in bytes</option>
-set context dCap3-defaultRecvBufferSize <option>value in bytes</option>
-        </screen>
-        Or it may specified in the create ... command line
-        <screen>
-  create diskCacheV111.pools.MultiProtocolPool2 ${0} \
+set context dCap3-defaultRecvBufferSize <option>value in bytes</option></screen>
+
+      <para>
+	Or it may specified in the create ... command line
+      </para>
+
+      <screen>  create diskCacheV111.pools.MultiProtocolPool2 ${0} \
   "!MoverMap \
   ${1} \
   -defaultSendBufferSize=<option>value in bytes</option> \
   *** \
   -${2} -${3} -${4} -${5} -${6} -${7} -${8} \
-"
-         </screen>
-         The most appropriate way to specify those values on the server side
-         is certainly to add the corresponding entry in the 
-         <filename>config/...poollist</filename>. The entry would look like
-         <screen>
-dcache30_1  /dcache/pool  sticky=allowed maxSendBufferSize=<option>value in bytes</option> tag.hostname=dcache30 ***
-         </screen>
-      </para>
+"</screen>
+
       <para>
-      Please note the different ways of using the '=' and the '-' sign in the different
-      alternatives.
+	The most appropriate way to specify those values on the server
+	side is certainly to add the corresponding entry in the
+	<filename>config/...poollist</filename>. The entry would look
+	like
+      </para>
+
+      <screen>dcache30_1  /dcache/pool  sticky=allowed maxSendBufferSize=<option>value in bytes</option> tag.hostname=dcache30 ***</screen>
+
+
+      <para>
+	Please note the different ways of using the '=' and the '-'
+	sign in the different alternatives.
       </para>
     </section>
+
+
     <section>
       <title>TCP send/recv buffer sizes from the dCap clients point of view</title>
+
       <para>
-      For a full list of dCap library API calls and dccp options, please refer to
-      to <literal>http://www.dcache.org/manuals/libdcap.shtml</literal> and 
-      <literal>http://www.dcache.org/manuals/dccp.shtml</literal> respectively.
-      To set the local and remote TCP buffer send and receive buffers either use
-      the API call <literal>dc_setTCPSend/ReceiveBuffer(int size)</literal> or the
-      <option>-r SIZE -s SIZE</option> dccp options. In both cases the value is
-      transferred to the remote mover which tries to set the corresponding values.
-      Please not the the server protects itself by having a maximum size for those
-      values which it doesn't exceed. Please check the section 'TCP send/recv buffer 
-      sizes from the servers point of view' to learn how to change those values.
+	For a full list of dCap library API calls and dccp options,
+	please refer to to
+	<literal>http://www.dcache.org/manuals/libdcap.shtml</literal>
+	and
+	<literal>http://www.dcache.org/manuals/dccp.shtml</literal>
+	respectively.  To set the local and remote TCP buffer send and
+	receive buffers either use the API call
+	<literal>dc_setTCPSend/ReceiveBuffer(int size)</literal> or
+	the <option>-r SIZE -s SIZE</option> dccp options. In both
+	cases the value is transferred to the remote mover which tries
+	to set the corresponding values.  Please not the the server
+	protects itself by having a maximum size for those values
+	which it doesn't exceed. Please check the section 'TCP
+	send/recv buffer sizes from the servers point of view' to
+	learn how to change those values.
       </para>
     </section>
-  </section>  
+  </section>
+
   <section id="cb-proto-dcap-open">
     <title>Specifying dCap open timeouts</title>
-    <partauthors>Patrick Fuhrmann</partauthors>
-    <para>
-      In cases where dccp/dcap requests a file which is still on tertiary storage,
-      the user resp. the administrator might what to limit the time, dccp/dCap
-      waits in the open call until the file has been fetched from backend storage.
-      This, so called <literal>openTimeout</literal>, can be specified on the server
-      or on the client. In all cases the <literal>-keepAlive</literal> must be specified
-      with an appropriate number of seconds on the cell create command in the 
-      door batch files. The following mechanisms are available to specify open timeouts :
-      <table tabstyle="cellattributes">
-        <title>Open Timeout mechanisms</title>
 
-        <tgroup cols="4" align="left">
-          <colspec colnum="1" colname="Precedence" colwidth="70"/>
-          <colspec colnum="2" colname="Mechanism" colwidth="70"/>
-          <colspec colnum="3" colname="Key Name" colwidth="120"/>
-          <colspec colnum="4" colname="Example"/>
-          <thead>
-            <row>
-              <entry>
-                Precedence
-              </entry>
-              <entry>
-                Mechanism
-              </entry>
-              <entry>
-                Key Name
-              </entry>
-              <entry>
-                Example
-              </entry>
-            </row>
-          </thead>
-          <tbody>
-            <row>
-              <entry>Lowest</entry>
-              <entry>context</entry>
-              <entry>dCap-openTimeout</entry>
-              <entry>set context dCap-openTimeout 200</entry>
-            </row>
-            <row>
-              <entry>...</entry>
-              <entry>context</entry>
-              <entry>openTimeout</entry>
-              <entry>set context openTimeout 200</entry>
-            </row>
-            <row>
-              <entry>...</entry>
-              <entry>cell create command line</entry>
-              <entry>openTimeout</entry>
-              <entry>-openTimeout=200</entry>
-            </row>
-            <row>
-              <entry>Highest</entry>
-              <entry>dccp command line</entry>
-              <entry>-o</entry>
-              <entry>dccp -o200 SOURCE DESTINATION</entry>
-            </row>
-          </tbody>
-        </tgroup>
-      </table>
+    <sectioninfo>
+      <author>
+	<firstname>Patrick</firstname>
+	<surname>Fuhrmann</surname>
+      </author>
+    </sectioninfo>
+
+    <para>
+      In cases where dccp/dcap requests a file which is still on
+      tertiary storage, the user resp. the administrator might what to
+      limit the time, dccp/dCap waits in the open call until the file
+      has been fetched from backend storage.  This, so called
+      <literal>openTimeout</literal>, can be specified on the server
+      or on the client. In all cases the <literal>-keepAlive</literal>
+      must be specified with an appropriate number of seconds on the
+      cell create command in the door batch files. The following
+      mechanisms are available to specify open timeouts :
+    </para>
+
+    <table tabstyle="cellattributes">
+      <title>Open Timeout mechanisms</title>
+
+      <tgroup cols="4" align="left">
+	<colspec colnum="1" colname="Precedence" colwidth="70"/>
+	<colspec colnum="2" colname="Mechanism" colwidth="70"/>
+	<colspec colnum="3" colname="Key Name" colwidth="120"/>
+	<colspec colnum="4" colname="Example" colwidth="*"/>
+	<thead>
+	  <row>
+	    <entry>
+	      Precedence
+	    </entry>
+	    <entry>
+	      Mechanism
+	    </entry>
+	    <entry>
+	      Key Name
+	    </entry>
+	    <entry>
+	      Example
+	    </entry>
+	  </row>
+	</thead>
+	<tbody>
+	  <row>
+	    <entry>Lowest</entry>
+	    <entry>context</entry>
+	    <entry>dCap-openTimeout</entry>
+	    <entry>set context dCap-openTimeout 200</entry>
+	  </row>
+	  <row>
+	    <entry>...</entry>
+	    <entry>context</entry>
+	    <entry>openTimeout</entry>
+	    <entry>set context openTimeout 200</entry>
+	  </row>
+	  <row>
+	    <entry>...</entry>
+	    <entry>cell create command line</entry>
+	    <entry>openTimeout</entry>
+	    <entry>-openTimeout=200</entry>
+	  </row>
+	  <row>
+	    <entry>Highest</entry>
+	    <entry>dccp command line</entry>
+	    <entry>-o</entry>
+	    <entry>dccp -o200 SOURCE DESTINATION</entry>
+	  </row>
+	</tbody>
+      </tgroup>
+    </table>
    
-<screen>
-#
+    <screen>#
 #    dCap    D o o r (create command line example)
 #
 create dmg.cells.services.login.LoginManager DCap-2 \
@@ -178,10 +236,9 @@ create dmg.cells.services.login.LoginManager DCap-2 \
              -keepAlive=60 \
              -openTimeout=300 \
              *** \
-             -loginBroker=LoginBroker"
-</screen>
-<screen>
-#
+             -loginBroker=LoginBroker"</screen>
+
+    <screen>#
 #    dCap    D o o r (context example)
 #
 set context dCap-openTimeout 200
@@ -193,40 +250,56 @@ create dmg.cells.services.login.LoginManager DCap-2 \
              *** \
              -keepAlive=60 \
              *** \
-             -loginBroker=LoginBroker"
-</screen>
-<screen>
-#
+             -loginBroker=LoginBroker"</screen>
+
+    <screen>#
 dccp -o200 /pnfs/desy.de/data/dteam/private/myfile /dev/null</screen>
-    </para>
+
     <para>
-    If the openTimeout expires while a read transfer is already active,
-    this transfer will be interrupted, but it will automatically resume
-    because the client can't destinguish between a network failure and
-    a timeout. So the timeout disturbes the read but it will finally
-    succeed. This is different for write. If a write is interrupted by
-    a timeout in the middle of a transfer, dccp will stuck. (This is not
-    a feature and needs further investigation).
+      If the openTimeout expires while a read transfer is already
+      active, this transfer will be interrupted, but it will
+      automatically resume because the client can't destinguish
+      between a network failure and a timeout. So the timeout
+      disturbes the read but it will finally succeed. This is
+      different for write. If a write is interrupted by a timeout in
+      the middle of a transfer, dccp will stuck. (This is not a
+      feature and needs further investigation).
     </para>
   </section>
   
   <section id="cb-proto-dcap-ext">
     <title>Using the dCap protocol for strict file checking</title>
-    <partauthors>Patrick Fuhrmann, Tigran Mkrtchyan</partauthors>
+
+    <sectioninfo>
+      <authorgroup>
+	<author>
+	  <firstname>Patrick</firstname>
+	  <surname>Fuhrmann</surname>
+	</author>
+	<author>
+	  <firstname>Tigran</firstname>
+	  <surname>Mkrtchyan</surname>
+	</author>
+      </authorgroup>
+    </sectioninfo>
+
     <para>
-       The dcap protocol allows to check whether a dataset is on tape
-       only or has a copy on a dCache disk. The dCap library API
-       call is <literal> int dc_check(const char *path, const char *location)</literal>
-       and the dccp options are <literal>-t -1 -P</literal>.
-       For a full list of dCap library API calls and dccp options, please refer to
-       to <literal>http://www.dcache.org/manuals/libdcap.shtml</literal> and 
-       <literal>http://www.dcache.org/manuals/dccp.shtml</literal> respectively.
-       Using a standard dCache installation those calls will return a guess
-       on the file location only. It is neither checked
-       whether the file is really on that pool or if the pool is up. To get a strict
-       checking a dCap door has to be started with a special (-check=strict) option.
-<screen>
-#
+       The &dcap; protocol allows to check whether a dataset is on
+       tape only or has a copy on a &dcache; disk. The &dcap; library
+       API call is <literal> int dc_check(const char *path, const char
+       *location)</literal> and the dccp options are <literal>-t -1
+       -P</literal>.  For a full list of dCap library API calls and
+       dccp options, please refer to to
+       <literal>http://www.dcache.org/manuals/libdcap.shtml</literal>
+       and <literal>http://www.dcache.org/manuals/dccp.shtml</literal>
+       respectively.  Using a standard &dcache; installation those
+       calls will return a guess on the file location only. It is
+       neither checked whether the file is really on that pool or if
+       the pool is up. To get a strict checking a &door-dcap; has to
+       be started with a special (-check=strict) option.
+    </para>
+
+    <screen>#
 #    dCap    D o o r
 #
 create dmg.cells.services.login.LoginManager DCap-strict \
@@ -238,81 +311,131 @@ create dmg.cells.services.login.LoginManager DCap-strict \
              -maxLogin=1500 \
              -brokerUpdateTime=120 \
              -protocolFamily=dcap \
-             -loginBroker=LoginBroker"
-</screen>
-    This door will do a precise checking (-check=strict). To get the dCap lib and
-    dccp to use this door only, the <literal>DCACHE_DOOR</literal>
-    environment variable has to be set to <option>doorHost:specialDCapPort</option>
-    in the shell, dccp is going to be used.
-    In the following example we assume that the <literal>specialDCapPort</literal> has
-    been set to <literal>23126</literal> :
-    <screen>
-   export DCACHE_DOOR=dcachedoorhost:23126
-   dccp -P -t -1 /pnfs/domain.tv/data/cms/users/waste.txt </screen>
-    </para>
+             -loginBroker=LoginBroker"</screen>
     <para>
-    If <literal>dccp</literal> returns <literal>File is not cached</literal> and this
-    dCache instance is connected to an HSM, the file is no longer on one of the dCache
-    pools but is assumed to have a copy within the HSM. If the dccp returns this message and
-    no HSM is attached, the file is either on a pool which is currently down or the file
-    is lost.
+      This door will do a precise checking (-check=strict). To get the
+      dCap lib and dccp to use this door only, the
+      <literal>DCACHE_DOOR</literal> environment variable has to be
+      set to <option>doorHost:specialDCapPort</option> in the shell,
+      dccp is going to be used.  In the following example we assume
+      that the <literal>specialDCapPort</literal> has been set to
+      <literal>23126</literal> :
+    </para>
+
+    <screen>   export DCACHE_DOOR=dcachedoorhost:23126
+   dccp -P -t -1 /pnfs/domain.tv/data/cms/users/waste.txt</screen>
+
+    <para>
+      If &prog-dccp; returns <literal>File is not cached</literal> and
+      this &dcache; instance is connected to an &hsm;, the file is no
+      longer on one of the &dcache; pools but is assumed to have a
+      copy within the &hsm;. If the &prog-dccp; returns this message
+      and no &hsm; is attached, the file is either on a pool which is
+      currently down or the file is lost.
     </para>
   </section>
   
   
   <section id="cb-proto-dcap-passive">
-    <title>Passive dCap</title>
+    <title>Passive &dcap;</title>
 
-    <partauthors>Tigran, Patrick</partauthors>
+    <sectioninfo>
+      <authorgroup>
+	<author>
+	  <firstname>Tigran</firstname>
+	  <surname>Mkrtchyan</surname>
+	</author>
+	<author>
+	  <firstname>Patrick</firstname>
+	  <surname>Fuhrmann</surname>
+	</author>
+      </authorgroup>
+    </sectioninfo>
+
 
     <para>
-      The dCap protocol, similiar to FTP, uses a control channel to request a transfer which 
-      is subsequently done through data channels. Per default, the data channel
-      is initiated by the server, connecting to an open port in the client library.
-      This is commonly known as active transfer.
-      Starting with dCache 1.7.0 the dCap protocol supports passive transfer mode as well,
-      which consequently means that the client connects to the server
-      pool to initiate the data channel. This is essential to support dCap clients running
-      behind firewalls and within private networks.
+      The &dcap; protocol, similiar to &ftp;, uses a control channel
+      to request a transfer which is subsequently done through data
+      channels. Per default, the data channel is initiated by the
+      server, connecting to an open port in the client library.  This
+      is commonly known as active transfer.  Starting with &dcache;
+      1.7.0 the &dcap; protocol supports passive transfer mode as
+      well, which consequently means that the client connects to the
+      server pool to initiate the data channel. This is essential to
+      support &dcap; clients running behind firewalls and within
+      private networks.
     </para>
+
     <section>
-    <title>Preparing the server for dCap passive transfer</title>
-    <para>
-    The port(s), the server pools should listens on, can be specified by the
-    org.dcache.net.tcp.portrange variable, as part of the 'java_options' directive in the
-    <filename>config/dCacheSetup</filename> configuration file. A range has to be
-    given if pools are split amoung multiple JVMs. E.g:
-<programlisting>java_options="-server ... -Dorg.dcache.dcap.port=0 -Dorg.dcache.net.tcp.portrange=33115:33145"</programlisting>
-    </para>
+      <title>Preparing the server for dCap passive transfer</title>
+
+      <para>
+	The port(s), the server pools should listens on, can be
+	specified by the
+	<literal>org.dcache.net.tcp.portrange</literal> variable, as
+	part of the 'java_options' directive in the
+	<filename>config/dCacheSetup</filename> configuration file. A
+	range has to be given if pools are split amoung multiple
+	JVMs. E.g:
+      </para>
+
+      <programlisting>java_options="-server ... -Dorg.dcache.dcap.port=0 -Dorg.dcache.net.tcp.portrange=33115:33145"</programlisting>
+
     </section>
+
     <section>
-    <title>Switching the dCap library resp. dccp to PASSIVE</title>
-    <para>
-    <screen>Remark : The commonly used expression 'passive' is seen from the server perspective and
-actually means 'server passive'. From the client perspective this is of course 'active'.
-Both means that the client connects to the server to establish the data connection. 
-This mode is supported by the server
-starting with 1.7.0 and dccp with 1-2-40 (included in 1.7.0)</screen>
-    </para>
-    <para>
-    The following dCap Api call  switches all subsequent dc_open calls to server-passive mode
-    if this mode is supported by the corresponding door. (dCache Version >= 1.7.0).
-<programlisting>
-<command>void dc_setClientActive()</command></programlisting>
-    </para>
-    <para>
-    The environment variable <command>DCACHE_CLIENT_ACTIVE</command>  switches
-    the dCap library to server-passive. This is true for dCap, dCap preload and dccp.
-    </para>
-    <para>
-    dccp, switches to server-passive when issuing the <command>-A</command> command line option.
-    </para>
+      <title>Switching the &dcap; library resp. &prog-dccp; to
+      PASSIVE</title>
+
+      <note>
+	<para>
+	  The commonly used expression 'passive' is seen from the
+	  server perspective and actually means 'server passive'. From
+	  the client perspective this is of course 'active'.  Both
+	  means that the client connects to the server to establish
+	  the data connection.  This mode is supported by the server
+	  starting with 1.7.0 and dccp with 1-2-40 (included in
+	  1.7.0)
+	</para>
+      </note>
+
+      <para>
+	The following &dcap; API call switches all subsequent dc_open
+	calls to server-passive mode if this mode is supported by the
+	corresponding door. (dCache Version >= 1.7.0).
+      </para>
+
+      <programlisting><command>void dc_setClientActive()</command></programlisting>
+
+      <para>
+	The environment variable <envar>DCACHE_CLIENT_ACTIVE</envar>
+	switches the &dcap; library to server-passive. This is true
+	for &dcap;, &dcap; preload and &prog-dccp;.
+      </para>
+
+      <para>
+	&prog-dccp; switches to server-passive when issuing the
+	<command>-A</command> command line option.
+      </para>
     </section>
   </section>
-  <section id="cb-proto-firewall">
-    <title>Access to SRM and GridFTP server from behind a firewall</title>
 
-    <partauthors>Timur Perelmutov, Mathias de Riese</partauthors>
+  <section id="cb-proto-firewall">
+    <title>Access to &srm; and &gridftp; server from behind a
+    firewall</title>
+
+    <sectioninfo>
+      <authorgroup>
+	<author>
+	  <firstname>Timur</firstname>
+	  <surname>Perelmutov</surname>
+	</author>
+	<author>
+	  <firstname>Mathias</firstname>
+	  <surname>de Riese</surname>
+	</author>
+      </authorgroup>
+    </sectioninfo>
 
     <para>
       This describes firewall issues from the clients
@@ -321,94 +444,103 @@ starting with 1.7.0 and dccp with 1-2-40 (included in 1.7.0)</screen>
     </para>
 
     <para>
-      When files are transferred in gridftp active mode from gridftp
-      server to the gridftp client, server establishes data channel(s)
-      by connecting to the client. In this case client creates a tcp
-      socket, bound to some particular address on the client host, and
-      sends the client host ip and port to the server. If the client
-      host is running a firewall, firewall might refuse server's
-      connection to the client's listening socket.  Common solution to
-      this problem is establishing a range of ports on the client's
-      host that are allowed to be connected from Internet by changing
-      firewall rules.Once the port range is defined the client can be
-      directed to use one of the ports from the port ranges when
-      creating listening tcp sockets.
+      When files are transferred in &gridftp; active mode from
+      &gridftp; server to the &gridftp; client, server establishes
+      data channel(s) by connecting to the client. In this case client
+      creates a &tcp; socket, bound to some particular address on the
+      client host, and sends the client host &ip; and port to the
+      server. If the client host is running a firewall, firewall might
+      refuse server's connection to the client's listening socket.
+      Common solution to this problem is establishing a range of ports
+      on the client's host that are allowed to be connected from
+      Internet by changing firewall rules.Once the port range is
+      defined the client can be directed to use one of the ports from
+      the port ranges when creating listening tcp sockets.
     </para>
 
     <section>
-      <title>Access with srmcp</title>
+      <title>Access with &prog-srmcp;</title>
 
       <para>
-	If you are using srmcp as a client you need to do the
+	If you are using &prog-srmcp; as a client you need to do the
 	following:
-
-	<itemizedlist>
-	  <listitem>
-	    <para>
-	      create a directory $HOME/.globus if it does not exist
-	    </para>
-	  </listitem>
-	  <listitem>
-	    <para>
-	      create and/or edit a file
-	      $HOME/.globus/cog.properties by appending a new
-	      line reading
-
-<programlisting>tcp.port.range=<replaceable>min</replaceable>,<replaceable>max</replaceable></programlisting>
-
-	      where <replaceable>min</replaceable> and
-	      <replaceable>max</replaceable> are the lower and upper
-	      bounds of the port range.
-	    </para>
-	  </listitem>
-	</itemizedlist>
-
       </para>
 
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    create a directory <filename
+	    class="directory">$HOME/.globus</filename> if it does not
+	    exist.
+	  </para>
+	</listitem>
+
+	<listitem>
+	  <para>
+	    create and/or edit a file
+	    <filename>$HOME/.globus/cog.properties</filename> by
+	    appending a new line reading
+	  </para>
+
+	  <programlisting>tcp.port.range=<replaceable>min</replaceable>,<replaceable>max</replaceable></programlisting>
+
+	  <para>
+	    where <replaceable>min</replaceable> and
+	    <replaceable>max</replaceable> are the lower and upper
+	    bounds of the port range.
+	  </para>
+	</listitem>
+      </itemizedlist>
+
       <para>
-	With the latest srmcp release you can use the <option>globus_tcp_port_range</option> option:
+	With the latest &prog-srmcp; release you can use the
+	<option>globus_tcp_port_range</option> option:
+      </para>
 
-<screen><userprompt/><command>srmcp</command> -globus_tcp_port_range=<replaceable>minValue</replaceable>:<replaceable>maxValue</replaceable> ...</screen>
+      <screen>&prompt-user; &prog-srmcp; -globus_tcp_port_range=<replaceable>minValue</replaceable>:<replaceable>maxValue</replaceable> ...</screen>
 
-
-	A range of ports open for tcp connections is specified as a
+      <para>
+	A range of ports open for &tcp; connections is specified as a
 	pair of positive integers separated by ":". This is not set by
 	default.
       </para>
 
     </section>
 
+
     <section>
-      <title>Access with globus-url-copy</title>
+      <title>Access with &prog-globus-url-copy;</title>
 
       <para>
 	If you are transferring files from gridftp server using
-	<command>globus-url-copy</command>, you need to define an
-	environment variable <varname>GLOBUS_TCP_PORT_RANGE</varname>,
-	in the same shell in which <command>globus-url-copy</command>
-	will be executed.
+	&prog-globus-url-copy;, you need to define an environment
+	variable <envar>GLOBUS_TCP_PORT_RANGE</envar>, in the same
+	shell in which &prog-globus-url-copy; will be executed.
       </para>
 
       <para>
 	In sh/bash you do that by invoking the following command:
+      </para>
 
-<screen><userprompt/>export GLOBUS_TCP_PORT_RANGE="<replaceable>min</replaceable>,<replaceable>max</replaceable>"</screen>
+      <screen>&prompt-user; export GLOBUS_TCP_PORT_RANGE="<replaceable>min</replaceable>,<replaceable>max</replaceable>"</screen>
 
+      <para>
 	in csh/tcsh you invoke:
+      </para>
 
-<screen><userprompt/>setenv GLOBUS_TCP_PORT_RANGE "<replaceable>min</replaceable>,<replaceable>max</replaceable>"</screen>
+      <screen>&prompt-user; setenv GLOBUS_TCP_PORT_RANGE "<replaceable>min</replaceable>,<replaceable>max</replaceable>"</screen>
 
+      <para>
 	here <replaceable>min</replaceable> and
 	<replaceable>max</replaceable> are again the lower and upper
 	bounds of the port range
       </para>
-      
-    </section>
-      
+    </section>      
   </section>
+
   
   <section id="cb-proto-dis-dcap">
-    <title>Disableing unauthenticated dCap via SRM</title>
+    <title>Disableing unauthenticated &dcap; via &srm;</title>
     
     <!-- 
     <para>
@@ -418,36 +550,35 @@ starting with 1.7.0 and dccp with 1-2-40 (included in 1.7.0)</screen>
     -->
 
     <para>
-      In some cases SRM transfers fail because they are tried via
-      the plain dCap protocol (URL starts with
-      <literal>dcap://</literal>). Since plain dCap is
-      unauthenticated, the dCache server will have no information
+      In some cases &srm; transfers fail because they are tried via
+      the plain &dcap; protocol (&url; starts with
+      <literal>dcap://</literal>). Since plain &dcap; is
+      unauthenticated, the &dcache; server will have no information
       about the user trying to access the system. While the transfer
       will succeed if the UNIX file permissions allow access to
-      anybody (e.g. mode 777), it will fail otherwise. 
+      anybody (e.g. mode 777), it will fail otherwise.
     </para>
     
     <para>
-      Usually all doors are registered in SRM as potential access
-      points for dCache. During a protocol negotiation the SRM
-      chooses one of the available doors. You can force srmcp to use
-      the gsidcap protocol (<option>-protocol=gsidcap</option>) or
-      you can unregister plain, unauthenticated dCap from known
-      protocols: From the file
-      <filename>config/door.batch</filename> remove
-      <option>-loginBroker=LoginBroker</option> and restart dcap
-      door with
-      
-<screen><rootprompt/>jobs/door stop
-<rootprompt/>jobs/door -logfile=<replaceable>dCacheLocation</replaceable>/log/door.log start</screen>
-
+      Usually all doors are registered in &srm; as potential access
+      points for &dcache;. During a protocol negotiation the &srm;
+      chooses one of the available doors. You can force &prog-srmcp;
+      to use the &gsidcap; protocol
+      (<option>-protocol=gsidcap</option>) or you can unregister
+      plain, unauthenticated &dcap; from known protocols: From the
+      file <filename>config/door.batch</filename> remove
+      <option>-loginBroker=LoginBroker</option> and restart
+      &door-dcap; with
     </para>
+      
+    <screen>&prompt-root; jobs/door stop
+&prompt-root; jobs/door -logfile=<replaceable>dCacheLocation</replaceable>/log/door.log start</screen>
     
   </section>
 
-  <unfinished>
+  <!-- TODO
     Maybe, this section should go into some kind of user
     documentation part of the book.
-  </unfinished>
+    -->
   
 </chapter>

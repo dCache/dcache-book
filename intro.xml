@@ -1,38 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+%sharedents;
+]>
 
-<chapter id="intro"> <!-- xmlns:xi="http://www.w3.org/2001/XInclude" -->
-  <!-- <?dbhtml dir="intro"?> -->
+<chapter id="intro">
+
   <title>Introduction to dCache</title>
-  
 
   <para>
     We still need to write this.
   </para>
   
-  <!--
-  
-  This is how graphics should be included: 
-
-   * Draw it in OpenOffice using the template images/template.sxd 
-     respecting the margin of 2.5cm
-
-   * Take care that is will still be readable when printed b&w. 
-     Fancy shadings won't be handled well, by fop.
-
-   * Select the whole drawing with the selectbox and export to 
-     SVG and PNG.
-
-   * Copy the block below and adjust id, title and filenames.
-
-  -->
-
-
   <figure id="fig-intro-layer-model">
-    <title>The <dcache/> Layer Model</title>
+    <title>The &dcache; Layer Model</title>
     <mediaobject>
       <imageobject role="fo">
-	<imagedata fileref="images/test.svg" format="SVG" align="center" contentwidth="16cm"/> 
+	<imagedata fileref="images/test2.svg" format="SVG" align="center" contentwidth="16cm"/> 
                             <!-- width="100%" scalefit="1" contentdepth="100%" should scale optimal, but fop doesnt like it -->
       </imageobject>
       <imageobject role="html">
@@ -43,75 +28,42 @@
 
   <para>
     The layer model shown in <xref linkend="fig-intro-layer-model"/>
-    gives an overview of the architecture of the <dcache/> system.
+    gives an overview of the architecture of the &dcache; system.
   </para>
 
-  <unfinished>
-    <para>
+  <!-- TODO:
       companion
-    </para>
 
-    <para>
       finish replica manager
-    </para>
 
-    <para>
       Emails durchgehen: Patrick, Timur, Alex, Vladimir,...
-    </para>
 
-    <para>
       Where to put comments/help/release notes for actual USERS (srmcp and dccp, ...)
-    </para>
-
-
-  </unfinished>
+    -->
   
-  <unfinished>
-    <para>
+    <!-- TODO:
       Short description, features, overview of structure
-    </para>
     
-    <para>
       Filesystem - PNFS (Database), Data on Pools/Tape, Protocols, SRM (Database)
-    </para>
     
-    <para>
       Distributed server system, domains, cells, messages
-    </para>
     
-    <para>
       (Important) cells in a dCache system.
-    </para>
 
-    <para>
       Book assumes installations as described by the distribution. 
-    </para>
-  </unfinished>
-  
-  <unfinished>
-    <para>
+      -->
+<!-- TODO 
       Todo somewhere:
-    </para>
     
-    <para>
-      HSM -- see dominik bernhard DONE
-    </para>
+      HSM - see dominik bernhard DONE
 
-    <para>
-      Copy Manager -- from Patrick
-    </para>
+      Copy Manager - from Patrick
 
-    <para>
-      unbalanced movers (CM?) -- should be covered by CM doc. Or additional short cookbook entry with reference to CM doc?
-    </para>
+      unbalanced movers (CM?) - should be covered by CM doc. Or additional short cookbook entry with reference to CM doc?
 
-    <para>
-      If a domain does not appear -- should be covered by intouch
-    </para>
+      If a domain does not appear - should be covered by intouch
 
-    <para>
       ssh authorized_keys for scripting (tr -d '\r')
-    </para>
-  </unfinished>
+-->
 
 </chapter>

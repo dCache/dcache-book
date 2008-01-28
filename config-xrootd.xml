@@ -1,41 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+%sharedents;
+]>
 
 <chapter id="cf-xrootd">
 
-	<title>dCache as xRootd-Server</title>
+  <title>dCache as xRootd-Server</title>
 
-	<partauthors>Martin Radicke</partauthors>
+  <chapterinfo>
+    <author>
+      <firstname>Martin</firstname>
+      <surname>Radicke</surname>
+    </author>
+  </chapterinfo>
 
-	<para>
-		This chapter explains how to configure dCache in order to access
-		it via the xrootd-protocol, allowing xrootd-Clients like ROOT's
-		TXNetfile and xrdcp to do file operations against a
-		dCache-instance in a transparent manner. The current
-		implementation in dCache 1.7.0 is based on the most recent
-		production version of the xrootd-protocol (2.4.5).
-	</para>
+  <para>
+    This chapter explains how to configure &dcache; in order to access
+    it via the &xrootd; protocol, allowing &xrootd;-Clients like
+    ROOT's TXNetfile and xrdcp to do file operations against a
+    &dcache; instance in a transparent manner. The current
+    implementation in &dcache; 1.7.0 is based on the most recent
+    production version of the &xrootd; protocol (2.4.5).
+  </para>
 
-	<section id="cf-xrootd-setup">
-		<title>Setting up</title>
+  <section id="cf-xrootd-setup">
+    <title>Setting up</title>
 
-		<para>
-			The xrootd functionality is contained in all dCache releases
-			starting from 1.7.0. Versions prior to this are not
-			supported!
-		</para>
+    <para>
+      The xrootd functionality is contained in all &dcache; releases
+      starting from 1.7.0. Versions prior to this are not supported!
+    </para>
 
-		<para>
-			To allow file transfers in and out of
-			<dcache />
-			using xrootd, a new xrootd-Door must be started. This door
-			acts then as the entry point to all xrootd requests.
-			Compared to the native xrootd server-implementation
-			(produced by SLAC), the xrootd-door refers to the <literal>redirector
-			node</literal>.
-		</para>
+    <para>
+      To allow file transfers in and out of &dcache; using xrootd, a
+      new &door-xrootd; must be started. This door acts then as the
+      entry point to all &xrootd; requests.  Compared to the native
+      xrootd server-implementation (produced by SLAC), the
+      &door-xrootd; refers to the <literal>redirector node</literal>.
+    </para>
 		
-		<!-- 
+    <!-- 
 		<section id="cf-xrootd-setup-yaim">
 			<title>YAIM-based setup</title>
 			<para>
@@ -47,90 +53,111 @@ XROOTD=yes
 			</para>
 		</section> -->
 
-		<para>
-			To enable the xrootd door, just change the config file
-			<filename>${dCacheHome}/etc/node_config</filename>
-			so that it contains the line
-			<programlisting>..
-XROOTD=yes
-..</programlisting>
+    <para>
+      To enable the &door-xrootd;, just change the config file
+      <filename>${dCacheHome}/etc/node_config</filename> so that it
+      contains the line
+    </para>
 
-			After a restart of the dcache core-services, done by
-			executing <screen><rootprompt/><command>${dCacheHome}/bin/dcache-core</command>	restart</screen>
-			, the xrootd door should be running. A few minutes later it
-			should appear at the web monitoring interface under "Cell
-			Services" (see
-			<xref linkend="intouch-web" />
-			).
-		</para>
-		
+    <programlisting>..  XROOTD=yes
+      ..</programlisting>
 
+    <para>
+      After a restart of the &dcache; core-services, done by executing
+    </para>
 
+    <screen>&prompt-root; <command>${dCacheHome}/bin/dcache-core</command> restart</screen>
+
+    <para>
+      the &xrootd; door should be running. A few minutes later it
+      should appear at the web monitoring interface under "Cell
+      Services" (see <xref linkend="intouch-web" />).
+    </para>
 		
-		<warning>
-			<para>
-				Starting from version 1.7.0 (patchlevel 20), the xrootd-Door is set to readonly by default. In prior 
-				versions, the door is started in unsecure mode, giving clients unrestricted read and write access. 
-				Please refer to <xref linkend="cf-xrootd-sec"/> on how to setup security.
-			</para>
-		</warning>
+    <warning>
+      <para>
+	Starting from version 1.7.0 (patchlevel 20), the &door-xrootd;
+	is set to readonly by default. In prior versions, the door is
+	started in unsecure mode, giving clients unrestricted read and
+	write access.  Please refer to <xref linkend="cf-xrootd-sec"/>
+	on how to setup security.
+      </para>
+    </warning>
 		
-		<section id="cf-xrootd-setup-params">
-			<title>Parameters</title>
+    <section id="cf-xrootd-setup-params">
+      <title>Parameters</title>
+      
+      <para>
+	The default port the &door-xrootd; is listening on is
+	1094. This can be changed in
+	<filename>${dCacheHome}/config/dCacheSetup</filename> by
+	setting the variable "xrootdPort" to the desired value (again
+	restart required).
+      </para>
 			
-			<para>
-				The default port the xrootd door is listening on is 1094. This can be changed in 
-				<filename>${dCacheHome}/config/dCacheSetup</filename> by setting the variable "xrootdPort" to the
-				desired value (again restart required). 
-			</para>
-			
-			<para>
-				The number of parallel xrootd file transfers per pool node is limited by the portrange 
-				defined in <filename>${dCacheHome}/config/dCacheSetup</filename>, since
-				each transfer occupies one (not firewalled) port for its own. The portrange can be set 
-				via the property "<literal>org.dcache.net.tcp.portrange</literal>" in the line
+      <para>
+	The number of parallel &xrootd; file transfers per pool node
+	is limited by the portrange defined in
+	<filename>${dCacheHome}/config/dCacheSetup</filename>, since
+	each transfer occupies one (not firewalled) port for its
+	own. The portrange can be set via the property
+	"<literal>org.dcache.net.tcp.portrange</literal>" in the line
+      </para>
 				
-				<programlisting>..
+      <programlisting>..
 java_options="-server -Xmx512m -XX:MaxDirectMemorySize=512m -Dorg.globus.tcp.port.range=50000,52000 
 -Dsun.net.inetaddr.ttl=1800 -Djava.net.preferIPv4Stack=true -Dorg.dcache.dcap.port=0 
 -Dorg.dcache.net.tcp.portrange=33115:33145 "
 ..</programlisting>
-			In the above example, the maximum would be 30 simultaneous xrootd transfers per pool. Any change 
-			to the door port or the portrange requires a dDache-core- or accordingly dCache-pool- restart.
-			</para>
-		</section>
-	</section>
 
-	<section id="cf-xrootd-tests">
-		<title>Quick tests</title>
+      <para>
+	In the above example, the maximum would be 30 simultaneous
+	&xrootd; transfers per pool. Any change to the door port or
+	the portrange requires a dDache-core- or accordingly
+	dCache-pool- restart.
+      </para>
 
-		<para>
-			The subsequent paragraphs describe a quick guide on how to
-			test xrootd using the <filename>xrdcp</filename> and <filename>ROOT</filename> clients.
-		</para>
+    </section>
+  </section>
 
-		<section id="cf-xrootd-tests-xrdcp">
-			<title>Copying files with xrdcp</title>
 
-			<para>
-				A simple way to get files in and out of dCache via
-				xrootd is the command xrdcp. It is included in every xrootd and ROOT distribution.
-			</para>
+  <section id="cf-xrootd-tests">
+    <title>Quick tests</title>
+
+    <para>
+      The subsequent paragraphs describe a quick guide on how to test
+      &xrootd; using the <filename>xrdcp</filename> and
+      <filename>ROOT</filename> clients.
+    </para>
+
+    <section id="cf-xrootd-tests-xrdcp">
+      <title>Copying files with xrdcp</title>
+
+      <para>
+	A simple way to get files in and out of &dcache; via &xrootd;
+	is the command xrdcp. It is included in every xrootd and ROOT
+	distribution.
+      </para>
 			
-			<para>
-				To transfer a single file in and out of dCache, just issue
-				<screen><userprompt/><command>xrdcp</command> /bin/sh root://<replaceable>door_hostname</replaceable>//pnfs/<replaceable>site.de</replaceable>/data/xrd_test
-<userprompt/><command>xrdcp</command> root://<replaceable>door_hostname</replaceable>//pnfs/<replaceable>site.de</replaceable>/data/xrd_test /dev/null</screen>
-			</para>
-		</section>
-		
-		<section id="cf-xrootd-tests-ROOT">
-			<title>Accessing files from within ROOT</title>
+      <para>
+	To transfer a single file in and out of &dcache;, just issue
+      </para>
+
+      <screen>&prompt-user; <command>xrdcp</command> /bin/sh root://<replaceable>door_hostname</replaceable>//pnfs/<replaceable>site.de</replaceable>/data/xrd_test
+      &prompt-user; <command>xrdcp</command>
+      root://<replaceable>door_hostname</replaceable>//pnfs/<replaceable>site.de</replaceable>/data/xrd_test /dev/null</screen>
+
+    </section>
+    
+    <section id="cf-xrootd-tests-ROOT">
+      <title>Accessing files from within ROOT</title>
 			
-			<para>
-				This simple ROOT example shows how to write a randomly filled histogram to a file in dCache:
-				<screen>
-root [0] TH1F h("testhisto", "test", 100, -4, 4);
+      <para>
+	This simple ROOT example shows how to write a randomly filled
+	histogram to a file in &dcache;:
+      </para>
+
+      <screen>root [0] TH1F h("testhisto", "test", 100, -4, 4);
 root [1] h->FillRandom("gaus", 10000);
 root [2] TFile *f = new TXNetFile("root://<replaceable>door_hostname</replaceable>//pnfs/<replaceable>site.de</replaceable>/data/test.root","new");
 061024 12:03:52 001 Xrd: Create: (C) 2004 SLAC INFN XrdClient 0.3
@@ -139,36 +166,42 @@ root [4] f->Write();
 root [5] f->Close();
 root [6] 061101 15:57:42 14991 Xrd: XrdClientSock::RecvRaw: Error reading from socket: Success
 061101 15:57:42 14991 Xrd: XrdClientMessage::ReadRaw: Error reading header (8 bytes)</screen>
-				
-				Closing remote xrootd files that live in dCache produces this warning, but has absolutely no effect on subsequent ROOT commands. 
-				It happens because dCache closes all TCP-Connections after finishing a file transfer, while xrootd expects to keep them open for later resue.
-			</para>
-			<para>
-				To read it back into ROOT from dCache:
-				<screen>
-root [7] TFile *reopen = TXNetFile ("root://<replaceable>door_hostname</replaceable>//pnfs/<replaceable>site.de</replaceable>/data/test.root","read");
+
+      <para>
+	Closing remote &xrootd; files that live in &dcache; produces
+	this warning, but has absolutely no effect on subsequent ROOT
+	commands.  It happens because &dcache; closes all &tcp;
+	connections after finishing a file transfer, while xrootd
+	expects to keep them open for later resue.
+      </para>
+
+      <para>
+	To read it back into ROOT from &dcache;:
+      </para>
+
+      <screen>root [7] TFile *reopen = TXNetFile ("root://<replaceable>door_hostname</replaceable>//pnfs/<replaceable>site.de</replaceable>/data/test.root","read");
 root [8] reopen->ls();
 TXNetFile**             //pnfs/<replaceable>site.de</replaceable>/data/test.root
  TXNetFile*             //pnfs/<replaceable>site.de</replaceable>/data/test.root
   KEY: TH1F     testhisto;1     test</screen>
 
-			</para>
-			
-		</section>
-	</section>
+    </section>
+  </section>
 	
-	
-
-	<section id="cf-xrootd-sec">
-		<title>xrootd security</title>
+  <section id="cf-xrootd-sec">
+    <title>&xrootd; security</title>
 		
-		<section id="cf-xrootd-sec-ro">
-			<title>Read-Write access</title>
+    <section id="cf-xrootd-sec-ro">
+      <title>Read-Write access</title>
 			
-			<para>
-				Per default dCache-xrootd is restricted to read-only, because plain xrootd is completely unauthenticated. A typical error message on the 
-				clientside if the server is read-only looks like:
-				<screen><userprompt/>xrdcp -d 1 /bin/sh root://ford.desy.de//pnfs/desy.de/data/xrd_test2
+      <para>
+	Per default &dcache; &xrootd; is restricted to read-only,
+	because plain &xrootd; is completely unauthenticated. A
+	typical error message on the clientside if the server is
+	read-only looks like:
+      </para>
+
+      <screen> &prompt-user; xrdcp -d 1 /bin/sh root://ford.desy.de//pnfs/desy.de/data/xrd_test2
 Setting debug level 1
 061024 18:43:05 001 Xrd: main: (C) 2004 SLAC INFN xrdcp 0.2 beta
 061024 18:43:05 001 Xrd: Create: (C) 2004 SLAC INFN XrdClient kXR_ver002+kXR_asyncap
@@ -180,118 +213,183 @@ Setting debug level 1
 061024 18:43:05 001 Xrd: Open: File open in progress.
 061024 18:43:06 5819 Xrd: SendGenCommand: Server declared: <command>Permission denied. Access is read only.(error code: 3003)</command>
 061024 18:43:06 001 Xrd: Close: File not opened.
-Error accessing path/file for root://ford//pnfs/desy.de/data/asdfas
-				</screen>
-			</para>
+Error accessing path/file for root://ford//pnfs/desy.de/data/asdfas</screen>
 			
-			<para>
-				To enable read-write access, edit the following line in <filename>${dCacheHome}/config/dCacheSetup</filename>
-				<programlisting>..
+      <para>
+	To enable read-write access, edit the following line in
+	<filename>${dCacheHome}/config/dCacheSetup</filename>
+      </para>
+
+      <programlisting>..
 xrootdIsReadOnly=false
 ..</programlisting>
-				and do a restart of the dCache core services. 
-		</para>
-		<para>
-Please note that due to the unauthenticated nature of this access mode, files can be written and read to/from any subdirectory in the PNFS namespace (including the automatic creation of parent directories). Because there is no user information at the time of request, new files/subdirectories generated through xrootd will inherit UID/GID from it's parent directory.
-			</para>
+
+      <para>
+	and do a restart of the dCache core services. 
+      </para>
+
+      <para>
+	Please note that due to the unauthenticated nature of this
+	access mode, files can be written and read to/from any
+	subdirectory in the &pnfs; namespace (including the automatic
+	creation of parent directories). Because there is no user
+	information at the time of request, new files/subdirectories
+	generated through &xrootd; will inherit UID/GID from its
+	parent directory.
+      </para>
 			
-		</section>
+    </section>
 		
-		<section id="cf-xrootd-sec-selected">
-			<title>Permitting write access on selected PNFS directories </title>
-		<para>
-		To overcome the security issue of uncontrolled xrootd write access mentioned in the previous section, it is possible to restrict write access on a per-directory basis (including subdirectories). This feature is available from dCache 1.7.0-36 on.
-		</para>
-		<para>
-			To activate this feature, a colon-seperated list containing the full PNFS paths of authorized directories must be provided in <filename>${dCacheHome}/config/dCacheSetup</filename>:
- <programlisting>..
+    <section id="cf-xrootd-sec-selected">
+      <title>Permitting write access on selected &pnfs; directories</title>
+
+      <para>
+	To overcome the security issue of uncontrolled &xrootd; write
+	access mentioned in the previous section, it is possible to
+	restrict write access on a per-directory basis (including
+	subdirectories). This feature is available from &dcache;
+	1.7.0-36 on.
+      </para>
+
+      <para>
+	To activate this feature, a colon-seperated list containing
+	the full &pnfs; paths of authorized directories must be provided
+	in <filename>${dCacheHome}/config/dCacheSetup</filename>:
+      </para>
+
+      <programlisting>..
 xrootdAllowedPaths=/pnfs/<replaceable>site.de</replaceable>/path1:/pnfs/<replaceable>site.de</replaceable>/path2
 ..</programlisting>
-		</para>
-		<para>
-		A restart of the xrootd door is required to make the changes take effect. As soon as <emphasis>${xrootdAllowedPaths}</emphasis> is set, all write requests to directories not matching the allowed path list will be refused.
-		</para>
-		</section>
-		<section id="cf-xrootd-sec-authz">
-			<title>Token-based authorization</title>
-			
-			<para>
-				The xrootd-dCache implementation includes a generic mechanism to plug in different 
-				authorization handler. The only plugin available so far implements token-based authorization 
-				as suggested in <ulink url="http://people.web.psi.ch/feichtinger/doc/authz.pdf"/>.
-			</para>
-			
-			<para>
-				The first thing to do is to setup the keystore. The keystore file basically specifies 
-				all RSA-keypairs used within the authorization process and has exactly the same syntax
-				as in the native xrootd tokenauthorization implementation. In this file, each line beginning with
-				the keyword <literal>KEY</literal> corresponds to a certain Virtual Organisation (VO) and 
-				specifies the remote public (owned by the file catalogue) and the local private key belonging
-				to that VO. A line containing the statement <literal>"KEY VO:*"</literal> defines a default
-				keypair that is used as a fallback solution if no VO is specified in token-enhanced xrootd 
-				requests. Lines not starting with the <literal>KEY</literal> keyword are ignored. A template 
-				can be found in <filename>${dCacheHome}/etc/keystore.template</filename>.
-			</para>
-			
-			<para>
-				The keys itself have to be converted into a certain format in order to be loaded into the
-				authorization plugin. dCache expects both keys to be binary DER-encoded 
-				(Distinguished Encoding Rules for ASN.1). Furthermore the private key must be PKCS #8-compliant
-				and	the public key must follow the X.509-standard.
-			</para>
-			
-			<para>
-				The following example demonstrates how to create and convert a keypair using OpenSSL:
-<screen> # generate new RSA private key
-<rootprompt/>openssl genrsa -rand 12938467 -out key.pem 1024
- # create certificate request
-<rootprompt/>openssl req -new -inform PEM -key key.pem -outform PEM -out certreq.pem
- # create certificate by self-signing certificate request 
-<rootprompt/>openssl x509 -days 3650 -signkey key.pem -in certreq.pem -req -out cert.pem
- # extract public key from certificate
-<rootprompt/>openssl x509 -pubkey -in cert.pem -out pkey.pem
 
-<rootprompt/>openssl pkcs8 -in key.pem -topk8 -nocrypt -outform DER -out <replaceable>new_private_key</replaceable>
-<rootprompt/>openssl enc -base64 -d -in pkey.pem -out <replaceable>new_public_key</replaceable></screen>
-			</para>
+      <para>
+	A restart of the &door-xrootd; is required to make the changes
+	take effect. As soon as
+	<emphasis>${xrootdAllowedPaths}</emphasis> is set, all write
+	requests to directories not matching the allowed path list
+	will be refused.
+      </para>
+
+    </section>
+
+
+    <section id="cf-xrootd-sec-authz">
+      <title>Token-based authorization</title>
 			
-			<para>
-				Only the last two lines are performing the actual conversion, therefore you can skip the 
-				previous lines in case you already have a keypair. Make sure that you keystore file correctly
-				points to the converted keys.
-			</para>
+      <para>
+	The &xrootd; &dcache; implementation includes a generic
+	mechanism to plug in different authorization handler. The only
+	plugin available so far implements token-based authorization
+	as suggested in <ulink
+	url="http://people.web.psi.ch/feichtinger/doc/authz.pdf"/>.
+      </para>
 			
-			<para>
-				To enable the plugin, it is necessary to uncomment and customize the following two lines 
-				in the 	file <filename>${dCacheHome}/config/dCacheSetup</filename>, so that it looks like
-				<programlisting>..
-xrootdAuthzPlugin=org.dcache.xrootd.security.plugins.tokenauthz.TokenAuthorizationFactory
-xrootdAuthzKeystore=<replaceable>Path_to_your_Keystore</replaceable>
-..</programlisting>
-			</para>
+      <para>
+	The first thing to do is to setup the keystore. The keystore
+	file basically specifies all RSA-keypairs used within the
+	authorization process and has exactly the same syntax as in
+	the native xrootd tokenauthorization implementation. In this
+	file, each line beginning with the keyword
+	<literal>KEY</literal> corresponds to a certain Virtual
+	Organisation (VO) and specifies the remote public (owned by
+	the file catalogue) and the local private key belonging to
+	that VO. A line containing the statement <literal>"KEY
+	VO:*"</literal> defines a default keypair that is used as a
+	fallback solution if no VO is specified in token-enhanced
+	&xrootd; requests. Lines not starting with the
+	<literal>KEY</literal> keyword are ignored. A template can be
+	found in
+	<filename>${dCacheHome}/etc/keystore.template</filename>.
+      </para>
 			
-			<para>
-				After doing a restart of dCache-core, any requests without an appropriate token should result in
-				an error saying "<literal>authorization check failed: No authorization token found in open request,
-				 access denied.(error code: 3010)</literal>".
-			</para>
+      <para>
+	The keys itself have to be converted into a certain format in
+	order to be loaded into the authorization plugin. &dcache;
+	expects both keys to be binary DER-encoded (Distinguished
+	Encoding Rules for ASN.1). Furthermore the private key must be
+	PKCS #8-compliant and the public key must follow the
+	X.509-standard.
+      </para>
 			
-			<para>
-				If both tokenbased authorization and read-only access are activated, the read-only restriction will 
-				dominate (local settings have precedence over remote file catalogue permissions).
-			</para>
-		</section>
-	<section id="cf-xrootd-sec-precedence">
-			<title>Precedence of security mechanisms</title>
-		<para>
-			The previously explained methods to restrict access via xrootd can also be used in conjunction. The precedence applied in that case is as following:
-		</para>
-		<para>
-			The permission check executed by the authorization plugin (if one is installed) is given the lowest priority, because it can controlled by a remote party. E.g. in the case of tokenbased authorization, access control is determined by the file catalogue (global namespace).
-			To allow local site's administrators to override remote security settings, write access can be further restricted to few directories (based on the local namespace, the PNFS). Setting xrootd access to read-only has the highest priority, overriding all other settings.
-		</para>
-	</section>
-	</section>
-	
+      <para>
+	The following example demonstrates how to create and convert a
+	keypair using OpenSSL:
+      </para>
+
+      <screen><lineannotation>Generate new RSA private key</lineannotation>
+&prompt-root; openssl genrsa -rand 12938467 -out key.pem 1024
+
+<lineannotation>Create certificate request</lineannotation>
+&prompt-root; openssl req -new -inform PEM -key key.pem -outform PEM -out certreq.pem
+
+<lineannotation>Create certificate by self-signing certificate request</lineannotation>
+&prompt-root; openssl x509 -days 3650 -signkey key.pem -in certreq.pem -req -out cert.pem
+
+<lineannotation>Extract public key from certificate</lineannotation>
+&prompt-root; openssl x509 -pubkey -in cert.pem -out pkey.pem
+&prompt-root; openssl pkcs8 -in key.pem -topk8 -nocrypt -outform DER -out <replaceable>new_private_key</replaceable>
+&prompt-root; openssl enc -base64 -d -in pkey.pem -out <replaceable>new_public_key</replaceable></screen>
+			
+      <para>
+	Only the last two lines are performing the actual conversion,
+	therefore you can skip the previous lines in case you already
+	have a keypair. Make sure that you keystore file correctly
+	points to the converted keys.
+      </para>
+			
+      <para>
+	To enable the plugin, it is necessary to uncomment and
+	customize the following two lines in the file
+	<filename>${dCacheHome}/config/dCacheSetup</filename>, so that
+	it looks like
+      </para>
+
+      <programlisting>..
+	xrootdAuthzPlugin=org.dcache.xrootd.security.plugins.tokenauthz.TokenAuthorizationFactory
+	xrootdAuthzKeystore=<replaceable>Path_to_your_Keystore</replaceable>
+	..</programlisting>
+			
+      <para>
+	After doing a restart of &dcache;-core, any requests without
+	an appropriate token should result in an error saying
+	"<literal>authorization check failed: No authorization token
+	found in open request, access denied.(error code:
+	3010)</literal>".
+      </para>
+			
+      <para>
+	If both tokenbased authorization and read-only access are
+	activated, the read-only restriction will dominate (local
+	settings have precedence over remote file catalogue
+	permissions).
+      </para>
+    </section>
+
+    <section id="cf-xrootd-sec-precedence">
+      <title>Precedence of security mechanisms</title>
+
+      <para>
+	The previously explained methods to restrict access via
+	&xrootd; can also be used in conjunction. The precedence
+	applied in that case is as following:
+      </para>
+
+      <para>
+	The permission check executed by the authorization plugin (if
+	one is installed) is given the lowest priority, because it can
+	controlled by a remote party. E.g. in the case of tokenbased
+	authorization, access control is determined by the file
+	catalogue (global namespace).
+      </para>
+
+      <para>
+	To allow local site's administrators to override remote
+	security settings, write access can be further restricted to
+	few directories (based on the local namespace, the
+	&pnfs;). Setting &xrootd; access to read-only has the highest
+	priority, overriding all other settings.
+      </para>
+    </section>
+
+  </section>
 
 </chapter>

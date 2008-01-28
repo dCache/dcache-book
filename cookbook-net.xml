@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+%sharedents;
+]>
 
 <chapter id="cb-net">
+
   <title>Complex Network Configuration</title>
   
   <para>
     This chapter contains solutions for several non-trivial network
     configurations. The first section discusses the interoperation of
-    <dcache/> with firewalls and does not require any background
-    knowledge about <dcache/> other than what is given in the
+    &dcache; with firewalls and does not require any background
+    knowledge about &dcache; other than what is given in the
     installation guide (<xref linkend="in"/>) and the first steps
     tutorial (<xref linkend="intouch"/>). The following sections will
     deal with more complex network topologies, e.g. private subnets.
@@ -24,7 +29,7 @@
     <title>Firewall Configuration</title>
 
     <para>
-      The components of a <dcache/> instance may be distributed over
+      The components of a &dcache; instance may be distributed over
       several hosts (nodes). Some of these components are accessed
       from outside and consequently the firewall needs to be aware of
       that. This section assumes that all nodes are behind a firewall
@@ -32,23 +37,23 @@
       described in the following sections. Depending on the access
       method, certain ports have to be opened to only some of the
       nodes. We will describe the behaviour of a standard installation
-      using the default values. Since <dcache/> is very flexible, most
+      using the default values. Since &dcache; is very flexible, most
       port numbers may be changed in the configuration. The location
-      (node) of any <dcache/> component might also be changed from this
+      (node) of any &dcache; component might also be changed from this
       standard.
     </para>
 
     <section>
-      <title>The <dcap/> Protocol</title>
+      <title>The &dcap; Protocol</title>
 
       <para>
-	The <dcap/> protocol should be used for local, trusted access
+	The &dcap; protocol should be used for local, trusted access
 	only, because it is not authenticated. The traditional method
-	is to mount <pnfs/> locally on the client and use paths to the
+	is to mount &pnfs; locally on the client and use paths to the
 	files on this local mount to address files. For this, the
-	client has to be able to mount the NFS export of the <pnfs/>
-	server. It is also possible to use the <dcap/> protocol with a
-	URL instead of a local path within a <pnfs/> mount. The URL
+	client has to be able to mount the NFS export of the &pnfs;
+	server. It is also possible to use the &dcap; protocol with a
+	URL instead of a local path within a &pnfs; mount. The URL
 	has the form
 
 <programlisting>dcap://<replaceable>dCapDoorHostFQN</replaceable>:<replaceable>dCapDoorPort</replaceable>/<replaceable>fullPnfsPath</replaceable></programlisting>
@@ -60,13 +65,13 @@
 	anymore. However, the access is unauthenticated and therefore
 	access is only granted if the <quote>other</quote> part of the
 	UNIX rights are set accordingly. In other words: The user is
-	mapped to nobody for unauthenticated <dcap/> access.
+	mapped to nobody for unauthenticated &dcap; access.
       </para>
 
       <para>
-	In both cases (<pnfs/> mount and URL access) the <dcap/>
-	client (<dcap/> library or <command>dccp</command> command)
-	will connect to the <dcap/> door
+	In both cases (&pnfs; mount and URL access) the &dcap;
+	client (&dcap; library or <command>dccp</command> command)
+	will connect to the &dcap; door
 	(<literal>doorDomain</literal>) on the admin node with TCP
 	port 22125 (can be changed in
 	<filename>config/dCacheSetup</filename> with <varname>dCapPort</varname>). After the pool
@@ -82,36 +87,36 @@
     </section>
 
     <section>
-      <title>The <gsidcap/> Protocol</title>
+      <title>The &gsidcap; Protocol</title>
 
       <para>
-	The <gsidcap/> protocol is the <dcap/> protocol with a GSI
+	The &gsidcap; protocol is the &dcap; protocol with a GSI
 	authentication wrapper (tunnel). The mechanism is the same as
-	described for the URL-stype <dcap/> protocol in the previous
+	described for the URL-stype &dcap; protocol in the previous
 	section. The only difference is the default port number: For
-	the <gsidcap/> door the default port number is 22128. It is
+	the &gsidcap; door the default port number is 22128. It is
 	specified in <filename>config/dCacheSetup</filename> with the
 	parameter <varname>dCapGsiPort</varname>.
       </para>
 
       <para>
-	Another difference between the <dcap/> door and <gsidcap/>
-	doors is that the <dcap/> door is started on the admin node
+	Another difference between the &dcap; door and &gsidcap;
+	doors is that the &dcap; door is started on the admin node
 	and there can only be one in the standard configuration, while
-	there may be several <gsidcap/> doors on separate
+	there may be several &gsidcap; doors on separate
 	nodes. Correspondingly, ports have to be opened in a
 	firewall. Note that it should not be necessary to run as many
-	<gsidcap/> doors as <gridftp/> doors (see below), because no
-	data is transfered through the <gsidcap/> door.
+	&gsidcap; doors as &gridftp; doors (see below), because no
+	data is transfered through the &gsidcap; door.
       </para>
 
     </section>
     
     <section>
-      <title>The <gridftp/> Protocol</title>
+      <title>The &gridftp; Protocol</title>
 
       <para>
-	A <gridftp/> client connects to one of the <gridftp/> doors on
+	A &gridftp; client connects to one of the &gridftp; doors on
 	TCP port 2811. The data connections are established
 	independent of the direction of the data transfer. In
 	<quote>active</quote> FTP mode the server connects to the
@@ -125,7 +130,7 @@
 	or more data connections to the client on a TCP port in the
 	range between 20000 and 25000. In <quote>passive</quote> FTP
 	mode, the client will establish the data connections to the
-	<gridftp/> door in the same port range. The pool will connect
+	&gridftp; door in the same port range. The pool will connect
 	to the door and the door will route the data traffic. It is
 	not possible to establish a direct connection between pool and
 	client in <quote>passive</quote> mode, because the FTP
@@ -137,16 +142,16 @@
 
 
     <section>
-      <title>The <srm/> Protocol</title>
+      <title>The &srm; Protocol</title>
 
       <para>
-	An <srm/> is a webservice which uses the https as transport
+	An &srm; is a webservice which uses the https as transport
 	protocol and negotiates data transfers between the client and
 	the server as well as between the server and another
 	server. For the actual data transfer one of the other
-	protocols is negotiated. Usually this is <gridftp/> -
+	protocols is negotiated. Usually this is &gridftp; -
 	especially for wide-area transfers. There are two things to
-	note about <srm/>-initiated <gridftp/> transfers:
+	note about &srm;-initiated &gridftp; transfers:
       </para>
 
       <para>
@@ -160,18 +165,18 @@
       </para>
 
       <para>
-	Apart from <srm/> put and get operations which always copy
-	data between one <srm/> and the client there is also a true
-	<srm/> copy from one <srm/> to another <srm/>. There are two
-	modes for <srm/> copy: <quote>pull</quote> and
-	<quote>push</quote> mode. If the destination <srm/> is
-	<dcache/> based and <srm/> pull mode (default) is used, the
-	destination pool will play the role of the <gridftp/> client,
-	will contact the <gridftp/> door of the source instance and
+	Apart from &srm; put and get operations which always copy
+	data between one &srm; and the client there is also a true
+	&srm; copy from one &srm; to another &srm;. There are two
+	modes for &srm; copy: <quote>pull</quote> and
+	<quote>push</quote> mode. If the destination &srm; is
+	&dcache; based and &srm; pull mode (default) is used, the
+	destination pool will play the role of the &gridftp; client,
+	will contact the &gridftp; door of the source instance and
 	receive the data directly from the source pool (if the source
-	system is a <dcache/> system). If push mode is used and the
-	source is a <dcache/> based <srm/>, the source pool will be
-	the <gridftp/> client and will send the data to the <gridftp/>
+	system is a &dcache; system). If push mode is used and the
+	source is a &dcache; based &srm;, the source pool will be
+	the &gridftp; client and will send the data to the &gridftp;
 	door of the destination. All this might have to be considered
 	when designing the system and configuring the firewall.
       </para>
@@ -183,7 +188,7 @@
       <title>Pool Selection</title>
 
       <para>
-	Restricting wide-area transfers to a subset of your <dcache/>
+	Restricting wide-area transfers to a subset of your &dcache;
 	pools may be done with the <glossterm
 	linkend="gl-pm-comp-psu">pool selection unit</glossterm> in
 	the pool manager. <xref linkend="cf-pm-psu"/> contains a
@@ -199,7 +204,7 @@
 
       <para>
 	The following table gives an overview about the default ports
-	used by the client protocols supported by <dcache/>. Note that
+	used by the client protocols supported by &dcache;. Note that
 	all of them may be changed in
 	<filename>config/dCacheSetup</filename>.
       </para>
@@ -211,7 +216,7 @@
 	  <colspec colnum="1" colname="Protocol" colwidth="70"/>
 	  <colspec colnum="2" colname="Ports" colwidth="70"/>
 	  <colspec colnum="3" colname="Direction" colwidth="120"/>
-	  <colspec colnum="4" colname="Nodes"/>
+	  <colspec colnum="4" colname="Nodes" colwidth="*" />
           <thead>
             <row>
               <entry>
@@ -230,7 +235,7 @@
           </thead>
           <tbody>
 	    <row class="firstline">
-	      <entry><dcap/></entry>
+	      <entry>&dcap;</entry>
 	      <entry>22125</entry>
 	      <entry>incoming</entry>
 	      <entry>doorDomain (admin node)</entry>
@@ -242,7 +247,7 @@
 	      <entry>pools</entry>
 	    </row>
 	    <row>
-	      <entry><gsidcap/></entry>
+	      <entry>&gsidcap;</entry>
 	      <entry>22128</entry>
 	      <entry>incoming</entry>
 	      <entry>gsidcapDomain (where GSIDCAP=yes in node_config)</entry>
@@ -254,7 +259,7 @@
 	      <entry>pools</entry>
 	    </row>
 	    <row class="firstline">
-	      <entry><gridftp/></entry>
+	      <entry>&gridftp;</entry>
 	      <entry>2811</entry>
 	      <entry>incoming</entry>
 	      <entry>gridftpDomain (where GRIDFTP=yes in node_config)</entry>
@@ -262,17 +267,17 @@
 	    <row class="firstline">
 	      <entry></entry>
 	      <entry>20000-25000</entry>
-	      <entry>outgoing (active FTP)</entry>
+	      <entry>outgoing (active &ftp;)</entry>
 	      <entry>pools</entry>
 	    </row>
 	    <row class="firstline">
 	      <entry></entry>
 	      <entry>20000-25000</entry>
-	      <entry>incoming (passive FTP)</entry>
+	      <entry>incoming (passive &ftp;)</entry>
 	      <entry>gridftpDomain</entry>
 	    </row>
 	    <row>
-	      <entry><srm/></entry>
+	      <entry>&srm;</entry>
 	      <entry>8443</entry>
 	      <entry>incoming</entry>
 	      <entry>srmDomain</entry>
@@ -286,65 +291,69 @@
   </section>
 
   <section id="cb-net-second-if">
-    <title>GridFTP Connections via two or more Network Interfaces</title>
+    <title>&gridftp; Connections via two or more Network Interfaces</title>
       
-    <section>
+    <section role="NotInToc">
       <title>Description</title>
       <para>
-	The host on which the GridFTP door is running has several network
-        interfaces and is supposed to accept client connections via all those
-        interfaces. The interfaces might even belong to separate networks with no
-        routing from one network to the other.
+	The host on which the &gridftp; door is running has several
+	network interfaces and is supposed to accept client
+	connections via all those interfaces. The interfaces might
+	even belong to separate networks with no routing from one
+	network to the other.
       </para>
 
       <para>
-	As long as the data connection is opened by the GridFTP server (active
-        FTP mode), there is no problem with having more than one interface. However,
-        when the client opens the data connection (passive FTP mode), the door (FTP
-        server) has to supply it with the correct interface it should connect to. If
-        this is the wrong interface, the client might not be able to connect to it,
-        because there is no route or the connection might be inefficient.
+	As long as the data connection is opened by the &gridftp;
+	server (active FTP mode), there is no problem with having more
+	than one interface. However, when the client opens the data
+	connection (passive FTP mode), the door (FTP server) has to
+	supply it with the correct interface it should connect to. If
+	this is the wrong interface, the client might not be able to
+	connect to it, because there is no route or the connection
+	might be inefficient.
       </para>
 
       <para>
-        Also, since a GridFTP server has to authenticate with an SSL grid
-        certificate and key, there needs to be a separate certificate and key pair for
-        each name of the host. Since each network interface might have a different
-        name, several certificates and keys are needed and the correct one has to be
+        Also, since a &gridftp; server has to authenticate with an SSL
+        grid certificate and key, there needs to be a separate
+	certificate and key pair for each name of the host. Since each
+        network interface might have a different name, several
+        certificates and keys are needed and the correct one has to be
         used, when authenticating via each of the interfaces.
       </para>
     </section>
       
-    <section>
+    <section  role="NotInToc">
       <title>Solution</title>
       <para>
-        Start a separate GridFTP server cell on the host for each
+        Start a separate &gridftp; server cell on the host for each
         interface on which connections should be
         accepted. 
       </para>
       
       <para>
-        The cells may be started in one domain or in separate
-        domains. The cells have to have different names, since they
-        are <glossterm linkend="gl-well-known-cell">well
-	  known</glossterm> cells. Each cell has to be configured,
-        only to listen on the interface it should serve with the
-        <option>-listen</option> option. The locations of the grid
-        host certificate and key files for the interface have to be
-        specified explicitly with the <option>-service-cert</option>
-        and <option>-service-key</option> options.
+	The cells may be started in one domain or in separate
+	domains. The cells have to have different names, since they
+	are <glossterm linkend="gl-well-known-cell">well
+	known</glossterm> cells. Each cell has to be configured, only
+	to listen on the interface it should serve with the
+	<option>-listen</option> option. The locations of the grid
+	host certificate and key files for the interface have to be
+	specified explicitly with the <option>-service-cert</option>
+	and <option>-service-key</option> options.
       </para>
       
       <para>
-        The following example shows a setup for two network
-        interfaces with the hostnames
-        <literal>door-a.grid.domain</literal> (111.111.111.5) and
-        <literal>door-b.other.domain</literal> (222.222.222.5) which are served by two
-        GridFTP door cells in one domain:
+        The following example shows a setup for two network interfaces
+        with the hostnames <literal>door-a.grid.domain</literal>
+        (111.111.111.5) and <literal>door-b.other.domain</literal>
+        (222.222.222.5) which are served by two &gridftp; door cells
+        in one domain:
       </para>
       
       <example>
-        <title>Batch file for two GridFTP doors serving separate network interfaces</title>
+        <title>Batch file for two &gridftp; doors serving separate network interfaces</title>
 
 <programlisting>set printout default 2
 set printout CellGlue none
@@ -386,7 +395,7 @@ create dmg.cells.services.login.LoginManager <emphasis>GFTP-door-b</emphasis> \
       
       <para>
         This batch file is very similar to the batch file for the
-        GridFTP door in the standard setup. (Comments have been left
+        &gridftp; door in the standard setup. (Comments have been left
         out.) It only contains an additional create command for the
         second cell and the emphasized changes within the two create
         commands: The cell names, the <option>-listen</option>
@@ -400,15 +409,15 @@ create dmg.cells.services.login.LoginManager <emphasis>GFTP-door-b</emphasis> \
   </section> 
   
   <section id="cb-net-pool-priv">
-    <title>GridFTP with Pools in a Private Subnet</title>
+    <title>&gridftp; with Pools in a Private Subnet</title>
     
-    <section>
+    <section role="NotInToc">
       <title>Description</title>
       <para>
         If pool nodes of a dCache instance are connected to a
         <glossterm linkend="gl-secondary-interface">secondary
-	  interface</glossterm> of the GridFTP door, e.g. because they
-        are in a private subnet, the GridFTP door will still tell
+	  interface</glossterm> of the &gridftp; door, e.g. because they
+        are in a private subnet, the &gridftp; door will still tell
         the pool to connect to its primary interface, which might be
         unreachable. 
       </para>
@@ -419,9 +428,9 @@ create dmg.cells.services.login.LoginManager <emphasis>GFTP-door-b</emphasis> \
         connections which have been established at start-up. In the
         standard setup this communication is routed via the dCache
         domain. However, for the data transfer, the pool connects to
-        the GridFTP door. The IP address it connects to is sent by
-        the GridFTP door to the pool via the control
-        connection. Since the GridFTP door cannot find out which of
+        the &gridftp; door. The IP address it connects to is sent by
+        the &gridftp; door to the pool via the control
+        connection. Since the &gridftp; door cannot find out which of
         its interfaces the pool should use, it normally sends the IP
         address of the <glossterm
 	  linkend="gl-primary-interface">primary
@@ -429,20 +438,20 @@ create dmg.cells.services.login.LoginManager <emphasis>GFTP-door-b</emphasis> \
       </para>
     </section>
     
-    <section>
+    <section role="NotInToc">
       <title>Solution</title>
       <para>
-        Tell the GridFTP door explicitly which IP it should send to
+        Tell the &gridftp; door explicitly which IP it should send to
         the pool for the data connection with the
         <option>-ftp-adapter-internal-interface</option>
         option. E.g. if the pools should connect to the secondary
-        interface of the GridFTP door host which has the IP address
+        interface of the &gridftp; door host which has the IP address
         <literal>10.0.1.1</literal>, the following batch file would
         be appropriate:
       </para>
       
       <example>
-        <title>Batch file for two GridFTP doors serving separate network interfaces</title>
+        <title>Batch file for two &gridftp; doors serving separate network interfaces</title>
 
 <programlisting>set printout default 2
 set printout CellGlue none
@@ -480,7 +489,7 @@ create dmg.cells.services.login.LoginManager GFTP \
 
       <para>
         This batch file is very similar to the batch file for the
-        GridFTP door in the standard setup. (Comments have been left
+        &gridftp; door in the standard setup. (Comments have been left
         out.) The emphasized last line has the desired effect.
       </para>
       
@@ -491,7 +500,7 @@ create dmg.cells.services.login.LoginManager GFTP \
   <section id="cb-net-dmz">
     <title>Doors in the DMZ</title>
     
-    <section>
+    <section role="NotInToc">
       <title>Description</title>
       <para>
         Some doors - e.g. for grid access - are located in the DMZ
@@ -505,7 +514,7 @@ create dmg.cells.services.login.LoginManager GFTP \
       </para>
     </section>
     
-    <section>
+    <section  role="NotInToc">
       <title>Solution</title>
       <para>
         Please contact <email>support@dcache.org</email> if you need

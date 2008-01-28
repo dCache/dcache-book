@@ -1,124 +1,150 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+%sharedents;
+]>
 
 <chapter id="cf-flushing">
 
   <title>Central Flushing to tertiary storage systems</title>
-  <partauthors>Patrick Fuhrmann</partauthors>
+
+  <chapterinfo>
+    <author>
+      <firstname>Patrick</firstname>
+      <surname>Fuhrmann</surname>
+    </author>
+  </chapterinfo>
+
   <!--
     I solemly swear that i'm not at all good.
   -->
+
   <para>
-  This chapter is of interest for dCache instances connected to a tertiary 
-  storage system or making use of the mass storage interface for any other reason.
-    <warning>
-       <para>
-          The central flush control is still in the evaluation phase. 
-          The configuration description within this chapter is mainly for
-          the dCache team to get it running on their test systems. The final
-          prodution version will have most of this stuff already be configured.
-       </para>
-    </warning>
-
-  dCache instances, connected to tertiary storage systems, collect incoming
-  data, sort it by storage class and flush it as soon as certain thresholds
-  are reached. All this is done autonomously by each individual write pool. 
-  Consequently
-  those flush operations are coordinated on the level of a pool but not 
-  globally wrt a set of write pools or even to the whole dCache instance.
-  Experiences during the last years show, that for various purposes a 
-  global flush management would be desirable.
+    This chapter is of interest for &dcache; instances connected to a
+    tertiary storage system or making use of the mass storage
+    interface for any other reason.
   </para>
-     <blockquote>
-     <title>Separation of read/write operations on write pools</title>
-     <para>
-       The total thoughput of various disk storage systems tend to drop
-       significantly
-       if extensive read and write operations have to be performed
-       in parallel on datasets exceeding the filesystem caches. To overcome
-       this technical obstacle, it would be good if disk storage systems would 
-       either allow writing into a pool or flushing data out of a pool
-       into the HSM system, but never both at the same time.
-     </para>
-     </blockquote>
 
-     <blockquote>
-     <title>Overcoming HSM limitations and restictions</title>
-     <para>
-        Some HSM systems, mainly those not coming with their own
-        scheduler, apply certain restrictions on the number of
-        requests being accepted simultaniously. For those,
-        a central flush control system would allow for limiting
-        the number of requests or the number of storage classes
-        being flushed at the same time. 
-     </para>
-  
-     </blockquote>
-  <section id="cf-flushing-configuration">
-  <title>Basic configuration (Getting it to run)</title>
+  <warning>
     <para>
-       This section describes how to setup a central flush control
-       manager. 
+      The central flush control is still in the evaluation phase.  The
+      configuration description within this chapter is mainly for the
+      &dcache; team to get it running on their test systems. The final
+      prodution version will have most of this stuff already be
+      configured.
+    </para>
+  </warning>
+
+  <para>
+    &dcache; instances, connected to tertiary storage systems, collect
+    incoming data, sort it by storage class and flush it as soon as
+    certain thresholds are reached. All this is done autonomously by
+    each individual write pool.  Consequently those flush operations
+    are coordinated on the level of a pool but not globally wrt a set
+    of write pools or even to the whole dCache instance.  Experiences
+    during the last years show, that for various purposes a global
+    flush management would be desirable.
+  </para>
+
+  <blockquote>
+    <title>Separation of read/write operations on write pools</title>
+
+    <para>
+      The total thoughput of various disk storage systems tend to drop
+      significantly if extensive read and write operations have to be
+      performed in parallel on datasets exceeding the filesystem
+      caches. To overcome this technical obstacle, it would be good if
+      disk storage systems would either allow writing into a pool or
+      flushing data out of a pool into the &hsm; system, but never both
+      at the same time.
+    </para>
+  </blockquote>
+
+  <blockquote>
+    <title>Overcoming &hsm; limitations and restictions</title>
+
+    <para>
+      Some &hsm; systems, mainly those not coming with their own
+      scheduler, apply certain restrictions on the number of requests
+      being accepted simultaniously. For those, a central flush
+      control system would allow for limiting the number of requests
+      or the number of storage classes being flushed at the same time.
+    </para>
+  </blockquote>
+
+  <section id="cf-flushing-configuration">
+    <title>Basic configuration (Getting it to run)</title>
+
+    <para>
+      This section describes how to setup a central flush control
+      manager.
        <!--With the production release 1.7.0 most of those
        steps will become obsolete.
        -->
-       <itemizedlist>
-       <listitem>
-       <para>
-         Whitin the <cellname>PoolManager</cellname>, a pool-group 
-         (<replaceable>flushPoolGroup</replaceable>) has 
-         to be created and populated with
-         pools planned to be controlled by the central flush mechanism.
-         An arbitrary number of flush control managers may run within the
-         same dCache instance as long as each can work on its own
-         pool-group and no pool is member of more than one <replaceable>flushPoolGroup</replaceable>.
-         
-       </para>
-       </listitem>
-       <listitem>
-       <para>
-         To start the flush control system, an corresponding 
-         dCache batch file has to be setup, installed and started.
-         As input parameter, the HsmFlushControl cell needs the name
-         of the <replaceable>flushPoolGroup</replaceable>) and the name of
-         the driver, controlling the flush behaviour. Within the same
-         batch file more than one flush control manager may be started
-         as long as they get different cell-names and different pool-groups
-         assigned.
-       </para>
-       </listitem>
-       <listitem>
-       <para>
-         The flush control web pages  have to be defined in the <filename>httpd.batch</filename>.
-       </para>
-       </listitem>
-       </itemizedlist>
     </para>
-     <section>
-     <title>Creating the flush pool group</title>
-       <para>
-       Creating <replaceable>flushPoolGroup</replaceable> and adding pools is done within the
-       <filename>config/PoolManager.config</filename> setup file or using
-       the <cellname>PoolManager</cellname> command line 
-       interface. Pools may be member of other pool-groups, as long as those
-       pool-groups are not managed by other flush control managers.
-       <programlisting>
-psu create pool <replaceable>pool-1</replaceable>
+
+    <itemizedlist>
+      <listitem>
+	<para>
+	  Whitin the &cell-poolmngr;, a pool-group
+	  (<replaceable>flushPoolGroup</replaceable>) has to be
+	  created and populated with pools planned to be controlled by
+	  the central flush mechanism.  An arbitrary number of flush
+	  control managers may run within the same dCache instance as
+	  long as each can work on its own pool-group and no pool is
+	  member of more than one
+	  <replaceable>flushPoolGroup</replaceable>.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  To start the flush control system, an corresponding &dcache;
+	  batch file has to be setup, installed and started.  As input
+	  parameter, the &cell-hsmflushctl; cell needs the name of the
+	  <replaceable>flushPoolGroup</replaceable>) and the name of
+	  the driver, controlling the flush behaviour. Within the same
+	  batch file more than one flush control manager may be
+	  started as long as they get different cell-names and
+	  different pool-groups assigned.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  The flush control web pages have to be defined in the
+	  <filename>httpd.batch</filename>.
+	</para>
+      </listitem>
+    </itemizedlist>
+
+    <section>
+      <title>Creating the flush pool group</title>
+      <para>
+	Creating <replaceable>flushPoolGroup</replaceable> and adding
+	pools is done within the
+	<filename>config/PoolManager.config</filename> setup file or
+	using the &cell-poolmngr; command line interface. Pools may be
+	member of other pool-groups, as long as those pool-groups are
+	not managed by other flush control managers.
+      </para>
+
+      <programlisting>psu create pool <replaceable>pool-1</replaceable>
 psu create pool <replaceable>...</replaceable>
 #
 psu create pgroup <replaceable>flushPoolGroup</replaceable>
 #
 psu addto pgroup <replaceable>flushPoolGroup</replaceable>  <replaceable>pool-1</replaceable>
 psu addto pgroup <replaceable>flushPoolGroup</replaceable>  <replaceable>...</replaceable>
-#
-       </programlisting>
-       </para>
-     </section>
-     <section>
-     <title>Creating and activating the hsmcontrol batch file</title>
-       <para>
-       <programlisting>
-#
+#</programlisting>
+
+    </section>
+
+    <section>
+      <title>Creating and activating the hsmcontrol batch file</title>
+
+      <programlisting>#
 set printout default errors
 set printout CellGlue none
 #
@@ -143,84 +169,102 @@ create diskCacheV111.hsmControl.flush.HsmFlushControlManager <replaceable>FlushM
          -scheduler=<replaceable>SchedulerName</replaceable>  \
          <replaceable>Scheduler specific options</replaceable> \
         "
-#
-       </programlisting>
-       Which the following meaning of the variables :
-       <itemizedlist>
-         <listitem>
-            <para>
-               <replaceable>flushPoolGroup</replaceable> needs to be the name of the pool group
-               defined in the PoolManager.conf files.
-            </para>
-         </listitem>
-         <listitem>
-            <para>
-               <replaceable>SchedulerName</replaceable> is the name of a class implementing
-               the <literal>diskCacheV111.hsmControl.flush.HsmFlushSchedulable</literal> interface.
-            </para>
-         </listitem>
-         <listitem>
-            <para>
-               <replaceable>Scheduler specific options</replaceable> may be options specific
-               to the selected scheduler.
-            </para>
-         </listitem>
-       </itemizedlist>
-       Initially there are three schedulers available :
-       <itemizedlist>
-         <listitem>
-           <para>
-             <literal>diskCacheV111.hsmControl.flush.driver.HandlerExample</literal> may be used as
-             an example implementation of the HsmFlushScheduler interface. The functionality is 
-             useless in an production environment but can be useful to check the functionality of
-             the central flush framework. If one allows this driver to take over control it will
-             initiate the flushing of data as soon as it becomes aware of it. One the other hand
-             it supports a mode where is doesn't do anything except preventing the individual 
-             pools from doing the flush autonomously. In that mode, the driver assumes the flushes
-             to be steered manually by the flush web pages decribed in the next paragraph. 
-             The latter mode is enabled by
-             starting the flush driver with the <replaceable>Scheduler specific options</replaceable>
-             set to <literal>-do-nothing</literal>
-           </para>
-         </listitem>
-         <listitem>
-           <para>
-             <literal>diskCacheV111.hsmControl.flush.driver.AlternateFlush</literal> is intended to
-             provide suffient functionality to cope with issues described in the introduction of the
-             paragraph. Still quite some code and knowledge has to go into this driver.
-           </para>
-         </listitem>
-         <listitem>
-           <para>
-             <literal>diskCacheV111.hsmControl.flush.driver.AlternatingFlushSchedulerV1</literal> is certainly
-             the most useful driver. It can be configured to flush all pools on a single machine
-             simultaniously. It is trigger by space consumption, number of files within a pool
-             or the time the oldest file resides on a pool without having been flushed.
-             Please checkout the next section for details on configuration and usage.
-           </para>
-         </listitem>
-       </itemizedlist> 
-       </para>
-     </section>
-     </section>
+#</programlisting>
 
-     <section id="cf-driverv1">
-     <title>The AlternatingFlushSchedulerV1 driver</title>
-       <para>
-       The AlternatingFlushSchedulerV1 is an alternating driver, which essentially means that 
-       it either allows data to flow into
-       a pool, or data going from a pool onto an HSM system  but never both at the same time. 
-       Data transfers from pools to other pools or from pools to clients are not
-       controlled by this driver. In order to minimize the latter one should configure
-       HSM write pools to not allow transfers to clients but doing pool to pool transfers
-       first.
-       </para>
-     
-     <section>
-     <title>Configuration</title>
-       <para>
-       <programlisting>
-#
+      <para>
+	Which the following meaning of the variables :
+      </para>
+
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    <replaceable>flushPoolGroup</replaceable> needs to be the
+	    name of the pool group defined in the
+	    <filename>PoolManager.conf</filename> files.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    <replaceable>SchedulerName</replaceable> is the name of a class implementing
+	    the <literal>diskCacheV111.hsmControl.flush.HsmFlushSchedulable</literal> interface.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    <replaceable>Scheduler specific options</replaceable> may be options specific
+	    to the selected scheduler.
+	  </para>
+	</listitem>
+      </itemizedlist>
+
+      <para>
+	Initially there are three schedulers available :
+      </para>
+
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    <literal>diskCacheV111.hsmControl.flush.driver.HandlerExample</literal>
+	    may be used as an example implementation of the
+	    HsmFlushScheduler interface. The functionality is useless
+	    in an production environment but can be useful to check
+	    the functionality of the central flush framework. If one
+	    allows this driver to take over control it will initiate
+	    the flushing of data as soon as it becomes aware of
+	    it. One the other hand it supports a mode where is doesn't
+	    do anything except preventing the individual pools from
+	    doing the flush autonomously. In that mode, the driver
+	    assumes the flushes to be steered manually by the flush
+	    web pages decribed in the next paragraph.  The latter mode
+	    is enabled by starting the flush driver with the
+	    <replaceable>Scheduler specific options</replaceable> set
+	    to <literal>-do-nothing</literal>
+	  </para>
+	</listitem>
+
+	<listitem>
+	  <para>
+	    <literal>diskCacheV111.hsmControl.flush.driver.AlternateFlush</literal>
+	    is intended to provide suffient functionality to cope with
+	    issues described in the introduction of the
+	    paragraph. Still quite some code and knowledge has to go
+	    into this driver.
+	  </para>
+	</listitem>
+
+	<listitem>
+	  <para>
+	    <literal>diskCacheV111.hsmControl.flush.driver.AlternatingFlushSchedulerV1</literal>
+	    is certainly the most useful driver. It can be configured
+	    to flush all pools on a single machine simultaniously. It
+	    is trigger by space consumption, number of files within a
+	    pool or the time the oldest file resides on a pool without
+	    having been flushed.  Please checkout the next section for
+	    details on configuration and usage.
+	  </para>
+	</listitem>
+      </itemizedlist> 
+    </section>
+  </section>
+
+  <section id="cf-driverv1">
+    <title>The AlternatingFlushSchedulerV1 driver</title>
+
+    <para>
+      The AlternatingFlushSchedulerV1 is an alternating driver, which
+      essentially means that it either allows data to flow into a
+      pool, or data going from a pool onto an &hsm; system but never
+      both at the same time.  Data transfers from pools to other pools
+      or from pools to clients are not controlled by this driver. In
+      order to minimize the latter one should configure &hsm; write
+      pools to not allow transfers to clients but doing pool to pool
+      transfers first.
+    </para>
+    
+    <section>
+      <title>Configuration</title>
+
+      <programlisting>#
 create diskCacheV111.hsmControl.flush.HsmFlushControlManager <replaceable>FlushManagerName</replaceable>  \
         "<replaceable>flushPoolGroup</replaceable>  \
          -export   -replyObject \
@@ -228,188 +272,259 @@ create diskCacheV111.hsmControl.flush.HsmFlushControlManager <replaceable>FlushM
          -driver-config-file=${config}/<replaceable>flushDriverConfigFile</replaceable> \
         "
 #</programlisting>
-        Where <replaceable>flushPoolGroup</replaceable> is a PoolGroup defined in the 
-        <filename>PoolManager.conf</filename> file, containing all pools which are intended to
-        be managed by this FlushManager. <replaceable>flushDriverConfigFile</replaceable>
-        is a file within the dCache <filename>config</filename> directory holding 
-        property values for this driver. The driver reloads the file whenever it changes
-        its modification time. One should allow for a minute of two before new setting
-        are getting activated. The configuration file has to contain key value pairs, separated
-        by the = sign. Keys, not corresponding to a driver property are silently ignored.
-        Properties, not set in the configuration file, are set to some reasonable default value. 
-       </para>
-       </section>       
-       <section>
-       <title>Properties</title>
-       <para>
-         Driver properties may be specified by a configuration file as described above or by
-         talking to the driver directly using the command line interface. Driver property commands
-         look like :
-         <programlisting>
-            driver properties -<replaceable>PropertyName</replaceable>=<replaceable>value</replaceable>
-         </programlisting>
-         Because the communication with the driver is asynchronous, this command will
-         never return an error. To check if the new property value has been accepted by the
-         driver, run the sequence
-         <programlisting>
-            driver properties
+
+      <para>
+	Where <replaceable>flushPoolGroup</replaceable> is a PoolGroup
+	defined in the <filename>PoolManager.conf</filename> file,
+	containing all pools which are intended to be managed by this
+	FlushManager. <replaceable>flushDriverConfigFile</replaceable>
+	is a file within the &dcache; <filename
+	class="directory">config</filename> directory holding property
+	values for this driver. The driver reloads the file whenever
+	it changes its modification time. One should allow for a
+	minute of two before new setting are getting activated. The
+	configuration file has to contain key value pairs, separated
+	by the = sign. Keys, not corresponding to a driver property
+	are silently ignored.  Properties, not set in the
+	configuration file, are set to some reasonable default value.
+      </para>
+    </section>
+
+    <section>
+      <title>Properties</title>
+
+      <para>
+	Driver properties may be specified by a configuration file as
+	described above or by talking to the driver directly using the
+	command line interface. Driver property commands look like :
+      </para>
+
+      <programlisting>driver properties -<replaceable>PropertyName</replaceable>=<replaceable>value</replaceable></programlisting>
+
+      <para>
+	Because the communication with the driver is asynchronous,
+	this command will never return an error. To check if the new
+	property value has been accepted by the driver, run the
+	sequence
+      </para>
+
+      <programlisting>            driver properties
             info</programlisting>
-         It will list all available properties together with the currently active values.
-         <table>
-          <title>Driver Properties</title>
-          <tgroup cols="3" align="left">
-            <colspec colnum="1" colname="Property Name" colwidth="50"/>
-            <colspec colnum="2" colname="Default Value"/>
-            <colspec colnum="3" colname="Meaning" colwidth="100"/>
-            <thead>
-              <row>
-                <entry>Property Name</entry>
-                <entry>Default Value</entry>
-                <entry>Meaning</entry>
-              </row>
-            </thead>
-            <tbody>
-              <row>
-                <entry>max.files</entry><entry>500</entry>
-                <entry>Collect this number of files per pool, before flushing</entry>
-              </row><row>
-                <entry>max.minutes</entry><entry>120</entry>
-                <entry>Collect data for this amount of minutes before flushing</entry>
-              </row><row>
-                <entry>max.megabytes</entry><entry>500 * 1024</entry>
-                <entry>Collecto this number of megabytes per pool before flushing</entry>
-              </row><row>
-                <entry>max.rdonly.fraction</entry><entry>0.5</entry>
-                <entry>Do not allow more than this percentage of pools to be set read only</entry>
-              </row><row>
-                <entry>flush.atonce</entry><entry>0</entry>
-                <entry>Never flush more than that in one junk</entry>
-              </row><row>
-                <entry>timer</entry><entry>60</entry>
-                <entry>Interval timer (minimum resolution)</entry>
-              </row><row>
-                <entry>print.events</entry><entry>false</entry>
-                <entry>Print events delivered by the FlushManager</entry>
-              </row><row>
-                <entry>print.rules</entry><entry>false</entry>
-                <entry>Print remarks from the rule engine</entry>
-              </row><row>
-                <entry>print.poolset.progress</entry><entry>false</entry>
-                <entry>Print progress messages</entry>
-              </row>
-            </tbody>
-           </tgroup>
-          </table> 
-          </para>
-       </section>
-       <section>
-       <title>The selection process</title>
-         <blockquote>
-            <title>Finding all flush candidates</title>
-            <para>
-            A pool is becoming a flush candidate if either the 
-            number of files collected exceeds <literal>max.files</literal> or the number of
-            megabytes collected exceeds <literal>max.megabytes</literal> or the oldest file,
-            not flushed yet, is becoming older than <literal>max.minutes</literal>.         
-            </para>
-         </blockquote>
-         <blockquote>
-            <title>Selecting the best candidate</title>
-            <para>
-            Pool Candidates are sorted according to a metric, which is essentially the sum of three items.
-            The number of files devided by <literal>max.files</literal>, the number of megabytes devided
-            by <literal>max.megabytes</literal> and the age of the oldest file devided by <literal>max.minutes</literal>.
-            </para>
-            <para>
-            The pool with the highest metric is chosen first. The driver determines the hardware unit, this pools
-            resides on. The intention is to flush all pools of this unit simultanionsly. Depending on the
-            configuration, the unit can be either a disk partition or a host. After the hardware unit is determined, the
-            driver adds the number of pools on that unit to the number of pools already in 'read only' mode.
-            If this sum exceeds the total number of pools in the flush pool group, multiplied by the
-            <literal>max.rdonly.fraction</literal> property, the pool is NOT selected. The process proceeds
-            until a pool, resp. a hardware unit complies with these contrains.
-            </para>
-            <para>       
-            The hardware unit, a pool belongs to, is set by the 'tag.hostname' field in the 
-            <filename>config/<replaceable>hostname</replaceable></filename> file.
-            </para>
-         </blockquote>
-         <blockquote>
-            <title>The actual flush process</title>
-            <para>
-            If a pool is flushed, all storage groups of that pool are flushed, and within each storage group all
-            precious files are flushed simultaniously. Setting the property <literal>flush.atonce</literal> to some 
-            positive nonzero number will advise each storage group not to flush more than this number of files
-            per flush operation. There is no way to stop a flush operation which has been triggered by the
-            FlushManager. The pool will proceed until all files, belonging to this flush operation, 
-            have been successfully flushed or failed to flush. Though, the next section describes how to suspend
-            the flush pool selection mechanism.
-            </para>
-         </blockquote>
-     </section>
 
-     <section>
-        <title>Suspending and resuming flush operations</title>
-        <para>
-        The driver can be advised to suspend all new flush operations and switch to halt mode.
-        <programlisting>
-        driver command suspend</programlisting>. To resume flushing :
-        <programlisting>
-        driver command resume</programlisting>
-        In suspend mode, all flushing is halted which sooner or later results in overflowing write pools.
-        </para>
-     </section>
+      <para>
+	It will list all available properties together with the
+	currently active values.
+      </para>
 
-     <section>
-       <title>Driver interactions with the flush web portal or the GUI</title>
-         <para>
-         Flush Manager operations can be visualized by configuring the flush web pages, described in 
-         one of the subsequent sections or by using the flush module of the 'org.pcells' GUI.
-         In addition to monitoring, both mechanisms allow to 
-         set the pool I/O mode (rdOnly, readWrite) and to flush individual storage groups or
-         pools. 
-         The problem may be that those manual interactions interfere with driver operations.
-         The AlternatingFlushSchedulerV1 tries to cope with manual interactions as follows :
-         <itemizedlist>
-         <listitem>
-           <para>
-           The pool I/O mode may be manually set to <literal>read only </literal> 
-           while the pool is not flushing data and therefor
-           naturally would be in read write mode. If this pool is then subsequently chosen for flushing,
-           and the flushing process has finished, the pool is NOT set back to readWrite mode, as it usually
-           would be, but it stays in readOnly mode, because the driver found this mode when starting the flush process
-           and assumes that it had been in that mode for good reason. So, setting the pool I/O mode to readOnly
-           while the pool is not flushing freezes this mode until manually changed again. Setting the I/O mode to readOnly while
-           the pool is flushing, has no effect.
-           </para>
-         </listitem>
-         <listitem>
-         <para>
-            If a pool is in readOnly mode because the driver has been initiating a flush process, and the pool
-            is manually set back to readWrite mode, is stays in readWrite mode during this flush process.
-            After the flush sequence has finished, the
-            pool is set back to normal as if no manual intervention had taken place. It does NOT 
-            stay with readWrite mode forever as it stays in readOnly mode forever in the example above.
-         </para>
-         </listitem>
-         </itemizedlist>
-         When using the web interface or the GUI for flushing pools or individual storage groups, one is
-         responsible for setting the pool I/O mode oneself.
-         </para>
-       </section>
+      <table>
+	<title>Driver Properties</title>
+
+	<tgroup cols="3" align="left">
+	  <colspec colnum="1" colname="Property Name" colwidth="3*"/>
+	  <colspec colnum="2" colname="Default Value" colwidth="2*"/>
+	  <colspec colnum="3" colname="Meaning" colwidth="6*"/>
+	  <thead>
+	    <row>
+	      <entry>Property Name</entry>
+	      <entry>Default Value</entry>
+	      <entry>Meaning</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry>max.files</entry><entry>500</entry>
+	      <entry>Collect this number of files per pool, before flushing</entry>
+	    </row>
+	    <row>
+	      <entry>max.minutes</entry><entry>120</entry>
+	      <entry>Collect data for this amount of minutes before flushing</entry>
+	    </row>
+	    <row>
+	      <entry>max.megabytes</entry><entry>500 * 1024</entry>
+	      <entry>Collecto this number of megabytes per pool before flushing</entry>
+	    </row>
+	    <row>
+	      <entry>max.rdonly.fraction</entry><entry>0.5</entry>
+	      <entry>Do not allow more than this percentage of pools to be set read only</entry>
+	      </row><row>
+	      <entry>flush.atonce</entry><entry>0</entry>
+	      <entry>Never flush more than that in one junk</entry>
+	      </row><row>
+	      <entry>timer</entry><entry>60</entry>
+	      <entry>Interval timer (minimum resolution)</entry>
+	      </row><row>
+	      <entry>print.events</entry><entry>false</entry>
+	      <entry>Print events delivered by the FlushManager</entry>
+	      </row><row>
+	      <entry>print.rules</entry><entry>false</entry>
+	      <entry>Print remarks from the rule engine</entry>
+	      </row><row>
+	      <entry>print.poolset.progress</entry><entry>false</entry>
+	      <entry>Print progress messages</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </table> 
+    </section>
+
+    <section>
+      <title>The selection process</title>
+
+      <blockquote>
+	<title>Finding all flush candidates</title>
+	<para>
+	  A pool is becoming a flush candidate if either the number of
+	  files collected exceeds <literal>max.files</literal> or the
+	  number of megabytes collected exceeds
+	  <literal>max.megabytes</literal> or the oldest file, not
+	  flushed yet, is becoming older than
+	  <literal>max.minutes</literal>.
+	</para>
+      </blockquote>
+      <blockquote>
+	<title>Selecting the best candidate</title>
+	<para>
+	  Pool Candidates are sorted according to a metric, which is
+	  essentially the sum of three items.  The number of files
+	  devided by <literal>max.files</literal>, the number of
+	  megabytes devided by <literal>max.megabytes</literal> and
+	  the age of the oldest file devided by
+	  <literal>max.minutes</literal>.
+	</para>
+
+	<para>
+	  The pool with the highest metric is chosen first. The driver
+	  determines the hardware unit, this pools resides on. The
+	  intention is to flush all pools of this unit
+	  simultanionsly. Depending on the configuration, the unit can
+	  be either a disk partition or a host. After the hardware
+	  unit is determined, the driver adds the number of pools on
+	  that unit to the number of pools already in 'read only'
+	  mode.  If this sum exceeds the total number of pools in the
+	  flush pool group, multiplied by the
+	  <literal>max.rdonly.fraction</literal> property, the pool is
+	  NOT selected. The process proceeds until a pool, resp. a
+	  hardware unit complies with these contrains.
+	</para>
+
+	<para>       
+	  The hardware unit, a pool belongs to, is set by the
+	  'tag.hostname' field in the
+	  <filename>config/<replaceable>hostname</replaceable></filename>
+	  file.
+	</para>
+      </blockquote>
+
+      <blockquote>
+	<title>The actual flush process</title>
+
+	<para>
+	  If a pool is flushed, all storage groups of that pool are
+	  flushed, and within each storage group all precious files
+	  are flushed simultaniously. Setting the property
+	  <literal>flush.atonce</literal> to some positive nonzero
+	  number will advise each storage group not to flush more than
+	  this number of files per flush operation. There is no way to
+	  stop a flush operation which has been triggered by the
+	  FlushManager. The pool will proceed until all files,
+	  belonging to this flush operation, have been successfully
+	  flushed or failed to flush. Though, the next section
+	  describes how to suspend the flush pool selection mechanism.
+	</para>
+      </blockquote>
+    </section>
+
+    <section>
+      <title>Suspending and resuming flush operations</title>
+
+      <para>
+	The driver can be advised to suspend all new flush operations
+	and switch to halt mode.
+      </para>
+
+      <programlisting>driver command suspend</programlisting>
+
+      <para>
+	To resume flushing :
+      </para>
+
+      <programlisting>driver command resume</programlisting>
+
+      <para>
+        In suspend mode, all flushing is halted which sooner or later
+        results in overflowing write pools.
+      </para>
      </section>
      
-     <section id="cf-gui">
-     <title>Setting up and using the flush control web pages.</title>
+     <section>
+       <title>Driver interactions with the flush web portal or the GUI</title>
+
        <para>
-       In order to keep track on the flush activities the flush control
-       web pages need to be activated. Add a new <literal>set alias</literal>directive somewhere between the
-       <command>define context httpdSetup endDefine</command> and the
-       <command>endDefine</command> command in the <filename>/opt/d-cache/config/httpd.batch</filename>
-       file.
+	 Flush Manager operations can be visualized by configuring the
+	 flush web pages, described in one of the subsequent sections
+	 or by using the flush module of the 'org.pcells' GUI.  In
+	 addition to monitoring, both mechanisms allow to set the pool
+	 I/O mode (rdOnly, readWrite) and to flush individual storage
+	 groups or pools.  The problem may be that those manual
+	 interactions interfere with driver operations.  The
+	 AlternatingFlushSchedulerV1 tries to cope with manual
+	 interactions as follows :
+       </para>
+
+       <itemizedlist>
+	 <listitem>
+	   <para>
+	     The pool I/O mode may be manually set to <literal>read
+	     only </literal> while the pool is not flushing data and
+	     therefor naturally would be in read write mode. If this
+	     pool is then subsequently chosen for flushing, and the
+	     flushing process has finished, the pool is NOT set back
+	     to readWrite mode, as it usually would be, but it stays
+	     in readOnly mode, because the driver found this mode when
+	     starting the flush process and assumes that it had been
+	     in that mode for good reason. So, setting the pool I/O
+	     mode to readOnly while the pool is not flushing freezes
+	     this mode until manually changed again. Setting the I/O
+	     mode to readOnly while the pool is flushing, has no
+	     effect.
+	   </para>
+	 </listitem>
+
+	 <listitem>
+	   <para>
+	     If a pool is in readOnly mode because the driver has been
+	     initiating a flush process, and the pool is manually set
+	     back to readWrite mode, is stays in readWrite mode during
+	     this flush process.  After the flush sequence has
+	     finished, the pool is set back to normal as if no manual
+	     intervention had taken place. It does
+	     <emphasis>not</emphasis> stay with readWrite mode forever
+	     as it stays in readOnly mode forever in the example
+	     above.
+	   </para>
+	 </listitem>
+       </itemizedlist>
+
+       <para>
+	 When using the web interface or the GUI for flushing pools or
+	 individual storage groups, one is responsible for setting the
+	 pool I/O mode oneself.
+       </para>
+     </section>
+   </section>
+     
+   <section id="cf-gui">
+     <title>Setting up and using the flush control web pages.</title>
+     <para>
+       In order to keep track on the flush activities the flush
+       control web pages need to be activated. Add a new <literal>set
+       alias</literal>directive somewhere between the <command>define
+       context httpdSetup endDefine</command> and the
+       <command>endDefine</command> command in the
+       <filename>/opt/d-cache/config/httpd.batch</filename> file.
+     </para>
        
-       <programlisting>
-       define context httpdSetup endDefine
+     <programlisting>   define context httpdSetup endDefine
              ***
              
            set alias flushManager class diskCacheV111.hsmControl.flush.HttpHsmFlushMgrEngineV1 mgr=<replaceable>FlushManagerName</replaceable>
@@ -417,64 +532,87 @@ create diskCacheV111.hsmControl.flush.HsmFlushControlManager <replaceable>FlushM
              ***
              
        endDefine</programlisting>
-       Additional flush managers may just be added to this command, separated by commas.
-       After restarting the 'httpd' service, the flush control pages are available at
-       <literal>http://<replaceable>headnode</replaceable>:2288/flushManager/mgr/*</literal>.
-       </para>
-       <para>
-       The flush control web page is split into 5 parts. The top part is a switchboard, pointing
-       to the different flush control managers installed. (listed in the mgr= option of the
-       <command>set alias flushManager</command> in the <filename>config/httpd.config</filename>).
-       The top menu is followed by a <literal>reload</literal> link. Its important to use this
-       link instead of the 'browsers' reload button. The actual page consists of tree tables.
-       The top one presents common configuration information. Initially this is the name of the
-       flush cell, the name of the driver and whether the flush controller has actually taken over
-       control or not. Two action buttons allow to switch between centrally and locally controlled
-       flushing. The second table lists all pools managed by this controller. Information is provided
-       on the pool mode (readonly vers. readwrite), the number of flushing storage classes, the total 
-       size of the pool and the  amount of precious space per pool. Action buttons allow to 
-       toggle individual pools between <literal>ReadOnly</literal> and <literal>ReadWrite</literal> mode.
-       Finally the third table presents all storage classes currently holding data to be flushed.
-       Per storage class and pool, characteristic properties are listed, like total size, precious size,
-       active and pending files. Here as well, an action button allows to flush individual 
-       storage classes on individual pools.
-       <warning>
-         <para>
-         The possibilty to interactively interact with the flush manager needs to be supported
-         by the driver choosen. Please check the information on the individual driver how far this
-         is supported.
-         </para>
-       </warning>  
-       </para>
-  </section>
-   
-  <section id="cf-flushing-examples">
-     <title>Examples</title>
-     <section>
-        <title>Configuring Central Flushing for a single Pool Group with the AlternatingFlushSchedulerV1 driver</title>
 
-     <blockquote>
-     <title>Setting up the PoolManager configuration</title>
+     <para>
+       Additional flush managers may just be added to this command,
+       separated by commas.  After restarting the 'httpd' service, the
+       flush control pages are available at
+       <literal>http://<replaceable>headnode</replaceable>:2288/flushManager/mgr/*</literal>.
+     </para>
+
+     <para>
+       The flush control web page is split into 5 parts. The top part
+       is a switchboard, pointing to the different flush control
+       managers installed. (listed in the mgr= option of the
+       <command>set alias flushManager</command> in the
+       <filename>config/httpd.config</filename>).  The top menu is
+       followed by a <literal>reload</literal> link. Its important to
+       use this link instead of the 'browsers' reload button. The
+       actual page consists of tree tables.  The top one presents
+       common configuration information. Initially this is the name of
+       the flush cell, the name of the driver and whether the flush
+       controller has actually taken over control or not. Two action
+       buttons allow to switch between centrally and locally
+       controlled flushing. The second table lists all pools managed
+       by this controller. Information is provided on the pool mode
+       (readonly vers. readwrite), the number of flushing storage
+       classes, the total size of the pool and the amount of precious
+       space per pool. Action buttons allow to toggle individual pools
+       between <literal>ReadOnly</literal> and
+       <literal>ReadWrite</literal> mode.  Finally the third table
+       presents all storage classes currently holding data to be
+       flushed.  Per storage class and pool, characteristic properties
+       are listed, like total size, precious size, active and pending
+       files. Here as well, an action button allows to flush
+       individual storage classes on individual pools.
+     </para>
+
+     <warning>
        <para>
-       Add all pools, which are planned to be centrally flushed to a PoolGroup, lets say <literal>flushPoolGroup</literal> :
-       <programlisting>
-psu create pool migration-pool-1
+	 The possibilty to interactively interact with the flush
+	 manager needs to be supported by the driver choosen. Please
+	 check the information on the individual driver how far this
+	 is supported.
+       </para>
+     </warning>  
+   </section>
+   
+   <section id="cf-flushing-examples">
+     <title>Examples</title>
+
+     <section>
+       <title>Configuring Central Flushing for a single Pool Group
+       with the AlternatingFlushSchedulerV1 driver</title>
+
+       <blockquote>
+	 <title>Setting up the PoolManager configuration</title>
+
+	 <para>
+	   Add all pools, which are planned to be centrally flushed to
+	   a PoolGroup, lets say <literal>flushPoolGroup</literal> :
+	 </para>
+
+	 <programlisting>psu create pool migration-pool-1
 psu create pool migration-pool-2
 #
 psu create pgroup flushPoolGroup
 #
 psu addto pgroup flushPoolGroup migration-pool-1
 psu addto pgroup flushPoolGroup migration-pool-2
-#
-       </programlisting>
-       </para>
-     </blockquote>  
-     <blockquote>
-     <title>Setting up the central flush batch file.</title>
-     <para>
-     Create a batchfile <filename>/opt/d-cache/config/hsmcontrol.batch</filename> with the following content :
-       <programlisting>
-#
+#</programlisting>
+
+       </blockquote>  
+
+       <blockquote>
+	 <title>Setting up the central flush batch file.</title>
+
+	 <para>
+	   Create a batchfile
+	   <filename>/opt/d-cache/config/hsmcontrol.batch</filename>
+	   with the following content :
+	 </para>
+        
+	 <programlisting>#
 set printout default 3
 set printout CellGlue none
 #
@@ -500,27 +638,40 @@ create diskCacheV111.hsmControl.flush.HsmFlushControlManager FlushManager  \
           -driver-config-file=${config}/flushPoolGroup.conf \
         "
 #</programlisting>
-     Change to <filename>/opt/d-cache/jobs</filename> and run
-     <filename>./initPackage.sh</filename>. Ignore possible warnings and error messages. The
-     Script will create the necessary links, mainly the <filename>jobs/hsmcontrol</filename>
-     startup file. To start the central service run 
-     <programlisting>
-       cd /opt/d-cache/jobs
+
+        <para>
+	  Change to <filename>/opt/d-cache/jobs</filename> and run
+	  <filename>./initPackage.sh</filename>. Ignore possible
+	  warnings and error messages. The Script will create the
+	  necessary links, mainly the
+	  <filename>jobs/hsmcontrol</filename> startup file. To start
+	  the central service run
+	</para>
+
+	<programlisting>	  cd /opt/d-cache/jobs
        ./hsmcontrol start</programlisting>
-      This setup will produce quite some output in <filename>/var/log/hsmcontrol.log</filename>.
-      Reduce the output level if this is not required.
-      <programlisting>
-          set printout default errors</programlisting>
-     </para>
-     </blockquote>   
-     <blockquote>
-     <title>Setting up the driver properties file</title>
-     <para>
-       Create a file in /opt/d-cache/config named <filename>flushPoolGroup.conf</filename> with the
-       content listed below. You may change the content any time. 
-       The driver will reload it after awhile.
-       <programlisting>
-#
+
+        <para>
+	  This setup will produce quite some output in
+	  <filename>/var/log/hsmcontrol.log</filename>.  Reduce the
+	  output level if this is not required.
+	</para>
+
+	<programlisting>set printout default errors</programlisting>
+       </blockquote>   
+
+       <blockquote>
+	 <title>Setting up the driver properties file</title>
+
+	 <para>
+	   Create a file in <filename
+	   class="directory">/opt/d-cache/config</filename> named
+	   <filename>flushPoolGroup.conf</filename> with the content
+	   listed below. You may change the content any time.  The
+	   driver will reload it after awhile.
+	 </para>
+
+	 <programlisting>#
 #  trigger parameter
 #
 max.files=4
@@ -541,11 +692,9 @@ print.events=true
 print.rules=true
 print.pool.progress=true
 print.poolset.progress=true
-mode=auto
-</programlisting>
-     </para>
-     </blockquote>
+mode=auto</programlisting>
+       </blockquote>
      </section>
-  </section>
-  
- </chapter>
+   </section>
+
+</chapter>

@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+%sharedents;
+]>
 
 <section id="rf-cc-pm">
-  <title>Pool Manager Commands</title>
+  <title>&cell-poolmngr; Commands</title>
   
   <refentry id="cmd-rc_ls">
     
@@ -12,7 +16,8 @@
     
     <refnamediv>
       <refname><command>rc ls</command></refname>
-      <refpurpose>List the requests currently handled by the Pool Manager</refpurpose>
+      <refpurpose>List the requests currently handled by the
+      &cell-poolmngr;</refpurpose>
     </refnamediv>
     
     <refsynopsisdiv>
@@ -122,14 +127,17 @@
       
       <para>
         A typical output reads
-<screen><dcprompt select="PoolManager"/><command>cm ls</command> -r -d -t 12312434442
-<replaceable>poolName1</replaceable>={R={a=0;m=2;q=0};S={a=0;m=2;q=0};M={a=0;m=100;q=0};PS={a=0;m=20;q=0};PC={a=0;m=20;q=0};SP={t=2147483648;f=924711076;p=1222772572;r=0;lru=0;{g=20000000;b=0.5}}}
+      </para>
+
+      <screen>&dc-prompt-pm; <command>cm ls</command> -r -d -t 12312434442
+<replaceable>poolName1</replaceable>={R={a=0;m=2;q=0};S={a=0;m=2;q=0};M={a=0;m=100;q=0};PS={a=0;m=20;q=0};PC={a=0;m=20;q=0};
+    <lineannotation>(...line continues...)</lineannotation>  SP={t=2147483648;f=924711076;p=1222772572;r=0;lru=0;{g=20000000;b=0.5}}}
 <replaceable>poolName1</replaceable>={Tag={{hostname=<replaceable>hostname</replaceable>}};size=543543543;SC=1.7633947200606475;CC=0.0;}
 <replaceable>poolName1</replaceable>=3180
-<replaceable>poolName2</replaceable>={R={a=0;m=2;q=0};S={a=0;m=2;q=0};M={a=0;m=100;q=0};PS={a=0;m=20;q=0};PC={a=0;m=20;q=0};SP={t=2147483648;f=2147483648;p=0;r=0;lru=0;{g=4294967296;b=250.0}}}
+<replaceable>poolName2</replaceable>={R={a=0;m=2;q=0};S={a=0;m=2;q=0};M={a=0;m=100;q=0};PS={a=0;m=20;q=0};PC={a=0;m=20;q=0};
+    <lineannotation>(...line continues...)</lineannotation>  SP={t=2147483648;f=2147483648;p=0;r=0;lru=0;{g=4294967296;b=250.0}}}
 <replaceable>poolName2</replaceable>={Tag={{hostname=<replaceable>hostname</replaceable>}};size=543543543;SC=0.0030372862312942743;CC=0.0;}
 <replaceable>poolName2</replaceable>=3157</screen>
-      </para>
       
     </refsection>
     
@@ -143,7 +151,8 @@
     
     <refnamediv>
       <refname><command>set pool decision</command></refname>
-      <refpurpose>Set the factors for the calculation of the total costs of the pools.</refpurpose>
+      <refpurpose>Set the factors for the calculation of the total
+      costs of the pools.</refpurpose>
     </refnamediv>
     
     <refsynopsisdiv>
@@ -200,10 +209,6 @@
     </refsection>
     
   </refentry>
-  
-<!--	
-  </section>
--->
   
 </section>
     

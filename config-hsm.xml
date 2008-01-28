@@ -1,80 +1,94 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+%sharedents;
+]>
 
 <chapter id="cf-hsm">
+
   <title>The Interface to a Tertiary Storage System</title>
-  <partauthors>Patrick Fuhrmann</partauthors>
+
+  <chapterinfo>
+    <author>
+      <firstname>Patrick</firstname>
+      <surname>Fuhrmann</surname>
+    </author>
+  </chapterinfo>
+
   <para>
-    dCache installations, used as a frontend to tertiary storage
+    &dcache; installations, used as a frontend to tertiary storage
     system, need, at some point, to exchange data this such a system
     in order to store new, precious files and to retrieve files from
-    the HSM if not yet, or no longer, available on one of the dCache
-    pools. Unfortunately there is no well defined interface for such
-    HSM operations. So the dCache overcomes this problem by calling
-    configurable (dCache external) shell scripts or binaries whenever
-    an HSM store or retrieve operation becomes necessary. The local
-    HSM administrator is responsible for providing this procedure and
-    to make it available and known to the dCache.  This small writeup
-    defines the way dCache will call such an external method.
+    the &hsm; if not yet, or no longer, available on one of the
+    &dcache; pools. Unfortunately there is no well defined interface
+    for such &hsm; operations. So the &dcache; overcomes this problem
+    by calling configurable (&dcache; external) shell scripts or
+    binaries whenever an &hsm; store or retrieve operation becomes
+    necessary. The local &hsm; administrator is responsible for
+    providing this procedure and to make it available and known to the
+    &dcache;.  This small writeup defines the way &dcache; will call
+    such an external method.
   </para>
 
-  <para>
-    Note : Most <dcache/> distributions do not expect to run together
-    with an HSM backend system. To make this work, make sure that
-    neither in the pool.batch file, nor in the
-    <filename>config/<replaceable>pool</replaceable>.poollist</filename>
-    files the option <literal>lfs=precious</literal> is specified.
-  </para>
+  <note>
+    <para>
+      Most &dcache; distributions do not expect to run together with
+      an &hsm; backend system. To make this work, make sure that
+      neither in the pool.batch file, nor in the
+      <filename>config/<replaceable>pool</replaceable>.poollist</filename>
+      files the option <literal>lfs=precious</literal> is specified.
+    </para>
+  </note>
 
   <section id="cf-hsm-define">
-    <title>Defining the HSM interface.</title>
+    <title>Defining the &hsm; interface.</title>
 
     <para>
       Each individual pool, which is expected to exchange data with an
-      HSM, has to define a dCache external method to flush/fetch
-      datasets into/from one or more connected HSM's.  The command
+      &hsm;, has to define a &dcache; external method to flush/fetch
+      datasets into/from one or more connected &hsm;'s.  The command
       decribed below has either to be given in the command line
       interface of the corresponding pool while the pool is active
-      (don't forget so 'save') or may be added to the pool setup file
-      commands prior to starting the pool.
+      (don't forget so <quote>save</quote>) or may be added to the
+      pool setup file commands prior to starting the pool.
+    </para>
     
-  <screen>
-     Syntax : hsm set &lt;hsmName&gt; -command=&lt;fullPathToExternalCommand&gt;
+  <screen>     Syntax : hsm set &lt;hsmName&gt; -command=&lt;fullPathToExternalCommand&gt;
      
      Example :
          
 	     hsm set osm -command=/usr/d-cache/jobs/osm-hsmcp.sh
 	 or
-	     hsm set enstore -command=/usr/d-cache-deployment/jobs/real-enstore.sh
-  </screen>
+	     hsm set enstore -command=/usr/d-cache-deployment/jobs/real-enstore.sh</screen>
 
+    <para>
       The external method, which might be a shell script or a binary,
-      is called by the dCache with a set of positional arguments (see
-      below). In addition, options may be specified which are appended
-      to the regular argument list on calling the external method.
+      is called by the &dcache; with a set of positional arguments
+      (see below). In addition, options may be specified which are
+      appended to the regular argument list on calling the external
+      method.
+    </para>
 
-      <screen>
-     Syntax : hsm set &lt;hsmName&gt; -&lt;key&gt;=&lt;value&gt;
+    <screen>     Syntax : hsm set &lt;hsmName&gt; -&lt;key&gt;=&lt;value&gt;
      
      Example :
          
 	     hsm set osm -command=/usr/d-cache/jobs/osm-hsmcp.sh
-	     hsm set osm -pnfs=/pnfs/desy.de -somethingElse=true
-  
-      </screen>
+	     hsm set osm -pnfs=/pnfs/desy.de -somethingElse=true</screen>
 
+    <para>
       This will result in excuting the following command line whenever
-      a file has to be exchanged with an HSM.
+      a file has to be exchanged with an &hsm;.
+    </para>
 
-      <screen>
-    /usr/d-cache/jobs/osm-hsmcp.sh put|get &lt;pnfsId&gt; &lt;LocalFilename&gt; \
+    <screen>/usr/d-cache/jobs/osm-hsmcp.sh put|get &lt;pnfsId&gt; &lt;LocalFilename&gt; \
         -si=&lt;See Below&gt; \
         -pnfs=/pnfs/desy.de   \
-        -somethingElse=true
-      </screen>
-
-    </para>
+        -somethingElse=true</screen>
   </section>
+
+
   <section id="cf-hsm-calling">
     <title>Calling sequence</title>
     
@@ -85,43 +99,43 @@
       options may follow if defined so with the <emphasis>hsm
       set</emphasis> pool command. Arguments and options are separated
       by at least on blank character.
+    </para>
 
-      <screen>
-    Syntax :
+      <screen>    Syntax :
     
         &lt;binary&gt; put|get &lt;pnfsid&gt; &lt;localFileName&gt;   \
-               -si=&lt;storageInfo&gt; [more options]
-      </screen>
+               -si=&lt;storageInfo&gt; [more options]</screen>
 
+    <para>
       The <emphasis>put|get</emphasis> argument determines the data
-      transfer direction seen from the HSM. <emphasis>put</emphasis>
-      means, that data has to be stored into the HSM while
-      <emphasis>get</emphasis> means it has be fetched out of the HSM.
+      transfer direction seen from the &hsm;. <emphasis>put</emphasis>
+      means, that data has to be stored into the &hsm; while
+      <emphasis>get</emphasis> means it has be fetched out of the
+      &hsm;.
     </para>
 
     <para>
       The &lt;storageInfo&gt; option is a collection of key value
       pairs, separated by semicola. All these values are derived from
       the pnfs database. The possible keys slightly differ, depending
-      on which HSM is addressed. The order of the key value pairs is
+      on which &hsm; is addressed. The order of the key value pairs is
       not determined and may vary between calls. The
       <literal>-si=</literal> string shouldn't contain blank TAB or
       newline characters.
     </para>
 
     <para>
-      Example : 
-      <screen>
-    -si=size=1048576000;new=true;stored=false;sClass=desy:cms-sc3;cClass=-;hsm=osm;Host=desy;
-      </screen>
+      Example:
     </para>
+
+    <screen>    -si=size=1048576000;new=true;stored=false;sClass=desy:cms-sc3;cClass=-;hsm=osm;Host=desy;</screen>
 
     <table>
       <title>Mandatory StorageInfo keys</title>
 
       <tgroup cols="2" align="left">
 	<colspec colnum="1" colname="Key" colwidth="50"/>
-	<colspec colnum="2" colname="Meaning"/>
+	<colspec colnum="2" colname="Meaning" colwidth="*"/>
 	<thead>
 	  <row>
 	    <entry>Key</entry>
@@ -137,20 +151,18 @@
 	  </row>
 	  <row>
 	    <entry>new</entry>
-	    <entry>
-	      <literal>false</literal> if file already in the dCache
+	    <entry>&false; if file already in the &dcache;
 	    </entry>
 	  </row>
 	  <row>
 	    <entry>stored</entry>
-	    <entry>
-	      <literal>true</literal> if file already stored in the HSM
+	    <entry>&true; if file already stored in the &hsm;
 	    </entry>
 	  </row>
 	  <row>
 	    <entry>sClass</entry>
 	    <entry>
-	      HSM depended. Used by the PoolManager for pool
+	      &hsm; depended. Used by the &cell-poolmngr; for pool
 	      attraction
 	    </entry>
 	  </row>
@@ -158,7 +170,7 @@
 	    <entry>cClass</entry>
 	    <entry>
 	      Parent Director tag (<literal>cacheClass</literal>). Used by the
-	      PoolManager for poolattraction. May be '-'
+	      &cell-poolmngr; for poolattraction. May be '-'
 	    </entry>
 	  </row>
 	  <row>
@@ -173,11 +185,11 @@
     </table>
 
     <table>
-      <title>Optional StorageInfo keys but used by all HSM's</title>
+      <title>Optional StorageInfo keys but used by all &hsm;'s</title>
 
       <tgroup cols="2" align="left">
 	<colspec colnum="1" colname="Key" colwidth="50"/>
-	<colspec colnum="2" colname="Meaning"/>
+	<colspec colnum="2" colname="Meaning" colwidth="*"/>
 	<thead>
 	  <row>
 	    <entry>Key</entry>
@@ -197,7 +209,7 @@
 
       <tgroup cols="2" align="left">
 	<colspec colnum="1" colname="Key" colwidth="50"/>
-	<colspec colnum="2" colname="Meaning"/>
+	<colspec colnum="2" colname="Meaning" colwidth="*"/>
 	<thead>
 	  <row>
 	    <entry>Key</entry>
@@ -219,7 +231,7 @@
 
       <tgroup cols="2" align="left">
 	<colspec colnum="1" colname="Key" colwidth="50"/>
-	<colspec colnum="2" colname="Meaning"/>
+	<colspec colnum="2" colname="Meaning" colwidth="*"/>
 	<thead>
 	  <row>
 	    <entry>Key</entry>
@@ -235,8 +247,9 @@
     </table>
 
     <para>
-      There might be more key values pairs which are used by the dCache internally
-      and which should not affect the behaviour of the hsm copy script.
+      There might be more key values pairs which are used by the
+      &dcache; internally and which should not affect the behaviour of
+      the hsm copy script.
     </para>
 
     <table>
@@ -246,7 +259,7 @@
 	<colspec colnum="1" colname="ReturnCode" colwidth="70"/>
 	<colspec colnum="2" colname="Meaning" colwidth="130"/>
 	<colspec colnum="3" colname="IntoHSM" colwidth="100"/>
-	<colspec colnum="4" colname="FromHSM"/>
+	<colspec colnum="4" colname="FromHSM" colwidth="*"/>
 	<thead>
 	  <row><entry morerows="1">Return Code</entry>
 	    <entry morerows="1">Meaning</entry>
@@ -283,96 +296,112 @@
       <title>Special Cases and exceptions</title>
 
       <section>
-	<title>Reading vers. Writing HSM files</title>
+	<title>Reading vers. Writing &hsm; files</title>
 
 	<para>
-	  When fetching a file from an HSM, the command line contains
-	  sufficient information about the location of the dataset
-	  within the HSM to get the file. No additional interaction
-	  with pnfs is needed.  So pnfs doesn't need to be mounted on
-	  read-only pools.
+	  When fetching a file from an &hsm;, the command line
+	  contains sufficient information about the location of the
+	  dataset within the &hsm; to get the file. No additional
+	  interaction with &pnfs; is needed.  So &pnfs; doesn't need
+	  to be mounted on read-only pools.
 	</para>
 
 	<para>
-	  This is different for storing files into an HSM. As a return
-	  from the actual HSM put operation, some data has to be
-	  stored in pnfs. Currently this has to be done directly by
-	  the corresponding external HSM script. So, other then for
-	  read pools, write pools still need to have pnfs mounted.
+	  This is different for storing files into an &hsm;. As a
+	  return from the actual &hsm; put operation, some data has to
+	  be stored in &pnfs;. Currently this has to be done directly
+	  by the corresponding external &hsm; script. So, other then
+	  for read pools, write pools still need to have &pnfs;
+	  mounted.
 	</para>
 
 	<para>
-	  A future approache will be to transfer the necessay HSM
-	  information from the HSM copy script into the dCache using
-	  STDOUT. The dCache subsequently performs the necessary pnfs
-	  store operation through the PnfsManager.
+	  A future approache will be to transfer the necessay &hsm;
+	  information from the &hsm; copy script into the &dcache;
+	  using STDOUT. The &dcache; subsequently performs the
+	  necessary &pnfs; store operation through the
+	  &cell-pnfsmngr;.
 	</para>
 
       </section>
 
       <section>
-	<title>Precious files are removed from Pnfs</title>
+	<title>Precious files are removed from &pnfs;</title>
 
 	<para>
-	  In case a precious file is removed from pnfs BEFORE the
-	  hsmcopy-Script (osmcp.sh or real-encp.sh) is called, the
-	  copy on disk is removed and the hsmcopy-Script is not
-	  called.
+	  In case a precious file is removed from &pnfs;
+	  <emphasis>before</emphasis> the hsmcopy-Script
+	  (<filename>osmcp.sh</filename> or
+	  <filename>real-encp.sh</filename>) is called, the copy on
+	  disk is removed and the hsmcopy-Script is not called.
 	</para>
 	
 	<para>
 	  If the file is removed while the hsmcopy-Script is active,
-	  the script will encounter an error when writing HSM data
-	  into the various pnfs layers.  In this case it's recommended
-	  to return an error code in the 30-39 range to have the
-	  request deactivated. So manual intervention is needed to get
-	  the situation cleaned up but no attempt is made by the
-	  dCache to get the corresponding dataset stored into the HSM
-	  again.
+	  the script will encounter an error when writing &hsm; data
+	  into the various &pnfs; layers.  In this case it's
+	  recommended to return an error code in the 30&ndash;39 range
+	  to have the request deactivated. So manual intervention is
+	  needed to get the situation cleaned up but no attempt is
+	  made by the &dcache; to get the corresponding dataset stored
+	  into the &hsm; again.
 	</para>
 
       </section>
     </section>
   </section>
+
   <section id="cf-hsm-rmfiles">
-    <title>Removing files from an backend HSM, triggered by dCache</title>
+    <title>Removing files from an backend &hsm;, triggered by &dcache;</title>
     
     <para>
-    Whenever a file entry is removed from pnfs (the dCache namespace), dCache takes care
-    that all copies of this file are removed from the various pools. In case, dCache
-    is attached to one or more tertiary storage systems, it provides an interface to
-    allow removing the file from those external systems as well.
+      Whenever a file entry is removed from pnfs (the &dcache;
+      namespace), &dcache; takes care that all copies of this file are
+      removed from the various pools. In case, &dcache; is attached to
+      one or more tertiary storage systems, it provides an interface
+      to allow removing the file from those external systems as well.
     </para>
+
     <para>
-    As soon as a file entry is removed from pnfs, a new file is created within a special,
-    so called, trash directory. (For details, see next paragraph) The name of this newly 
-    created file is identical to
-    its i-node, resp. pnfsId. A pnfsId is an internal unique identifier for each file
-    within the dCache. PnfsIds don't change if files are renamed and pnfsIds 
-    are never reused. The content of the this (new) file is exactly 
-    the information written into <option>level 1</option> during the HSM store prodecure, discussed
-    in the sections above. This information is usually sufficient to get the file 
-    removed from the backend HSM storage system.
+      As soon as a file entry is removed from &pnfs;, a new file is
+      created within a special, so called, trash directory. (For
+      details, see next paragraph) The name of this newly created file
+      is identical to its inode, resp. pnfsId. A pnfsId is an internal
+      unique identifier for each file within the &dcache;. PnfsIds
+      don't change if files are renamed and pnfsIds are never
+      reused. The content of the this (new) file is exactly the
+      information written into <option>level 1</option> during the
+      &hsm; store prodecure, discussed in the sections above. This
+      information is usually sufficient to get the file removed from
+      the backend &hsm; storage system.
     </para>
+
     <para>
-    The <option>trash</option> directory is a local directory residing on the head node, or to 
-    be more precise, on the server node where pnfs/chimera is running. In regular 
-    dCache installations, the directory is <filename>/opt/pnfsdb/pnfs/trash/1</filename>.
-    After the installation of pnfs, only the path section <filename>/opt/pnfsdb/pnfs/trash</filename>
-    exists. In order to activate the signaling on pnfs file removes, a subdirectory
-    named <filename>1</filename> has to be created within <filename>/opt/pnfsdb/pnfs/trash</filename>.
-    From that point in time, this directory is populated with file entries for each
-    file removed from pnfs/chimera. The mechanism, taking this file information and
-    doing the appropriate HSM specific actions, is resposible for removing
-    those entries if no longer needed, resp. if the file has been removed from the
-    backend HSM. 
+      The <option>trash</option> directory is a local directory
+      residing on the head node, or to be more precise, on the server
+      node where pnfs/chimera is running. In regular &dcache;
+      installations, the directory is
+      <filename>/opt/pnfsdb/pnfs/trash/1</filename>.  After the
+      installation of pnfs, only the path section
+      <filename>/opt/pnfsdb/pnfs/trash</filename> exists. In order to
+      activate the signaling on pnfs file removes, a subdirectory
+      named <filename>1</filename> has to be created within
+      <filename>/opt/pnfsdb/pnfs/trash</filename>.  From that point in
+      time, this directory is populated with file entries for each
+      file removed from pnfs/chimera. The mechanism, taking this file
+      information and doing the appropriate &hsm; specific actions, is
+      resposible for removing those entries if no longer needed,
+      resp. if the file has been removed from the backend &hsm;.
     </para>
+
     <para>
-    For exotic dCache installations, the entry <option>trash=</option> in 
-    <filename>/usr/etc/pnfsSetup</filename> points to the <option>trash</option> directory
-    within the local filesystem.
+      For exotic &dcache; installations, the entry
+      <option>trash=</option> in
+      <filename>/usr/etc/pnfsSetup</filename> points to the
+      <option>trash</option> directory within the local filesystem.
     </para>
   </section>
+
 	<!--
   <pre>
         The storage info options is a collection of        

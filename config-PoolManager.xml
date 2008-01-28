@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+  <!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+  %sharedents;
+]>
 
-<!-- <namespacewrapper xmlns:xi="http://www.w3.org/2001/XInclude"> -->
 <chapter id="cf-pm">
-  
   
   <title>Configuring the Pool Manager</title>
 
@@ -567,11 +569,13 @@ STRING</screen>This is the setup after a fresh installation and it will lead
 	linkend="gl-restore">restore</glossterm>, pool-to-pool client,
 	pool-to-pool server, and client request) with the following
 	equation:
-	
-	<simpleequation>
-	  perfCost(per Type) = ( activeTransfers + waitingTransfers ) / maxAllowed .
-	</simpleequation>
+      </para>
 
+      <para>
+	perfCost(per Type) = ( activeTransfers + waitingTransfers ) / maxAllowed .
+      </para>
+
+      <para>
 	The maximum number of concurrent transfers
 	(<symbol>maxAllowed</symbol>) can be configured with the commands
 	<xref linkend="cmd-st_set_max_active"/> (store),
@@ -589,18 +593,22 @@ STRING</screen>This is the setup after a fresh installation and it will lead
 	Then the average is taken for each mover type where
 	<symbol>maxAllowed</symbol> is not zero. For a pool where
 	store, restore and client transfers are allowed, e.g.:
+      </para>
 
-	<simpleequation>
-	  perfCost(total) = ( perfCost(store) + perfCost(restore) + perfCost(client) ) / 3 ,
-	</simpleequation>
-  
+      <para>
+	perfCost(total) = ( perfCost(store) + perfCost(restore) + perfCost(client) ) / 3 ,
+      </para>
+
+      <para>
 	and for a read only pool:
-  
-	<simpleequation>
-	  perfCost(total) = ( perfCost(restore) + perfCost(client) ) / 2 .
-	</simpleequation>
+      </para>
 
-  	For a well balanced system, the performance cost should not exceed 1.0.
+      <para>
+	perfCost(total) = ( perfCost(restore) + perfCost(client) ) / 2 .
+      </para>
+
+      <para>
+	For a well balanced system, the performance cost should not exceed 1.0.
       </para>
 
     </section>
@@ -625,86 +633,84 @@ STRING</screen>This is the setup after a fresh installation and it will lead
       <para>
 	The space cost is calculated as follows:
 
-	<simpleequation>
-	  <informaltable frame="none">
-	    <tgroup cols="6" colsep="none" rowsep="none" align="left">
-	      <colspec colnum="1" colname="if" colwidth="20"/>
-	      <colspec colnum="2" colname="formula" colwidth="100"/>
-	      <colspec colnum="3" colname="and" colwidth="25"/>
-	      <colspec colnum="4" colname="formula" colwidth="60"/>
-	      <colspec colnum="5" colname="then" colwidth="30"/>
-	      <colspec colnum="6" colname="formula"/>
-	      <tbody>
-		<row>
-		  <entry>If </entry>
-		  <entry>
-		    <inlineeq>
-		      freeSpace &gt; gapPara
-		    </inlineeq>
-		  </entry>
-		  <entry></entry>
-		  <entry></entry>
-		  <entry> then </entry>
-		  <entry>		  
-		    <inlineeq>
-		      spaceCost = 3 * newFileSize / freeSpace
-		    </inlineeq>
-		  </entry>
-		</row>
-		<row>
-		  <entry>If </entry>
-		  <entry>
-		    <inlineeq>
-		      freeSpace &lt;= gapPara
-		    </inlineeq>
-		  </entry>
-		  <entry>
-		    and
-		  </entry>
-		  <entry>
-		    <inlineeq>
-		      lruAge &lt; 60
-		    </inlineeq>
-		  </entry>
-		  <entry> then </entry>
-		  <entry>		  
-		    <inlineeq>
-		      spaceCost = 1 + costForMinute
-		    </inlineeq>
-		  </entry>
-		</row>
-		<row>
-		  <entry>If </entry>
-		  <entry>
-		    <inlineeq>
-		      freeSpace &lt;= gapPara
-		    </inlineeq>
-		  </entry>
-		  <entry>
-		    and
-		  </entry>
-		  <entry>
-		    <inlineeq>
-		      lruAge &gt;= 60
-		    </inlineeq>
-		  </entry>
-		  <entry> then </entry>
-		  <entry>		  
-		    <inlineeq>
-		      spaceCost = 1 + costForMinute * 60 / lruAge
-		    </inlineeq>
-		  </entry>
-		</row>
-	      </tbody>
-	    </tgroup>
-	  </informaltable>
-	</simpleequation>
+	<informaltable frame="none">
+	  <tgroup cols="6" colsep="none" rowsep="none" align="left">
+	    <colspec colnum="1" colname="if" colwidth="20"/>
+	    <colspec colnum="2" colname="formula" colwidth="5*"/>
+	    <colspec colnum="3" colname="and" colwidth="25"/>
+	    <colspec colnum="4" colname="formula" colwidth="3*"/>
+	    <colspec colnum="5" colname="then" colwidth="25"/>
+	    <colspec colnum="6" colname="formula" colwidth="8*"/>
+	    <tbody>
+	      <row>
+		<entry>If </entry>
+		<entry>
+		  <phrase role="math">
+		    freeSpace &gt; gapPara
+		  </phrase>
+		</entry>
+		<entry></entry>
+		<entry></entry>
+		<entry> then </entry>
+		<entry>	
+		  <phrase role="math">
+		    spaceCost = 3 * newFileSize / freeSpace
+		  </phrase>
+		</entry>
+	      </row>
+	      <row>
+		<entry>If </entry>
+		<entry>
+		  <phrase role="math">
+		    freeSpace &lt;= gapPara
+		  </phrase>
+		</entry>
+		<entry>
+		  and
+		</entry>
+		<entry>
+		  <phrase role="math">
+		    lruAge &lt; 60
+		  </phrase>
+		</entry>
+		<entry> then </entry>
+		<entry>
+		  <phrase role="math">
+		    spaceCost = 1 + costForMinute
+		  </phrase>
+		</entry>
+	      </row>
+	      <row>
+		<entry>If </entry>
+		<entry>
+		  <phrase role="math">
+		    freeSpace &lt;= gapPara
+		  </phrase>
+		</entry>
+		<entry>
+		  and
+		</entry>
+		<entry>
+		  <phrase role="math">
+		    lruAge &gt;= 60
+		  </phrase>
+		</entry>
+		<entry> then </entry>
+		<entry>
+		  <phrase role="math">
+		    spaceCost = 1 + costForMinute * 60 / lruAge
+		  </phrase>
+		</entry>
+	      </row>
+	    </tbody>
+	  </tgroup>
+	</informaltable>
 
 	where the variable names have the following meanings:
 
 	<variablelist>
 	  <varlistentry>
-	    <term>freeSpace</term>
+	    <term><phrase role="math">freeSpace</phrase></term>
 	    <listitem>
 	      <para>
 		The free space left on the pool
@@ -712,7 +718,7 @@ STRING</screen>This is the setup after a fresh installation and it will lead
 	    </listitem>
 	  </varlistentry>
 	  <varlistentry>
-	    <term>newFileSize</term>
+	    <term><phrase role="math">newFileSize</phrase></term>
 	    <listitem>
 	      <para>
 		The size of the file to be written to one of the pools, and at least 50MB.
@@ -720,7 +726,7 @@ STRING</screen>This is the setup after a fresh installation and it will lead
 	    </listitem>
 	  </varlistentry>
 	  <varlistentry>
-	    <term>lruAge</term>
+	    <term><phrase role="math">lruAge</phrase></term>
 	    <listitem>
 	      <para>
 		The age of the <glossterm linkend="gl-lru">least
@@ -729,7 +735,7 @@ STRING</screen>This is the setup after a fresh installation and it will lead
 	    </listitem>
 	  </varlistentry>
 	  <varlistentry>
-	    <term>gapPara</term>
+	    <term><phrase role="math">gapPara</phrase></term>
 	    <listitem>
 	      <para>
 		The gap parameter. Default is 4GB. The size of free
@@ -751,63 +757,63 @@ STRING</screen>This is the setup after a fresh installation and it will lead
 	    </listitem>
 	  </varlistentry>
 	  <varlistentry>
-	    <term>costForMinute</term>
+	    <term><phrase role="math">costForMinute</phrase></term>
 	    <listitem>
 	      <para>
 		A parameter which fixes the space cost of a
-		one-minute-old LRU file to <inlineeq>(1 +
-		costForMinute)</inlineeq>.  It can be set with
-		the <xref linkend="cmd-set_breakeven"/>, where
-		<simpleequation>
+		one-minute-old LRU file to <phrase role="math">(1 +
+		costForMinute)</phrase>.  It can be set with the <xref
+		linkend="cmd-set_breakeven"/>, where
+	      </para>
+
+	      <para>
 		  costForMinute = breakeven * 7 * 24 * 60.
-		</simpleequation>
+	      </para>
+
+	      <para>
 		I.e. the the space cost of a one-week-old LRU file
-		will be <inlineeq>(1 +
-		breakeven)</inlineeq>. Not again, that all this
-		only applies if <inlineeq>breakeven &lt;
-		1.0</inlineeq>
+		will be <phrase role="math">(1 +
+		breakeven)</phrase>. Not again, that all this only
+		applies if <phrase role="math">breakeven &lt;
+		1.0</phrase>
 	      </para>
 	    </listitem>
 	  </varlistentry>
 	</variablelist>
 	
 	The prescription above can be stated a little differently as follows:
-	<simpleequation>
-	  <informaltable frame="none">
-	    <tgroup cols="4">
-	      <tbody>
-		<row>
-		  <entry>If </entry>
-		  <entry>
-		    <inlineeq>
-		      freeSpace &gt; gapPara
-		    </inlineeq>
-		  </entry>
-		  <entry> then </entry>
-		  <entry>		  
-		    <inlineeq>
-		      spaceCost = 3 * newFileSize / freeSpace
-		    </inlineeq>
-		  </entry>
-		</row>
-		<row>
-		  <entry>If </entry>
-		  <entry>
-		    <inlineeq>
-		      freeSpace &lt;= gapPara
-		    </inlineeq>
-		  </entry>
-		  <entry> then </entry>
-		  <entry>		  
-		    <inlineeq>
-		      spaceCost = 1 + breakeven * 7 * 24 * 60 * 60 / lruAge
-		    </inlineeq>,
-		  </entry> 
-		</row>
-	      </tbody>
-	    </tgroup>
-	  </informaltable>
-	</simpleequation>
+
+	<informaltable frame="none">
+	  <tgroup cols="4">
+	    <colspec colnum="1" colname="if"       colwidth="20"/>
+	    <colspec colnum="2" colname="formula"  colwidth="*"/>
+	    <colspec colnum="3" colname="then"     colwidth="25"/>
+	    <colspec colnum="4" colname="formula2" colwidth="2*"/>
+	    <tbody>
+	      <row>
+		<entry>If </entry>
+		<entry>
+		  freeSpace &gt; gapPara
+		</entry>
+		<entry> then </entry>
+		<entry>		  
+		    spaceCost = 3 * newFileSize / freeSpace
+		</entry>
+	      </row>
+	      <row>
+		<entry>If </entry>
+		<entry>
+		  freeSpace &lt;= gapPara
+		</entry>
+		<entry> then </entry>
+		<entry>		  
+		    spaceCost = 1 + breakeven * 7 * 24 * 60 * 60 / lruAge
+		  ,
+		</entry> 
+	      </row>
+	    </tbody>
+	  </tgroup>
+	</informaltable>
 
 	where <varname>newFileSize</varname> is at least 50MB and
 	<varname>lruAge</varname> at least one minute.
@@ -822,11 +828,10 @@ STRING</screen>This is the setup after a fresh installation and it will lead
 
 	<para>
 	  As the last version of the formula suggests, a pool can be
-	  in two states: Either <inlineeq>freeSpace &gt;
-	  gapPara</inlineeq> or <inlineeq>freeSpace &lt;=
-	    gapPara</inlineeq> - either there is free space left
-	  to store files without deleting cached files or there
-	  isn't. 
+	  in two states: Either <phrase role="math">freeSpace &gt;
+	  gapPara</phrase> or <phrase role="math">freeSpace &lt;=
+	  gapPara</phrase> - either there is free space left to store
+	  files without deleting cached files or there isn't.
 	</para>
 
 	<para>
@@ -864,7 +869,6 @@ STRING</screen>This is the setup after a fresh installation and it will lead
 <!-- 
 <screen><varname>cost</varname> = <varname>ccf</varname> * <varname>performance_cost</varname> + <varname>scf</varname> * <varname>space_cost</varname>,</screen>
 -->
-      <simpleequation>
 <!--	<m:math xmlns:m="http://www.w3.org/1998/Math/MathML">
 	  <m:mrow>
 	    <m:mi>totalCost</m:mi>
@@ -902,7 +906,6 @@ STRING</screen>This is the setup after a fresh installation and it will lead
 	</m:math>
 	-->
 	  totalCost = ccf * perfCost + scf * spaceCost ,
-      </simpleequation>
 
 
       where <varname>ccf</varname> and <varname>scf</varname> are
@@ -911,7 +914,7 @@ STRING</screen>This is the setup after a fresh installation and it will lead
 
       E.g.
 
-<screen><dcpmprompt/><command>set pool decision</command> <option>-spacecostfactor=3</option> <option>-cpucostfactor=1</option></screen>
+<screen>&dc-prompt-pm; <command>set pool decision</command> <option>-spacecostfactor=3</option> <option>-cpucostfactor=1</option></screen>
 
       will give the <glossterm linkend="gl-space_cost">space
       cost</glossterm> three times the weight of the <glossterm
@@ -979,4 +982,3 @@ STRING</screen>This is the setup after a fresh installation and it will lead
   </section>
 
 </chapter>
-<!-- </namespacewrapper> -->

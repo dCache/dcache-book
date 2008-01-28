@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+%sharedents;
+]>
 
 <section id="rf-cc-pool">
   <title>Pool Commands</title>
@@ -44,8 +48,8 @@
 	  <term>pnfsId</term>
 	  <listitem>
 	    <para>
-	      The <pnfs/> ID(s) for which the files in the repository will
-	      be listed.
+	      The &pnfs; ID(s) for which the files in the repository
+	      will be listed.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -53,16 +57,17 @@
 	  <term>-l</term>
 	  <listitem>
                 <para>
-	      List only the files with one of the following properties:
+		  List only the files with one of the following
+		  properties:
+		</para>
 
-<screen>s      sticky files
+		<screen>s      sticky files
 p      precious files
 l      locked files
 u      files in use
 nc     files which are not cached
 e      files with an error condition</screen>
 
-	    </para>
 	  </listitem>
 	</varlistentry>
 	<varlistentry>
@@ -70,13 +75,13 @@ e      files with an error condition</screen>
 	  <listitem>
 	    <para>
 	      Unit, the filesize is shown:
+	    </para>
 
-<screen>k      data amount in KBytes
+	    <screen>k      data amount in KBytes
 m      data amount in MBytes
 g      data amount in GBytes
 t      data amount in TBytes</screen>
 
-	    </para>
 	  </listitem>
 	</varlistentry>
       </variablelist>
@@ -380,14 +385,14 @@ t      data amount in TBytes</screen>
 	  <listitem>
 	    <para>
 	      The breakeven parameter has to be a positive number
-	      smaller than 1.0.  It specifies the impact of the
-	      age of the <glossterm linkend="gl-lru">least
-		recently used file</glossterm> on space cost. It the
-	      LRU file is one week old, the space cost will be
-	      equal to <inlineeq>(1 + breakeven)</inlineeq>. Note
-	      that this will not be true, if the breakeven
-	      parameter has been set to a value greater or equal
-	      to 1.
+	      smaller than 1.0.  It specifies the impact of the age of
+	      the <glossterm linkend="gl-lru">least recently used
+	      file</glossterm> on space cost. It the LRU file is one
+	      week old, the space cost will be equal to <!-- TODO:
+	      this should be done better --> <literal>(1 +
+	      breakeven)</literal>. Note that this will not be true,
+	      if the breakeven parameter has been set to a value
+	      greater or equal to 1.
 	    </para>
 	  </listitem>
 	</varlistentry>

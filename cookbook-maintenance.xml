@@ -1,34 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">     
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+  <!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+  %sharedents;
+]> 
+ 
 
 <chapter id="cb-maintenance">
+
   <title>The Maintenance Module</title>
-  <partauthors>Patrick Fuhrmann</partauthors>
+
+  <chapterinfo>
+    <author>
+      <firstname>Patrick</firstname>
+      <surname>Fuhrmann</surname>
+      <affiliation>
+	<shortaffil>DESY</shortaffil>
+      </affiliation>
+    </author>
+  </chapterinfo>
+
   <para>
-  The maintenance module is designed to perform regular duties on a dCache system. Those tasks may run
-  in parallel and may be busy for a long period of time or even permanently. Users may attach to
-  those tasks and manipulate their behaviour. The first paragraph describes the framework itself
-  and subsequent paragraphs the different loadable modules.
+    The maintenance module is designed to perform regular duties on a
+    dCache system. Those tasks may run in parallel and may be busy for
+    a long period of time or even permanently. Users may attach to
+    those tasks and manipulate their behaviour. The first paragraph
+    describes the framework itself and subsequent paragraphs the
+    different loadable modules.
   </para>
+
   <section id="cb-m-basics">
     <title>The Basic Framework</title>
+
     <para>
-      The <classname>CommandTaskCell</classname> allows for multiple subtasks to perform
-      various timeconsuming operations on the dCache system. For now only the
-      file copy management is available. Multiple of those "pool draining tasks" may run independently
-      within one maintenance Cell.
+      The <classname>CommandTaskCell</classname> allows for multiple
+      subtasks to perform various timeconsuming operations on the
+      dCache system. For now only the file copy management is
+      available. Multiple of those "pool draining tasks" may run
+      independently within one maintenance Cell.
     </para>
+
     <section>
-    <title>Configuration</title>
-    <para>
-    In case the dCache distribution is not coming with this feature 
-    installed, please follow the instructions below to get it enabled.
-    </para>
-    <para>
-    Create a file <filename>/opt/d-cache/config/maintenance.batch</filename> with the
-    following content.
-<programlisting>
-set printout default 3
+      <title>Configuration</title>
+
+      <para>
+	In case the dCache distribution is not coming with this
+	feature installed, please follow the instructions below to get
+	it enabled.
+      </para>
+
+      <para>
+	Create a file
+	<filename>/opt/d-cache/config/maintenance.batch</filename>
+	with the following content.
+      </para>
+
+      <programlisting>set printout default 3
 set printout CellGlue none
 onerror shutdown
 #
@@ -60,73 +87,94 @@ endDefine
 #
 create dmg.cells.services.CommandTaskCell maintenance "default -export"
 #</programlisting>
-   <itemizedlist>
-   <listitem>
-     <para> Change to ../jobs and run ./initPackage.sh. The script may complain about some security
-     issues which are not relevant in this context. 
-     </para>
-    </listitem>
-    <listitem>
-    <para> Make sure you create the
-    directory <filename>/opt/d-cache/config/copytask</filename>. It will hold temporary
-    information for the various copy tasks.
-    </para>
-    </listitem>
-    <listitem>
-    <para>
-    Start the service by :
-<screen>
-./maintenance start</screen>
-</para>
-    </listitem>
-    </itemizedlist>
-    </para>
+
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    Change to ../jobs and run ./initPackage.sh. The script may
+	    complain about some security issues which are not relevant
+	    in this context.
+	  </para>
+	</listitem>
+
+	<listitem>
+	  <para>
+	    Make sure you create the directory
+	    <filename>/opt/d-cache/config/copytask</filename>. It will
+	    hold temporary information for the various copy tasks.
+	  </para>
+	</listitem>
+
+	<listitem>
+	  <para>
+	    Start the service by :
+	     <screen>./maintenance start</screen>
+	  </para>
+	</listitem>
+      </itemizedlist>
    
     </section>
+
+
     <section>
-    <title>The concept</title>
-    <para>
-    A maintenance cell provides a set of modules each of which can be
-    instantiated multiple times and run concurrently. An instantiated module
-    is called a task. A user session may be attached and detached to/from any task.
-    Different modules provide different functionalities and consequently comes
-    with a different command set.
+      <title>The concept</title>
+
+      <para>
+	A maintenance cell provides a set of modules each of which can
+	be instantiated multiple times and run concurrently. An
+	instantiated module is called a task. A user session may be
+	attached and detached to/from any task.  Different modules
+	provide different functionalities and consequently comes with
+	a different command set.
+      </para>
+
+      <para>
+	A typical session would look as follows :
+      </para>
+
+      <blockquote>
+	<para>
+	  Change to the maintenance cell and get a listing of all available modules.
+	</para>
     
-    A typical session would look as follows :
-    </para>
-    <blockquote>
-    <para>
-    Change to the maintenance cell and get a listing of all available modules.
-    
-<screen>
-<dcprompt>local</dcprompt><command>cd maintenance</command>
-<dcprompt>maintenance</dcprompt><command>ls module</command> -l
+	<screen>&dc-prompt-local;<command>cd maintenance</command>
+&dc-prompt-maint;<command>ls module</command> -l
 copy-module -> diskCacheV111.replicaManager.EasyCopyCellModule</screen>
-    Create a new task of module copy-module.
-<screen>
-<dcprompt>maintenance</dcprompt><command>create task</command> my-first-task  copy-module
+
+        <para>
+	  Create a new task of module copy-module.
+	</para>
+
+	<screen>&dc-prompt-maint;<command>create task</command> my-first-task  copy-module
 Task &lt;my-first-task&gt; created and attached to (us) [alm-admin-101@adminDoorDomain]</screen>
-    The task 'my-first-task' has been created and the current terminal session is attached to that task.
-    (as the message says). 'my-first-task' is listed as follows :
-<screen>
-<dcprompt>maintenance</dcprompt><command>ls task</command>  -l 
+
+        <para>
+	  The task 'my-first-task' has been created and the current
+	  terminal session is attached to that task.  (as the message
+	  says). 'my-first-task' is listed as follows :
+	</para>
+    
+	<screen>&dc-prompt-maint;<command>ls task</command>  -l 
 my-first-task copy-module {my-first-task;Status=idle;m=IDLE}</screen>
-    Communiction with the task is done by prepending the actual task command    
-    by the keywork 'task'. So if there a is a copy-module command 'load pool' one would
-    have to issue 'task load pool'.
-<screen>
-<dcprompt>maintencance</dcprompt><command>task help</command>
+
+        <para>
+	  Communiction with the task is done by prepending the actual
+	  task command by the keywork 'task'. So if there a is a
+	  copy-module command 'load pool' one would have to issue
+	  'task load pool'.
+	</para>
+
+
+	<screen>&dc-prompt-maint;<command>task help</command>
  exclude pinned|cached|precious|bad|locked|&lt;storageClass&gt;
  info
  halt  # halt processing
  ***
  keeponly pinned|cached|precious|bad|locked|&lt;storageClass&gt;
  load pool &lt;PoolName&gt; [&lt;StorageInfoPattern&gt;]
-<dcprompt>maintencance</dcprompt>
-<dcprompt>maintencance</dcprompt>
-<dcprompt>maintencance</dcprompt>
-<dcprompt>maintencance</dcprompt>
-<dcprompt>maintencance</dcprompt><command>task info</command>
+&dc-prompt-maint;
+<lineannotation>...some time later...</lineannotation>
+&dc-prompt-maint;<command>task info</command>
 Task
 ----
         Name : copy
@@ -135,119 +183,125 @@ Task
 Parameter
 ---------
    ***</screen>
-The <command>task</command> keyword may be omited as long as the command is not ambiguous.
-</para>
-<para>
-In order to create a new task or to attach to another, already existing one, 
-one has to detach from the current task.
-<screen>
-<dcprompt>maintenance</dcprompt><command>detach</command>
+
+        <para>
+	  The <command>task</command> keyword may be omited as long as
+	  the command is not ambiguous.
+	</para>
+
+	<para>
+	  In order to create a new task or to attach to another,
+	  already existing one, one has to detach from the current
+	  task.
+	</para>
+
+	<screen>&dc-prompt-maint;<command>detach</command>
 Detached from : &lt;my-first-task&gt;</screen>
-</para>
-<para>
-If a session is idle for more than an hour, it automatically detaches from the
-currently attached  task, if it had been connected. In order to continue working with that
-task, one has to reattach :
-<screen>
-<dcprompt>maintenance</dcprompt><command>attach my-first-task</command>
-Task &lt;my-first-task&gt; attached to (us) [alm-admin-101@adminDoorDomain]</screen>
-</para>
-</blockquote>
-</section>
-    <section>
-    <title>Framework Reference Manual</title>
-    <blockquote>
-    <para>
-    <screen><command>define module <replaceable>ModuleName</replaceable> <replaceable>ModuleClass</replaceable></command></screen>
-    </para>
-    <blockquote>
-    <para>
-    Assigns a java class to a module name. Subsequently this module may be instantiated using the module name only.
-    This command is typically executed during startup in <filename>maintenance.batch</filename>.
-    </para>
-    </blockquote>
-    
-    <para>
-    <screen><command>undefine module <replaceable>ModuleName</replaceable></command></screen>
-    </para>
-    <blockquote>
-    <para>
-    Undefines a module name. Tasks still running the module are not affected.
-    </para>
-    </blockquote>
-    
-    <para>
-    <screen><command>ls -l module</command></screen>
-    </para>
-    <blockquote>
-    <para>
-    Lists all available modules.
-    </para>
-    </blockquote>
-    
-    <para>
-    <screen><command>ls -l task</command></screen>
-    </para>
-    <blockquote>
-    <para>
-    Lists all active tasks.
-    </para>
-    </blockquote>
-    
-    <para>
-    <screen><command>ls -l session</command></screen>
-    </para>
-    <blockquote>
-    <para>
-    Lists all session together with tasks they are currently attached to.
-    </para>
-    </blockquote>
-    
-    <para>
-    <screen><command>ceate task <replaceable>taskName</replaceable> <replaceable>moduleName</replaceable></command></screen>
-    </para>
-    <blockquote>
-    <para>
-    Creates a new task based on the specified module. The <replaceable>taskName</replaceable> must be unique.
-    The current session is automatically attached to the new task.
-    </para>
-    </blockquote>
-    
-    <para>
-    <screen><command>attach <replaceable>taskName</replaceable></command></screen>
-    </para>
-    <blockquote>
-    <para>
-    Attached to an already active task. The <replaceable>taskName</replaceable> must exists.
-    The current session must not be attached to any other task. So it might become necesssary
-    to <command>detach</command> first.
-    </para>
-    </blockquote>
-    
-    <para>
-    <screen><command>detach</command></screen>
-    </para>
-    <blockquote>
-    <para>
-    Detaches this session from the currently attached task.
-    </para>
-    </blockquote>
-    
-    <para>
-    <screen><command>task <replaceable>task specific command</replaceable></command></screen>
-    </para>
-    <blockquote>
-    <para>
-    Forward the command <replaceable>task specific command</replaceable> to the attached task for
-    execution. If the command is not ambiguous, the <command>task</command> keywork may be omitted.
-    </para>
-    </blockquote>
-   </blockquote>
-    
-    
-    
+
+        <para>
+	  If a session is idle for more than an hour, it automatically
+	  detaches from the currently attached task, if it had been
+	  connected. In order to continue working with that task, one
+	  has to reattach :
+	</para>
+
+	<screen>&dc-prompt-maint;<command>attach my-first-task</command>
+	Task &lt;my-first-task&gt; attached to (us) [alm-admin-101@adminDoorDomain]</screen>
+      </blockquote>
+
     </section>
-</section>
+    
+
+    <section>
+      <title>Framework Reference Manual</title>
+
+      <screen><command>define module <replaceable>ModuleName</replaceable> <replaceable>ModuleClass</replaceable></command></screen>
+
+      <blockquote>
+	<para>
+	  Assigns a java class to a module name. Subsequently this
+	  module may be instantiated using the module name only.  This
+	  command is typically executed during startup in
+	  <filename>maintenance.batch</filename>.
+	</para>
+      </blockquote>
+      
+      <screen><command>undefine module <replaceable>ModuleName</replaceable></command></screen>
+
+      <blockquote>
+	<para>
+	  Undefines a module name. Tasks still running the module are
+	  not affected.
+	</para>
+      </blockquote>
+    
+      <screen><command>ls -l module</command></screen>
+
+      <blockquote>
+	<para>
+	  Lists all available modules.
+	</para>
+      </blockquote>
+    
+      <screen><command>ls -l task</command></screen>
+
+      <blockquote>
+	<para>
+	  Lists all active tasks.
+	</para>
+      </blockquote>
+    
+      <screen><command>ls -l session</command></screen>
+
+      <blockquote>
+	<para>
+	  Lists all session together with tasks they are currently attached to.
+	</para>
+      </blockquote>
+    
+      <screen><command>ceate task <replaceable>taskName</replaceable> <replaceable>moduleName</replaceable></command></screen>
+
+      <blockquote>
+	<para>
+	  Creates a new task based on the specified module. The
+	  <replaceable>taskName</replaceable> must be unique.  The
+	  current session is automatically attached to the new task.
+	</para>
+      </blockquote>
+    
+      <screen><command>attach <replaceable>taskName</replaceable></command></screen>
+      
+      <blockquote>
+	<para>
+	  Attached to an already active task. The
+	  <replaceable>taskName</replaceable> must exists.  The
+	  current session must not be attached to any other task. So
+	  it might become necesssary to <command>detach</command>
+	  first.
+	</para>
+      </blockquote>
+    
+      <screen><command>detach</command></screen>
+
+      <blockquote>
+	<para>
+	  Detaches this session from the currently attached task.
+	</para>
+      </blockquote>
+    
+      <screen><command>task <replaceable>task specific command</replaceable></command></screen>
+      
+      <blockquote>
+	<para>
+	  Forward the command <replaceable>task specific
+	  command</replaceable> to the attached task for execution. If
+	  the command is not ambiguous, the <command>task</command>
+	  keywork may be omitted.
+	</para>
+      </blockquote>    
+    </section>
+  </section>
+    
 <!--
 
             T H E   C O P Y    M O D U L E
@@ -259,193 +313,267 @@ Task &lt;my-first-task&gt; attached to (us) [alm-admin-101@adminDoorDomain]</scr
     <title>The copy module</title>
 
     <para>
-    The purpose of the copy module is essentially to copy the content
-    of a pool to one or more other pools to have the data available 
-    while the source pool is not available.
+      The purpose of the copy module is essentially to copy the
+      content of a pool to one or more other pools to have the data
+      available while the source pool is not available.
     </para>
     
     <section>
-    <title>The Concept</title>
-    <para>
-    Vacating a pool is done in three steps.
-    <itemizedlist>
-    <listitem>
-    <para>
-    The pool, to be vacated, has to be set to read-only to make sure that
-    during the copy procedure, the content doesn't change. This 
-    is not a technical requirement, it simply ensures consistency.
-    </para>
-    </listitem>
-    <listitem>
-    <para>
-    A snapshot is taken from the repository of the source pool. 
-    Filters can be run on this repostiory listing to select or deselect
-    classes of files to be copied. Classes can either be special types like
-    'cached' 'precious' a.s.o or storage groups like cms:generated@osm.
-    </para>
-    </listitem>
-    <listitem>
-    <para>
-    The actual copy is initiated. The copy is done only on the preselected
-    list. The destination pools may be specified individually or as a 
-    PoolManager pool group.
-    </para>
-    </listitem>
-    </itemizedlist>
-    </para>
-    <para>
-    </para>
+      <title>The Concept</title>
+      <para>
+	Vacating a pool is done in three steps.
+      </para>
+      
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    The pool, to be vacated, has to be set to read-only to
+	    make sure that during the copy procedure, the content
+	    doesn't change. This is not a technical requirement, it
+	    simply ensures consistency.
+	  </para>
+	</listitem>
+
+	<listitem>
+	  <para>
+	    A snapshot is taken from the repository of the source
+	    pool.  Filters can be run on this repostiory listing to
+	    select or deselect classes of files to be copied. Classes
+	    can either be special types like 'cached' 'precious' a.s.o
+	    or storage groups like cms:generated@osm.
+	  </para>
+	</listitem>
+
+	<listitem>
+	  <para>
+	    The actual copy is initiated. The copy is done only on the
+	    preselected list. The destination pools may be specified
+	    individually or as a PoolManager pool group.
+	  </para>
+	</listitem>
+      </itemizedlist>
     </section>
 
+    <section>
+      <title>Setting a pool read only</title>
+
+      <para>
+	In oder to ensure consistency during a data copy process a
+	pool needs to be set 'read-only' within the pool
+	manager. Subsequently no repository-modification operation
+	will be submitted to the pool. (write or restore).
+      </para>
+
+      <screen>&dc-prompt-pm;<command>psu set pool <replaceable>PoolName</replaceable> rdonly</command></screen>
+
+      <para>
+	This command doesn't stop ongoing transfers to the pool. So
+	one needs to wait until all write and restore movers have
+	finished.
+      </para>
+    </section>
 
     <section>
-    <title>Setting a pool read only</title>
-    <para>
-    In oder to ensure consistency during a data copy process a pool needs to be set 'read-only'
-    within the pool manager. Subsequently no repository-modification operation will be submitted
-    to the pool. (write or restore).
-    <screen><dcprompt>PoolManager</dcprompt><command>psu set pool <replaceable>PoolName</replaceable> rdonly</command></screen>
-    This command doesn't stop ongoing transfers to the pool. So one needs to wait until all write 
-    and restore movers have finished.
-    </para>
+      <title>Creating or attaching to a maintenance task</title>
+      <para>
+	All subsequent operations need to be done within the framework
+	of a copy-task. So one either has to create a new copy task or
+	has to reuse an already existing, idle one.
+      </para>
+
+      <screen>&dc-prompt-maint;<command>create task my-copy-task copy-module</command></screen>
+
+      <para>
+	or if there is already an idle task :
+      </para>
+
+      <screen>&dc-prompt-maint;<command>attach my-copy-task</command></screen>
     </section>
+
     <section>
-    <title>Creating or attaching to a maintenance task</title>
-    <para>
-    All subsequent operations need to be done within the framework of a copy-task. So one either has to
-    create a new copy task or has to reuse an already existing, idle one.
-    <screen><dcprompt>maintenance</dcprompt><command>create task my-copy-task copy-module</command></screen>
-    or if there is already an idle task :
-    <screen><dcprompt>maintenance</dcprompt><command>attach my-copy-task</command></screen>   
-    </para>
-    </section>
-    <section>
-    <title>Getting and customizing the source repository listing</title>
-    <para>
-    The next step is to obtain a listing of the source pool repository.
-    <screen><dcprompt>maintenance</dcprompt><command>load pool <replaceable>poolName</replaceable></command></screen>
-    Depending on the size of the source pool listing, this may take awhile. Checkout 'task info' to
-    learn when the fetch operation is done.
-    </para>
-    <para>
-     
-    <screen><dcprompt>maintenance</dcprompt><command>ls stat</command></screen>
-    shows the content of the source pool repository. It provides a table of file classes containing
-    the number of bytes and the number of files per class. For simplification, a file class may either be
-    a the status of a file, (precious,cached,pinned, locked and bad) or the storage class, like 
-    cms:generated@osm.
+      <title>Getting and customizing the source repository listing</title>
+
+      <para>
+	The next step is to obtain a listing of the source pool repository.
+      </para>
+
+      <screen>&dc-prompt-maint;<command>load pool <replaceable>poolName</replaceable></command></screen>
+
+      <para>
+	Depending on the size of the source pool listing, this may
+	take awhile. Checkout 'task info' to learn when the fetch
+	operation is done.
+      </para>
+
+      <screen>&dc-prompt-maint;<command>ls stat</command></screen>
+
+      <para>
+	shows the content of the source pool repository. It provides a
+	table of file classes containing the number of bytes and the
+	number of files per class. For simplification, a file class
+	may either be a the status of a file, (precious,cached,pinned,
+	locked and bad) or the storage class, like cms:generated@osm.
+      </para>
    
-    <screen><dcprompt>maintenance</dcprompt><command>ls files</command></screen>
-    gives a full listing of all  files  found in the repository. 
-    </para>
-    <para>
-    The <command>ls files/stat</command> listing is the bases of the subsequent copy process.
-    The listing may be customized to select/deselect particular file classes to be copied or not.
-    Any class may be excluded from the repository listing by
-    <screen><dcprompt>maintenance</dcprompt><command>exclude <replaceable>fileClass</replaceable></command></screen>
-    where file class may be 'cached, precious, pinned, locked or bad' or a storage class
-    like 'cms:generated@osm'. 
-    The 
-    <screen><dcprompt>maintenance</dcprompt><command>keeponly <replaceable>fileClass</replaceable></command></screen>
-    excludes all file classes except for the specified one.
-    Both, 'exclude' and 'keeponly" may be used until the repository listing fits your needs.
-    </para>
+      <screen>&dc-prompt-maint;<command>ls files</command></screen>
+
+      <para>
+	gives a full listing of all files found in the repository.
+      </para>
+
+      <para>
+	The <command>ls files/stat</command> listing is the bases of
+	the subsequent copy process.  The listing may be customized to
+	select/deselect particular file classes to be copied or not.
+	Any class may be excluded from the repository listing by
+      </para>
+
+      <screen>&dc-prompt-maint;<command>exclude <replaceable>fileClass</replaceable></command></screen>
+
+      <para>
+	where file class may be 'cached, precious, pinned, locked or
+	bad' or a storage class like 'cms:generated@osm'.  The
+      </para>
+
+      <screen>&dc-prompt-maint;<command>keeponly <replaceable>fileClass</replaceable></command></screen>
+
+      <para>
+	excludes all file classes except for the specified one.  Both,
+	'exclude' and 'keeponly" may be used until the repository
+	listing fits your needs.
+      </para>
     </section>
 
+
     <section>
-    <title>Starting the copy process</title>
-    <para>
-    Two parameters should be set before starting the copy procedure. All parameters are valid
-    for all subsequent copy operations or until they  are changed. 
-    <itemizedlist>
-    <listitem>
-    <para><command>task set copy-mode nn|same|precious|cached</command> defines the mode of the
-    replicated file.
-       <warning>
-       <para>
-       Replicating precious files or creating precious replica from or to pools which are connected
-       to an HSM system will very likely result in a serious error condition 
-       </para>
-       </warning>
-       Mode can be one of the following :
-       <itemizedlist>
-       <listitem>
-       <para>
-       <command>precious</command> Independend of the source mode, the created replica will be 
-          created in 'precious' mode.
-       </para>
-       </listitem>
-       <listitem>
-       <para>
-       <command>cached</command> Independend of the source mode, the created replica will be 
-          created in 'cached' mode. 
-       </para>
-       </listitem>
-       <listitem>
-       <para>
-       <command>same</command> The mode of the destination file will be identical to the mode of
-       the soure file.
-       </para>
-       </listitem>
-       <listitem>
-       <para>
-       <command>nn</command> The mode of the destination file is determined by the setting of the
-       destination pool. (Don't use)
-       </para>
-       </listitem>
-       </itemizedlist>
-       </para> 
-   
-    </listitem>
-    <listitem>
-    <para><command>task set parallel <replaceable>numberOfParallelTransfers</replaceable></command> defines the number
-    of concurrent parallel copy operations. This doesn't overwrite the 'max mover' settings of the
-    pools themselves.
-    </para>
-    </listitem>
-    </itemizedlist>
-    </para>
-    <para>
-    The actual copy operation is trigged by either
-    <command>copyto pools <replaceable>PoolName</replaceable> [<replaceable>PoolName</replaceable> [...]]</command>
-    or
-    <command>copyto group <replaceable>PoolGroupName</replaceable></command>
-    The command is processed asynchronously and progress may be checked by 'task info'. 
-    The process may be stopped using <command>halt</command>. Already started transfers will be finished first.
-    After the process has been finished, the <command>ls stat -l</command> command will show files not
-    transferred. Information is provided for which reason the transfer hasn't been performed. This includes 
-    a manual 'halt'. This allows to resume from an 'halt'.
-    </para>
-    <para>
-    Remarks:
-    <itemizedlist>
-    <listitem>
-    <para>
-    Replicating a file to a pool which already contains a copy of this file is not an error condition
-    and is silently ignored.
-    </para>
-    </listitem>
-    <listitem>
-    <para>
-    To get a fair distribution of files among the destination pools, one should allow for
-    a reasonable parallism. (<command>task set parallel</command>
-    </para>
-    </listitem>
-    <listitem>
-    <para>
-    Space management : Among the available destination pools, the copy process will always chose the
-    pool with the maximum 'free + replaceable' space. In the worst case this may lead to deleting 'cached' files
-    though there would have been 'real free' space available on a different pool. We are currently trying to improve the
-    distribution algorithm.
-    </para>
-    </listitem>
-    </itemizedlist>
-    </para>
+      <title>Starting the copy process</title>
+
+      <para>
+	Two parameters should be set before starting the copy
+	procedure. All parameters are valid for all subsequent copy
+	operations or until they are changed.
+      </para>
+
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    <command>task set copy-mode
+	    nn|same|precious|cached</command> defines the mode of the
+	    replicated file.
+	  </para>
+	    
+	  <warning>
+	    <para>
+	      Replicating precious files or creating precious replica
+	      from or to pools which are connected to an HSM system
+	      will very likely result in a serious error condition.
+	    </para>
+	  </warning>
+
+	  <para>
+	    Mode can be one of the following :
+	  </para>
+
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+		<command>precious</command> Independend of the source
+		mode, the created replica will be created in
+		'precious' mode.
+	      </para>
+	    </listitem>
+
+	    <listitem>
+	      <para>
+		<command>cached</command> Independend of the source
+		mode, the created replica will be created in 'cached'
+		mode.
+	      </para>
+	    </listitem>
+
+	    <listitem>
+	      <para>
+		<command>same</command> The mode of the destination
+		file will be identical to the mode of the soure file.
+	      </para>
+	    </listitem>
+
+	    <listitem>
+	      <para>
+		<command>nn</command> The mode of the destination file
+		is determined by the setting of the destination
+		pool. (Don't use)
+	      </para>
+	    </listitem>
+	  </itemizedlist>
+	</listitem>
+
+	<listitem>
+	  <para>
+	    <command>task set parallel
+	    <replaceable>numberOfParallelTransfers</replaceable></command>
+	    defines the number of concurrent parallel copy
+	    operations. This doesn't overwrite the 'max mover'
+	    settings of the pools themselves.
+	  </para>
+	</listitem>
+      </itemizedlist>
+
+      <para>
+	The actual copy operation is trigged by either <command>copyto
+	pools <replaceable>PoolName</replaceable>
+	[<replaceable>PoolName</replaceable> [...]]</command> or
+	<command>copyto group
+	<replaceable>PoolGroupName</replaceable></command> The command
+	is processed asynchronously and progress may be checked by
+	'task info'.  The process may be stopped using
+	<command>halt</command>. Already started transfers will be
+	finished first.  After the process has been finished, the
+	<command>ls stat -l</command> command will show files not
+	transferred. Information is provided for which reason the
+	transfer hasn't been performed. This includes a manual
+	'halt'. This allows to resume from an 'halt'.
+      </para>
+
+      <para>
+	Remarks:
+      </para>
+
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    Replicating a file to a pool which already contains a copy
+	    of this file is not an error condition and is silently
+	    ignored.
+	  </para>
+	</listitem>
+
+	<listitem>
+	  <para>
+	    To get a fair distribution of files among the destination
+	    pools, one should allow for a reasonable
+	    parallism. (<command>task set parallel</command>
+	  </para>
+	</listitem>
+
+	<listitem>
+	  <para>
+	    Space management : Among the available destination pools,
+	    the copy process will always chose the pool with the
+	    maximum 'free + replaceable' space. In the worst case this
+	    may lead to deleting 'cached' files though there would
+	    have been 'real free' space available on a different
+	    pool. We are currently trying to improve the distribution
+	    algorithm.
+	  </para>
+	</listitem>
+      </itemizedlist>
     </section>
     
     <section>
-    <title>Copy Module Reference Manual</title>
-    <blockquote>
+      <title>Copy Module Reference Manual</title>
+
+      <blockquote>
 <!--
  exclude pinned|cached|precious|bad|locked|<storageClass>
  info
@@ -463,145 +591,132 @@ Task &lt;my-first-task&gt; attached to (us) [alm-admin-101@adminDoorDomain]</scr
  load pool <PoolName> [<StorageInfoPattern>]
 
 -->
-    <para>
-    <screen><command>task load pool <replaceable>PoolName</replaceable></command></screen>
-    </para>
-    <blockquote>
-    <para>
-    The pool repository of pool <replaceable>PoolName</replaceable> is loaded and becomes the
-    current pool listing. Use 'info' to check for completion of the command.
-    </para>
-    </blockquote>
+        <screen><command>task load pool <replaceable>PoolName</replaceable></command></screen>
 
-    <para>
-    <screen><command>[task] info</command></screen>
-    </para>
-    <blockquote>
-    <para>
-    Provides information on the current status of this copy task.
-    </para>
-    </blockquote>
+	<para>
+	  The pool repository of pool
+	  <replaceable>PoolName</replaceable> is loaded and becomes
+	  the current pool listing. Use 'info' to check for completion
+	  of the command.
+	</para>
 
-    <para>
-    <screen><command>[task] ls stat [-l]</command></screen>
-    </para>
-    <blockquote>
-    <para>
-    Provides information on the currently loaded pool repository.
-    </para>
-    </blockquote>
+        <screen><command>[task] info</command></screen>
 
-    <para>
-    <screen><command>[task] ls files [-l]</command></screen>
-    </para>
-    <blockquote>
-    <para>
-    Lists all files of the currently loaded pool repository. This may be a very long list.
-    (Don't use)
-    </para>
-    </blockquote>
+	<para>
+	  Provides information on the current status of this copy
+	  task.
+	</para>
 
-    <para>
-    <screen><command>[task] exclude pinned|cached|precious|bad|locked|<replaceable>storageClass</replaceable></command></screen>
-    <screen><command>[task] keeponly pinned|cached|precious|bad|locked|<replaceable>storageClass</replaceable></command></screen>
-    </para>
-    <blockquote>
-    <para>
-    Either excludes the specified class from the pool listing 'ls stat' or only keeps the specified class.
-    The result may be viewed by 'ls stat -l'.
-    </para>
-    </blockquote>
+	<screen><command>[task] ls stat [-l]</command></screen>
 
-    <para>
-    <screen><command>[task] halt</command></screen>
-    </para>
-    <blockquote>
-    <para>
-    This command finishes the currently active transfers but doesn't launch new ones.
-    The 'ls stat' command reports on files not yet transferred. Use the 'copyto' command(s) to resume transfers.
-    </para>
-    </blockquote>
+	<para>
+	  Provides information on the currently loaded pool repository.
+	</para>
 
-    <para>
-    <screen><command>[task] clear</command></screen>
-    </para>
-    <blockquote>
-    <para>
-    Clears the internal status of a command. This might become necessary of a component (e.g. pool) doesn't
-    respond on a request.
-    </para>
-    </blockquote>
-    <para>
-    <screen><command>[task] set copy-mode precious|cached|same|nn</command></screen>
-    </para>
-    <blockquote>    
-    <para>
-    Sets the copy mode, valide for subsequent 'copyto' request.
-    </para>
-    <para>
-       <warning>
-       <para>
-       Replicating precious files or creating precious replica from or to pools which are connected
-       to an HSM system will very likely result in a serious error condition 
-       </para>
+	<screen><command>[task] ls files [-l]</command></screen>
+
+	<para>
+	  Lists all files of the currently loaded pool
+	  repository. This may be a very long list.  (Don't use)
+	</para>
+
+	<screen><command>[task] exclude pinned|cached|precious|bad|locked|<replaceable>storageClass</replaceable></command></screen>
+
+	<screen><command>[task] keeponly pinned|cached|precious|bad|locked|<replaceable>storageClass</replaceable></command></screen>
+
+	<para>
+	  Either excludes the specified class from the pool listing
+	  'ls stat' or only keeps the specified class.  The result may
+	  be viewed by 'ls stat -l'.
+	</para>
+
+	<screen><command>[task] halt</command></screen>
+
+	<para>
+	  This command finishes the currently active transfers but
+	  doesn't launch new ones.  The 'ls stat' command reports on
+	  files not yet transferred. Use the 'copyto' command(s) to
+	  resume transfers.
+	</para>
+
+	<screen><command>[task] clear</command></screen>
+
+	<para>
+	  Clears the internal status of a command. This might become
+	  necessary of a component (e.g. pool) doesn't respond on a
+	  request.
+	</para>
+
+	<screen><command>[task] set copy-mode precious|cached|same|nn</command></screen>
+
+	<para>
+	  Sets the copy mode, valide for subsequent 'copyto' request.
+	</para>
+
+	<warning>
+	  <para>
+	    Replicating precious files or creating precious replica
+	    from or to pools which are connected to an HSM system will
+	    very likely result in a serious error condition
+	  </para>
        </warning>
+
        <!-- Mode can be one of the following : -->
        <itemizedlist>
-       <listitem>
-       <para>
-       <command>precious</command> Independend of the source mode, the created replica will be 
-          created in 'precious' mode.
-       </para>
-       </listitem>
-       <listitem>
-       <para>
-       <command>cached</command> Independend of the source mode, the created replica will be 
-          created in 'cached' mode. 
-       </para>
-       </listitem>
-       <listitem>
-       <para>
-       <command>same</command> The mode of the destination file will be identical to the mode of
-       the soure file.
-       </para>
-       </listitem>
-       <listitem>
-       <para>
-       <command>nn</command> The mode of the destination file is determined by the setting of the
-       destination pool. (Don't use)
-       </para>
-       </listitem>
+	 <listitem>
+	   <para>
+	     <command>precious</command> Independend of the source
+	     mode, the created replica will be created in 'precious'
+	     mode.
+	   </para>
+	 </listitem>
+
+	 <listitem>
+	   <para>
+	     <command>cached</command> Independend of the source mode,
+	     the created replica will be created in 'cached' mode.
+	   </para>
+	 </listitem>
+
+	 <listitem>
+	   <para>
+	     <command>same</command> The mode of the destination file
+	     will be identical to the mode of the soure file.
+	   </para>
+	 </listitem>
+
+	 <listitem>
+	   <para>
+	     <command>nn</command> The mode of the destination file is
+	     determined by the setting of the destination pool. (Don't
+	     use)
+	   </para>
+	 </listitem>
        </itemizedlist>
-   
-    </para>  
-    </blockquote>   
-    <para>
-    <screen><command>[task] set parallel <replaceable>NumberOfParallelStreams</replaceable></command></screen>
-    </para>
-    <blockquote>
-    <para>
-    Sets the nimber of parallel transferes. This is actually the number of transfer requests. Depending on the
-    pp and p2p values of the involved pools, the number may be lower.
-    </para>
-    </blockquote>
+      </blockquote>
 
-    <para>
-    <screen><command>[task] copyto pools <replaceable>PoolName</replaceable> [<replaceable>PoolName</replaceable> [...]]</command></screen>
-    <screen><command>[task] copyto group <replaceable>PoolGroupName</replaceable></command></screen>
-    </para>
-    <blockquote>
-    <para>
-    Starts the actual transfer of all files prepared by the 'load pool' and 'exclude/keeponly' commands. 
-    The destination pools by either be directly specified using the  'copyto pools' command or indirectly to
-    a PoolManager pool group using 'copyto group'. Check 'task info' on the progress of the command.
-    </para>
-    </blockquote>
+      <screen><command>[task] set parallel <replaceable>NumberOfParallelStreams</replaceable></command></screen>
 
-    </blockquote>
+      <para>
+	Sets the nimber of parallel transferes. This is actually the
+	number of transfer requests. Depending on the pp and p2p
+	values of the involved pools, the number may be lower.
+      </para>
+
+      <screen><command>[task] copyto pools <replaceable>PoolName</replaceable> [<replaceable>PoolName</replaceable> [...]]</command></screen>
+      <screen><command>[task] copyto group <replaceable>PoolGroupName</replaceable></command></screen>
+
+      <para>
+	Starts the actual transfer of all files prepared by the 'load
+	pool' and 'exclude/keeponly' commands.  The destination pools
+	by either be directly specified using the 'copyto pools'
+	command or indirectly to a PoolManager pool group using
+	'copyto group'. Check 'task info' on the progress of the
+	command.
+      </para>
+
     </section>
   </section>
   
 
 </chapter>
-  
-  
