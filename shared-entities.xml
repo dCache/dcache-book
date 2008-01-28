@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<!--
+This file contains entities.  These representing commonly typed
+text and provide a simple method of expansing to the
+underlying DocBook vocabulary.
+
+You use them by inserting the entity reference, like this:
+  &dcache; for the dCache entity.
+
+Rules / Guidelines / Suggestions for adding new entities:
+  0.  Check if it's already defined.
+  1.  Try to group similar defns, with common prefix (e.g. cell-nnn)
+  2.  All entities should be lowercase, by convention.
+  3.  Use "correct" DocBook markup: if it doesn't look right, adjust the XSLT.
+  4.  Go through whole document and switch existing usage to new entity.
+-->
+
+<!-- "Products" or high-level services -->
+<!ENTITY dcache       "<productname>dCache</productname>">
+<!ENTITY xml          "<abbrev>XML</abbrev>">
+<!ENTITY hsm          "<abbrev>HSM</abbrev>">
+<!ENTITY pnfs         "<productname><literal>pnfs</literal></productname>">
+<!ENTITY gip          "<abbrev>GIP</abbrev>">
+<!ENTITY yaim         "<abbrev>YAIM</abbrev>">
+<!ENTITY jvm          "<abbrev>JVM</abbrev>">
+<!ENTITY psql         "<productname>PostgreSQL</productname>">
+<!ENTITY tomcat       "<productname>Tomcat</productname>">
+
+<!-- Various domains -->
+<!ENTITY domain-http      "<literal>httpDomain</literal>">
+<!ENTITY domain-stats     "<literal>statisticsDomain</literal>">
+<!ENTITY domain-pool      "<literal><replaceable>pool</replaceable>Domain</literal>">
+<!ENTITY domain-adminDoor "<literal>adminDoor</literal>">
+<!ENTITY domain-dcache    "<literal>dCacheDomain</literal>">
+<!ENTITY domain-utility   "<literal>utility</literal>">
+
+
+<!-- Various cells -->
+<!ENTITY cell-poolmngr "<literal>PoolManager</literal>">
+<!ENTITY cell-acm      "<literal>acm</literal>">
+<!ENTITY cell-pnfsmngr "<literal>PnfsManager</literal>">
+<!ENTITY cell-pool-eg  "<literal><replaceable>poolHostname</replaceable>_1</literal>">
+<!ENTITY cell-billing   "<literal>billing</literal>">
+<!ENTITY cell-spacemngr "<literal>SpaceManager</literal>">
+<!ENTITY cell-cleaner   "<literal>Cleaner</literal>">
+<!ENTITY cell-cpymngr   "<literal>CopyManager</literal>">
+<!ENTITY cell-gplazma   "<literal>gPlazma</literal>">
+<!ENTITY cell-hopmngr   "<literal>HoppingManager</literal>">
+<!ENTITY cell-hsmflushctl "<literal>HsmFlushControl</literal>">
+<!ENTITY cell-gplazma   "<literal>gPlazma</literal>">
+
+<!-- Various protocols: TODO: should these names be prefixed by "protocol-" ? -->
+<!ENTITY dcap     "<systemitem class='protocol'>dCap</systemitem>">
+<!ENTITY gsi      "<systemitem class='protocol'>GSI</systemitem>">
+<!ENTITY gsidcap  "<systemitem class='protocol'>GSIdCap</systemitem>">
+<!ENTITY gsiftp   "<systemitem class='protocol'>GSI-FTP</systemitem>">
+<!ENTITY gridftp  "<systemitem class='protocol'>GridFTP</systemitem>">
+<!ENTITY srm      "<systemitem class='protocol'>SRM</systemitem>">
+<!ENTITY ssh      "<systemitem class='protocol'>ssh</systemitem>">
+<!ENTITY ftp      "<systemitem class='protocol'>FTP</systemitem>">
+<!ENTITY tcp      "<systemitem class='protocol'>TCP</systemitem>">
+<!ENTITY ip       "<systemitem class='protocol'>IP</systemitem>">
+<!ENTITY http     "<systemitem class='protocol'>HTTP</systemitem>">
+<!ENTITY xrootd   "<systemitem class='protocol'>xrootd</systemitem>">
+
+
+
+<!-- Various formats -->
+<!ENTITY ascii    "<acronym>ASCII</acronym>">
+<!ENTITY html     "<acronym>HTML</acronym>">
+
+<!-- Other network concepts -->
+<!ENTITY url      "<acronym>URL</acronym>">
+<!ENTITY surl     "<acronym>SURL</acronym>">
+<!ENTITY turl     "<acronym>TURL</acronym>">
+
+
+<!-- When defining attributes, default values, etc. -->
+<!ENTITY true       "<emphasis>True</emphasis>">
+<!ENTITY false      "<emphasis>False</emphasis>">
+<!ENTITY no-default "<emphasis>Not set</emphasis>">
+
+
+
+<!-- Some commands -->
+<!ENTITY prog-dccp            "<command>dccp</command>">
+<!ENTITY prog-srmcp           "<command>srmcp</command>">
+<!ENTITY prog-globus-url-copy "<command>globus-url-copy</command>">
+
+
+<!-- Various movers -->
+<!ENTITY mover-dcap  "<literal>&dcap; mover</literal>">
+
+
+<!-- Various doors -->
+<!ENTITY door-dcap     "<literal>&dcap; door</literal>">
+<!ENTITY door-gridftp  "<literal>&gridftp; door</literal>">
+<!ENTITY door-xrootd   "<literal>&xrootd; door</literal>">
+
+
+<!-- Prompts when using the administrative interface -->
+<!ENTITY dc-prompt-local "<prompt>(local) admin &gt;</prompt>">
+<!ENTITY dc-prompt-maint "<prompt>(maintenance) admin &gt; </prompt>">
+<!ENTITY dc-prompt-pm    "<prompt>(PoolManager) admin &gt;</prompt>">
+<!ENTITY dc-prompt-pool  "<prompt>(<replaceable>poolname</replaceable>) admin &gt;</prompt>">
+<!ENTITY dc-prompt-srcpool "<prompt>(<replaceable>sourcePool</replaceable>) admin &gt;</prompt>">
+<!ENTITY dc-prompt-cpymngr "<prompt>(<replaceable>copyManagerCell</replaceable>) admin &gt;</prompt>">
+
+<!ENTITY dc-prompt-pnfsmngr "<prompt>(PnfsManager) admin &gt;</prompt>">
+<!ENTITY dc-prompt-acm   "<prompt>(acm) admin &gt;</prompt>">
+
+<!-- Shell prompts -->
+<!ENTITY prompt-user   "<prompt>[user] $</prompt>">
+<!ENTITY prompt-root   "<prompt>[root] #</prompt>">
+
+<!-- Colo(u)r definitions -->
+<!ENTITY pi-fo-bgcolour-item "<?dbfo bgcolor='#FCFFFC'?>">
+<!-- !ENTITY pi-fo-bgcolour-bg   "<?dbfo bgcolor='#FDFDFD'?>" -->
+<!ENTITY pi-fo-bgcolour-bg   "<?dbfo bgcolor='#FFFFFF'?>">
+
+
+<!-- Misc -->
+<!-- <!ENTITY ndash "&#x2013;"> -->
