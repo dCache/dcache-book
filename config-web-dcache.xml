@@ -96,7 +96,7 @@
 	  Untar <filename>web-dcache.tgz</filename> archive into
 	  &tomcat; <filename class="directory">webapps/</filename>
 	  directory. This should be done by
-	  <screen>&prompt-root;	<command>tar</command> xfz /opt-dcache/web-dcache/web-dcache.tgz</screen>
+	  <screen>&prompt-root; <command>tar</command> xfz /opt-dcache/web-dcache/web-dcache.tgz</screen>
 	</para>
       </listitem>
 		
