@@ -182,18 +182,23 @@
       satisfied, if the request is coming from a host with IP address within
       the subnet given by the address/netmask pair.</para>
 
-      <para>An <emphasis>elementary storage class condition</emphasis> is
-      given by a storage class. It is satisfied if the requested file has this
-      storage class. Simple wild cards are allowed: For this it is important
-      to know that a storage class always contains exactly one
-      <literal>@</literal>-sign as will be explained in <xref
-      linkend="secStorageClass" />. In an elementary storage class condition
-      the part before the <literal>@</literal>-sign, or the part after it, or
-      both may be replaced by a <quote><literal>*</literal></quote>. The
-      <quote><literal>*</literal></quote> represents any string. Note, that
-      this is not a true wild card: The <quote><literal>*</literal></quote>
-      may only replace the whole part before or the whole part after the
-      <quote><literal>@</literal></quote>-sign.</para>
+      <para>
+	An <emphasis>elementary storage class condition</emphasis> is
+	given by a storage class. It is satisfied if the requested
+	file has this storage class. Simple wild cards are allowed:
+	for this it is important to know that a storage class must
+	always contains exactly one <literal>@</literal>-symbol as
+	will be explained in <xref linkend="secStorageClass" />. In an
+	elementary storage class condition, either the part before the
+	<literal>@</literal>-symbol or both parts may be replaced by a
+	<literal>*</literal>-symbol; for example,
+	<literal>*@osm</literal> and <literal>*@*</literal> are both
+	valid elementary storage class conditions whereas
+	<literal>something@*</literal> is invalid. The
+	<literal>*</literal>-symbol represents a limited wildcard: any
+	string that doesn't contain an <literal>@</literal>-symbol
+	will match.
+      </para>
 
       <para>An <emphasis>elementary cache class condition</emphasis> is given
       by a cache class. It is satisfied, if the cache class of the requested
