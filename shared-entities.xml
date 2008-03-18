@@ -49,6 +49,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY cell-hopmngr   "<literal>HoppingManager</literal>">
 <!ENTITY cell-hsmflushctl "<literal>HsmFlushControl</literal>">
 <!ENTITY cell-gplazma   "<literal>gPlazma</literal>">
+<!ENTITY cell-replicamngr "<literal>ReplicaManager</literal>">
 
 <!-- Various protocols: TODO: should these names be prefixed by "protocol-" ? -->
 <!ENTITY dcap     "<systemitem class='protocol'>dCap</systemitem>">
