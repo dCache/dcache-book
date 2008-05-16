@@ -7,10 +7,63 @@
 
 <chapter id="intro">
 
-  <title>Introduction to dCache</title>
+  <title>Introduction</title>
 
   <para>
-    We still need to write this.
+    &dcache; is a distributed storage solution.  It organises storage
+    across computers so the combined storage can be used without the
+    end-users being aware of on precisely which computer their data is
+    stored; end-users see simply a large amount of storage.
+  </para>
+
+  <para>
+    Because end-users need not know on which computer their data is
+    stored, their data can be migrated from one computer to another
+    without any interruption of service.  This allows &dcache; storage
+    computers to be taken out of service or additional machines (with
+    additional storage) to be added without interrupting the service
+    the end-users enjoy.
+  </para>
+
+  <para>
+    &dcache; supports requesting data from a tertiary storage system.
+    A tertiary storage system typically uses a robotic tape system,
+    where data is stored on a tape from a library of available tapes,
+    which must be loaded and unloaded using a tape robot.  Tertiary
+    storage systems typically have a higher initial cost, but can be
+    extended cheaply by added additional tapes.  This results in
+    tertiary storage systems being popular where large amounts of data
+    must be read.
+  </para>
+
+  <para>
+    &dcache; also provides many transfer protocols (allowing users to
+    read and write to data).  These have a modular deployment,
+    allowing &dcache; to support expanded capacity by providing
+    additional front-end machines.
+  </para>
+
+  <para>
+    Another performance feature of &dcache; is hot-spot data
+    migration.  In this process, &dcache; will detect when a few file
+    are being requested very often.  If this happens, &dcache; can
+    make duplicate copies of the popular files on other computers.
+    This allows the load to be spread across multiple machines, so
+    increasing throughput.
+  </para>
+
+  <para>
+    The flow of data within &dcache; can also be carefully controlled.
+    This is especially important for large sites as chaotic movement
+    of data may lead to suboptimal usage; instead, incoming and
+    outgoing data can be marshaled so they use designated resources;
+    allowing better throughput and guaranteeing end-user experience.
+  </para>
+
+  <para>
+    &dcache; provides a comprehensive administrative interface for
+    configuring the &dcache; instance.  This is described in the later
+    sections of this book.
   </para>
   
   <figure id="fig-intro-layer-model">
