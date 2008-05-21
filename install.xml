@@ -114,123 +114,196 @@
 
 
     <section>
-      <title>Configuring the PostgreSQL Server</title>
+      <title>Readying the &psql; server</title>
 
       <para>
-	For &dcache; version 1.6.6 release 1, please make sure the file
-	<filename>/var/lib/pgsql/data/postgresql.conf</filename>
-	contains
+	You must configure &psql; for use by &dcache; and create the
+	necessary &psql; user accounts and database structure.  This
+	section describes how to do this.
       </para>
 
-      <programlisting>...
-add_missing_from = on
-...</programlisting>
+      <section>
+	<title>Configuring the &psql; server</title>
 
-      <para>
-	This will not be necessary in future releases.
-      </para>
+	<para>
+	  Using a &psql; server with &dcache; places a number of
+	  requirements on the database.  This section describes what
+	  configuration is necessary to ensure &psql; operates so
+	  &dcache; can use it.
+	</para>
 
-      <para>
-	The file <filename>/var/lib/pgsql/data/pg_hba.conf</filename>
-	should contain
-      </para>
+	<important>
+	  <title>Restarting &psql;</title>
+
+	  <para>
+	    If you have edited &psql; configuration files, you
+	    <emphasis>must</emphasis> restart &psql; for those changes
+	    to take effect.  On many systems, this can be done with
+	    the following command:
+	  </para>
+	  
+	  <screen>&prompt-root; <command>/etc/init.d/postgresql</command> restart</screen>
+	</important>
+
+
+	<section>
+	  <title>Enabling &tcp; connections</title>
+
+	  <para>
+	    When connecting to &psql;, &dcache; will always use &tcp;
+	    connections.  So, for &dcache; to use &psql;, support for
+	    &tcp; sockets must be enabled.
+	  </para>
+	  
+	  <para>
+	    In contrast to &dcache;, the &psql; stand-alone client
+	    application <command>psql</command> can connect using
+	    either a &tcp; socket or via the local filesystem (a
+	    <quote>UNIX</quote> socket).  Because of this, it is
+	    common for &psql; to disable &tcp; sockets by default,
+	    requiring the admin to explicitly configure &psql; so
+	    connecting via a &tcp; socket is supported.
+	  </para>
+
+	  <para>
+	    To enable &tcp; sockets, edit the &psql; configuration
+	    file <filename>postgresql.conf</filename>.  This is often
+	    found in the <filename
+	    class="directory">/var/lib/pgsql/data</filename>, but may
+	    be located elsewhere.  You should ensure that the line
+	    <literal>tcpip_socket</literal> is set to
+	    <literal>true</literal>; for example:
+	  </para>
+
+	  <programlisting>tcpip_socket = true</programlisting>
+	</section>
+
+
+	<section>
+	  <title>Enabling local trust</title>
+
+	  <para>
+	    Perhaps the simplest configuration is to allow
+	    password-less access to the database and the following
+	    documentation assumes this is so.
+	  </para>
+
+	  <para>
+	    To allow local users to access &psql; without requiring a
+	    password, ensure the file
+	    <filename>pg_hba.conf</filename>, usually located in
+	    <filename class="directory">/var/lib/pgsql/data</filename>,
+	    contains the following lines.
+	  </para>
 	
-      <programlisting>...
-local   all         all                        trust
+	  <programlisting>local   all         all                        trust
 host    all         all         127.0.0.1/32   trust
 host    all         all         ::1/128        trust</programlisting>
 
-      <para>
-	For these changes to take effect, restart the server, e.g. with
-      </para>
-      
-      <screen>&prompt-root; <command>/etc/init.d/postgresql</command> restart</screen>
-      
-      <para>
-	Prepare the PostgreSQL users and databases as they are needed
-	for the components of &dcache; and/or the &pnfs; server: The
-	&pnfs; server only needs a database user. We suggest to call
-	it <database class="user">pnfsserver</database>. Create it
-	with:
-      </para>
+          <note>
+	    <para>
+	      Please note it is also possible to run &dcache; with all
+	      &psql; accounts requiring passwords.
+	    </para>
+	  </note>
+	</section>
 
-      <screen>&prompt-root; <command>createuser</command> -U postgres --no-superuser --no-createrole --createdb --pwprompt pnfsserver</screen>
+      </section>
 
-      <para>
-	Several databases will be created by this user. At initial
-	installation, as described below, two databases will be
-	created: <database>admin</database> and
-	<database>data1</database>. These databases will contain the
-	information about the namespace of the &pnfs; filesystem. If
-	the information in these databases is lost, the whole data in
-	the &dcache; instance is not accessible anymore. Therefore,
-	make sure these databases are backed up regularly and also
-	stored on appropriately reliable hardware. Further advice may
-	be found in <xref linkend="cb-postgres"/>.
-      </para>
 
-      <para>
-        The &dcache; components will access the database server with
-        the user <database class="user">srmdcache</database>:
-      </para>
+      <section>
+	<title>Creating data users and structure</title>
 
-      <screen>&prompt-root; <command>createuser</command> -U postgres --no-superuser --no-createrole --createdb --pwprompt srmdcache</screen>
+	<para>
+	  Prepare the PostgreSQL users and databases as they are
+	  needed for the components of &dcache; and/or the &pnfs;
+	  server: The &pnfs; server only needs a database user. We
+	  suggest to call it <database
+	  class="user">pnfsserver</database>. Create it with:
+	</para>
 
-      <para>
-	Several central components running on the admin node as well
-	as each &srm; will use the database
-	<database>dcache</database> for state information:
-      </para>
+	<screen>&prompt-root; <command>createuser</command> -U postgres --no-superuser --no-createrole --createdb --pwprompt pnfsserver</screen>
 
-      <screen>&prompt-root; <command>createdb</command> -U srmdcache dcache</screen>
+	<para>
+	  Several databases will be created by this user. At initial
+	  installation, as described below, two databases will be
+	  created: <database>admin</database> and
+	  <database>data1</database>. These databases will contain the
+	  information about the namespace of the &pnfs; filesystem. If
+	  the information in these databases is lost, the whole data
+	  in the &dcache; instance is not accessible
+	  anymore. Therefore, make sure these databases are backed up
+	  regularly and also stored on appropriately reliable
+	  hardware. Further advice may be found in <xref
+	  linkend="cb-postgres"/>.
+	</para>
 
-      <para>
-	There might be several of these on several hosts. Each is used
-	by the &dcache; components running on the respective host.
-      </para>
+	<para>
+	  The &dcache; components will access the database server with
+	  the user <database class="user">srmdcache</database>:
+	</para>
 
-      <para>
-        The &pnfs; companion uses the database
-        <database>companion</database> to store the pools all files
-        are located on. On the admin node create and initialize it
-        with
-      </para>
+	<screen>&prompt-root; <command>createuser</command> -U postgres --no-superuser --no-createrole --createdb --pwprompt srmdcache</screen>
 
-      <screen>&prompt-root; <command>createdb</command> -U srmdcache companion
+	<para>
+	  Several central components running on the admin node as well
+	  as each &srm; will use the database
+	  <database>dcache</database> for state information:
+	</para>
+
+	<screen>&prompt-root; <command>createdb</command> -U srmdcache dcache</screen>
+
+	<para>
+	  There might be several of these on several hosts. Each is
+	  used by the &dcache; components running on the respective
+	  host.
+	</para>
+
+	<para>
+	  The &pnfs; companion uses the database
+	  <database>companion</database> to store the pools all files
+	  are located on. On the admin node create and initialize it
+	  with
+	</para>
+
+	<screen>&prompt-root; <command>createdb</command> -U srmdcache companion
 &prompt-root; <command>psql</command> -U srmdcache companion -f /opt/d-cache/etc/psql_install_companion.sql</screen>
 
-      <para>
-        (It has to be located on the same host as the &pnfs; server.)
-      </para>
+        <para>
+	  (It has to be located on the same host as the &pnfs;
+	  server.)
+	</para>
 
-      <para>
-	If the resilience feature provided by the <glossterm
-          linkend="gl-replicamanager">replica manager</glossterm> is used, the
-        database <quote>replicas</quote> has to be prepared on the admin node
-      </para>
+	<para>
+	  If the resilience feature provided by the <glossterm
+	  linkend="gl-replicamanager">replica manager</glossterm> is
+	  used, the database <quote>replicas</quote> has to be
+	  prepared on the admin node
+	</para>
 
-<screen>&prompt-root; <command>createdb</command> -U srmdcache replicas
+	<screen>&prompt-root; <command>createdb</command> -U srmdcache replicas
 &prompt-root; <command>psql</command> -U srmdcache replicas -f /opt/d-cache/etc/psql_install_replicas.sql</screen>
-        
-      <para>
-	Note that the disk space will at least be cut in half if the
-	replica manager is used.
-      </para>
 
-      <para>
-        If the billing information should also be stored in a database
-        (in addition to files) the database
-        <database>billing</database> has to be created:
-      </para>
+        <para>
+	  Note that the disk space will at least be cut in half if the
+	  replica manager is used.
+	</para>
 
-      <screen>&prompt-root; <command>createdb</command> -U srmdcache billing</screen>
+	<para>
+	  If the billing information should also be stored in a
+	  database (in addition to files) the database
+	  <database>billing</database> has to be created:
+	</para>
+
+	<screen>&prompt-root; <command>createdb</command> -U srmdcache billing</screen>
      
-      <para>
-	However, we strongly advise against using the same database
-	server for the &pnfs; server and the billing information.
-	For how to configure the billing cell to write into this
-	database, see below.
-      </para>
+	<para>
+	  However, we strongly advise against using the same database
+	  server for the &pnfs; server and the billing information.
+	  For how to configure the billing cell to write into this
+	  database, see below.
+	</para>
+      </section>
     </section>
     
     <section>
@@ -473,7 +546,7 @@ Starting dcache pool: Starting clintonDomain  6 5 4 3 2 1 0 Done (pid=7990)</scr
     </section>
   </section>
 
-  <section>
+  <section id="in-upgrade">
     <title>Upgrading a &dcache; Instance</title>
 
     <para>
@@ -760,7 +833,7 @@ Threads (4) Queue
   </section>
 
 
-  <section>
+  <section id="in-additional">
     <title>Additional Components</title>
 
     <para>
