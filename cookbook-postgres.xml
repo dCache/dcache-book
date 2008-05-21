@@ -264,7 +264,7 @@ export dbConnectString="user=pnfsserver password=<replaceable>yourPassword</repl
     </para>
   </section>
 
-  <section>
+  <section id="cb-postgres-perf">
     <title>Performance of the &psql; Server</title>
 
     <para>
