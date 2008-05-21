@@ -30,7 +30,7 @@
     database.
   </para>
 
-  <section>
+  <section id="cb-pnfs-postgres-prelim">
     <title>Preliminaries and Preparations</title>
 
     <para>
@@ -190,7 +190,7 @@
     </para>
   </section>
 
-  <section>
+  <section id="cb-pnfs-postgres-sw">
     <title>Updating the &pnfs; Software</title>
 
     <para>
@@ -269,7 +269,7 @@
 
   </section>
 
-  <section>
+  <section id="cb-pnfs-postgres-conversion">
     <title>Conversion of the Databases</title>
 
     <para>
@@ -324,7 +324,7 @@ There are 3671 records in the database.</programlisting>
 
   </section>
 
-  <section>
+  <section id="cb-pnfs-postgres-testing">
     <title>Testing the Converted Databases</title>
 
     <para>
