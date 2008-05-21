@@ -6,7 +6,7 @@
 ]>
 <chapter id="cf-gplazma">
 
-<title>gPlazma authorization in dCache</title>
+<title>gPlazma authorization in &dcache;</title>
 
   <chapterinfo>
     <author>
@@ -80,7 +80,7 @@
     The following describes how to use gPlazma in dCache.
   </para>
   
-  <section>
+  <section id="cf-gplazma-install">
     <title>Installation</title>
 
     <para>
@@ -92,9 +92,8 @@
     <para>
       For the &dcache; 1.7 version, there must be host certificates on
       the node running the &cell-gplazma; cell. For version 1.8, host
-      certificates are needed if the option to delegate (see section
-      "Delegation to gPlazma" <!-- TODO: ref. correctly through
-      DocBook-->) to &cell-gplazma; is used.
+      certificates are needed if the option to delegate (see <xref
+      linkend='cf-gplazma-ops-del'/>) to &cell-gplazma; is used.
     </para>
 
     <para>
@@ -110,7 +109,7 @@
 
 
 
-  <section>
+  <section id="cf-gplazma-policy">
     <title>Configuring the gPlazma Policy File</title>
 
     <para>
@@ -167,7 +166,7 @@ gplazmalite-vorole-mapping-priority="2"</programlisting>
   </section>
 
 
-  <section>
+  <section id="cf-gplazma-kpwd">
     <title>Configuring the kpwd Plugin</title>
 
     <para>
@@ -194,7 +193,7 @@ kpwdPath="/opt/d-cache/etc/dcache.kpwd"</programlisting>
   </section>
 
 
-  <section>
+  <section id="cf-gplazma-gridmap">
     <title>Configuring the grid-mapfile Plugin</title>
 
     <para>
@@ -230,14 +229,14 @@ storageAuthzPath="/etc/grid-security/storage-authzdb"</programlisting>
       <para>
 	When using the grid-mapfile plugin, the
 	<filename>torage-authzdb</filename> file must also be
-	configured. See the section "Configuring storage-authzdb" for
-	details.<!-- TODO: use proper DocBook linking -->
+	configured. See <xref linkend="cf-gplazma-authzdb"/> for
+	details.
       </para>
     </section>
   </section>
 
 
-  <section id='storage-authzdb-sect'>
+  <section id="cf-gplazma-authzdb">
     <title>Configuring storage-authzdb</title>
  
     <para>
@@ -362,7 +361,7 @@ authorize cmssoft     read-write    0       60501 5502   / /pnfs/fnal.gov/reduct
   </section>
 
 
-  <section>
+  <section id="cf-gplazma-vorole">
     <title>Configuring the gplazmalite-vorole-mapping Plugin</title>
 
     <para>
@@ -379,8 +378,8 @@ gridVoRoleStorageAuthzPath="/etc/grid-security/storage-authzdb"</programlisting>
     <para>
       The second is the storage-authz-db used in other plugins. See
       the above documentation <link
-      linkend='storage-authzdb-sect'>Configuring
-      storage-authzdb</link> for how to create the file.
+      linkend='cf-gplazma-authzdb'>Configuring storage-authzdb</link>
+      for how to create the file.
     </para>
 
     <section>
@@ -617,7 +616,7 @@ authorize cms823 read-write 10823 7000 / /pnfs/fnal.gov/data/cms823 /</programli
   </section>
 
 
-  <section>
+  <section id="cf-gplazma-saml">
     <title>Configuring the saml-vo-mapping Plugin</title>
 
     <para>
@@ -639,7 +638,7 @@ saml-vo-mapping-cache-lifetime="60"</programlisting>
       provide the username mapping and it will still be necesary to
       have the storage-authzdb file used in other plugins. See the
       above documentation <link
-      linkend='storage-authzdb-sect'>Configuring
+      linkend='cf-gplazma-authzdb'>Configuring
       storage-authzdb</link> for how to create the file. If a GUMS
       server providing a "StorageAuthorizationServicePort" with
       correct uid, gid, and rootpath information for your site is
@@ -669,7 +668,7 @@ saml-vo-mapping-cache-lifetime="60"</programlisting>
 
 
 
-  <section>
+  <section id="cf-gplazma-example">
     <title>An example policy file</title>
 
     <para>
@@ -704,7 +703,7 @@ gridVoRoleStorageAuthzPath="/etc/grid-security/storage-authzdb"</programlisting>
   </section>
 
 
-  <section>
+  <section id="cf-gplazma-setup">
     <title>The Setup Files </title>
 
     <para>
@@ -801,7 +800,7 @@ gridVoRoleStorageAuthzPath="/etc/grid-security/storage-authzdb"</programlisting>
   </section>
 
 
-  <section>
+  <section id="cf-gplazma-direct">
     <title>Using Direct Calls of gPlazma Methods</title>
 
     <para>
@@ -882,7 +881,7 @@ useGPlazmaAuthorizationCell=true</programlisting>
   </section>
 
 
-  <section>
+  <section id="cf-gplazma-ops">
     <title>&cell-gplazma; Options</title>
 
     <section>
@@ -914,7 +913,7 @@ useGPlazmaAuthorizationCell=true</programlisting>
 
     </section>
 
-    <section>
+    <section id="cf-gplazma-ops-del">
       <title>Delegation to &cell-gplazma;</title>
  
       <para>
