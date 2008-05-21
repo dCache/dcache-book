@@ -171,196 +171,191 @@
   </section> 
 
 
-  <section>
+  <section id="cf-repman-op">
     <title>Operation</title>
 
-    <section>
-      <para>
-	When file is transfered into the &dcache; its replica is
-	copied into one of the pools.  Since this is the only replica
-	and normally required range is higher (e.g., (2,3) ), this
-	file will be replicated to other pools.  When some pool goes
-	down the replica count for the files in that pool may fall
-	below the valid range and these files will be replicated.
-	Replicas of the file with replica count below the valid range
-	and which need replication are called <firstterm>deficient
-	replicas</firstterm>.
-      </para>
+    <para>
+      When file is transfered into the &dcache; its replica is copied
+      into one of the pools.  Since this is the only replica and
+      normally required range is higher (e.g., (2,3) ), this file will
+      be replicated to other pools.  When some pool goes down the
+      replica count for the files in that pool may fall below the
+      valid range and these files will be replicated.  Replicas of the
+      file with replica count below the valid range and which need
+      replication are called <firstterm>deficient
+      replicas</firstterm>.
+    </para>
+      
+    <para>
+      Later on some of the failed pools can come up and bring online
+      more valid replicas.  If there are too many replicas for some
+      file these extra replicas are called <firstterm>redundant
+      replicas</firstterm> and they will be <quote>reduced</quote>.
+      Extra replicas will be deleted from pools.
+    </para>
     
-      <para>
-	Later on some of the failed pools can come up and bring online
-	more valid replicas.  If there are too many replicas for some
-	file these extra replicas are called <firstterm>redundant
-	replicas</firstterm> and they will be <quote>reduced</quote>.
-	Extra replicas will be deleted from pools.
-      </para>
+    <para>
+      Resilience Manager (RM) counts number of replicas for each file
+      in the pools which can be used online (see Pool States below)
+      and keeps number of replicas within the valid range (min, max).
+    </para>
     
-      <para>
-	Resilience Manager (RM) counts number of replicas for each
-	file in the pools which can be used online (see Pool States
-	below) and keeps number of replicas within the valid range
-	(min, max).
-      </para>
+    <para>
+      RM keeps information about pool state, list of the replicas (
+      file ID, pool ) and current copy/delete operations in persistent
+      database.
+    </para>
     
-      <para>
-	RM keeps information about pool state, list of the replicas (
-	file ID, pool ) and current copy/delete operations in
-	persistent database.
-      </para>
-    
-      <para>
-	For each replica RM keeps list of pools where it can be found.
-	For the pools pool state is kept in DB. There is table which
-	keeps ongoing operations (replication, deletion) for replica.
-      </para>
+    <para>
+      For each replica RM keeps list of pools where it can be found.
+      For the pools pool state is kept in DB. There is table which
+      keeps ongoing operations (replication, deletion) for replica.
+    </para>
 
-      <figure id="resilient_poolstate">
-	<title>Pool State Diagram</title>
-	<mediaobject>
-	  <imageobject role="fo">
-	    <imagedata fileref="images/resilient_poolstate_v1-0.svg"
-		       format="SVG" align="center" contentwidth="10cm" />
-	  </imageobject>
-	  <imageobject role="html"> 
-	    <imagedata fileref="images/resilient_poolstate_v1-0.png"
-		       format="PNG" align="center"/>
-	  </imageobject>
-	</mediaobject>
-      </figure>
+    <figure id="resilient_poolstate">
+      <title>Pool State Diagram</title>
+      <mediaobject>
+	<imageobject role="fo">
+	  <imagedata fileref="images/resilient_poolstate_v1-0.svg"
+		     format="SVG" align="center" contentwidth="10cm" />
+	</imageobject>
+	<imageobject role="html"> 
+	  <imagedata fileref="images/resilient_poolstate_v1-0.png"
+		     format="PNG" align="center"/>
+	</imageobject>
+      </mediaobject>
+    </figure>
 
-      <para>
-	This is description of pool states as it is in v1.0 of
-	Risilience Manager. Some of the states and transitions will be
-	changed in the next release.
-      </para>
+    <para>
+      This is description of pool states as it is in v1.0 of
+      Risilience Manager. Some of the states and transitions will be
+      changed in the next release.
+    </para>
 
-      <variablelist>
-	<varlistentry>
-	  <term>online</term>
-
-	  <listitem>
-	    <para>
-	      normal operation. Replicas in this state are readable
-	      and can be counted. Files can be written (copied) to
-	      this pool.
-	    </para>
-	  </listitem>
-	</varlistentry>
-
-	<varlistentry>
-	  <term>down</term>
-	  
-	  <listitem>
-	    <para>
-	      &dcache; pool is stopped by operator or crashed. On
-	      startup, pool comes briefly to the online state, and
-	      then it goes <quote>down</quote> to do pool
-	      <quote>Inventory</quote> &mdash; to cleanup files which
-	      broke when pool crashed during transfer. When pool comes
-	      online again, RM will update list of replicas in the
-	      pool and store it in the DB.
-	    </para>
-    
-	    <para>
-	      Replicas in pools which are <quote>down</quote> are not
-	      <quote>counted</quote>, so when pool crashes it reduces
-	      number of <quote>online</quote> replicas for some
-	      files. The crash of the pool (pool departure) may
-	      trigger replication of multiple files.
-	    </para>
+    <variablelist>
+      <varlistentry>
+	<term>online</term>
 	
-	    <para>
-	      Pool recovery (arrival) may rigger massive deletition of
-	      file replicas, not necessarily in this pool.
-	    </para>
+	<listitem>
+	  <para>
+	    normal operation. Replicas in this state are readable and
+	    can be counted. Files can be written (copied) to this
+	    pool.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>down</term>
+	  
+	<listitem>
+	  <para>
+	    &dcache; pool is stopped by operator or crashed. On
+	    startup, pool comes briefly to the online state, and then
+	    it goes <quote>down</quote> to do pool
+	    <quote>Inventory</quote> &mdash; to cleanup files which
+	    broke when pool crashed during transfer. When pool comes
+	    online again, RM will update list of replicas in the pool
+	    and store it in the DB.
+	  </para>
     
-	    <para>
-	      There are special situations when operator wants to
-	      change pool state and he/she does not want to trigger
-	      massive replication. Or vice versa he/she wants to take
-	      pool permanently out of operation and wants to make sure
-	      that files in the pool will not be locked out and will
-	      be available later.
-	    </para>
-	  </listitem>
-	</varlistentry>
+	  <para>
+	    Replicas in pools which are <quote>down</quote> are not
+	    <quote>counted</quote>, so when pool crashes it reduces
+	    number of <quote>online</quote> replicas for some
+	    files. The crash of the pool (pool departure) may trigger
+	    replication of multiple files.
+	  </para>
+	
+	  <para>
+	    Pool recovery (arrival) may rigger massive deletition of
+	    file replicas, not necessarily in this pool.
+	  </para>
+	    
+	  <para>
+	    There are special situations when operator wants to change
+	    pool state and he/she does not want to trigger massive
+	    replication. Or vice versa he/she wants to take pool
+	    permanently out of operation and wants to make sure that
+	    files in the pool will not be locked out and will be
+	    available later.
+	  </para>
+	</listitem>
+      </varlistentry>
 
-	<varlistentry>
-	  <term>offline</term>
+      <varlistentry>
+	<term>offline</term>
+	
+	<listitem>  
+	  <para>
+	    replicas in this pool are counted whether this pool is up
+	    or down. It does done matter fore replication purpose if
+	    offline pool goes down or up.  Rationale &mdash; operator
+	    wants to bring pool down briefly and he/she knows that
+	    replicas in the pool are safe. This state is introduced to
+	    avoid unnecessary massive replication. When pool comes
+	    online from offline state replicas in the pool will be
+	    inventoried to make sure we know the real list of replicas
+	    in the pool.
+	  </para>
+	</listitem>
+      </varlistentry>
 
-	  <listitem>  
-	    <para>
-	      replicas in this pool are counted whether this pool is
-	      up or down. It does done matter fore replication purpose
-	      if offline pool goes down or up.  Rationale &mdash;
-	      operator wants to bring pool down briefly and he/she
-	      knows that replicas in the pool are safe. This state is
-	      introduced to avoid unnecessary massive
-	      replication. When pool comes online from offline state
-	      replicas in the pool will be inventoried to make sure we
-	      know the real list of replicas in the pool.
-	    </para>
-	  </listitem>
-	</varlistentry>
+      <varlistentry>
+	<term>down</term>
+	
+	<listitem>    
+	  <para>
+	    operator needs to set pool or set of pools down
+	    permanently and wants to make sure that there no replicas
+	    <quote>locked out</quote> when all known replicas of the
+	    file are in the pools which are unavailable. Thus whether
+	    pool is really up or down replicas in it are not counted.
+	  </para>
+	</listitem>
+      </varlistentry>
 
-	<varlistentry>
-	  <term>down</term>
-
-	  <listitem>    
-	    <para>
-	      operator needs to set pool or set of pools down
-	      permanently and wants to make sure that there no
-	      replicas <quote>locked out</quote> when all known
-	      replicas of the file are in the pools which are
-	      unavailable. Thus whether pool is really up or down
-	      replicas in it are not counted.
-	    </para>
-	  </listitem>
-	</varlistentry>
-
-	<varlistentry>
-	  <term>drainoff</term>
-	  <term>offline-prepare</term>
-
-	  <listitem>    
-	    <para>
-	      transient states between online and down or offline
-	      states respectively.  If there are files which can be
-	      <quote>locked out</quote> in down or offline states,
-	      they will be evacuated &mdash; at least one replica for
-	      each locked file will be copied out. It is unlikely that
-	      file will be locked out when singly pool goes down &mdash;
-	      normally few replicas are online. When several pools go
-	      down or set drainoff or offline file lockout may
-	      happens.
-	    </para>
-	  </listitem>
-	</varlistentry>
-      </variablelist>
+      <varlistentry>
+	<term>drainoff</term>
+	<term>offline-prepare</term>
+	
+	<listitem>    
+	  <para>
+	    transient states between online and down or offline states
+	    respectively.  If there are files which can be
+	    <quote>locked out</quote> in down or offline states, they
+	    will be evacuated &mdash; at least one replica for each
+	    locked file will be copied out. It is unlikely that file
+	    will be locked out when singly pool goes down &mdash;
+	    normally few replicas are online. When several pools go
+	    down or set drainoff or offline file lockout may happens.
+	  </para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
 
       
-      <note>
-	<para>
-	  Currently replicas counted separately in groups of
-	  offline-prepare and drainoff pools.
+    <note>
+      <para>
+	Currently replicas counted separately in groups of
+	offline-prepare and drainoff pools.
 	</para>
-      </note>
+    </note>
 
-      <para>
-	RM needs the single copy of the replica to be copied out and
-	then you can turn pool down, the other replicas will be made
-	from the replica available online. To confirm that it is safe
-	to turn pool down there is command to check number of files
-	which can be locked in this pool.
-      </para>
+    <para>
+      RM needs the single copy of the replica to be copied out and
+      then you can turn pool down, the other replicas will be made
+      from the replica available online. To confirm that it is safe to
+      turn pool down there is command to check number of files which
+      can be locked in this pool.
+    </para>
+      
+    <para>
+      v1.0 &mdash; these states called <quote>transient</quote> but
+      pool does not automatically turned down
+    </para>
 
-      <para>
-	v1.0 &mdash; these states called <quote>transient</quote> but
-	pool does not automatically turned down
-      </para>
-    </section>
-
-    <section> 
+    <section id="cf-repman-op-start"> 
       <title>Startup</title>
 
       <para>
@@ -441,7 +436,7 @@
     </section>
 
     
-    <section>
+    <section id="cf-repman-op-more">
       <title>More on operation</title>
 
       <para>
@@ -552,7 +547,7 @@
 
 
 
-    <section>
+    <section id="cf-repman-op-cmds">
       <title>Commands</title>
 
       <para>
@@ -641,7 +636,7 @@
 
     </section>
     
-    <section>
+    <section id="cf-repman-op-hybrid">
       <title>Hybrid &dcache;</title>
 
       <para>
@@ -675,8 +670,9 @@ psu addto  pgroup ResilientPools <replaceable>myPoolName003</replaceable></scree
     </section>
 
 
-    <section>
-      <title>Arguments for the replicaManager cell in the batch file:</title>
+    <section id="cf-repman-op-args">
+      <title>Arguments for the &cell-replicamngr; cell in the batch
+      file:</title>
 
       <para>
 	Default argument values as for <computeroutput>$Id:
@@ -960,7 +956,7 @@ psu addto  pgroup ResilientPools <replaceable>myPoolName003</replaceable></scree
     <para><emphasis>DRAFT</emphasis></para>
 
 
-    <section>
+    <section id="cf-repman-mon-scope">
       <title>Scope of this document</title>
 
       <para>
@@ -981,7 +977,7 @@ psu addto  pgroup ResilientPools <replaceable>myPoolName003</replaceable></scree
       </para>
     </section>
 
-    <section>
+    <section id="cf-repman-mon-prereq">
       <title>Prerequisites</title>
 
       <para>
@@ -993,7 +989,7 @@ psu addto  pgroup ResilientPools <replaceable>myPoolName003</replaceable></scree
       </para>
     </section>
 
-    <section>
+    <section id="cf-repman-mon-install">
       <title>&tomcat; Installation and Configuration</title>
 
       <itemizedlist>
