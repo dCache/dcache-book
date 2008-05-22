@@ -47,7 +47,7 @@
   </para>
   
   <section id="in-install">
-    <title>Installation of a Basic &dcache; Instance</title>
+    <title>Installing a Basic &dcache; Instance</title>
 
     <para>
       In the following the installation of a central admin node of a
@@ -57,9 +57,9 @@
       optionally one &srm;, one GridFTP door, and/or one GSIdCap
       door. On the admin node, a &pnfs; server and several central
       &dcache; components are installed. The &pnfs; server, some
-      central components, and each &srm; need an PostgreSQL server
+      central components, and each &srm; need an &psql; server
       installed locally on the node. The first section describes the
-      configuration of a PostgreSQL server. After that the
+      configuration of a &psql; server. After that the
       installation of the &pnfs; server and of the &dcache;
       components will follow. During the whole installation process
       root access is required.
@@ -69,25 +69,28 @@
       <title>Prerequisites</title>
       
       <para>
-	In order to install dCache the following requirements must be met:
+	In order to install &dcache; the following requirements must be met:
       </para>
 
       <itemizedlist>
 	<listitem>
 	  <para>
-	    A RPM-based Linux distribution is required.
+	    An RPM-based Linux distribution is required.
 	  </para>
 	</listitem>
 
 	<listitem>
 	  <para>
-	    Java 1.4.2, either SDK or JRE, needs to be installed.
+           &dcache; 1.8 requires Java 1.5 or 1.6 SDK. Previous
+           releases of &dcache; can use Java 1.4.2. It is recommended
+           to use the newest Java release available within the release
+           series used.
 	  </para>
 	</listitem>
 
 	<listitem>
 	  <para>
-	    PostgreSQL must be installed and running. See <xref
+	    &psql; must be installed and running. See <xref
 	    linkend="cb-postgres-install"/> for more details. It is
 	    strongly recommended to use version 8 or higher.
 	  </para>
@@ -99,14 +102,16 @@
       <title>Installation of the &dcache; Software</title>
 
       <para>
-	The RPM packages may be installed right away on each node:
+	The RPM packages may be installed right away on each node, for
+        example using the command:
       </para>
 
       <screen>&prompt-root; <command>rpm</command> -ivh dcache-server-<replaceable>version</replaceable>-<replaceable>release</replaceable>.i386.rpm
 &prompt-root; <command>rpm</command> -ivh dcache-client-<replaceable>version</replaceable>-<replaceable>release</replaceable>.i386.rpm</screen>
 
       <para>
-	and the &pnfs; server software on the admin node:
+        The &pnfs; server software on the admin node can be installed
+        with the command:
       </para>
 
       <screen>&prompt-root; <command>rpm</command> -ivh pnfs-postgresql-<replaceable>version</replaceable>-<replaceable>release</replaceable>.i386.rpm</screen>
@@ -215,7 +220,7 @@ host    all         all         ::1/128        trust</programlisting>
 	<title>Creating data users and structure</title>
 
 	<para>
-	  Prepare the PostgreSQL users and databases as they are
+	  Prepare the &psql; users and databases as they are
 	  needed for the components of &dcache; and/or the &pnfs;
 	  server: The &pnfs; server only needs a database user. We
 	  suggest to call it <database
@@ -240,7 +245,9 @@ host    all         all         ::1/128        trust</programlisting>
 
 	<para>
 	  The &dcache; components will access the database server with
-	  the user <database class="user">srmdcache</database>:
+          the user <database class="user">srmdcache</database> which can
+          be created with the <command>createuser</command>; for
+          example:
 	</para>
 
 	<screen>&prompt-root; <command>createuser</command> -U postgres --no-superuser --no-createrole --createdb --pwprompt srmdcache</screen>
@@ -263,7 +270,7 @@ host    all         all         ::1/128        trust</programlisting>
 	  The &pnfs; companion uses the database
 	  <database>companion</database> to store the pools all files
 	  are located on. On the admin node create and initialize it
-	  with
+	  with the command:
 	</para>
 
 	<screen>&prompt-root; <command>createdb</command> -U srmdcache companion
@@ -276,18 +283,20 @@ host    all         all         ::1/128        trust</programlisting>
 
 	<para>
 	  If the resilience feature provided by the <glossterm
-	  linkend="gl-replicamanager">replica manager</glossterm> is
-	  used, the database <quote>replicas</quote> has to be
-	  prepared on the admin node
+          linkend="gl-replicamanager">replica manager</glossterm> is
+          used, the database <quote>replicas</quote> has to be prepared
+          on the admin node with the command:
 	</para>
 
 	<screen>&prompt-root; <command>createdb</command> -U srmdcache replicas
 &prompt-root; <command>psql</command> -U srmdcache replicas -f /opt/d-cache/etc/psql_install_replicas.sql</screen>
 
-        <para>
-	  Note that the disk space will at least be cut in half if the
-	  replica manager is used.
-	</para>
+        <note>
+          <para>
+            Note that the disk space will at least be cut in half if the
+            replica manager is used.
+          </para>
+        </note>
 
 	<para>
 	  If the billing information should also be stored in a
@@ -314,7 +323,8 @@ host    all         all         ::1/128        trust</programlisting>
 	<filename class="directory">/opt/pnfs/</filename>. For the
 	installation copy the file
 	<filename>/opt/pnfs/etc/pnfs_config.template</filename> to
-	<filename>/opt/pnfs/etc/pnfs_config</filename>. It contains
+	<filename>/opt/pnfs/etc/pnfs_config</filename>. The default
+        should be suitable for most installations. It contains:
       </para>
 
       <programlisting>PNFS_INSTALL_DIR = /opt/pnfs
@@ -325,7 +335,16 @@ PNFS_OVERWRITE = no
 PNFS_PSQL_USER = pnfsserver</programlisting>
 
       <para>
-	and should be suitable for most installations. Next, run
+        Next run
+        <command>/opt/pnfs/install/pnfs-install.sh</command>. This
+        will write the central configuration file
+        <filename>/usr/etc/pnfsSetup</filename> and initialize the
+        databases in the &psql; server as well as configuration
+        information below <filename
+        class="directory">/opt/pnfsdb/</filename> (as configured by
+        <varname>PNFS_DB</varname> in
+        <filename>/opt/pnfs/etc/pnfs_config</filename>).  For
+        example:
       </para>
 
       <screen>&prompt-root; <command>/opt/pnfs/install/pnfs-install.sh</command>
@@ -360,17 +379,8 @@ Installation of PNFS completed - stop PNFS
  Removing main switchboard ... O.K.</screen>
 
       <para>
-	This will write the central configuration file
-	<filename>/usr/etc/pnfsSetup</filename> and initialize the
-	databases in the PostgreSQL server as well as configuration
-	information below <filename
-	class="directory">/opt/pnfsdb/</filename> (as configured by
-	<varname>PNFS_DB</varname> in
-	<filename>/opt/pnfs/etc/pnfs_config</filename>.)
-      </para>
-
-      <para>
 	The &pnfs; server may now be started with
+       <command>/opt/pnfs/bin/pnfs start</command>, for example:
       </para>
 
       <screen>&prompt-root; <command>/opt/pnfs/bin/pnfs</command> start
@@ -382,23 +392,36 @@ Starting Mountd : pmountd
 Starting nfsd : pnfsd</screen>
 
       <para>
-	This script may be copied to <filename
-	class="directory">/etc/init.d/</filename> and the &pnfs; may
-	be configured to start at boot time with
+       This script may be linked from <filename
+       class="directory">/etc/init.d/</filename>.  Please do not copy
+       the init script as it may change between releases. On Red Hat
+       derived Linux distributions the &pnfs; may be configured to
+       start at boot time with
       </para>
 
       <screen>&prompt-root; <command>chkconfig</command> --add pnfs
 &prompt-root; <command>chkconfig</command> pnfs on</screen>
+
+      <para>
+        It is advisable to create a basic directory structure in the
+        &pnfs; namespace where each directory uses a separate &pnfs;
+        database. This is still true for the &psql; version of
+        &pnfs; since the &pnfs; server uses global locks on each
+        database. <xref linkend="cf-pnfs-db"/> describes how it is
+        done. WLCG sites should use at least two databases for each VO
+        they support: One for the directory
+        <filename>/pnfs/<replaceable>domainName</replaceable>/data/<replaceable>
+        voName</replaceable>/</filename>
+        and one for the generated files, i.e. for
+        <filename>/pnfs/<replaceable>domainName</replaceable>/data/<replaceable>
+        voName</replaceable>/generated/</filename>.
+      </para>
 
     </section>
 
 
     <section>
       <title>Installing &dcache; Components</title>
-
-      <para>
-	Quick &dcache; installation:
-      </para>
 
       <para>
 	Use the templates of the configuration files found in
@@ -409,8 +432,8 @@ Starting nfsd : pnfsd</screen>
       <para>
 	The central configuration file of a &dcache; instance is
 	<filename>/opt/d-cache/config/dCacheSetup</filename>. For most
-	installation it is only necessary to set the variable
-	<varname>java</varname> to the binary of the java VM and the
+	installations it is only necessary to set the variable
+	<varname>java</varname> to the binary of the Java VM and the
 	variable <varname>serviceLocatorHost</varname> to the hostname
 	of the admin node. Note that the file has to go into the
 	subdirectory <filename class="directory">config/</filename>
@@ -454,7 +477,7 @@ Starting nfsd : pnfsd</screen>
 	needed. Note that it may be generated from the standard
 	<filename>/etc/grid-security/grid-mapfile</filename> with the
 	tool <filename>grid-mapfile2dcache-kpwd</filename> which is
-	distributed with the LCG software.
+	distributed with the WLCG software.
       </para>
 
       <para>
@@ -526,22 +549,9 @@ Starting dcache pool: Starting clintonDomain  6 5 4 3 2 1 0 Done (pid=7990)</scr
 &prompt-root; <command>chkconfig</command> dcache-pool on</screen>
 
       <para>
-	It is advisable to create a basic directory structure in the
-	&pnfs; namespace where each directory uses a separate &pnfs;
-	database. This is still true for the PostgreSQL version of
-	&pnfs; since the &pnfs; server uses global locks on each
-	database. <xref linkend="cf-pnfs-db"/> describes how it is
-	done. LCG sites should use at least two databases for each VO
-	they support: One for the directory
-	<filename>/pnfs/<replaceable>domainName</replaceable>/data/<replaceable>voName</replaceable>/</filename>
-	and one for the generated files, i.e. for
-	<filename>/pnfs/<replaceable>domainName</replaceable>/data/<replaceable>voName</replaceable>/generated/</filename>.
-      </para>
-
-      <para>
 	<xref linkend="cb-general-lcg"/> describes how to activate the
 	new info provider included since version 1.6.6-2 based on an
-	earlier LCG installation.
+	earlier WLCG installation.
       </para>
     </section>
   </section>
@@ -564,7 +574,7 @@ Starting dcache pool: Starting clintonDomain  6 5 4 3 2 1 0 Done (pid=7990)</scr
       This section describes the upgrade of &dcache; instances
       installed with the previous version (currently version 1.6.5)
       and also some earlier versions - notably the one distributed
-      with the previous or current LCG software. The first
+      with the previous or current WLCG software. The first
       section will give a quick upgrade guide. It might not be
       applicable to complex setups. Not all features of the new version
       will be enabled after the quick upgrade guide. The next section
@@ -573,26 +583,26 @@ Starting dcache pool: Starting clintonDomain  6 5 4 3 2 1 0 Done (pid=7990)</scr
 
     <para>
       Note that the upgrade of &dcache; is independent of a
-      conversion of the &pnfs; database from GDBM to PostgreSQL. The
-      conversion and upgrade to the PostgreSQL version of &pnfs; may
+      conversion of the &pnfs; database from GDBM to &psql;. The
+      conversion and upgrade to the &psql; version of &pnfs; may
       be performed any time before or after the upgrade of
       &dcache;. Do not perform the &dcache; upgrade and the &pnfs;
       database conversion simultaneously. It is better to do them one
       after the other, and test the system inbetween. Do not be
       mislead by the fact the &dcache; release only contains the
-      PostgreSQL version of &pnfs; (since version 1.6.6). See <xref
+      &psql; version of &pnfs; (since version 1.6.6). See <xref
       linkend="cb-pnfs-postgres"/> for a guide to convert and upgrade
       the &pnfs; server.
     </para>
 
     <para>
-      In case you are already using PostgreSQL (e.g. for the &srm;),
+      In case you are already using &psql; (e.g. for the &srm;),
       it is a good idea to upgrade to version 8 now, because prior to
-      dCache Version 1.6.6 no precious data is stored and therefore
-      can be wiped off, allowing a PostgreSQL 8 installation from
-      scratch. Starting from &dcache; version 1.6.6 PostgreSQL will
+      &dcache; Version 1.6.6 no precious data is stored and therefore
+      can be wiped off, allowing a &psql; 8 installation from
+      scratch. Starting from &dcache; version 1.6.6 &psql; will
       be utilized more heavily, making migration a complex
-      task. Another advantage of PostgreSQL 8 is an integrated
+      task. Another advantage of &psql; 8 is an integrated
       mechanism for automatic backups.
     </para>
 
@@ -609,7 +619,7 @@ Starting dcache pool: Starting clintonDomain  6 5 4 3 2 1 0 Done (pid=7990)</scr
 &prompt-root; <command>/opt/d-cache/bin/dcache-core</command> stop</screen>
 
       <para>
-	Leave the &pnfs; server running. In LCG installations, there
+	Leave the &pnfs; server running. In WLCG installations, there
 	might be a <quote>meta-package</quote> installed which can
 	prevent the update to the current version. It should be
 	deinstalled. The following command will do that and will not
@@ -760,7 +770,7 @@ Starting dcache pool: Starting clintonDomain  6 5 4 3 2 1 0 Done (pid=7990)</scr
 	For each file the list of pools the file is stored on (the
 	cache info) is now stored within the &pnfs; namespace
 	metadata. When switching on the companion, the &dcache;
-	system expects it to be stored in a PostgreSQL database. You
+	system expects it to be stored in a &psql; database. You
 	should first create this database:
       </para>
 
@@ -854,7 +864,7 @@ Threads (4) Queue
       <programlisting>billingToDb=yes</programlisting>
 
       <para>
-	A PostgreSQL server is expected to run on the admin node with
+	A &psql; server is expected to run on the admin node with
 	a database user <quote><literal>srmdcache</literal></quote>
 	and a database <quote><literal>billing</literal></quote> with
       </para>
@@ -1774,19 +1784,18 @@ Note: The following is supported in version 1.2.2-1 for the
 
 
     <section id="in-other-os">
-    <title>Running dCache on non Linux OS'es</title>
+    <title>Running dCache on non Linux operating systems</title>
 
     <para>
       Because of the wide spread usage of dCache in the grid word, we
       provide the dCache binary packages mainly for a certain Linux
-      flavour complaint to the rest of the LCG, gLite or OSG software.
+      flavour complaint to the rest of the WLCG, gLite or OSG software.
       The dCache system itself is, except for the filesystem engine
-      (pnfs) and the dCap client, 100% java, so that a port should be
-      easy as long as the OS is coming with a resonably modern java
-      virtual machine.  For now dCache is fine with java 1.4 but very
-      soon we will move to 1.5. This chapter should give an estimate
-      on how much effort is necessary to do the porting to other
-      OS'es.
+      (pnfs) and the dCap client, pure Java, so that a port should be
+      easy as long as the OS is coming with a resonably modern Java
+      virtual machine.  For now dCache is fine with Java 1.5. This
+      chapter should give an estimate on how much effort is necessary
+      to do the porting to other operating systems.
     </para>
 
     <section>
