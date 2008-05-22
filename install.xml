@@ -649,7 +649,7 @@ INFO:Skipping ssh key generation
             </para>
 
             <para>
-              Create a pool does not modify the &dcache;
+              Creating a pool does not modify the &dcache;
               configuration.
             </para>
           </listitem>
