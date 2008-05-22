@@ -452,26 +452,6 @@ Starting nfsd : pnfsd</screen>
       </para>
 
       <para>
-	Whether and how many pools should be installed on the current
-	node is configured by
-	<filename>/opt/d-cache/etc/pool_path</filename>. Each line in
-	this file describes one pool. The format is as follows:
-      </para>
-
-      <programlisting><replaceable>poolDataDirectory</replaceable> <replaceable>poolSizeInGB</replaceable> <replaceable>reinstallPoolYesNo</replaceable></programlisting>
-
-      <para>
-	where <replaceable>poolDataDirectory</replaceable> is the full
-	path to the directory which will contain the data files as
-	well as some of the configuration of the pool,
-	<replaceable>poolSizeInGB</replaceable> is the size of the
-	pool. Make shure that there is always enough space under
-	<replaceable>poolDataDirectory</replaceable>. Be aware that
-	only pure data content is counted by &dcache;. Leave enough
-	room for configuration files and filesystem overhead.
-     </para>
-
-      <para>
 	For authorization of grid users the file
 	<filename>/opt/d-cache/etc/dcache.kpwd</filename> is
 	needed. Note that it may be generated from the standard
@@ -481,10 +461,48 @@ Starting nfsd : pnfsd</screen>
       </para>
 
       <para>
-	When all configuration files are prepared configure the system with
+        How to proceed from here depends on whether the release to be
+        installed is older than 1.8.0-14 or not. In particular init
+        scripts and pool creation procedures have changed in &dcache;
+        1.8.0-14. Both procedures are described in the following
+        sections.
       </para>
 
-      <screen>&prompt-root; <command>/opt/d-cache/install/install.sh</command>
+      <para>
+        Once &dcache; is installed, <xref linkend="cb-general-lcg"/>
+        may be consulted about how to activate the info provider
+        included since version 1.6.6-2 based on an earlier WLCG
+        installation.
+      </para>
+
+      <section>
+        <title>Prior to 1.8.0-14</title>
+
+        <para>
+          Whether and how many pools should be installed on the current
+          node is configured by
+          <filename>/opt/d-cache/etc/pool_path</filename>.  Each line in
+          this file describes one pool. The format is as follows:
+        </para>
+      
+        <programlisting><replaceable>poolDataDirectory</replaceable> <replaceable>poolSizeInGB</replaceable> <replaceable>reinstallPoolYesNo</replaceable></programlisting>
+      
+        <para>
+          where <replaceable>poolDataDirectory</replaceable> is the full
+          path to the directory which will contain the data files as
+          well as some of the configuration of the pool,
+          <replaceable>poolSizeInGB</replaceable> is the size of the
+          pool. Make sure that there is always enough space under
+          <replaceable>poolDataDirectory</replaceable>. Be aware that
+          only pure data content is counted by &dcache;. Leave enough
+          room for configuration files and filesystem overhead.
+        </para>
+      
+        <para>
+          When all configuration files are prepared, configure the system with
+        </para>
+
+        <screen>&prompt-root; <command>/opt/d-cache/install/install.sh</command>
 
 [INFO]  No 'SERVER_ID' set in 'node_config'. Using SERVER_ID=<replaceable>your.domain</replaceable>.
 
@@ -512,11 +530,11 @@ e3:4a:13:d5:33:45:e0:cd:69:a3:fb:d7:a8:64:df:73 root@grid-se3.desy.de
 [INFO]  Creating Pool <replaceable>hostname</replaceable>_1
 [INFO]  Creating Pool <replaceable>hostname</replaceable>_2</screen>
 
-      <para>
-	and start the central components (only on the admin node) with
-      </para>
+        <para>
+          and start the central components (only on the admin node) with
+        </para>
 
-      <screen>&prompt-root; <command>/opt/d-cache/bin/dcache-core</command> start
+        <screen>&prompt-root; <command>/opt/d-cache/bin/dcache-core</command> start
 Starting dcache services:
 Starting lmDomain  6 5 4 3 2 1 0 Done (pid=6802)
 Starting dCacheDomain  6 5 4 3 2 1 0 Done (pid=6875)
@@ -530,29 +548,175 @@ Starting gridftp-clintonDomain  6 5 4 3 2 1 0 Done (pid=7569)
 Starting gsidcap-clintonDomain  6 5 4 3 2 1 0 Done (pid=7672)
 Starting srm-clintonDomain  6 5 4 3 2 1 0 Done (pid=7777)</screen>
 
-      <para>
-	the configured pools are started with
-      </para>
+        <para>
+          the configured pools are started with
+        </para>
 
-      <screen>&prompt-root; <command>/opt/d-cache/bin/dcache-pool</command> start
+        <screen>&prompt-root; <command>/opt/d-cache/bin/dcache-pool</command> start
 Starting dcache pool: Starting clintonDomain  6 5 4 3 2 1 0 Done (pid=7990)</screen>
 
-      <para>
-	These scripts may be copied to <filename
-	class="directory">/etc/init.d/</filename> and &dcache; is
-	configured to start at boot-time with
-      </para>
+        <para>
+          These scripts may be linked from <filename
+          class="directory">/etc/init.d/</filename>. Please do not
+          copy the init scripts as they may change between
+          releases. On Red Hat derived Linux distributions &dcache;
+          may be configured to start at boot-time using
+          <command>chkconfig</command>, for example:
+        </para>
 
-      <screen>&prompt-root; <command>chkconfig</command> --add dcache-core
+        <screen>&prompt-root; <command>chkconfig</command> --add dcache-core
 &prompt-root; <command>chkconfig</command> --add dcache-pool
 &prompt-root; <command>chkconfig</command> dcache-core on
 &prompt-root; <command>chkconfig</command> dcache-pool on</screen>
+      </section>
 
-      <para>
-	<xref linkend="cb-general-lcg"/> describes how to activate the
-	new info provider included since version 1.6.6-2 based on an
-	earlier WLCG installation.
-      </para>
+      <section>
+        <title>Since 1.8.0-14</title>
+
+        <para>
+          A new init script was introduced in release 1.8.0-14. In
+          addition to being able to start and stop &dcache;, it
+          provides commands for creating and configuring pools. Thus
+          pool creation is no longer part of the install script and
+          pools can be created after the install script has been
+          executed. We therefore proceed by finalising the initial
+          configuration by executing
+          <command>/opt/d-cache/install/install.sh</command>, for
+          example:
+        </para>
+
+        <screen>&prompt-root; <command>/opt/d-cache/install/install.sh</command>
+INFO:Skipping ssh key generation
+
+ Checking MasterSetup  ./config/dCacheSetup O.k.
+
+   Sanning dCache batch files
+
+    Processing adminDoor
+    Processing chimera
+    Processing dCache
+    Processing dir
+    Processing door
+    Processing gPlazma
+    Processing gridftpdoor
+    Processing gsidcapdoor
+    Processing httpd
+    Processing info
+    Processing infoProvider
+    Processing lm
+    Processing maintenance
+    Processing pnfs
+    Processing pool
+    Processing replica
+    Processing srm
+    Processing statistics
+    Processing utility
+    Processing xrootdDoor
+
+
+ Checking Users database .... Ok
+ Checking Security       .... Ok
+ Checking JVM ........ Ok
+ Checking Cells ...... Ok
+ dCacheVersion ....... Version production-1-8-0-14
+        </screen>
+
+        <para>
+          No pools have been created on the node yet. Adding pools to
+          a node is a two step process:
+        </para>
+
+        <orderedlist>
+          <listitem>
+            <para>
+              The directory layout of the pool is created and filled
+              with a skeleton configuration using <command>dcache pool
+              create <replaceable>poolSize</replaceable>
+              <replaceable>poolDirectory</replaceable></command>,
+              where <replaceable>poolDirectory</replaceable> is the
+              full path to the directory which will contain the data
+              files as well as some of the configuration of the pool,
+              and <replaceable>poolSize</replaceable> is the size of
+              the pool, specified in bytes or with a M, G, or T suffix
+              (for mibibytes, gibibytes and tibibytes, respectively).
+            </para>
+
+            <para>
+              Make sure that there is always enough space under
+              <replaceable>poolDirectory</replaceable>. Be aware that
+              only pure data content is counted by &dcache;. Leave enough
+              room for configuration files and filesystem overhead.
+            </para>
+
+            <para>
+              Create a pool does not modify the &dcache;
+              configuration.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              The pool is given a unique name and added to the
+              &dcache; configuration using <command>dcache pool add
+              <replaceable>poolName</replaceable>
+              <replaceable>poolDirectory</replaceable></command>,
+              where <replaceable>poolDirectory</replaceable> is the
+              directory in which the pool was created and
+              <replaceable>poolName</replaceable> is a name for the
+              pool. The name must be unique throughout the whole
+              &dcache; installation, not just on the node.
+            </para>
+            <para>
+              Adding a pool to a configuration does not modify the
+              pool or the data in it and can thus safely be undone or
+              repeated.
+            </para>
+          </listitem>
+        </orderedlist>
+
+        <para>
+          An example may help to clarify the use of these commands:
+        </para>
+
+        <screen>&prompt-root; <command>/opt/d-cache/bin/dcache</command> pool create 500G <filename class="directory">/q/pool1</filename>
+Created a 500 GiB pool in /q/pool1. The pool cannot be used until it has
+been added to a domain. Use 'pool add' to do so.
+
+Please note that this script does not set the owner of the pool directory.
+You may need to adjust it.
+&prompt-root; <command>/opt/d-cache/bin/dcache</command> pool add myFirstPool <filename class="directory">/q/pool1/</filename>
+
+Added pool myFirstPool in /q/pool1 to dcache-vmDomain.
+
+The pool will not be operational until the domain has been started. Use
+'start dcache-vmDomain' to start the pool domain.
+&prompt-user; <command>/opt/d-cache/bin/dcache</command> pool ls
+Pool        Domain                       Size   Free Path
+myFirstPool dcache-vmDomain               500    550 /q/pool1
+Disk space is measured in GiB.
+        </screen>
+
+        <para>
+          All configured components can now be starting with
+          <command>dcache start</command>, for example:
+        </para>
+
+        <screen>&prompt-root; <command>/opt/d-cache/bin/dcache</command> start
+Starting lmDomain  Done (pid=7514)
+Starting dCacheDomain  Done (pid=7574)
+Starting pnfsDomain  Done (pid=7647)
+Starting dirDomain  Done (pid=7709)
+Starting adminDomain  Done (pid=7791)
+Starting httpdDomain  Done (pid=7849)
+Starting utilityDomain  Done (pid=7925)
+Starting gPlazma-dcache-vmDomain  Done (pid=8002)
+Starting infoProviderDomain  Done (pid=8081)
+Starting dcap-dcache-vmDomain  Done (pid=8154)
+Starting gridftp-dcache-vmDomain  Done (pid=8221)
+Starting gsidcap-dcache-vmDomain  Done (pid=8296)
+Starting dcache-vmDomain  Done (pid=8369)
+        </screen>
+        
+      </section>
     </section>
   </section>
 
