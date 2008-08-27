@@ -176,8 +176,8 @@
 
       <para>An <emphasis>elementary network condition</emphasis> consists of
       an IP address and a net mask written as
-      <quote><literal><replaceable>&lt;IP-address&gt;</replaceable>/<replaceable>&lt;net
-      mask&gt;</replaceable></literal></quote>, say
+      <quote><literal><replaceable>IP-address</replaceable>/<replaceable>net
+      mask</replaceable></literal></quote>, say
       <quote><literal>111.111.111.0/255.255.255.0</literal></quote>. It is
       satisfied, if the request is coming from a host with IP address within
       the subnet given by the address/netmask pair.</para>
@@ -372,10 +372,10 @@
         <xref linkend="secCacheClass" />.) A suitable setup would
         be<programlisting><command>psu create ugroup</command> <replaceable>exp-a-cond</replaceable>
 
-<command>psu create unit</command> -store <replaceable>exp-a:run2003@*</replaceable>
-<command>psu addto ugroup</command> <replaceable>exp-a-cond</replaceable> <replaceable>exp-a:run2003@*</replaceable>
-<command>psu create unit</command> -store <replaceable>exp-a:run2004@*</replaceable>
-<command>psu addto ugroup</command> <replaceable>exp-a-cond</replaceable> <replaceable>exp-a:run2004@*</replaceable>
+<command>psu create unit</command> -store <replaceable>exp-a:run2003@osm</replaceable>
+<command>psu addto ugroup</command> <replaceable>exp-a-cond</replaceable> <replaceable>exp-a:run2003@osm</replaceable>
+<command>psu create unit</command> -store <replaceable>exp-a:run2004@osm</replaceable>
+<command>psu addto ugroup</command> <replaceable>exp-a-cond</replaceable> <replaceable>exp-a:run2004@osm</replaceable>
 
 <command>psu create link</command> <replaceable>exp-a-link</replaceable> <replaceable>allnet-cond</replaceable> <replaceable>exp-a-cond</replaceable>
 <command>psu set link</command> <replaceable>exp-a-link</replaceable> <parameter>-readpref=</parameter><replaceable>10</replaceable> <parameter>-writepref=</parameter><replaceable>10</replaceable> <parameter>-cachepref=</parameter><replaceable>10</replaceable>
@@ -383,8 +383,8 @@
 
 <command>psu create ugroup</command> <replaceable>exp-b-cond</replaceable>
 
-<command>psu create unit</command> <parameter>-store</parameter> <replaceable>exp-b:alldata@*</replaceable>
-<command>psu addto ugroup</command> <replaceable>exp-b-cond</replaceable> <replaceable>exp-b:alldata@*</replaceable>
+<command>psu create unit</command> <parameter>-store</parameter> <replaceable>exp-b:alldata@osm</replaceable>
+<command>psu addto ugroup</command> <replaceable>exp-b-cond</replaceable> <replaceable>exp-b:alldata@osm</replaceable>
 
 <command>psu create ugroup</command> <replaceable>imp-cond</replaceable>
 <command>psu create unit</command> <parameter>-dcache</parameter> <replaceable>important</replaceable>
@@ -409,13 +409,6 @@
         pools in <literal>exp-a-pools</literal> have nothing to do and lots of
         free space.</para>
 
-        <para>Note also that the elementary storage class conditions are
-        always given in the form
-        <literal><replaceable>&lt;something&gt;</replaceable>@*</literal>.
-        This way it is possible to transparently migrate to a new tertiary
-        storage system, say from <literal>osm</literal> to
-        <literal>tsm</literal>.</para>
-
         <para>The central IT department might also want to set up a few pools,
         which are used as fall-back, if none of the pools of the experiments
         are functioning. These will also be used for internal testing. The
@@ -425,10 +418,10 @@
 <command>psu add link</command> <replaceable>fallback-link</replaceable> <replaceable>it-pools</replaceable></programlisting>Note
         again that these will only be used, if none of the experiments pools
         can be reached, or if the storage class is not of the form
-        <literal>exp-a:run2003@*</literal>,
-        <literal>exp-a:run2004@*</literal>, or
-        <literal>exp-b:alldata@*</literal>. If the administrator fails to
-        create the elementary condition <literal>exp-a:run2005@*</literal> and
+        <literal>exp-a:run2003@osm</literal>,
+        <literal>exp-a:run2004@osm</literal>, or
+        <literal>exp-b:alldata@osm</literal>. If the administrator fails to
+        create the elementary condition <literal>exp-a:run2005@osm</literal> and
         add it to the condition <literal>exp-a-cond</literal>, the fall-back
         pools will be used eventually.</para>
       </section>
@@ -438,19 +431,19 @@
       <title>Storage Classes</title>
 
       <para>The storage class is a string of the form
-      <literal><replaceable>&lt;StoreDescriptor&gt;</replaceable>@<replaceable>&lt;hsm&gt;</replaceable></literal>,
-      where <replaceable>&lt;hsm&gt;</replaceable> denotes the type of
+      <literal><replaceable>StoreDescriptor</replaceable>@<replaceable>hsm</replaceable></literal>,
+      where <replaceable>hsm</replaceable> denotes the type of
       tertiary storage system in use, and
-      <replaceable>&lt;StoreDescriptor&gt;</replaceable> is a string
+      <replaceable>StoreDescriptor</replaceable> is a string
       describing the storage class in a syntax which depends on the used
       tertiary storage system. If no tertiary storage system is used, it is
       probably best to use
-      <literal><replaceable>&lt;hsm&gt;</replaceable>=osm</literal>, since
+      <literal><replaceable>hsm</replaceable>=osm</literal>, since
       this is tested best. Then the
-      <replaceable>&lt;StoreDescriptor&gt;</replaceable> has the syntax
-      <literal><replaceable>&lt;Store&gt;</replaceable>:<replaceable>&lt;StorageGroup&gt;</replaceable></literal>.
+      <replaceable>StoreDescriptor</replaceable> has the syntax
+      <literal><replaceable>Store</replaceable>:<replaceable>StorageGroup</replaceable></literal>.
       These can be set within PNFS per directory. Consider for example the
-      following setup:<screen><prompt>[admin] # </prompt><command>cd</command> <filename>/pnfs/<replaceable>&lt;domain&gt;</replaceable>/<replaceable>&lt;experiment-a&gt;</replaceable>/</filename>
+      following setup:<screen><prompt>[admin] # </prompt><command>cd</command> <filename>/pnfs/<replaceable>domain</replaceable>/<replaceable>experiment-a</replaceable>/</filename>
 <prompt>[admin] # </prompt><command>cat</command> "<filename>.(tag)(OSMTemplate)</filename>"
 StoreName myStore
 <prompt>[admin] # </prompt><command>cat</command> "<filename>.(tag)(sGroup)</filename>"
