@@ -34,6 +34,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY domain-adminDoor "<literal>adminDoor</literal>">
 <!ENTITY domain-dcache    "<literal>dCacheDomain</literal>">
 <!ENTITY domain-utility   "<literal>utility</literal>">
+<!ENTITY domain-srm       "<literal>srm</literal>">
 
 
 <!-- Various cells -->
@@ -50,6 +51,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY cell-hsmflushctl "<literal>HsmFlushControl</literal>">
 <!ENTITY cell-gplazma   "<literal>gPlazma</literal>">
 <!ENTITY cell-replicamngr "<literal>ReplicaManager</literal>">
+<!ENTITY cell-system    "<literal>System</literal>">
 
 <!-- Various protocols: TODO: should these names be prefixed by "protocol-" ? -->
 <!ENTITY dcap     "<systemitem class='protocol'>dCap</systemitem>">
