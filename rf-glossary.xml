@@ -10,7 +10,7 @@
   <title>&dcache; Glossary</title>
 
   <para>
-    The following terms are defined.
+    The following terms are used in this &dcache; book.
   </para>
 
   <glosslist>
@@ -41,7 +41,7 @@
     </glossentry>
 
     <glossentry id="gl-hsm">
-      <glossterm>Hierachical Storage Manager (&hsm;)</glossterm>
+      <glossterm>Hierarchical Storage Manager (&hsm;)</glossterm>
       &hsm;
       <glosssee otherterm="gl-tss">tertiary storage system</glosssee>
     </glossentry>
@@ -66,7 +66,7 @@
       <glossdef>
 	<para>
 	  If a &dcache; instance does not have a <glossterm
-	  linkend="gl-tss">tetiary storage system</glossterm>, it is
+	  linkend="gl-tss">tertiary storage system</glossterm>, it is
 	  not a cache but a large file store. There are two lfs modes:
 	  <glossterm>precious</glossterm> and
 	  <glossterm>transient</glossterm> mode.
@@ -89,7 +89,7 @@
 	<glossdef>
 	  <para>
 	    Copying a file from the <glossterm
-	    linkend="gl-tss">tertiary strorage system</glossterm> to
+	    linkend="gl-tss">tertiary storage system</glossterm> to
 	    one of the &dcache; pools.
 	  </para>
 	</glossdef>
@@ -118,8 +118,18 @@
 	<glossterm>mover</glossterm>
 	<glossdef>
 	  <para>
-	    The process/thread within a pool which performs a
+	    The process/thread within a <glossterm
+	    linkend="gl-pool">pool</glossterm> which performs a
 	    <glossterm linkend="gl-transfer">transfer</glossterm>.
+	    Each pool has a limited number of movers that may be
+	    active at any time; if this limit is reached then further
+	    requests for data are queued.
+	  </para>
+
+	  <para>
+	    In many protocols, end clients connect to a mover to
+	    transfer file contents.  To support this, movers must
+	    speak the protocol the end client is using.
 	  </para>
 	  <glossseealso otherterm="gl-transfer">transfer</glossseealso>
 	</glossdef>
@@ -129,13 +139,14 @@
       <glossterm><filename>dCacheSetup</filename> File</glossterm>
       <glossdef>
         <para>
-          The primary configuration file of a &dcache; hostis
-          <filename>config/dCacheSetup</filename>. Each domain uses the file
+          The primary configuration file of a &dcache; host is
+          <filename>config/dCacheSetup</filename>. Each <glossterm
+          linkend="gl-domain">domain</glossterm> uses the file
           <filename>config/<replaceable>domainName</replaceable>Setup</filename>
-          which is
-          in fact a link to <filename>config/dCacheSetup</filename>. The
-          <filename>config/dCacheSetup</filename> file might even be the 
-          same across the hosts of a &dcache; instance.
+          which is in fact a symbolic link to
+          <filename>config/dCacheSetup</filename>. The
+          <filename>config/dCacheSetup</filename> file might even be
+          the same across the hosts of a &dcache; instance.
         </para>
       </glossdef>
     </glossentry>
@@ -157,10 +168,17 @@
 	</glossdef>
       </glossentry>
 
-      <glossentry id="gl-location-manager">
+(      <glossentry id="gl-location-manager">
 	<glossterm>Location Manager</glossterm>
 	<glossdef>
 	  <para>
+	    The location manager is a <glossterm
+	    linkend="gl-cell">cell</glossterm> that instructs a newly
+	    started <glossterm linkend="gl-domain">domain</glossterm>s
+	    to which domain they should connect.  This allows domains
+	    to form arbitrary network topologies; although, by
+	    default, a &dcache; instance will form a star topology
+	    with the &domain-dcache; domain at the centre.
 	  </para>
 	</glossdef>
       </glossentry>
@@ -169,6 +187,16 @@
 	<glossterm>Cell</glossterm>
 	<glossdef>
 	  <para>
+	    A cell is a collection of Java threads that provide a
+	    discrete and simple service within &dcache;.  Each cell is
+	    hosted within a <glossterm
+	    linkend="gl-domain">domain</glossterm>.
+	  </para>
+
+	  <para>
+	    Cells have an address derived from concatenating their
+	    name, the <literal>@</literal> symbol and their containing
+	    domain name.
 	  </para>
 	</glossdef>
       </glossentry>
@@ -177,6 +205,77 @@
 	<glossterm>Domain</glossterm>
 	<glossdef>
 	  <para>
+	    A domain is a collection of one or more <glossterm
+	    linkend="gl-cell">cell</glossterm>s that provide a set of
+	    related services within a &dcache; instance.  Each domain
+	    requires its own Java Virtual Machine.  A typical domain
+	    might provide external connectivity (i.e., a <glossterm
+	    linkend="gl-door">door</glossterm>) or manage the
+	    <glossterm linkend="gl-pool">pool</glossterm>s hosted on a
+	    machine.
+	  </para>
+
+	  <para>
+	    Each domain has at least one cell, called the
+	    &cell-system; cell and will typically have one or more
+	    tunnel cells for communicating with other Domains.
+	    However, to provide a useful service, a domain will
+	    contain other cells that provide specific behaviour.
+	  </para>
+	</glossdef>
+      </glossentry>
+
+      <glossentry id="gl-door">
+	<glossterm>Door</glossterm>
+	<glossdef>
+	  <para>
+	    A door provides the first point of access for end clients
+	    to communicate with a &dcache; instance.  There are
+	    different door implementations, allowing &dcache; to
+	    support multiple communication protocols.
+	  </para>
+
+	  <para>
+	    A door will (typically) bind to a well-known port number
+	    depending on the protocol the door supports.  This allows
+	    only a single door instance per machine for each protocol.
+	  </para>
+
+	  <para>
+	    A door will typically identify which <glossterm
+	    linkend="gl-pool">pool</glossterm> will satisfy the end
+	    user's operation and redirect the client to the
+	    corresponding pool.  In some cases this is not possible;
+	    for example, some protocols (such as &gridftp; version 1)
+	    do not allow servers to redirect end-clients, in other
+	    cases pool servers may be behind a firewall, so preventing
+	    direct access.  When direct end-client access is not
+	    possible, the door may act as a data proxy, streaming data
+	    to the client.
+	  </para>
+
+	  <para>
+	    A door is a <glossterm linkend="gl-cell">cell</glossterm>,
+	    typically hosted in a dedicated <glossterm
+	    linkend="gl-domain">domain</glossterm>.
+	  </para>
+	</glossdef>
+      </glossentry>
+
+      <glossentry id="gl-jvm">
+	<glossterm>Java Virtual Machine (JVM)</glossterm>
+	<glossdef>
+	  <para>
+	    Java programs are typically compiled into a binary form
+	    called Java byte-code.  Byte-code is comparable to the
+	    format that computers understand native; however, no
+	    mainstream processor understands Java byte-code.  Instead
+	    compiled Java programs typically require a translation
+	    layer for them to run.  This translation layer is called a
+	    Java Virtual Machine (JVM).  It is a standardised
+	    execution environment that Java programs may run within.
+	    A JVM is typically represented as a process within the
+	    host computer.
 	  </para>
 	</glossdef>
       </glossentry>
@@ -185,6 +284,10 @@
 	<glossterm>Well Known Cell</glossterm>
 	<glossdef>
 	  <para>
+	    A well-known cell is a <glossterm
+	    linkend="gl-cell">cell</glossterm> that registers itself
+	    centrally.  Within the admin interface, a well-known cell
+	    may be referred to by just its cell name.
 	  </para>
 	</glossdef>
       </glossentry>
@@ -193,6 +296,10 @@
 	<glossterm>Pinboard</glossterm>
 	<glossdef>
 	  <para>
+	    The pinboard is a collection of messages describing events
+	    within &dcache; and is similar to a log file.  Each
+	    <glossterm linkend="gl-cell">cell</glossterm> will
+	    (typically) have its own pinboard.
 	  </para>
 	</glossdef>
       </glossentry>
@@ -230,10 +337,28 @@
       </glossentry>
 
       <glossentry id="gl-pnfsid">
-	<glossterm>&pnfs; Id</glossterm>
+	<glossterm>PNFS-ID</glossterm>
 	<glossdef>
-	  <para>
+	  <para> 
+	    Each component in a &pnfs; instance has a unique ID: a
+	    24-digit hexadecimal number.  This unique ID is used in
+	    &dcache; to refer to files without knowing the filename or
+	    in which directory the file is located.
 	  </para>
+
+	  <para>
+	    If the &pnfs; namespace is mounted (via the NFS protocol)
+	    then the PNFS-ID can be discovered by querying the
+	    contents of the appropriate <filename>.(id)</filename>
+	    file.  For example, if a file <filename>bar</filename> is
+	    located in a directory <filename
+	    class="directory">foo</filename>, then the following
+	    command would return the PNFS-ID of
+	    <filename>bar</filename>:
+	  </para>
+
+	  <screen>&prompt-user; cat foo/.(id)(bar)
+001000000000000000123458</screen>
 	</glossdef>
       </glossentry>
 
@@ -241,7 +366,11 @@
 	<glossterm>Pool to Pool Transfer</glossterm>
 	<glossdef>
 	  <para>
-	    (PP or P2P)
+	    A pool-to-pool transfer is one where a file is transferred
+	    from one &dcache; pool to another.  This is typically done
+	    to satisfy a read request, either as a load-balancing
+	    technique or because the file is not available on pools
+	    that the end-user has access.
 	  </para>
 	</glossdef>
       </glossentry>
@@ -255,10 +384,25 @@
       </glossentry>
 
       <glossentry id="gl-batch-file">
-	    <glossterm><filename>.batch</filename> File</glossterm>
+	    <glossterm><filename>batch</filename> File</glossterm>
 	<glossdef>
 	  <para>
-	    <filename><replaceable>DomainName</replaceable>.batch</filename> File
+	    A batch file describes which <glossterm
+	    linkend="gl-cell">cell</glossterm>s in a <glossterm
+	    linkend="gl-domain">domain</glossterm> are to be started
+	    and with what options.  They typically have filenames from
+	    combining the name of a domain with
+	    <filename>.batch</filename>; for example, the
+	    &domain-dcache; domain has a corresponding batch file
+	    <filename>dCache.batch</filename>
+	  </para>
+
+	  <para>
+	    Although the cells in a domain may be configured by
+	    altering the corresponding batch file, most typical
+	    changes can be altered by editing the
+	    <filename>dCacheConfig</filename> file and this is the
+	    preferred method.
 	  </para>
 	</glossdef>
       </glossentry>
@@ -275,6 +419,10 @@
 	<glossterm>Wormhole</glossterm>
 	<glossdef>
 	  <para>
+	    A wormhole is a feature of the PNFS filesystem.  A
+	    wormhole is a file that is accessible in all directories;
+	    however, the file is not returned when scanning a
+	    directory; e.g., using the <command>ls</command> command.
 	  </para>
 	</glossdef>
       </glossentry>
@@ -335,14 +483,16 @@
       <glossterm>Storage Resource Manager (<abbrev>SRM</abbrev>)</glossterm>
       <glossdef>
         <para>
-          An SRM provides a standard webservice interface for managing a
-          storage resouce (e.g. a &dcache; instance). It is possible to
-          reserve space, retrieve or store files, and replicate files to
-          another SRM. The actual transfer of data is not done via the SRM
-          itself but via any protocol supported by both parties of the
-          transfer. Authentication and authorisation is done with the grid
-          security infrastructure. &dcache; comes with an implementation of an
-          SRM which can turn any &dcache; instance into a grid storage element.
+          An SRM provides a standard webservice interface for managing
+          a storage resource (e.g. a &dcache; instance). It is possible
+          to reserve space, initiate file storage or retrieve, and
+          replicate files to another SRM. The actual transfer of data
+          is not done via the SRM itself but via any protocol
+          supported by both parties of the transfer. Authentication
+          and authorisation is done with the grid security
+          infrastructure. &dcache; comes with an implementation of an
+          SRM which can turn any &dcache; instance into a grid storage
+          element.
         </para>
       </glossdef>
     </glossentry>
@@ -351,12 +501,18 @@
       <glossterm>&pnfs; Companion</glossterm>
       <glossdef>
         <para>
-          The &pnfs; companion is a database which stores the &dcache;
-          specific information (cache info) which is normally stored within the
-          &pnfs; namespace. Because this information is accessed very often by
-          the <glossterm linkend="gl-poolmanager">pool manager</glossterm>,
-          using the companion greatly improves the performance of 
-          the pool manager and the &pnfs; server.
+          The &pnfs; companion is a database that stores &dcache;
+          specific information; specifically, on which pools a file
+          may be found.  &dcache; can operate without a &pnfs;
+          companion database and will store this information within
+          the &pnfs; namespace.
+	</para>
+
+	<para>
+	  Storing replica location information in the companion
+	  database greatly improves the performance of &dcache; as the
+	  location information is often queried by the <glossterm
+	  linkend="gl-poolmanager">pool manager</glossterm>.
         </para>
       </glossdef>
     </glossentry>
@@ -366,8 +522,10 @@
       <glossdef>
         <para>
           Accounting information is either stored in a text file or in
-          a PostgreSQL database by the &cell-billing; cell usually
-          started in the &domain-http; domain. This is described in
+          a PostgreSQL database by the &cell-billing; <glossterm
+          linkend="gl-cell">cell</glossterm> usually started in the
+          &domain-http; <glossterm
+          linkend="gl-domain">domain</glossterm>. This is described in
           <xref linkend="cb-accounting"/>.
         </para>
       </glossdef>
@@ -377,8 +535,12 @@
       <glossterm>Pool Manager</glossterm>
       <glossdef>
         <para>
-          The pool manager is the central component of a &dcache; system. It
-          decides which pool is used for any kind of request...
+          The pool manager is the <glossterm
+          linkend="gl-cell">cell</glossterm> running in the
+          &domain-dcache; <glossterm
+          linkend="gl-domain">domain</glossterm>.  It is a central
+          component of a &dcache; instance and decides which pool is
+          used for an incoming request.
         </para>
       </glossdef>
     </glossentry>
@@ -387,9 +549,12 @@
       <glossterm>Cost Module</glossterm>
       <glossdef>
         <para>
-          Responsible for determining the cost for copying a file
-          to a pool. The pool manager will choose the pool with
-          the least cost.
+	  The cost module is a Java class responsible for combining
+	  the different types of cost associated with a particular
+	  operation; for example, if a file is to be stored, the cost
+	  module will combine the storage costs and CPU costs for each
+	  candidate target pool. The pool manager will choose the
+	  candidate pool with the least combined cost.
         </para>
       </glossdef>
     </glossentry>
@@ -398,10 +563,10 @@
       <glossterm>Pool Selection Unit</glossterm>
       <glossdef>
         <para>
-          Responsible for determining all pools allowable for a
-          specific transaction. A detailed account of its
-          configuration and behaviour is given in <xref
-            linkend="cf-pm-psu"/>.
+	  The pool selection unit is a Java class responsible for
+	  determining the set of candidate pools for a specific
+	  transaction.  A detailed account of its configuration and
+	  behaviour is given in <xref linkend="cf-pm-psu"/>.
         </para>
       </glossdef>
     </glossentry>
@@ -410,8 +575,13 @@
       <glossterm>Pin Manager</glossterm>
       <glossdef>
         <para>
-          A central service which can <quote>pin</quote> files to a pool for a
-          certain time. It is used by the &srm; to satisfy prestage requests.
+	  The pin manager is a <glossterm
+	  linkend="gl-cell">cell</glossterm> typically running in the
+	  &domain-utility; <glossterm
+	  linkend="gl-domain">domain</glossterm>.  It is a central
+	  service that can <quote>pin</quote> files to a pool for a
+	  certain time. It is used by the &srm; to satisfy prestage
+	  requests.
         </para>
       </glossdef>
     </glossentry>
@@ -420,9 +590,14 @@
       <glossterm>Space Manager</glossterm>
       <glossdef>
         <para>
-          A central service which can reserve space on pools for a
-          certain time. It is used by the &srm; to satisfy space
-          reservation requests.
+	  The (SRM) Space Manager is a <glossterm
+	  linkend="gl-cell">cell</glossterm> typically running in the
+	  &domain-srm; <glossterm
+	  linkend="gl-domain">domain</glossterm>.  It is a central
+	  service that records reserved space on pools.  A space
+	  reservation may be either for a specific duration or never
+	  expires.  The Space Manager is used by the &srm; to satisfy
+	  space reservation requests.
         </para>
       </glossdef>
     </glossentry>
@@ -431,13 +606,27 @@
       <glossterm>Pool</glossterm>
       <glossdef>
         <para>
-	  A pool in a &dcache; instance is responsible for storing
-	  data on disk. It is a <glossterm
-	  linkend="gl-cell">cell</glossterm> which manages the space
-	  available in a subdirectory (specified in the <glossterm
+	  A pool is a <glossterm linkend="gl-cell">cell</glossterm>
+	  that is responsible for managing the space available within
+	  a subdirectory.  Each machine may have multiple pools,
+	  typically due to multiple partitions being made available.
+	  A pool is responsible for storing retrieved files and for
+	  providing access to the data via <glossterm
+	  linkend="gl-mover">mover</glossterm>s.
+	</para>
+
+	<para>
+	  A pool must have a unique name and all pool cells on a
+	  particular machine are hosted in a <glossterm
+	  linkend="gl-domain">domain</glossterm> that derives its name
+	  from the host machine's name.
+	</para>
+
+	<para>
+	  The list of directories that are to store pool data are
+	  found in the <glossterm
 	  linkend="gl-poollist-file"><filename>poollist</filename>
-	  File</glossterm>) which is localizes on the host on which
-	  the pool cell is running.
+	  File</glossterm>, which is located on the pool node.
 	</para>
       </glossdef>
     </glossentry>
