@@ -409,7 +409,7 @@ StoreName myStore</screen>
   </section>
 
   <section id="cf-pnfs-wormholes">
-    <title>Global Configuration with <glossterm linkend="gl-wormhole">Wormholes</glossterm></title>
+    <title>Global Configuration with <glossterm linkend="gl-pnfs-wormhole">Wormholes</glossterm></title>
 
     <para>
       &pnfs; provides a way to distribute configuration information

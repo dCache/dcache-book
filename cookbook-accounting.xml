@@ -32,9 +32,9 @@
   </informalexample>
     
   <para>
-    The first barcket contains the pool name, the second the
-    <glossterm linkend="gl-pnfsid">PNFS Id</glossterm> and the size of
-    the file which is transferred. Then follows the <glossterm
+    The first bracket contains the pool name, the second the
+    <glossterm linkend="gl-pnfs-id">&pnfs; ID</glossterm> and the size
+    of the file which is transferred. Then follows the <glossterm
     linkend="gl-storage_class">storage class</glossterm>, the actual
     amount of bytes transferred, and the number of milliseconds the
     transfer took. The next entry is <literal>true</literal> if the
