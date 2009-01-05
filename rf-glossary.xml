@@ -591,7 +591,7 @@
       <glossdef>
 	<para>
 	  It is possible that &dcache; will choose to make a file
-	  accessable from more than one <glossterm
+	  accessible from more than one <glossterm
 	  linkend="gl-pool">pool</glossterm> using a <glossterm
 	  linkend="gl-p2p">pool-to-pool</glossterm> copy.  If this
 	  happens, then each copy of the file is a replica.
