@@ -566,8 +566,8 @@
 	  <para>
 	    Many <glossterm linkend="gl-pnfs">&pnfs;</glossterm>
 	    features are available in Chimera, including <glossterm
-	    linkend="gl-pnfs-levels">levels</glossterm>, <glossterm
-	    linkend="gl-pnfs-tags">directory tags</glossterm> and many
+	    linkend="gl-pnfs-level">levels</glossterm>, <glossterm
+	    linkend="gl-pnfs-tag">directory tags</glossterm> and many
 	    of the <glossterm linkend="gl-pnfs-dot-cmd">dot
 	    commands</glossterm>.
 	  </para>
