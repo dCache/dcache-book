@@ -65,12 +65,69 @@
       <glossterm>Large File Store (<abbrev>LFS</abbrev>)</glossterm>
       <glossdef>
 	<para>
-	  If a &dcache; instance does not have a <glossterm
-	  linkend="gl-tss">tertiary storage system</glossterm>, it is
-	  not a cache but a large file store. There are two lfs modes:
-	  <glossterm>precious</glossterm> and
-	  <glossterm>transient</glossterm> mode.
+	  A Large File Store is the name for a &dcache; instance that
+	  is acting as a filesystem independent to, or in cooperation
+	  with, an <glossterm linkend="gl-hsm">&hsm;</glossterm>
+	  system.  When &dcache; is acting as an LFS, files may be
+	  stored and later read without involving any &hsm; system.
 	</para>
+
+	<para>
+	  Whether a &dcache; instance provides an LFS depends on
+	  whether there are <glossterm
+	  linkend="gl-pool">pools</glossterm> configured to do so.
+	  The <literal>LFS</literal> option, specified for each pool
+	  within the <glossterm
+	  linkend="gl-poollist-file"><filename>poollist</filename>
+	  file</glossterm>, describes how that pool should behave.
+	  This option can take three possible values:
+	</para>
+	
+	<variablelist>
+          <varlistentry>
+            <term><literal>none</literal></term>
+	    <listitem>
+              <para>
+		the pool does not contribute to any LFS capacity. All
+		newly written files are regarded precious and sent to
+		the &hsm; backend.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+          <varlistentry>
+            <term><literal>precious</literal></term>
+	    <listitem>
+              <para>
+		Newly create files are regarded as precious but are
+		not scheduled for the &hsm; store
+		procedure. Consequently, these file will only
+		disappear from the pool when deleted in the <glossterm
+		linkend="gl-namespace">namespace</glossterm>.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+          <varlistentry>
+            <term><literal>volatile</literal> (or <literal>transient</literal>)</term>
+	    <listitem>
+	      <para>
+		Newly create files are regarded cached and are not
+		scheduled for the &hsm; store procedure.  Though they
+		will never be stored on tape, these file are part of
+		the aging procedure and will be removed as soon as new
+		space is needed.
+	      </para>
+	     
+	      <note>
+		<para>
+		  The <literal>volatile</literal> lfs mode is
+		  deprecated and should not be used.
+		</para>
+	      </note>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
       </glossdef>
     </glossentry>
       
@@ -164,10 +221,25 @@
       </glossentry>
 
       <glossentry id="gl-poollist-file">
-	<glossterm><literal>.poollist</literal> File</glossterm>
+	<glossterm><literal>poollist</literal> File</glossterm>
 	<glossdef>
 	  <para>
-	    <filename><replaceable>PoolDomainName</replaceable>.poollist</filename> File
+	    The poollist files are a collection of files in the
+	    <filename class="directory">/opt/d-cache/config</filename>
+	    directory.  Each <literal>poollist</literal> file
+	    describes the set of <glossterm
+	    linkend="gl-pool">pools</glossterm> that should be
+	    available for a given node.  These files have a filename
+	    like
+	    <filename><replaceable>hostname</replaceable>.poollist</filename>,
+	    where
+	    <literal><replaceable>hostname</replaceable></literal> is
+	    the simple hostname of the node the pools are to run on.
+	  </para>
+
+	  <para>
+	    The file consists of one or more lines, with each line
+	    describing a pool.
 	  </para>
 	</glossdef>
       </glossentry>
@@ -391,7 +463,7 @@
 	    linkend="gl-pnfs-level">levels</glossterm>, <glossterm
 	    linkend="gl-pnfs-tag">directory tags</glossterm> and
 	    <glossterm
-	    linkend="gl-pnfs-wormhole">wormoles</glossterm>.
+	    linkend="gl-pnfs-wormhole">wormholes</glossterm>.
 	  </para>
 	</glossdef>
       </glossentry>
@@ -804,7 +876,36 @@
       </glossdef>
     </glossentry>
 
-    
+    <glossentry id="gl-sweeper">
+      <glossterm>sweeper</glossterm>
+      <glossdef>
+	<para>
+	  A sweeper is an activity located on a <glossterm
+	  linkend="gl-pool">pool</glossterm>.  It is responsible for
+	  deleting files on the pool that have been marked for
+	  removal.  Files can be marked for removal because their
+	  corresponding <glossterm
+	  linkend="gl-namespace">namespace</glossterm> entry has been
+	  deleted or because the local file is a <glossterm
+	  linkend="gl-cached">cache copy</glossterm> and more disk
+	  space is needed.
+	</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry id="gl-hsm-sweeper">
+      <glossterm>&hsm; sweeper</glossterm>
+      <glossdef>
+	<para>
+	  The &hsm; sweeper, if enabled, is a component that is
+	  responsible for removing files from the <glossterm
+	  linkend="gl-hsm">&hsm;</glossterm> when the corresponding
+	  <glossterm linkend="gl-namespace">namespace</glossterm>
+	  entry has been removed.
+	</para>
+      </glossdef>
+    </glossentry>
+
     <glossentry id="gl-cost">
       <glossterm>cost</glossterm>
       <glossdef>
