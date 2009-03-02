@@ -116,7 +116,7 @@
 
     <table>
       <title>New and old PoolManager parameter names</title>
-      <tgroup cols="2" align="left">
+      <tgroup cols="3" align="left">
 	<colspec colnum="1" colname="Pre 1.7.0 Command" colwidth="*"/>
 	<colspec colnum="2" colname="New Command" colwidth="*"/>
 	<colspec colnum="3" colname="Type" colwidth="*"/>
