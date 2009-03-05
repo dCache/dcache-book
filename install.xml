@@ -331,8 +331,7 @@ host    all         all         ::1/128        trust</programlisting>
 PNFS_ROOT = /pnfs
 PNFS_DB = /opt/pnfsdb
 PNFS_LOG = /var/log
-PNFS_OVERWRITE = no
-PNFS_PSQL_USER = pnfsserver</programlisting>
+PNFS_OVERWRITE = no</programlisting>
 
       <para>
         Next run
