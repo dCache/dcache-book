@@ -122,6 +122,7 @@
 
     <blockquote>
       <programlisting width="80"># Switches
+xacml-vo-mapping="OFF"
 saml-vo-mapping="ON"
 kpwd="ON"
 grid-mapfile="OFF"
@@ -135,6 +136,7 @@ gplazmalite-vorole-mapping="OFF"</programlisting>
 
     <blockquote>
       <programlisting width="80"># Priorities
+xacml-vo-mapping-priority="5"
 saml-vo-mapping-priority="1"
 kpwd-priority="3"
 grid-mapfile-priority="4"
@@ -660,14 +662,87 @@ saml-vo-mapping-cache-lifetime="60"</programlisting>
     </blockquote>
 
     <para>
-      The default value is 60 seconds. To turn off cach caching, set
-      the value to 0.
+      To turn off cach caching, set the value to 0.The default value is 60
+      seconds except for in &dcache; version 1.9.2, in which the
+      default value is 0; caching is turned off by default in that version.
     </para>
 
   </section>
 
 
+  <section id="cf-gplazma-xacml">
+    <title>Configuring the xacml-vo-mapping Plugin</title>
+    
+    <para>
+     Beginning with &dcache; version 1.9.2, gPlazma includes a new authorization plugin,
+     to support the XACML
+     authorization schema. Using XACML with SOAP messaging allows gPlazma
+     to acquire authorization mappings from any service which supports the
+     obligation profile for grid interoperability
+     (http://cd-docdb.fnal.gov/cgi-bin/ShowDocument?docid=2952).
+     Servers presently supporting XACML mapping are the latest releases of
+     GUMS and SCAS. Using the new plugin is optional, and previous
+     configuration files are still compatible with gPlazma. If the
+     installation is an upgrade it will change /opt/d-cache/config/gPlazma.batch.
+     It is normally not necessary to change this file, but if you have customized
+     the previous copy, transfer your changes to the new batch file.    
+    </para>
 
+    <para>
+      The configuration is very similar to that for the saml-vo-mapping plugin.
+      There are two lines for the configuration.
+    </para>
+
+    <blockquote>
+      <programlisting width="80"># XACML-based grid VO role mapping 
+XACMLmappingServiceUrl="https://fledgling09.fnal.gov:8443/gums/services/GUMSXACMLAuthorizationServicePort"
+# Time in seconds to cache the mapping in memory
+xacml-vo-mapping-cache-lifetime="180"
+</programlisting>
+    </blockquote>
+    
+for a <ulink url="http://grid.racf.bnl.gov/GUMS/">GUMS</ulink> server, or
+
+    <blockquote>
+      <programlisting width="80"># XACML-based grid VO role mapping 
+XACMLmappingServiceUrl="https://scas.europeansite.eu:8443"
+# Time in seconds to cache the mapping in memory
+xacml-vo-mapping-cache-lifetime="180"
+</programlisting>
+    </blockquote>
+
+    <para>
+      As for the saml-vo-mapping, the first line containins the &url;
+      for the web service.Replace the &url; with that of the site-specific
+      GUMS or SCAS server. When using the "GUMSXACMLAuthorizationServicePort"
+      (notice the difference in service name from that for the saml-vo-mapping),
+      the service will only provide the username mapping and it will still
+      be necesary to have the storage-authzdb file used in other plugins.
+      See the above documentation <link linkend='cf-gplazma-authzdb'>Configuring
+      storage-authzdb</link> for how to create the file.
+    </para>
+
+    <para>
+      The second line contains the value of the caching lifetime. In
+      order to decrease the volume of requests to the XACML
+      authorization (GUMS or SCAS) service, authorizations for the
+      saml-vo-mapping method are by default cached for a period of
+      time. To change the caching duration, modify the
+      saml-vo-mapping-cache-lifetime value in
+      <filename>/opt/d-cache/etc/dcachesrm-gplazma.policy</filename>
+    </para>
+
+    <blockquote>
+      <programlisting width="80">saml-vo-mapping-cache-lifetime="120"</programlisting>
+    </blockquote>
+
+    <para>
+      To turn off cach caching, set the value to 0. For xacml-vo-mapping, the
+      default value is 0; caching is turned off by default.
+    </para>
+
+  </section>
+  
   <section id="cf-gplazma-example">
     <title>An example policy file</title>
 
@@ -885,7 +960,7 @@ useGPlazmaAuthorizationCell=true</programlisting>
     <title>&cell-gplazma; Options</title>
 
     <section>
-      <title>Validating User Attributes</title>
+      <title>Validating User Attributes in &dcache; 1.8</title>
  
       <para>
 	A user's roles (Fully Qualified Attribute Names) are read from
@@ -909,6 +984,43 @@ useGPlazmaAuthorizationCell=true</programlisting>
 	The default is <literal>false</literal>. The same would need
 	to be done on the &srm; or any door node for which
 	&cell-gplazma; modules are called directly as a fallback.
+      </para>
+
+    </section>
+    
+    <section>
+      <title>Validating User Attributes in &dcache; 1.9</title>
+ 
+      <para>
+	In version 1.9, VOMS attribute validation in &cell-gplazma;
+	uses a method in which installation of the voms server certificate
+	is not required. Instead the signature on an attribute is checked
+	against the ca certificate that signed the voms server certificate.
+	To have &cell-gplazma; validate the proxy attributes in &dcache; 1.9,
+	write configuration directories and "*.lsc" files in
+	<filename>/etc/grid-security/vomsdir</filename> for each authorized voms
+	server according to
+	<ulink url="https://twiki.cern.ch/twiki/bin/view/LCG/VomsFAQforServiceManagers">these instructions</ulink> 
+	and in <filename>/opt/d-cache/etc/dcachesrm-gplazma.policy</filename> set
+      </para>
+
+      <blockquote>
+	<programlisting width="80">vomsValidation="true"</programlisting>
+      </blockquote>
+
+      <para>
+	As with previous versions, the default is <literal>false</literal>. Whether
+	validation is on or not, there must be a non-empty /etc/grid-security/vomsdir
+	on the node which is running &cell-gplazma;. It is enough to do
+      </para>
+      
+      <blockquote>
+	mkdir /etc/grid-security/vomsdir
+        touch /etc/grid-security/vomsdir/empty-cert.pem
+      </blockquote>
+      
+      <para>
+      to create the non-empty directory.
       </para>
 
     </section>
