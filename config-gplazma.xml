@@ -299,7 +299,15 @@ storageAuthzPath="/etc/grid-security/storage-authzdb"</programlisting>
 	path. The first path is always defined as being relative to
 	the second path.
       </para>
-
+      
+      <para>
+        Starting with &dcache; 1.9, multiple gids can be assigned by using comma-separated values for the GID file, as in
+      </para>
+      
+      <blockquote>
+	<programlisting width="80">authorize uscms01 read-write 60076 5063,5071,6843 / / /</programlisting>
+      </blockquote>   
+      
       <para>
 	The lines of the storage-authzdb file are similar to the
 	<quote>login</quote> lines of the
@@ -678,8 +686,7 @@ saml-vo-mapping-cache-lifetime="60"</programlisting>
      to support the XACML
      authorization schema. Using XACML with SOAP messaging allows gPlazma
      to acquire authorization mappings from any service which supports the
-     obligation profile for grid interoperability
-     (http://cd-docdb.fnal.gov/cgi-bin/ShowDocument?docid=2952).
+     <ulink url="http://cd-docdb.fnal.gov/cgi-bin/ShowDocument?docid=2952">obligation profile for grid interoperability</ulink>.
      Servers presently supporting XACML mapping are the latest releases of
      GUMS and SCAS. Using the new plugin is optional, and previous
      configuration files are still compatible with gPlazma. If the
@@ -710,16 +717,40 @@ XACMLmappingServiceUrl="https://scas.europeansite.eu:8443"
 xacml-vo-mapping-cache-lifetime="180"
 </programlisting>
     </blockquote>
+    
+    <para>
+    for an SCAS server.
+    </para>
 
     <para>
       As for the saml-vo-mapping, the first line containins the &url;
       for the web service.Replace the &url; with that of the site-specific
       GUMS or SCAS server. When using the "GUMSXACMLAuthorizationServicePort"
-      (notice the difference in service name from that for the saml-vo-mapping),
-      the service will only provide the username mapping and it will still
-      be necesary to have the storage-authzdb file used in other plugins.
-      See the above documentation <link linkend='cf-gplazma-authzdb'>Configuring
-      storage-authzdb</link> for how to create the file.
+      (notice the difference in service name from that for the saml-vo-mapping)
+      with a GUMS server, the service will only provide the username mapping
+      and it will still be necesary to have the storage-authzdb file used in
+      other plugins. See the above documentation <link linkend='cf-gplazma-authzdb'>
+      Configuring storage-authzdb</link> for how to create the file. An SCAS server
+      will return a UID, a primary GID, and secondary GIDS, but not a rootpath. A
+      storage-authzdb file will be necesary to assign the rootpath. Since SCAS
+      does not return a username, the convention in  &cell-gplazma; is to use "uid:gid"
+      for the username, where uid is the string representation of the uid returned by
+      SCAS, and gid is the string representation of the primary GID returned by SCAS.
+      Thus a line such as 
+    </para>
+    
+    <blockquote>
+    authorize 13160:9767 read-write 13160 9767 / /pnfs/fnal.gov/data /
+    </blockquote>
+    
+    <para>
+    in <filename>/etc/grid-security/storage-authzdb</filename> will serve to
+    assign the user mapped by SCAS to uid=13160 and primary gid=9767 the rootpath
+    <filename>/pnfs/fnal.gov/data</filename>. It is best for consistency's sake
+    to fill in the UID and GID fields with the same values as in the "uid:gid" field.
+    Additional secondary gids can be assigned by using comma-separated values in the
+    GID field. Any gids there not already returned as secondary gids by SCAS will
+    be added to the secondary gids list.
     </para>
 
     <para>
