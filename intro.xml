@@ -65,6 +65,99 @@
     configuring the &dcache; instance.  This is described in the later
     sections of this book.
   </para>
+
+
+  <section>
+    <title>Cells and Domains</title>
+
+    <para>
+      A <firstterm>cell</firstterm> is &dcache;'s most fundamental
+      executable building block.  Even a small &dcache; deployment
+      will have many cells, each of which has a specific task to
+      perform.  Later sections will describe these cells and how they
+      interact in more detail.
+    </para>
+
+    <para>
+      A <firstterm>domain</firstterm> is a container for running
+      cells.  Although the default configuration of &dcache; will be
+      configured to start certain cells within specific domains, this
+      layout is not required; instead, it's a reasonable default
+      layout for a normal &dcache; instance.
+    </para>
+
+    <para>
+      One can reconfigure &dcache; changing which cells the domains
+      run.  In effect, cells can be freely moved from domain to
+      domain, often without requiring any additional change to
+      configuration.  This allows &dcache; to expand: as a service
+      comes under increased usage, so additional hardware can be
+      brought into play and &dcache; can spread the load over more
+      hardware.
+    </para>
+
+    <para>
+      A node (or computer) can host many domains, but the choice of
+      which domains to run on a single machine will depend on expected
+      load of the &dcache; instance.
+    </para>
+
+    <para>
+      A domain requires precisely one Java Virtual Machine (JVM)
+      instance, which it cannot share with any other domain.  In
+      essence, a domain <emphasis>is</emphasis> the JVM with the
+      additional functionality necessary to run cells.  Since domains
+      each have an independent JVM, they share the node's resources
+      such as memory, CPU time and network bandwidth.
+    </para>
+  </section>
+
+
+<!--
+  <section>
+    <title>Pools of storage</title>
+
+    <para>
+      We introduce pools and poolgroups.
+    </para>
+  </section>
+
+  <section>
+    <title>Doors and movers</title>
+
+    <para>
+      Introduce doors...
+    </para>
+  </section>
+
+
+  <section>
+    <title>Linking &dcache; to the outside world</title>
+
+    <para>
+      Introduce unit, unitgroups and links.
+    </para>
+  </section>
+
+
+  <section>
+    <title>Storing data on tape</title>
+
+    <para>
+      Introduce HSM activity
+    </para>
+
+  </section>
+
+  <section>
+    <title>Linkgroups and SRM</title>
+
+    <para>
+      Introducing SRM concepts and linkgroups.
+    </para>
+  </section>
+
+-->
   
   <figure id="fig-intro-layer-model">
     <title>The &dcache; Layer Model</title>
