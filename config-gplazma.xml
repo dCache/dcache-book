@@ -708,7 +708,7 @@ xacml-vo-mapping-cache-lifetime="180"
 </programlisting>
     </blockquote>
     
-for a <ulink url="http://grid.racf.bnl.gov/GUMS/">GUMS</ulink> server, or
+for a <ulink url="http://grid.racf.bnl.gov/GUMS/">GUMS</ulink> server, or, for an SCAS server,
 
     <blockquote>
       <programlisting width="80"># XACML-based grid VO role mapping 
@@ -717,10 +717,6 @@ XACMLmappingServiceUrl="https://scas.europeansite.eu:8443"
 xacml-vo-mapping-cache-lifetime="180"
 </programlisting>
     </blockquote>
-    
-    <para>
-    for an SCAS server.
-    </para>
 
     <para>
       As for the saml-vo-mapping, the first line containins the &url;
