@@ -67,49 +67,94 @@
   </para>
 
 
-  <section>
+  <section id="intro-cells-domains">
     <title>Cells and Domains</title>
+
+    <para>
+      &dcache;, as distributed storage software, can provide a
+      coherent service using multiple computers or
+      <firstterm>nodes</firstterm> (the two terms are used
+      interchangeable).  Although &dcache; can provide a complete
+      storage solution on a single computer, one of its strengths is
+      the ability to scale by spreading the work over multiple nodes.
+    </para>
 
     <para>
       A <firstterm>cell</firstterm> is &dcache;'s most fundamental
       executable building block.  Even a small &dcache; deployment
-      will have many cells, each of which has a specific task to
-      perform.  Later sections will describe these cells and how they
-      interact in more detail.
+      will have many cells running.  Each cell has a specific task to
+      perform and most will interact with other cells to achieve it.
+    </para>
+
+    <para>
+      Cells can be grouped into common types; for example, pools,
+      doors.  Cells of the same type behave in a similar fashion and
+      have higher-level behaviour (such as storing files, making files
+      available).  Later chapters will describe these different cell
+      types and how they interact in more detail.
+    </para>
+
+    <para>
+      There are only a few cells where (at most) only a single
+      instance is required.  The majority of cells within a &dcache;
+      instance can have multiple instances and &dcache; is designed to
+      allow load-balancing over these cells.
     </para>
 
     <para>
       A <firstterm>domain</firstterm> is a container for running
-      cells.  Although the default configuration of &dcache; will be
-      configured to start certain cells within specific domains, this
-      layout is not required; instead, it's a reasonable default
-      layout for a normal &dcache; instance.
-    </para>
-
-    <para>
-      One can reconfigure &dcache; changing which cells the domains
-      run.  In effect, cells can be freely moved from domain to
-      domain, often without requiring any additional change to
-      configuration.  This allows &dcache; to expand: as a service
-      comes under increased usage, so additional hardware can be
-      brought into play and &dcache; can spread the load over more
-      hardware.
-    </para>
-
-    <para>
-      A node (or computer) can host many domains, but the choice of
-      which domains to run on a single machine will depend on expected
-      load of the &dcache; instance.
-    </para>
-
-    <para>
-      A domain requires precisely one Java Virtual Machine (JVM)
+      cells.  Each domain runs in its own Java Virtual Machine (JVM)
       instance, which it cannot share with any other domain.  In
-      essence, a domain <emphasis>is</emphasis> the JVM with the
-      additional functionality necessary to run cells.  Since domains
-      each have an independent JVM, they share the node's resources
-      such as memory, CPU time and network bandwidth.
+      essence, a domain <emphasis>is</emphasis> a JVM with the
+      additional functionality necessary to run cells (such as system
+      administration and inter-cell communication).  Since domains
+      running on the same node and each have an independent JVM, they
+      share the node's resources such as memory, available CPU and
+      network bandwidth.
     </para>
+
+    <para>
+      &dcache; comes with a set of domain definitions, each specifying
+      a useful set of cells to run within that domain to achieve a
+      certain goal.  These goals include storing data, providing a
+      front-end to the storage, recording filenames, and so on.  The
+      list of cells to run within these domains are recommended
+      deployments: the vast majority of &dcache; deployments do not
+      need to alter these lists.
+    </para>
+
+    <para>
+      A node is free to run multiple domains, provided there's no
+      conflicting requirement from the domains for exclusive access to
+      hardware.  A node may run a single domain; but, typically a node
+      will run multiple domains.  The choice of which domains to run
+      on which nodes will depend on expected load of the &dcache;
+      instance and on the available hardware.  If this sounds
+      daunting, don't worry: starting and stopping a domain is easy
+      and migrating a domain from one node to another is often as easy
+      as stopping the domain on one node and starting it on another.
+    </para>
+
+
+    <para>
+      &dcache; is scalable storage software.  This means that (in most
+      cases) the performance of &dcache; can be improved by
+      introducing new hardware.  Depending on the performance issue,
+      the new hardware may be used by hosting a domain migrated from a
+      overloaded node, or by running an additional instance of a
+      domain to allow load-balancing.
+    </para>
+
+    <para>
+      Most cells communicate in such a way that they don't rely on in
+      which domain they are running.  This allows a site to move cells
+      from one domain to another or to create new domain definitions
+      with some subset of available cells.  Although this is possible,
+      it is rare that redefining domains or defining new domains is
+      necessary. Starting or stopping domains is usually sufficient
+      for managing load.
+    </para>
+
   </section>
 
 
