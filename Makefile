@@ -41,10 +41,12 @@ HTML_CHUNK_DEPS = $(SOURCES:%.xml=.%-chunk.d)
 # Used by deploy target
 ALL = $(HTML_SINGLE_FILES) $(PDF_FILES) $(HTML_ALL_CHUNK_FILES) book.css
 ALL_INSTALLED = $(ALL:%=%__INSTALL__)
+ALL_TEST_INSTALLED = $(ALL:%=%__TEST_INSTALL__)
 
 
 WWW_SERVER = www.dcache.org
 WWW_LOCATION = /data/www/dcache.org/manuals/Book/
+WWW_TEST_LOCATION = /data/www/dcache.org/manuals/Book-test/
 
 # NB we don't do deps on txt as it depends on html-single output.  This
 #    is cheating, but hey, it works.
@@ -84,6 +86,7 @@ info:
 	@echo "  html        -- build HTML pages"
 	@echo "  txt         -- build text version"
 	@echo "  deploy      -- use scp to deploy files at www.dCache.org"
+	@echo "  test-deploy -- use scp to deploy files at www.dCache.org in a test location"
 	@echo
 	@echo "More specific build targets:"
 	@echo
@@ -155,14 +158,24 @@ xsl/fo-titlepage.xsl: xsl/fo-titlepage.xml
 
 deploy: $(ALL_INSTALLED)
 
+test-deploy: $(ALL_TEST_INSTALLED)
+
 %__INSTALL__: %
 	chmod a+r $<
 	scp $< $(WWW_SERVER):$(WWW_LOCATION)
+
+%__TEST_INSTALL__: %
+	chmod a+r $<
+	scp $< $(WWW_SERVER):$(WWW_TEST_LOCATION)
 
 #  Unfortunately, we need a special case here.
 Book__INSTALL__: Book/index.$(HTML_EXT)
 	chmod -R a+Xr Book/*
 	scp -r Book/* $(WWW_SERVER):$(WWW_LOCATION)
+
+Book__TEST_INSTALL__: Book/index.$(HTML_EXT)
+	chmod -R a+Xr Book/*
+	scp -r Book/* $(WWW_SERVER):$(WWW_TEST_LOCATION)
 
 
 
