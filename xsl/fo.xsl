@@ -34,8 +34,6 @@
 
     <xsl:attribute name="text-align">start</xsl:attribute>
     <xsl:attribute name="wrap-option">wrap</xsl:attribute>
-    <!-- The following item doesn't work with FOP -->
-    <xsl:attribute name="hyphenation-character">&#8626;</xsl:attribute>
 
     <xsl:attribute name="font-family">
       <xsl:value-of select="$monospace.font.family"/>
