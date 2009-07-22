@@ -7,7 +7,7 @@
 
 <section id="rf-cc-pool">
   <title>Pool Commands</title>
-  
+
   <refentry id="cmd-rep_ls">
     <refmeta>
       <refentrytitle><command>rep ls</command></refentrytitle>
@@ -16,84 +16,84 @@
       <refname><command>rep ls</command></refname>
       <refpurpose>List the files currently in the repository of the pool.</refpurpose>
     </refnamediv>
-    
+
     <refsynopsisdiv>
       <cmdsynopsis>
-	<command>rep ls</command>
-	<group choice="plain">
-	  <arg rep="repeat">pnfsId</arg>
-	  <!-- <sbr/> -->
-	  <arg choice="plain">
-	    <arg>-l=<group choice="plain" rep="repeat">
-		<arg choice="plain">s</arg>
-		<arg choice="plain">p</arg>
-		<arg choice="plain">l</arg>
-		<arg choice="plain">u</arg>
-		<arg choice="plain">nc</arg>
-		<arg choice="plain">e</arg>
-	      </group>
-	    </arg>
-	    <arg>-s=<group choice="plain">
-		<arg choice="plain">k</arg>
-		<arg choice="plain">m</arg>
-		<arg choice="plain">g</arg>
-		<arg choice="plain">t</arg>
-	      </group>
-	    </arg>
-	  </arg>
-	</group>
+        <command>rep ls</command>
+        <group choice="plain">
+          <arg rep="repeat">pnfsId</arg>
+          <!-- <sbr/> -->
+          <arg choice="plain">
+            <arg>-l=<group choice="plain" rep="repeat">
+                <arg choice="plain">s</arg>
+                <arg choice="plain">p</arg>
+                <arg choice="plain">l</arg>
+                <arg choice="plain">u</arg>
+                <arg choice="plain">nc</arg>
+                <arg choice="plain">e</arg>
+              </group>
+            </arg>
+            <arg>-s=<group choice="plain">
+                <arg choice="plain">k</arg>
+                <arg choice="plain">m</arg>
+                <arg choice="plain">g</arg>
+                <arg choice="plain">t</arg>
+              </group>
+            </arg>
+          </arg>
+        </group>
       </cmdsynopsis>
       <variablelist>
-	<varlistentry>
-	  <term>pnfsId</term>
-	  <listitem>
-	    <para>
-	      The &pnfs; ID(s) for which the files in the repository
-	      will be listed.
-	    </para>
-	  </listitem>
-	</varlistentry>
-	<varlistentry>
-	  <term>-l</term>
-	  <listitem>
+        <varlistentry>
+          <term>pnfsId</term>
+          <listitem>
+            <para>
+              The &pnfs; ID(s) for which the files in the repository
+              will be listed.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>-l</term>
+          <listitem>
                 <para>
-		  List only the files with one of the following
-		  properties:
-		</para>
+                  List only the files with one of the following
+                  properties:
+                </para>
 
-		<screen>s      sticky files
+                <screen>s      sticky files
 p      precious files
 l      locked files
 u      files in use
 nc     files which are not cached
 e      files with an error condition</screen>
 
-	  </listitem>
-	</varlistentry>
-	<varlistentry>
-	  <term>-s</term>
-	  <listitem>
-	    <para>
-	      Unit, the filesize is shown:
-	    </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>-s</term>
+          <listitem>
+            <para>
+              Unit, the filesize is shown:
+            </para>
 
-	    <screen>k      data amount in KBytes
+            <screen>k      data amount in KBytes
 m      data amount in MBytes
 g      data amount in GBytes
 t      data amount in TBytes</screen>
 
-	  </listitem>
-	</varlistentry>
+          </listitem>
+        </varlistentry>
       </variablelist>
     </refsynopsisdiv>
-    
+
     <refsection>
       <title>Description</title>
       <para>
       </para>
     </refsection>
   </refentry>
-  
+
   <refentry id="cmd-st_set_max_active">
     <refmeta>
       <refentrytitle><command>st set max active</command></refentrytitle>
@@ -104,32 +104,32 @@ t      data amount in TBytes</screen>
     </refnamediv>
     <refsynopsisdiv>
       <cmdsynopsis>
-	<command>st set max active</command>
-	<arg choice="req"><replaceable>maxActiveStoreTransfers</replaceable></arg>
+        <command>st set max active</command>
+        <arg choice="req"><replaceable>maxActiveStoreTransfers</replaceable></arg>
       </cmdsynopsis>
       <variablelist>
-	<varlistentry>
-	  <term>maxActiveStoreTransfers</term>
-	  <listitem>
-	    <para>
-	      The maximum number of active store transfers.
-	    </para>
-	  </listitem>
-	</varlistentry>
+        <varlistentry>
+          <term>maxActiveStoreTransfers</term>
+          <listitem>
+            <para>
+              The maximum number of active store transfers.
+            </para>
+          </listitem>
+        </varlistentry>
       </variablelist>
     </refsynopsisdiv>
     <refsection>
       <title>Description</title>
       <para>
-	Any further requests will be queued. This value will also be
-	used by the <glossterm linkend="gl-pm-comp-cm">cost
-	  module</glossterm> for calculating the <glossterm
-	  linkend="gl-performance_cost">performance cost</glossterm>.
+        Any further requests will be queued. This value will also be
+        used by the <glossterm linkend="gl-pm-comp-cm">cost
+          module</glossterm> for calculating the <glossterm
+          linkend="gl-performance_cost">performance cost</glossterm>.
       </para>
     </refsection>
   </refentry>
-  
-  
+
+
   <refentry id="cmd-rh_set_max_active">
     <refmeta>
       <refentrytitle><command>rh set max active</command></refentrytitle>
@@ -140,31 +140,31 @@ t      data amount in TBytes</screen>
     </refnamediv>
     <refsynopsisdiv>
       <cmdsynopsis>
-	<command>rh set max active</command>
-	<arg choice="req"><replaceable>maxActiveRetoreTransfers</replaceable></arg>
+        <command>rh set max active</command>
+        <arg choice="req"><replaceable>maxActiveRetoreTransfers</replaceable></arg>
       </cmdsynopsis>
       <variablelist>
-	<varlistentry>
-	  <term>maxActiveRetoreTransfers</term>
-	  <listitem>
-	    <para>
-	      The maximum number of active restore transfers.
-	    </para>
-	  </listitem>
-	</varlistentry>
+        <varlistentry>
+          <term>maxActiveRetoreTransfers</term>
+          <listitem>
+            <para>
+              The maximum number of active restore transfers.
+            </para>
+          </listitem>
+        </varlistentry>
       </variablelist>
     </refsynopsisdiv>
     <refsection>
       <title>Description</title>
       <para>
-	Any further requests will be queued. This value will also be
-	used by the <glossterm linkend="gl-pm-comp-cm">cost
-	  module</glossterm> for calculating the <glossterm
-	  linkend="gl-performance_cost">performance cost</glossterm>.
+        Any further requests will be queued. This value will also be
+        used by the <glossterm linkend="gl-pm-comp-cm">cost
+          module</glossterm> for calculating the <glossterm
+          linkend="gl-performance_cost">performance cost</glossterm>.
       </para>
     </refsection>
   </refentry>
-  
+
   <refentry id="cmd-mover_set_max_active">
     <refmeta>
       <refentrytitle><command>mover set max active</command></refentrytitle>
@@ -175,45 +175,45 @@ t      data amount in TBytes</screen>
     </refnamediv>
     <refsynopsisdiv>
       <cmdsynopsis>
-	<command>mover set max active</command>
-	<arg choice="req"><replaceable>maxActiveClientTransfers</replaceable></arg>
-	<arg><option>-queue=<replaceable>moverQueueName</replaceable></option></arg>
+        <command>mover set max active</command>
+        <arg choice="req"><replaceable>maxActiveClientTransfers</replaceable></arg>
+        <arg><option>-queue=<replaceable>moverQueueName</replaceable></option></arg>
       </cmdsynopsis>
       <variablelist>
-	<varlistentry>
-	  <term>maxActiveClientTransfers</term>
-	  <listitem>
-	      <para>
-	      The maximum number of active client transfers.
-	    </para>
-	  </listitem>
-	</varlistentry>
-	<varlistentry>
-	  <term>moverQueueName</term>
-	  <listitem>
-	    <para>
-	      The mover queue for which the maximum number of
-	      active transfers should be set. If this is not
-	      specified, the default queue is assumed, in order to
-	      be compatible with previous versions which did not
-	      support multiple mover queues (before version
-	      1.6.6).
-	    </para>
-	  </listitem>
-	</varlistentry>
+        <varlistentry>
+          <term>maxActiveClientTransfers</term>
+          <listitem>
+              <para>
+              The maximum number of active client transfers.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>moverQueueName</term>
+          <listitem>
+            <para>
+              The mover queue for which the maximum number of
+              active transfers should be set. If this is not
+              specified, the default queue is assumed, in order to
+              be compatible with previous versions which did not
+              support multiple mover queues (before version
+              1.6.6).
+            </para>
+          </listitem>
+        </varlistentry>
       </variablelist>
     </refsynopsisdiv>
     <refsection>
       <title>Description</title>
       <para>
-	Any further requests will be queued. This value will also be
-	used by the <glossterm linkend="gl-pm-comp-cm">cost
-	  module</glossterm> for calculating the <glossterm
-	  linkend="gl-performance_cost">performance cost</glossterm>.
+        Any further requests will be queued. This value will also be
+        used by the <glossterm linkend="gl-pm-comp-cm">cost
+          module</glossterm> for calculating the <glossterm
+          linkend="gl-performance_cost">performance cost</glossterm>.
       </para>
     </refsection>
   </refentry>
-  
+
   <refentry id="cmd-p2p_set_max_active">
     <refmeta>
       <refentrytitle><command>p2p set max active</command></refentrytitle>
@@ -224,74 +224,74 @@ t      data amount in TBytes</screen>
     </refnamediv>
     <refsynopsisdiv>
       <cmdsynopsis>
-	<command>p2p set max active</command>
-	<arg choice="req"><replaceable>maxActiveP2PTransfers</replaceable></arg>
+        <command>p2p set max active</command>
+        <arg choice="req"><replaceable>maxActiveP2PTransfers</replaceable></arg>
       </cmdsynopsis>
       <variablelist>
-	<varlistentry>
-	  <term>maxActiveP2PTransfers</term>
-	  <listitem>
-	    <para>
-	      The maximum number of active pool-to-pool server transfers.
-	    </para>
-	  </listitem>
-	</varlistentry>
+        <varlistentry>
+          <term>maxActiveP2PTransfers</term>
+          <listitem>
+            <para>
+              The maximum number of active pool-to-pool server transfers.
+            </para>
+          </listitem>
+        </varlistentry>
       </variablelist>
     </refsynopsisdiv>
     <refsection>
       <title>Description</title>
       <para>
-	Any further requests will be queued. This value will also be
-	used by the <glossterm linkend="gl-pm-comp-cm">cost
-	  module</glossterm> for calculating the <glossterm
-	  linkend="gl-performance_cost">performance cost</glossterm>.
+        Any further requests will be queued. This value will also be
+        used by the <glossterm linkend="gl-pm-comp-cm">cost
+          module</glossterm> for calculating the <glossterm
+          linkend="gl-performance_cost">performance cost</glossterm>.
       </para>
     </refsection>
   </refentry>
-  
+
   <refentry id="cmd-pp_set_max_active">
     <refmeta>
       <refentrytitle><command>pp set max active</command></refentrytitle>
     </refmeta>
     <refnamediv>
-      <refname><command>pp set max active</command></refname> 
+      <refname><command>pp set max active</command></refname>
       <refpurpose>
-	Set the value used for scaling the performance cost of
-	pool-to-pool client transfers analogous to the other
-	<literal>set max active</literal>-commands.
+        Set the value used for scaling the performance cost of
+        pool-to-pool client transfers analogous to the other
+        <literal>set max active</literal>-commands.
       </refpurpose>
     </refnamediv>
     <refsynopsisdiv>
       <cmdsynopsis>
-	<command>pp set max active</command>
-	<arg choice="req"><replaceable>maxActivePPTransfers</replaceable></arg>
+        <command>pp set max active</command>
+        <arg choice="req"><replaceable>maxActivePPTransfers</replaceable></arg>
       </cmdsynopsis>
       <variablelist>
-	<varlistentry>
-	  <term>maxActivePPTransfers</term>
-	  <listitem>
-	    <para>
-	      The new scaling value for the cost calculation.
-	    </para>
-	  </listitem>
-	</varlistentry>
+        <varlistentry>
+          <term>maxActivePPTransfers</term>
+          <listitem>
+            <para>
+              The new scaling value for the cost calculation.
+            </para>
+          </listitem>
+        </varlistentry>
       </variablelist>
     </refsynopsisdiv>
     <refsection>
       <title>Description</title>
       <para>
-	All pool-to-pool client requests will be performed
-	immediately in order to avoid deadlocks.
-	
-	This value will only used by the <glossterm
-	  linkend="gl-pm-comp-cm">cost module</glossterm> for
-	calculating the <glossterm
-	  linkend="gl-performance_cost">performance cost</glossterm>.
+        All pool-to-pool client requests will be performed
+        immediately in order to avoid deadlocks.
+
+        This value will only used by the <glossterm
+          linkend="gl-pm-comp-cm">cost module</glossterm> for
+        calculating the <glossterm
+          linkend="gl-performance_cost">performance cost</glossterm>.
       </para>
     </refsection>
   </refentry>
 
-<!--  
+<!--
   <refentry id="cmd-flush_set_max_active">
     <refmeta>
       <refentrytitle><command>flush set max active</command></refentrytitle>
@@ -302,28 +302,28 @@ t      data amount in TBytes</screen>
     </refnamediv>
     <refsynopsisdiv>
       <cmdsynopsis>
-	<command>flush set max active</command>
-	<arg choice="req"><replaceable>maxActiveNOCLUETransfers</replaceable></arg>
+        <command>flush set max active</command>
+        <arg choice="req"><replaceable>maxActiveNOCLUETransfers</replaceable></arg>
       </cmdsynopsis>
       <variablelist>
-	<varlistentry>
-	  <term>maxActiveNOCLUETransfers</term>
-	  <listitem>
-	    <para>
-	      The maximum number of active NOCLUE transfers.
-	    </para>
-	  </listitem>
-	</varlistentry>
+        <varlistentry>
+          <term>maxActiveNOCLUETransfers</term>
+          <listitem>
+            <para>
+              The maximum number of active NOCLUE transfers.
+            </para>
+          </listitem>
+        </varlistentry>
       </variablelist>
     </refsynopsisdiv>
     <refsection>
       <title>Description</title>
       <para>
-	NOCLUE
+        NOCLUE
       </para>
     </refsection>
   </refentry>
--->  
+-->
 
   <refentry id="cmd-set_gap">
     <refmeta>
@@ -335,37 +335,37 @@ t      data amount in TBytes</screen>
     </refnamediv>
     <refsynopsisdiv>
       <cmdsynopsis>
-	<command>set gap</command>
-	<arg choice="req"><replaceable>gapPara</replaceable></arg>
+        <command>set gap</command>
+        <arg choice="req"><replaceable>gapPara</replaceable></arg>
       </cmdsynopsis>
       <variablelist>
-	<varlistentry>
-	  <term>gapPara</term>
-	  <listitem>
-	    <para>
-	      The size of free space below which it will be
-	      assumed that the pool is full. Default is 4GB.
-	    </para>
-	  </listitem>
-	</varlistentry>
+        <varlistentry>
+          <term>gapPara</term>
+          <listitem>
+            <para>
+              The size of free space below which it will be
+              assumed that the pool is full. Default is 4GB.
+            </para>
+          </listitem>
+        </varlistentry>
       </variablelist>
     </refsynopsisdiv>
     <refsection>
       <title>Description</title>
       <para>
-	The gap parameter is used within the space cost
-	calculation scheme described in <xref
-	  linkend="cf-pm-cm-space"/>. It specifies the size of free
-	space below which it will be assumed that the pool is full
-	and consequently the least recently used file has to be
-	removed if a new file has to be stored on the pool. If, on
-	the other hand, the free space is greater than gapPara, it
-	will be expensive to store a file on the pool which
-	exceeds the free space.
+        The gap parameter is used within the space cost
+        calculation scheme described in <xref
+          linkend="cf-pm-cm-space"/>. It specifies the size of free
+        space below which it will be assumed that the pool is full
+        and consequently the least recently used file has to be
+        removed if a new file has to be stored on the pool. If, on
+        the other hand, the free space is greater than gapPara, it
+        will be expensive to store a file on the pool which
+        exceeds the free space.
       </para>
     </refsection>
   </refentry>
-  
+
   <refentry id="cmd-set_breakeven">
     <refmeta>
       <refentrytitle><command>set breakeven</command></refentrytitle>
@@ -376,38 +376,38 @@ t      data amount in TBytes</screen>
     </refnamediv>
     <refsynopsisdiv>
       <cmdsynopsis>
-	<command>set breakeven</command>
-	<arg choice="req"><replaceable>breakevenPara</replaceable></arg>
+        <command>set breakeven</command>
+        <arg choice="req"><replaceable>breakevenPara</replaceable></arg>
       </cmdsynopsis>
       <variablelist>
-	<varlistentry>
-	  <term>breakevenPara</term>
-	  <listitem>
-	    <para>
-	      The breakeven parameter has to be a positive number
-	      smaller than 1.0.  It specifies the impact of the age of
-	      the <glossterm linkend="gl-lru">least recently used
-	      file</glossterm> on space cost. It the LRU file is one
-	      week old, the space cost will be equal to <!-- TODO:
-	      this should be done better --> <literal>(1 +
-	      breakeven)</literal>. Note that this will not be true,
-	      if the breakeven parameter has been set to a value
-	      greater or equal to 1.
-	    </para>
-	  </listitem>
-	</varlistentry>
+        <varlistentry>
+          <term>breakevenPara</term>
+          <listitem>
+            <para>
+              The breakeven parameter has to be a positive number
+              smaller than 1.0.  It specifies the impact of the age of
+              the <glossterm linkend="gl-lru">least recently used
+              file</glossterm> on space cost. It the LRU file is one
+              week old, the space cost will be equal to <!-- TODO:
+              this should be done better --> <literal>(1 +
+              breakeven)</literal>. Note that this will not be true,
+              if the breakeven parameter has been set to a value
+              greater or equal to 1.
+            </para>
+          </listitem>
+        </varlistentry>
       </variablelist>
     </refsynopsisdiv>
     <refsection>
       <title>Description</title>
       <para>
-	The breakeven parameter is used within the space cost
-	calculation scheme described in <xref
-	  linkend="cf-pm-cm-space"/>.
+        The breakeven parameter is used within the space cost
+        calculation scheme described in <xref
+          linkend="cf-pm-cm-space"/>.
       </para>
     </refsection>
   </refentry>
-  
+
   <refentry id="cmd-mover_ls">
     <refmeta>
       <refentrytitle><command>mover ls</command></refentrytitle>
@@ -418,32 +418,780 @@ t      data amount in TBytes</screen>
     </refnamediv>
     <refsynopsisdiv>
       <cmdsynopsis>
-	<command>mover ls</command>
-	<group>
-	  <arg choice="req">-queue</arg>
-	  <arg choice="req">-queue=<replaceable>queueName</replaceable></arg>
-	</group>
+        <command>mover ls</command>
+        <group>
+          <arg choice="req">-queue</arg>
+          <arg choice="req">-queue=<replaceable>queueName</replaceable></arg>
+        </group>
       </cmdsynopsis>
       <variablelist>
-	<varlistentry>
-	  <term>queueName</term>
-	  <listitem>
-	    <para>
-	      The name of the mover queue for which the transfers should be listed.
-	    </para>
-	  </listitem>
-	</varlistentry>
+        <varlistentry>
+          <term>queueName</term>
+          <listitem>
+            <para>
+              The name of the mover queue for which the transfers should be listed.
+            </para>
+          </listitem>
+        </varlistentry>
       </variablelist>
     </refsynopsisdiv>
     <refsection>
       <title>Description</title>
       <para>
-	Without parameter all transfers are listed. With
-	<option>-queue</option> all requests sorted according to
-	the mover queue are listed. If a queue is explicitly
-	specified, only transfers in that mover queue are listed.
+        Without parameter all transfers are listed. With
+        <option>-queue</option> all requests sorted according to
+        the mover queue are listed. If a queue is explicitly
+        specified, only transfers in that mover queue are listed.
       </para>
     </refsection>
   </refentry>
-  
+
+  <refentry id="cmd-migration-cache">
+    <refnamediv>
+      <refname>migration cache</refname>
+      <refpurpose>Caches replicas on other pools.</refpurpose>
+    </refnamediv>
+    <refsynopsisdiv><title>SYNOPSIS</title>
+
+    <cmdsynopsis>
+      <command>migration cache</command>
+      <arg><replaceable>options</replaceable></arg>
+      <arg choice="plain" rep="repeat"><replaceable>target</replaceable></arg>
+    </cmdsynopsis>
+
+    </refsynopsisdiv>
+    <refsect1><title>DESCRIPTION</title>
+
+    <para>Caches replicas on other pools. Similar to
+    <command>migration copy</command>, but with different
+    defaults. See <command>migration copy</command> for a
+    description of all options. Equivalent to: <command>migration
+    copy</command> -smode=same -tmode=cached</para>
+
+    </refsect1>
+  </refentry>
+
+  <refentry id="cmd-migration-cancel">
+    <refnamediv>
+      <refname>migration cancel</refname>
+      <refpurpose>Cancels a migration job</refpurpose>
+    </refnamediv>
+    <refsynopsisdiv><title>SYNOPSIS</title>
+
+    <cmdsynopsis>
+      <command>migration cancel</command>
+      <arg>-force</arg>
+      <arg choice="plain">job</arg>
+    </cmdsynopsis>
+
+    </refsynopsisdiv>
+    <refsect1><title>DESCRIPTION</title>
+    <para>
+      Cancels the given migration job. By default ongoing transfers are
+      allowed to finish gracefully.
+    </para>
+    </refsect1>
+  </refentry>
+
+
+  <refentry id="cmd-migration-clear">
+    <refnamediv>
+      <refname>migration clear</refname>
+      <refpurpose>Removes completed migration jobs.</refpurpose>
+    </refnamediv>
+    <refsynopsisdiv><title>SYNOPSIS</title>
+
+    <cmdsynopsis>
+      <command>migration clear</command>
+    </cmdsynopsis>
+
+    </refsynopsisdiv>
+    <refsect1><title>DESCRIPTION</title>
+    <para>
+      Removes completed migration jobs. For reference, information
+      about migration jobs are kept until explicitly cleared.
+    </para>
+    </refsect1>
+  </refentry>
+
+
+  <refentry id="cmd-migration-concurrency">
+    <refnamediv>
+      <refname>migration concurrency</refname>
+      <refpurpose>Adjusts the concurrency of a job.</refpurpose>
+    </refnamediv>
+    <refsynopsisdiv><title>SYNOPSIS</title>
+
+    <cmdsynopsis>
+      <command>migration concurrency</command>
+      <arg choice="plain"><replaceable>job</replaceable></arg>
+      <arg choice="plain"><replaceable>n</replaceable></arg>
+    </cmdsynopsis>
+
+    </refsynopsisdiv>
+    <refsect1><title>DESCRIPTION</title>
+    <para>
+      Sets the concurrency of <replaceable>job</replaceable> to
+      <replaceable>n</replaceable>.
+    </para>
+    </refsect1>
+  </refentry>
+
+
+  <refentry id="cmd-migration-copy">
+    <refnamediv>
+      <refname>migration copy</refname>
+      <refpurpose>Copies files to other pools.</refpurpose>
+    </refnamediv>
+    <refsynopsisdiv><title>SYNOPSIS</title>
+
+    <cmdsynopsis>
+      <command>migration copy</command>
+      <arg><replaceable>options</replaceable></arg>
+      <arg choice="plain" rep="repeat"><replaceable>target</replaceable></arg>
+    </cmdsynopsis>
+
+    </refsynopsisdiv>
+    <refsect1>
+      <title>DESCRIPTION</title>
+
+      <para>Copies files to other pools. Unless filter options are
+      specified, all files on the source pool are copied.</para>
+
+      <para>The operation is idempotent, that is, it can safely be
+      repeated without creating extra copies of the files. If the
+      replica exists on any of the target pools, then it is not
+      copied again. If the target pool with the existing replica
+      fails to respond, then the operation is retried indefinitely,
+      unless the job is marked as eager.</para>
+
+      <para>Both the state of the local replica and that of the
+      target replica can be specified. If the target replica already
+      exists, the state is updated to be at least as strong as the
+      specified target state, that is, the lifetime of sticky bits
+      is extended, but never reduced, and cached can be changed to
+      precious, but never the opposite.</para>
+
+      <para>Jobs can be marked permanent. Permanent jobs never
+      terminate and are stored in the pool setup file with the
+      'save' command. Permanent jobs watch the repository for state
+      changes and copy any replicas that match the selection
+      criteria, even replicas added after the job was
+      created. Notice that any state change will cause a replica to
+      be reconsidered and enqueued if it matches the selection
+      criteria - also replicas that have been copied before.</para>
+
+      <variablelist>
+        <title>Options</title>
+        <varlistentry>
+          <term>-state=cached|precious</term>
+          <listitem>
+            <para>
+              Only copy replicas in the given state.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>-sticky[=<replaceable>owner</replaceable>[,<replaceable>owner</replaceable>...]]</term>
+          <listitem>
+            <para>
+              Only copy sticky replicas. Can optionally be limited to
+              the list of owners. A sticky flag for each owner must be
+              present for the replica to be selected.
+            </para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>-storage=<replaceable>class</replaceable></term>
+          <listitem>
+            <para>
+              Only copy replicas with the given storage class.
+            </para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>-pnfsid=<replaceable>pnfsid</replaceable>[,<replaceable>pnfsid</replaceable>] ...</term>
+          <listitem>
+            <para>
+              Only copy replicas with one of the given PNFS IDs.
+            </para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>-accessed=<replaceable>n</replaceable>|[<replaceable>n</replaceable>]..[<replaceable>m</replaceable>]</term>
+          <listitem>
+            <para>
+              Only copy replicas accessed n seconds ago, or accessed
+              within the given, possibly open-ended, interval. E.g.
+              -accessed=0..60 matches files accessed within the last
+              minute; -accesed=60.. matches files accessed one minute
+              or more ago.
+            </para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>-size=<replaceable>n</replaceable>|[<replaceable>n</replaceable>]..[<replaceable>m</replaceable>]</term>
+          <listitem>
+            <para>
+              Only copy replicas with size n, or a size within the
+              given, possibly open-ended, interval.
+            </para>
+          </listitem>
+        </varlistentry>
+
+
+        <varlistentry>
+          <term>-smode=same|cached|precious|removable|delete[+<replaceable>owner</replaceable>[(<replaceable>lifetime</replaceable>)] ...]</term>
+          <listitem>
+            <para>
+              Update the local replica to the given mode after transfer:
+
+              <variablelist>
+                <varlistentry>
+                  <term>same</term>
+                  <listitem>
+                    <para>
+                      does not change the local state (this is the default).
+                    </para>
+                  </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                  <term>cached</term>
+                  <listitem>
+                    <para>
+                      marks it cached.
+                    </para>
+                  </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                  <term>precious</term>
+                  <listitem>
+                    <para>
+                      marks it precious.
+                    </para>
+                  </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                  <term>removable</term>
+                  <listitem>
+                    <para>
+                      marks it cached and strips all existing sticky
+                      flags exluding pins.
+                    </para>
+                  </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                  <term>delete</term>
+                  <listitem>
+                    <para>
+                      deletes the replica unless it is pinned.
+                    </para>
+                  </listitem>
+                </varlistentry>
+              </variablelist>
+
+              An optional list of sticky flags can be specified. The
+              lifetime is in seconds. A lifetime of 0 causes the flag
+              to immediately expire. Notice that existing sticky flags
+              of the same owner are overwritten.
+            </para>
+          </listitem>
+        </varlistentry>
+
+
+        <varlistentry>
+          <term>-tmode=same|cached|precious[+<replaceable>owner</replaceable>[(<replaceable>lifetime</replaceable>)]...]</term>
+          <listitem>
+            <para>
+              Set the mode of the target replica:
+
+              <variablelist>
+                <varlistentry>
+                  <term>same</term>
+                  <listitem>
+                    <para>
+                      applies the state and sticky bits excluding pins
+                      of the local replica (this is the default).
+                    </para>
+                  </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                  <term>cached</term>
+                  <listitem>
+                    <para>
+                      marks it cached.
+                    </para>
+                  </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                  <term>precious</term>
+                  <listitem>
+                    <para>
+                      marks it precious.
+                    </para>
+                  </listitem>
+                </varlistentry>
+              </variablelist>
+
+              An optional list of sticky flags can be specified. The
+              lifetime is in seconds.
+            </para>
+          </listitem>
+        </varlistentry>
+
+
+        <varlistentry>
+          <term>-pins=move|keep</term>
+          <listitem>
+            <para>
+              Controls how sticky flags owned by the pin manager is
+              handled:
+
+              <variablelist>
+                <varlistentry>
+                  <term>move</term>
+                  <listitem>
+                    <para>
+                      Ask pin manager to move pins to the target pool.
+                    </para>
+                  </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                  <term>keep</term>
+                  <listitem>
+                    <para>
+                      Keep pin on the source pool.
+                    </para>
+                  </listitem>
+                </varlistentry>
+              </variablelist>
+            </para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>-select=proportional|best|random</term>
+          <listitem>
+            <para>
+              Determines how a pool is selected from the set of target
+              pools:
+
+              <variablelist>
+                <varlistentry>
+                  <term>proportional</term>
+                  <listitem>
+                    <para>
+                      selects a pool with a probability inversely
+                      proportional to the cost of the pool.
+                    </para>
+                  </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                  <term>best</term>
+                  <listitem>
+                    <para>
+                      selects the pool with the lowest cost.
+                    </para>
+                  </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                  <term>random</term>
+                  <listitem>
+                    <para>
+                      selects a pool randomly.
+                    </para>
+                  </listitem>
+                </varlistentry>
+              </variablelist>
+
+              The default is proportional.
+            </para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>-target=pool|pgroup|link</term>
+          <listitem>
+            <para>
+              Determines the interpretation of the target names. The
+              default is 'pool'.
+            </para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>-refresh=<replaceable>time</replaceable></term>
+          <listitem>
+            <para>
+              Specifies the period in seconds of when target pool
+              information is queried from the pool manager. The
+              default is 300 seconds.
+            </para>
+          </listitem>
+        </varlistentry>
+
+
+        <varlistentry>
+          <term>-exclude=<replaceable>pool</replaceable>[,<replaceable>pool</replaceable>...]</term>
+          <listitem>
+            <para>
+              Exclude target pools.
+            </para>
+          </listitem>
+        </varlistentry>
+
+
+        <varlistentry>
+          <term>-concurrency=<replaceable>concurrency</replaceable></term>
+          <listitem>
+            <para>
+              Specifies how many concurrent transfers to perform.
+              Defaults to 1.
+            </para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>-eager</term>
+          <listitem>
+            <para>
+              Copy replicas rather than retrying when pools with
+              existing replicas fail to respond.
+            </para>
+          </listitem>
+        </varlistentry>
+
+
+        <varlistentry>
+          <term>-permanent</term>
+          <listitem>
+            <para>
+              Mark job as permanent.
+            </para>
+          </listitem>
+        </varlistentry>
+
+
+      </variablelist>
+    </refsect1>
+  </refentry>
+
+  <refentry id="cmd-migration-info">
+    <refnamediv>
+      <refname>migration info</refname>
+      <refpurpose>Shows detailed information about a migration job.</refpurpose>
+    </refnamediv>
+    <refsynopsisdiv><title>SYNOPSIS</title>
+
+    <cmdsynopsis>
+      <command>migration info</command>
+      <arg choice="plain"><replaceable>job</replaceable></arg>
+    </cmdsynopsis>
+
+    </refsynopsisdiv>
+    <refsect1>
+      <title>DESCRIPTION</title>
+      <para>
+      Shows detailed information about a migration job. Possible
+      job states are:
+
+      <variablelist>
+        <varlistentry>
+          <term>INITIALIZING</term>
+          <listitem>
+            <para>
+              Initial scan of repository
+            </para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>RUNNING</term>
+          <listitem>
+            <para>
+              Job runs (schedules new tasks)
+            </para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>SLEEPING</term>
+          <listitem>
+            <para>
+              A task failed; no tasks are scheduled for 10 seconds
+            </para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>SUSPENDED</term>
+          <listitem>
+            <para>
+              Job suspended by user; no tasks are scheduled
+            </para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>CANCELLING</term>
+          <listitem>
+            <para>
+              Job cancelled by user; waiting for tasks to stop
+            </para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>CANCELLED</term>
+          <listitem>
+            <para>
+              Job cancelled by user; no tasks are running
+            </para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>FINISHED</term>
+          <listitem>
+            <para>
+              Job completed
+            </para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+      </para>
+
+      <para>
+        Job tasks may be in any of the following states:
+        <variablelist>
+          <varlistentry>
+            <term>Queued</term>
+            <listitem>
+              <para>
+                Queued for execution
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>GettingLocations</term>
+            <listitem>
+              <para>
+                Querying PnfsManager for file locations
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>UpdatingExistingFile</term>
+            <listitem>
+              <para>
+                Updating the state of existing target file
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>CancellingUpdate</term>
+            <listitem>
+              <para>
+                Task cancelled, waiting for update to complete
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>InitiatingCopy</term>
+            <listitem>
+              <para>
+                Request send to target, waiting for confirmation
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>Copying</term>
+            <listitem>
+              <para>
+                Waiting for target to complete the transfer
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>Pinging</term>
+            <listitem>
+              <para>
+                Ping send to target, waiting for reply
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>NoResponse</term>
+            <listitem>
+              <para>
+                Cell connection to target lost
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>Waiting</term>
+            <listitem>
+              <para>
+                Waiting for final confirmation from target
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>MovingPin</term>
+            <listitem>
+              <para>
+                Waiting for pin manager to move pin
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>Cancelling</term>
+            <listitem>
+              <para>
+                Attempting to cancel transfer
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>Cancelled</term>
+            <listitem>
+              <para>
+                Task cancelled, file was not copied
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>Failed</term>
+            <listitem>
+              <para>
+                The task failed
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>Done</term>
+            <listitem>
+              <para>
+                The task completed successfully
+              </para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+      </para>
+    </refsect1>
+  </refentry>
+
+  <refentry id="cmd-migration-ls">
+    <refnamediv>
+      <refname>migration ls</refname>
+      <refpurpose>Lists all migration jobs.</refpurpose>
+    </refnamediv>
+    <refsynopsisdiv><title>SYNOPSIS</title>
+
+    <cmdsynopsis>
+      <command>migration ls</command>
+    </cmdsynopsis>
+
+    </refsynopsisdiv>
+    <refsect1><title>DESCRIPTION</title>
+    <para>
+      Lists all migration jobs.
+    </para>
+    </refsect1>
+  </refentry>
+
+  <refentry cmd="cmd-migration-move">
+    <refnamediv>
+      <refname>migration move</refname>
+      <refpurpose>Moves replicas to other pools.</refpurpose>
+    </refnamediv>
+    <refsynopsisdiv><title>SYNOPSIS</title>
+
+    <cmdsynopsis>
+      <command>migration move</command>
+      <arg><replaceable>options</replaceable></arg>
+      <arg choice="plain" rep="repeat"><replaceable>target</replaceable></arg>
+    </cmdsynopsis>
+
+    </refsynopsisdiv>
+    <refsect1><title>DESCRIPTION</title>
+
+    <para>Moves replicas to other pools. The source replica is
+    deleted. Caches replicas on other pools. Similar to
+    <command>migration copy</command>, but with different
+    defaults.  Accepts the same options as <command>migration
+    copy</command>. Equivalent to: <command>migration
+    copy</command> -smode=delete -tmode=same -pins=move
+    </para>
+    </refsect1>
+  </refentry>
+
+  <refentry id="cmd-migration-suspend">
+    <refnamediv>
+      <refname>migration suspend</refname>
+      <refpurpose>Suspends a migration job.</refpurpose>
+    </refnamediv>
+    <refsynopsisdiv><title>SYNOPSIS</title>
+
+    <cmdsynopsis>
+      <command>migration suspend</command>
+      <arg choice="plain">job</arg>
+    </cmdsynopsis>
+
+    </refsynopsisdiv>
+    <refsect1><title>DESCRIPTION</title>
+    <para>
+      Suspends a migration job. A suspended job finishes ongoing
+      transfers, but is does not start any new transfer.
+    </para>
+    </refsect1>
+  </refentry>
+
+
+  <refentry id="cmd-migration-resume">
+    <refnamediv>
+      <refname>migration resume</refname>
+      <refpurpose>Resumes a suspended migration job.</refpurpose>
+    </refnamediv>
+    <refsynopsisdiv><title>SYNOPSIS</title>
+
+    <cmdsynopsis>
+      <command>migration resume</command>
+      <arg choice="plain">job</arg>
+    </cmdsynopsis>
+
+    </refsynopsisdiv>
+    <refsect1><title>DESCRIPTION</title>
+    <para>
+      Resumes a suspended migration job.
+    </para>
+    </refsect1>
+  </refentry>
+
 </section>
