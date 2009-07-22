@@ -18,6 +18,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 
 <!-- "Products" or high-level services -->
 <!ENTITY dcache       "<productname>dCache</productname>">
+<!ENTITY chimera      "<productname>Chimera</productname>">
 <!ENTITY xml          "<abbrev>XML</abbrev>">
 <!ENTITY hsm          "<abbrev>HSM</abbrev>">
 <!ENTITY pnfs         "<productname><literal>pnfs</literal></productname>">
