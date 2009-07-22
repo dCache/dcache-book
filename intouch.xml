@@ -8,22 +8,15 @@
 <chapter id="intouch">
 
   <title>Getting in Touch with &dcache;</title>
-  
+
   <para>
     This section is a guide for exploring a newly installed &dcache;
     system. The confidence obtained by this exploration will prove
     very helpful when encountering problems in the running
     system. This forms the basis for the more detailed stuff in the
-    later parts of this book.
-  </para>
-  
-  <para>
-    The starting point is a fresh installation according to the
-    installation instructions shipped with any distribution of
-    &dcache;. All components (<literal>pnfs</literal>,
-    <literal>dcache-core</literal>, <literal>dcache-pool</literal>,
-    and <literal>dcache-opt</literal>) are started on the same
-    host. Additional pools on other hosts may also be running.
+    later parts of this book. The starting point is a fresh
+    installation according to the <xref
+    linkend="in-install">installation instructions</xref>.
   </para>
 
   <section id="intouch-client">
@@ -31,7 +24,7 @@
 
     <para>
       First, we will get used to the client tools. On the &dcache;
-      admin host, change into the &pnfs; directory, where the users
+      head node, change into the &pnfs; directory, where the users
       are going to store their data:
     </para>
 
@@ -39,21 +32,9 @@
 &prompt-user;</screen>
 
     <para>
-      Note that on the &dcache; admin node this directory is a link to
-      <filename class="directory">/pnfs/fs/usr/</filename> and the NFS
-      export <literal>localhost:/fs</literal> is mounted to <filename
-      class="directory">/pnfs/fs</filename>. The NFS server running on
-      the &dcache; admin node is part of the &pnfs; system which is
-      not part of &dcache; but heavily used by it.
-    </para>
-
-    <para>
-      The &pnfs; filesystem is not intended for reading or writing
-      actual data with regular file operations via the NFS
-      protocol. However, <literal>localhost:/fs</literal> is a
-      special, privileged NFS export that allows reading and writing
-      for administrative tasks. It should only be mounted by the admin
-      node.
+      The mounted &chimera; filesystem is not intended for reading or
+      writing actual data with regular file operations via the NFS
+      protocol.
     </para>
 
     <para>
@@ -92,7 +73,7 @@
 
     <para>
       However, this command only succeeds if the file is world
-      readable.  The following shows how ensure the file is
+      readable.  The following shows how to ensure the file is
       <emphasis>not</emphasis> world readable and illustrates dccp
       consequently failing to copy the file.
     </para>
@@ -158,7 +139,7 @@ Transfer took 770 ms</screen>
     </para>
 
     <screen>&prompt-user; <command>srm-advisory-delete</command> srm://<replaceable>dCacheAdminFQN</replaceable>:8443/pnfs/<replaceable>site.de</replaceable>/data/my-test-file
- srmcp error :  advisoryDelete(User [name=...],pnfs/<replaceable>site.de</replaceable>/data/my-test-file) 
+ srmcp error :  advisoryDelete(User [name=...],pnfs/<replaceable>site.de</replaceable>/data/my-test-file)
 Error user User [name=...] has no permission to delete 000100000000000000BAF0C0</screen>
 
     <para>
@@ -185,10 +166,10 @@ Error user User [name=...] has no permission to delete 000100000000000000BAF0C0<
 
     <para>
       In the standard configuration the &dcache; web interface is
-      started on the admin node and can be reached via port
+      started on the head node and can be reached via port
       <systemitem class="resource">2288</systemitem>. Point a web
       browser to <ulink
-      url="http://adminNode:2288/">http://<replaceable>adminNode</replaceable>:2288/</ulink>
+      url="http://headNode:2288/">http://<replaceable>adminNode</replaceable>:2288/</ulink>
       to get to the main menue of the dCache web interface.  The
       contents of the web interface are self-explanatory and are the
       primary source for most monitoring and trouble-shooting tasks.
@@ -198,47 +179,27 @@ Error user User [name=...] has no permission to delete 000100000000000000BAF0C0<
       The <quote>Cell Services</quote> page displays the status of
       some important <glossterm linkend="gl-cell">cells</glossterm> of
       the &dcache; instance. You might observe that some cells are
-      marked <quote>OFFLINE</quote> even though you know that they are
-      running and fine. These might be the cells <quote>SRM</quote>,
-      <quote>GFTP</quote>, and <quote>DCap-gsi</quote>. The reason is
-      that the names of the cells monitored by the web interface are
-      explicitly configured in the file
-      <filename>/opt/d-cache/config/httpd.batch</filename>. However,
-      the cells have other names. If you change the following section
-      near the end of the file
+      marked <quote>OFFLINE</quote>. In general &dcache; has no
+      knowledge about which cells are supposed to be online, but for
+      purposes of monitoring, some cells may be hard coded in the file
+      <filename>/opt/d-cache/config/httpd.batch</filename>:
     </para>
 
     <programlisting>#
 create diskCacheV111.cells.WebCollectorV3 collector \
     "PnfsManager \
      PoolManager \
-     GFTP \
-     SRM \
-     DCap-gsi \
+     -loginBroker=LoginBroker,srm-LoginBroker \
      -replyObject"
 #</programlisting>
 
     <para>
-      such that it reads
+      Additional cells may be added. To take effect, the &domain-http;
+      <glossterm linkend="gl-domain">domain</glossterm> must be
+      restarted by executing
     </para>
 
-    <programlisting>#
-create diskCacheV111.cells.WebCollectorV3 collector \
-    "PnfsManager \
-     PoolManager \
-     GFTP-<replaceable>adminNode</replaceable> \
-     SRM-<replaceable>adminNode</replaceable> \
-     DCap-gsi-<replaceable>adminNode</replaceable> \
-     -replyObject"
-#</programlisting>
-
-    <para>
-      and restart the &domain-http; <glossterm
-      linkend="gl-domain">domain</glossterm> by executing
-    </para>
-
-    <screen>&prompt-root; <command>/opt/d-cache/jobs/httpd</command> stop
-&prompt-root; <command>/opt/d-cache/jobs/httpd</command> -logfile=/opt/d-cache/log/http.log start</screen>
+    <screen>&prompt-root; <command>/opt/d-cache/bin/dcache</command> restart httpd</screen>
 
     <para>
       More information about the
@@ -247,7 +208,7 @@ create diskCacheV111.cells.WebCollectorV3 collector \
     </para>
 
     <para>
-      The <quote>Pool Usage</quote> page gives an good overview of the
+      The <quote>Pool Usage</quote> page gives a good overview of the
       current space usage of the whole &dcache; instance. In the
       graphs, free space is marked yellow, space occupied by
       <glossterm linkend="gl-cached">cached files</glossterm> (which
@@ -283,117 +244,69 @@ create diskCacheV111.cells.WebCollectorV3 collector \
 
     <para>
       In this section we will have a look at the configuration and log
-      files of &pnfs; and &dcache;. 
-    </para>
-
-    <para>
-      The primary configuration file for &pnfs; is
-      <filename>/usr/etc/pnfsSetup</filename>. For administrative
-      tasks in &pnfs; it has to be sourced and the path to the
-      admninistration tools should be added to <varname>$PATH</varname>:
-    </para>
-
-    <screen>&prompt-root; . /usr/etc/pnfsSetup
-&prompt-root; PATH=$PATH:$pnfs/tools</screen>
-
-    <para>
-      Stopping and starting the &pnfs; server can now be done with
-    </para>
-
-    <screen>&prompt-root; <command>pnfs</command> stop
-&prompt-root; <command>pnfs</command> start</screen>
-
-    <para>
-      The log files for the three &pnfs; server daemons are
-      <filename>/var/log/pmountd.log</filename>,
-      <filename>/var/log/dbserver.log</filename>, and
-      <filename>/var/log/pnfsd.log</filename>. The
-      <command>pnfsd</command> is the NFS server implementation. Its
-      log file contains one line for each NFS filesystem
-      operation. The result code of that operation can be found at the
-      end of the line.
-    </para>
-
-    <para>
-      The <command>pnfsd</command> daemons communicate with the
-      <command>dbserver</command> daemons via a shared memory
-      area. These perform the actual operations on the database files
-      which can be found in <filename
-      class="directory">/opt/pnfsdb/pnfs/databases/</filename>. The
-      &pnfs; system finds them via the information in the directory
-      <filename
-      class="directory">/opt/pnfsdb/pnfs/info/</filename>. 
-    </para>
-
-    <para>
-      Each database file is handled by one <command>dbserver</command>
-      daemon and each access will lock the database file. Each
-      database file/server is the container for one directory
-      sub-tree. Similar to mounts in the UNIX filesystem, the
-      filesystem tree is stitched together from several such
-      sub-trees. In the standard configuration the
-      <database>admin</database> database contains the root of the
-      filesystem (the one mounted on <filename
-      class="directory">/pnfs/fs/</filename>) and the
-      <database>data1</database> database the sub-tree starting at
-      <filename class="directory">/pnfs/fs/usr/data/</filename>. <xref
-      linkend="cf-pnfs-db"/> describes how to create new databases.
+      files of &dcache;.
     </para>
 
     <para>
       The &dcache; software is installed in one directory, normally
       <filename class="directory">/opt/d-cache/</filename>.  All
-      configuration and log files can be found here. In the following
+      configuration files can be found here. In the following relative
       filenames will always be relative to this directory.
     </para>
-    
+
     <para>
       In the previous section we have already seen how a <glossterm
       linkend="gl-domain">domain</glossterm> is restarted:
     </para>
-      
-    <screen>&prompt-root; <command>/opt/d-cache/jobs/<replaceable>domainName</replaceable></command> stop
-&prompt-root; <command>/opt/d-cache/jobs/<replaceable>domainName</replaceable></command> \
--logfile=/opt/d-cache/log/<replaceable>domainName</replaceable>.log start</screen>
+
+    <screen>&prompt-root; <command>/opt/d-cache/bin/dcache</command> restart <replaceable>domainName</replaceable></screen>
 
     <para>
-      Listing the contents of <filename
-      class="directory">jobs/</filename> you will see that these
-      scripts are all in fact links to
-      <filename>jobs/wrapper2.sh</filename>. This script will
-      determine the domain to start by its basename. From the above
-      commands you can already read of the standard location for the
-      log files.
+      Log files of domains are by default stored in
+      <filename>/var/log/<replaceable>domainName</replaceable>.log</filename>. We
+      strongly encourage to configure logrotate to rotate the &dcache;
+      log files to avoid filling up the log file system. This can
+      typically be achieved by creating the file
+      <filename>/etc/logrotate.d/dcache</filename> with the following
+      content:
     </para>
+
+    <screen>/var/log/*Domain.log {
+    compress
+    rotate 100
+    missingok
+    copytruncate
+}</screen>
 
     <para>
       The files
       <filename>config/<replaceable>domainName</replaceable>Setup</filename>
-      will be used by the wrapper script and by the domains at
-      start-up. These files are also links to
+      contain configuration parameters for the domain. These files are
+      typically symbolic links to
       <filename>config/dCacheSetup</filename>. This is the primary
-      configuration file of the &dcache; system. 
+      configuration file of &dcache;.
     </para>
 
     <para>
       The only files which are different for each domain are
       <filename>config/<replaceable>domainName</replaceable>.batch</filename>.
-      They describe which <glossterm linkend="gl-cell">cells</glossterm> are 
-      started in the <glossterm linkend="gl-domain">domains</glossterm>. Normally,
-      changes in these files should not be necessary. However, if you need to
-      change something, consider the following:
+      They describe which <glossterm
+      linkend="gl-cell">cells</glossterm> are started in the
+      <glossterm linkend="gl-domain">domains</glossterm>. Normally,
+      changes in these files should not be necessary. However, if you
+      need to change something, consider the following:
     </para>
 
     <para>
       Since the standard
       <filename>config/<replaceable>domainName</replaceable>.batch</filename>
-      files will be overwritten when updating to a newer version of &dcache;
-      (e.g. with RPM), it is a good idea to modify only private copies of them.
-      When choosing a name like
-      <filename>config/<replaceable>newDomainName</replaceable>.batch</filename> 
+      files will be overwritten when updating to a newer version of
+      &dcache; (e.g. with RPM), it is a good idea to modify only
+      private copies of them.  When choosing a name like
+      <filename>config/<replaceable>newDomainName</replaceable>.batch</filename>
       you give the domain the name
-      <replaceable>newDomainName</replaceable>. The necessary links can be
-      created with
+      <replaceable>newDomainName</replaceable>. The necessary links
+      can be created with
     </para>
 
     <screen>&prompt-root; <command>cd</command> /opt/d-cache/config/
@@ -403,42 +316,8 @@ create diskCacheV111.cells.WebCollectorV3 collector \
       Then the old domain can be stopped and the new one started:
     </para>
 
-    <screen>&prompt-root; <command>/opt/d-cache/jobs/<replaceable>domainName</replaceable></command> stop
-&prompt-root; <command>/opt/d-cache/jobs/<replaceable>newDomainName</replaceable></command> -logfile=/opt/d-cache/log/<replaceable>newDomainName</replaceable>.log start</screen>
-
-
-    <para>
-      Recall, that we did change <filename>config/httpd.batch</filename> in
-      order to adjust the names of the cells which should show up in the
-      <quote>Cell Services</quote> page. Since this was a minor change not
-      influencing the functionality of the &dcache; instance, it is preferable
-      not to change the name of the domain. This way, changes to
-      <filename>config/http.batch</filename> in the distribution will be
-      included in your <filename>config/httpd.batch</filename>. Such a future
-      change will correct the problem with the <quote>OFFLINE</quote> cells, anyway.
-    </para>
-
-    <para>
-      An example, where you might want to create new
-      <filename>.batch</filename> files is the following:
-    </para>
-
-    <para>
-      Changing the postgresql password in
-      <filename>config/srm.batch</filename>,
-      <filename>config/utility.batch</filename>, and
-      <filename>config/replica.batch</filename> to a secure one would be done
-      best in copies of these <filename>.batch</filename> files. You should
-      also do e.g.
-    </para>
-
-    <screen>&prompt-root; <command>chmod</command> 600 <filename>config/mysrm.batch</filename></screen>
-
-    <para>
-      to secure the password further. Note that future versions of &dcache;
-      will not require a plain text postgresql password in these files
-      anymore. 
-    </para>
+    <screen>&prompt-root; <command>/opt/d-cache/bin/dache</command> stop <replaceable>domainName</replaceable>
+&prompt-root; <command>/opt/d-cache/bin/dcache</command> start <replaceable>newDomainName</replaceable></screen>
 
     <para>
       More details about domains and cells can be found in <xref
@@ -449,7 +328,7 @@ create diskCacheV111.cells.WebCollectorV3 collector \
       The most central component of a &dcache; instance is the
       &cell-poolmngr; cell. It reads additional configuration
       information from the file
-      <filename>config/PoolManager.config</filename> at
+      <filename>config/PoolManager.conf</filename> at
       start-up. However, in contrast to the
       <filename>config/<replaceable>domainName</replaceable>Setup</filename>
       files, it is not necessary to restart the domain when changing
@@ -457,46 +336,19 @@ create diskCacheV111.cells.WebCollectorV3 collector \
     </para>
 
     <para>
-      The domains containing the pools are handled a little
-      differently from the other domains. They are started by
-    </para>
-
-    <screen>&prompt-root; <command>/opt/d-cache/jobs/pool</command> -pool=<replaceable>pool</replaceable> \
--logfile=log/<replaceable>pool</replaceable>Domain.log start</screen>
-
-    <para>
-      This will start the domain &domain-pool; which contains a pool
-      cell for each line in the file
-      <filename>config/<replaceable>pool</replaceable>.poollist</filename>.
-      When only one pool domain is started on a host, it is
-      conventional to use the hostname for
-      <replaceable>pool</replaceable>. A line of the
-      <filename><replaceable>pool</replaceable>.poollist</filename>
-      has the form
-    </para>
-
-    <programlisting><replaceable>poolName</replaceable> <replaceable>poolDir</replaceable> <replaceable>options</replaceable></programlisting>
-
-    <para>
-      The convention for pool names is
-      <literal><replaceable>hostname</replaceable>_<replaceable>n</replaceable></literal>
-      where the first pool has <replaceable>n</replaceable> of 1.
-    </para>
-
-    <para>
-      Similar to <filename>config/PoolManager.conf</filename>, the
+      Similar to <filename>config/PoolManager.conf</filename>,
       pools read their configuration from
       <filename><replaceable>poolDir</replaceable>/pool/setup</filename>
       at startup.
     </para>
 
     <!--
-	TODO:
-	<para>
-	<filename>certificate</filename>
-	<filename>CAs</filename>
-	<filename>kpwd</filename>
-	</para>
+        TODO:
+        <para>
+        <filename>certificate</filename>
+        <filename>CAs</filename>
+        <filename>kpwd</filename>
+        </para>
       -->
   </section>
 
@@ -508,11 +360,10 @@ create diskCacheV111.cells.WebCollectorV3 collector \
     <para>
       &dcache; has a powerful administration interface. It is accessed
       with the &ssh; protocol. The server is part of the
-      &domain-adminDoor; domain, which is started on the admin
-      node. Connect to it with
+      &domain-adminDoor; domain. Connect to it with
     </para>
 
-    <screen>&prompt-user; <command>ssh</command> -c blowfish -p 22223 -l admin <replaceable>adminNode</replaceable></screen>
+    <screen>&prompt-user; <command>ssh</command> -c blowfish -p 22223 -l admin <replaceable>headNode</replaceable></screen>
 
     <para>
       The initial password is
@@ -526,7 +377,7 @@ create diskCacheV111.cells.WebCollectorV3 collector \
 
 &dc-prompt-local;</screen>
 
-    
+
     <para>
       The password can now be changed with
     </para>
@@ -571,7 +422,7 @@ create diskCacheV111.cells.WebCollectorV3 collector \
     <para>
       There also is the command <command>help</command> for listing all
       commands the cell knows and their parameters. However, many of the
-      commands are only used for debuging and 
+      commands are only used for debuging and
       development purposes. Only commands described in this documentation
       should be used for the administration of a &dcache; system.
     </para>
@@ -590,8 +441,8 @@ create diskCacheV111.cells.WebCollectorV3 collector \
       First, a new session has to be created with
 
       <menuchoice>
-	<guimenu>Session</guimenu>
-	<guimenuitem>New...</guimenuitem>
+        <guimenu>Session</guimenu>
+        <guimenuitem>New...</guimenuitem>
       </menuchoice>.
 
       After giving the session a name of your choice, a login mask
@@ -633,9 +484,9 @@ create diskCacheV111.cells.WebCollectorV3 collector \
       the pool manager. A typical line of output for a read request
       with an error condition is (all in one line):
     </para>
-    
+
     <screen>000100000000000000001230@0.0.0.0/0.0.0.0 m=1 r=1 [&lt;unknown&gt;]
-  [Waiting 08.28 19:14:16] 
+  [Waiting 08.28 19:14:16]
   {149,No pool candidates available or configured for 'staging'}</screen>
 
     <para>
@@ -688,7 +539,7 @@ create diskCacheV111.cells.WebCollectorV3 collector \
 
     <screen>&prompt-user; <command>ssh-keygen</command> -t rsa1 -C 'SSH1 key of <replaceable>user</replaceable>'
 Generating public/private rsa1 key pair.
-Enter file in which to save the key (/home/<replaceable>user</replaceable>/.ssh/identity): 
+Enter file in which to save the key (/home/<replaceable>user</replaceable>/.ssh/identity):
 Enter passphrase (empty for no passphrase):
 Enter same passphrase again:
 Your identification has been saved in /home/<replaceable>user</replaceable>/.ssh/identity.
@@ -710,7 +561,7 @@ c1:95:03:6a:66:21:3c:f3:ee:1b:8d:cb:46:f4:29:6a SSH1 key of <replaceable>user</r
     <para>
       and add the key to it with
     </para>
-      
+
     <screen>&prompt-user; <command>ssh-add</command>
 Enter passphrase for SSH1 key of <replaceable>user</replaceable>:
 Identity added: /home/<replaceable>user</replaceable>/.ssh/identity (SSH1 key of <replaceable>user</replaceable>)</screen>
@@ -724,7 +575,7 @@ Identity added: /home/<replaceable>user</replaceable>/.ssh/identity (SSH1 key of
       &dcache; user name. An example file is:
     </para>
 
-    <programlisting>1024 35 141939124<lineannotation>(... many more numbers ...)</lineannotation>15331 admin</programlisting> 
+    <programlisting>1024 35 141939124<lineannotation>(... many more numbers ...)</lineannotation>15331 admin</programlisting>
 
     <para>
       The key manager within &dcache; will read this file every minute.
@@ -851,5 +702,5 @@ echo -e 'cd <replaceable>pool_1</replaceable>\nrep ls\n<lineannotation>(more com
       of them.
     </para>
     -->
-  
+
 </chapter>
