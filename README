@@ -110,14 +110,13 @@ EOF
 Using the Makefile rules
 
   Do "make" (equiv. to "make info") to see a summary of what's
-  available
+  available.  Here are a few useful options
 
   make all              builds everything,
   make pdf              builds all PDF,
-  make Book-a4.pdf      builds just the A4 PDF version of the Book,
-  make Book.html        build just the single-page HTML,
-  make Book/index.shtml build the chunked HTML output,
-  make deploy           build and deploy on the web-server,
+  make html             builds all HTML output,
+  make test-deploy      builds and deploys on the web-server at the test location,
+  make deploy           builds and deploys on the web-server at the live location,
   make clean            remove backup files,
   make distclean        remove all generated files.
 
