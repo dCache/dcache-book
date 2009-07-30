@@ -29,11 +29,11 @@ support for converting XSLT-FO files to text (using fop) is currently
 not very good.
 
 FOP can use LaTeX-derived hyphenation patterns to break words at the
-end-of-line.  However, due to a licensing issue wringle, these rules
+end-of-line.  However, due to a licensing issue wrangle, these rules
 are not include with FOP.  Instead, the rules are available from the
 Objects For Formatting Objects (OFFO) SourceForge project.  A single
 .jar file must be installed for hyphenation to work; this
-staight-forward process is described below.
+straight-forward process is described below.
 
 
 What you will need:
@@ -58,7 +58,7 @@ it's easy.
 
 Where to get things:
 
-  Many distributions package the bare essencials.  Some caveats: make
+  Many distributions package the bare essentials.  Some caveats: make
   sure the version of FOP is fairly recent: 0.9x is a requirement.
   For DocBook, make sure you get DocBookXML support (i.e., the
   stylesheets).  DocBook is (or "used to") come with SGML support, but
@@ -136,7 +136,7 @@ use your ~/.ssh/config file to specify this.  For example:
 
 
 
-Some notes on XML catalogs.
+Some notes on XML catalogues.
 
 XML Catalogs are how a global reference (e.g.,
 http://docbook.sourceforge.net/release/xsl/current/fo/docbook.xsl) is
