@@ -162,24 +162,24 @@ test-deploy: $(ALL_TEST_INSTALLED)
 
 %__INSTALL__: %
 	chmod a+r,g+w $<
-	scp -p $< $(WWW_SERVER):$(WWW_LOCATION)
+	scp $< $(WWW_SERVER):$(WWW_LOCATION)
 
 %__TEST_INSTALL__: %
 	chmod a+r,g+w $<
-	scp -p $< $(WWW_SERVER):$(WWW_TEST_LOCATION)
+	scp $< $(WWW_SERVER):$(WWW_TEST_LOCATION)
 
 #  Unfortunately, we need a special case here.
 Book__INSTALL__: Book/index.$(HTML_EXT)
 	chmod -R a+Xr,g+w Book/*
 	chmod g+s Book
 	find Book -type d -exec chmod g+s \{\} \;
-	scp -pr Book/* $(WWW_SERVER):$(WWW_LOCATION)
+	scp -r Book/* $(WWW_SERVER):$(WWW_LOCATION)
 
 Book__TEST_INSTALL__: Book/index.$(HTML_EXT)
 	chmod -R a+Xr,g+w Book/*
 	chmod g+s Book
 	find Book -type d -exec chmod g+s \{\} \;
-	scp -pr Book/* $(WWW_SERVER):$(WWW_TEST_LOCATION)
+	scp -r Book/* $(WWW_SERVER):$(WWW_TEST_LOCATION)
 
 
 
