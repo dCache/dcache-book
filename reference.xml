@@ -62,7 +62,7 @@
 
     <xi:include href="rf-dc-StorageInfoQuotaObserver.xml"/>
   </chapter>
-
+  <xi:include href="rf-ports.xml"/>
   <!--
   <xi:include href="rf-dvl.xml"/>
   -->
