@@ -1480,7 +1480,7 @@ remoteGsiftpMaxTransfers=260</programlisting>
       </para>
       
       <screen>&prompt-root; <command>cd</command> <replaceable>pnfsDir</replaceable>
-&prompt-root; <command>cat</command> ".(tags)(all)"
+&prompt-root; <command>cat</command> ".(tags)()"
 .(tag)(OSMTemplate)
 .(tag)(file_family)
 .(tag)(storage_group)
