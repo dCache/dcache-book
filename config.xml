@@ -34,6 +34,7 @@
   <xi:include href="config-xrootd.xml"/>
   <xi:include href="config-SRM.xml"/>
   <xi:include href="config-web-dcache.xml"/>
+  <xi:include href="config-acl.xml"/>
 
 </part>
 
