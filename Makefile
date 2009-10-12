@@ -19,7 +19,7 @@ HTML_EXT = shtml
 STYLESHEETS_CHUNK := xsl/html-chunk.xsl xsl/html-common.xsl xsl/common.xsl
 STYLESHEETS_HTML := xsl/html-single.xsl xsl/html-common.xsl xsl/common.xsl
 STYLESHEETS_FO := xsl/fo.xsl xsl/fo-titlepage.xsl xsl/common.xsl 
-
+STYLESHEETS_MAN := xsl/man.xsl xsl/common.xsl
 
 
 #########  Some derived locations: output files
@@ -85,6 +85,7 @@ info:
 	@echo "  pdf         -- build PDF versions"
 	@echo "  html        -- build HTML pages"
 	@echo "  txt         -- build text version"
+	@echo "  man         -- build man pages"
 	@echo "  deploy      -- use scp to deploy files at www.dCache.org"
 	@echo "  test-deploy -- use scp to deploy files at www.dCache.org in a test location"
 	@echo
@@ -98,7 +99,7 @@ info:
 	@echo "  distclean   -- remove all generated files"
 	@echo
 
-all: pdf html txt
+all: pdf html txt man
 
 
 ###### HTML targets
@@ -131,6 +132,15 @@ txt: $(TXT_FILES)
 	$(HTML_TO_TXT) $< > $@
 
 # (should we also produce install instructions as separate txt file?)
+
+
+###### man page targets
+#
+
+## TODO: we should autogenerate dependencies, like with other targets
+man: Book.xml $(STYLESHEETS_MAN) shared-entities.xml
+	@[ ! -d man ] && mkdir man || :
+	$(XSLTPROC) $(XSLT_FLAGS) --output man/ xsl/man.xsl $<
 
 
 ###### FO-based targets
