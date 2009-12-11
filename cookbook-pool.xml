@@ -650,10 +650,10 @@
           remaining files.
         </para>
 
-<screen>&dc-prompt-srcpool; <command>pool disable</command> -rdonly
-&dc-prompt-srcpool; <command>migration move</command> <replaceable>targetPool</replaceable>
+<screen>&dc-prompt-srcpool; <userinput>pool disable -rdonly</userinput>
+&dc-prompt-srcpool; <userinput>migration move <replaceable>targetPool</replaceable></userinput>
 [1] RUNNING      migration move <replaceable>targetPool</replaceable>
-&dc-prompt-srcpool; <command>migration info</command> 1
+&dc-prompt-srcpool; <userinput>migration info 1</userinput>
 Command    : migration move <replaceable>targetPool</replaceable>
 State      : RUNNING
 Queued     : 0
@@ -664,7 +664,7 @@ Total      : 830424 bytes
 Concurrency: 1
 Running tasks:
 [0] 0001000000000000000BFAE0: TASK.Copying -> [<replaceable>targetPool</replaceable>@local]
-&dc-prompt-srcpool; <command>migration info</command> 1
+&dc-prompt-srcpool; <userinput>migration info 1</userinput>
 Command    : migration move <replaceable>targetPool</replaceable>
 State      : FINISHED
 Queued     : 0
@@ -674,7 +674,7 @@ Completed  : 1 files; 830424 bytes
 Total      : 830424 bytes
 Concurrency: 1
 Running tasks:
-&dc-prompt-srcpool; <command>rep ls</command>
+&dc-prompt-srcpool; <userinput>rep ls</userinput>
 &dc-prompt-srcpool;</screen>
       </section>
 
@@ -689,9 +689,9 @@ Running tasks:
           command.
         </para>
 
-<screen>&dc-prompt-srcpool; <command>migration cache</command> -target=pgroup -accessed=0..2592000 -storage=atlas:default cache_pools
+<screen>&dc-prompt-srcpool; <userinput>migration cache -target=pgroup -accessed=0..2592000 -storage=atlas:default cache_pools</userinput>
 [1] INITIALIZING migration cache -target=pgroup -accessed=0..2592000 -storage=atlas:default cache_pools
-&dc-prompt-srcpool; <command>migration info</command> 1
+&dc-prompt-srcpool; <userinput>migration info 1</userinput>
 Command    : migration cache -target=pgroup -accessed=0..2592000 -storage=atlas:default cache_pools
 State      : RUNNING
 Queued     : 2577
@@ -722,44 +722,44 @@ Running tasks:
     <para>
       Disable file transfers from and to the pool with
 
-<screen>&dc-prompt-pool; <command>pool disable</command> <option>-strict</option></screen>
+<screen>&dc-prompt-pool; <userinput>pool disable <option>-strict</option></userinput></screen>
 
       Then make sure, no transfers are being processed anymore.
       All the following commands should give no output:
 
-<screen>&dc-prompt-pool; <command>queue ls queue</command>
-&dc-prompt-pool; <command>mover ls</command>
-&dc-prompt-pool; <command>p2p ls</command>
-&dc-prompt-pool; <command>pp ls</command>
-&dc-prompt-pool; <command>st jobs ls</command>
-&dc-prompt-pool; <command>rh jobs ls</command></screen>
+<screen>&dc-prompt-pool; <userinput>queue ls queue</userinput>
+&dc-prompt-pool; <userinput>mover ls</userinput>
+&dc-prompt-pool; <userinput>p2p ls</userinput>
+&dc-prompt-pool; <userinput>pp ls</userinput>
+&dc-prompt-pool; <userinput>st jobs ls</userinput>
+&dc-prompt-pool; <userinput>rh jobs ls</userinput></screen>
 
       Now the files on the pools have to be unregistered on the &pnfs;
       server with
 
-<screen>&dc-prompt-pool; <command>pnfs unregister</command></screen>
+<screen>&dc-prompt-pool; <userinput>pnfs unregister</userinput></screen>
 
       Even if the pool contains precious files, this is no problem, since
       we will register them again in a moment. The files might not be available
       for a short moment, though.
       Log out of the pool, and stop the service:
 
-<screen>&prompt-root; jobs/pool<footnote>
+<screen>&prompt-root; <userinput>jobs/pool<footnote>
             <para>
               Filenames will always be relative to the &dcache; installation
               directory, which defaults to
               <filename>/opt/d-cache/</filename>.
             </para>
-      </footnote> -pool=<replaceable>poolDomainName</replaceable> stop</screen>
+      </footnote> -pool=<replaceable>poolDomainName</replaceable> stop</userinput></screen>
 
       Rename the pool in the
       <filename><replaceable>poolDomain</replaceable>.poollist</filename>-file.
       Restart the service:
 
-<screen>&prompt-root; jobs/pool -pool=<replaceable>poolDomainName</replaceable> -logfile=<replaceable>dCacheLocation</replaceable>/log/<replaceable>poolDomainName</replaceable>Domain.log start</screen>
+<screen>&prompt-root; <userinput>jobs/pool -pool=<replaceable>poolDomainName</replaceable> -logfile=<replaceable>dCacheLocation</replaceable>/log/<replaceable>poolDomainName</replaceable>Domain.log start</userinput></screen>
 
       Register the files on the pool with
-      <screen>&dc-prompt-pool; <command>pnfs register</command></screen>
+      <screen>&dc-prompt-pool; <userinput>pnfs register</userinput></screen>
     </para>
 
   </section>
@@ -770,7 +770,7 @@ Running tasks:
     <para>
       You may pin a file locally within the private pool repository:
 
-<screen><command>rep set sticky</command> <replaceable>pnfsid</replaceable> <option>on|off</option></screen>
+<screen><userinput>rep set sticky <replaceable>pnfsid</replaceable> <option>on|off</option></userinput></screen>
 
       the 'sticky' mode will stay with the file as long as the file
       is in the pool.  If the file is removed from the pool and
@@ -781,7 +781,7 @@ Running tasks:
       You may use the same mechanism globally:  in the command line
       interface (local mode) there is the command
 
-<screen><command>set sticky</command> <replaceable>pnfsid</replaceable></screen>
+<screen><userinput>set sticky <replaceable>pnfsid</replaceable></userinput></screen>
 
       This command does:
       <orderedlist>

@@ -243,8 +243,8 @@
 	achieved by running two SQL files:
       </para>
 
-<screen>&prompt-root; psql chimera &lt; /opt/d-cache/libexec/chimera/sql/addACLtoChimeraDB.sql
-&prompt-root; psql chimera &lt; /opt/d-cache/libexec/chimera/sql/pgsql-procedures.sql</screen>
+<screen>&prompt-root; <userinput>psql chimera &lt; /opt/d-cache/libexec/chimera/sql/addACLtoChimeraDB.sql</userinput>
+&prompt-root; <userinput>psql chimera &lt; /opt/d-cache/libexec/chimera/sql/pgsql-procedures.sql</userinput></screen>
     </section>
 
 
@@ -259,8 +259,8 @@
 	store &dcache; &acl; data.
       </para>
 
-      <screen>&prompt-root; createdb aclpnfs
-&prompt-root; psql aclpnfs &lt; /opt/d-cache/libexec/chimera/sql/create-dCacheACL.sql</screen>
+      <screen>&prompt-root; <userinput>createdb aclpnfs</userinput>
+&prompt-root; <userinput>psql aclpnfs &lt; /opt/d-cache/libexec/chimera/sql/create-dCacheACL.sql</userinput></screen>
 
     </section>
   </section>
@@ -1111,12 +1111,12 @@ diskCacheV111.services.acl.UnixPermissionHandler</programlisting>
 	    class="directory">/pnfs/example.org/data/exampleDir</filename>.
 	  </para>
 
-	  <screen>&dc-prompt-acladmin; <userinput>setfacl</userinput> /pnfs/example.org/data/exampleDir EVERYONE@:+l USER:3750:D
-    <lineannotation>(...line continues...)</lineannotation>   USER:3750:+d:of
-&dc-prompt-acladmin; <userinput>setfacl</userinput> /pnfs/example.org/data/exampleDir/existingFile1
-    <lineannotation>(...line continues...)</lineannotation>   USER:3750:+d:f
-&dc-prompt-acladmin; <userinput>setfacl</userinput> /pnfs/example.org/data/exampleDir/existingFile2
-    <lineannotation>(...line continues...)</lineannotation>   USER:3750:+d:f</screen>
+	  <screen>&dc-prompt-acladmin; <userinput>setfacl /pnfs/example.org/data/exampleDir EVERYONE@:+l USER:3750:D
+    <lineannotation>(...line continues...)</lineannotation>   USER:3750:+d:of</userinput>
+&dc-prompt-acladmin; <userinput>setfacl /pnfs/example.org/data/exampleDir/existingFile1
+    <lineannotation>(...line continues...)</lineannotation>   USER:3750:+d:f</userinput>
+&dc-prompt-acladmin; <userinput>setfacl /pnfs/example.org/data/exampleDir/existingFile2
+    <lineannotation>(...line continues...)</lineannotation>   USER:3750:+d:f</userinput></screen>
 
 	  <para>
 	    The first command creates an &acl; for the directory.
@@ -1148,8 +1148,8 @@ diskCacheV111.services.acl.UnixPermissionHandler</programlisting>
 	    can do neither.
 	  </para>
 
-	  <screen>&dc-prompt-acladmin; <userinput>setfacl</userinput> /pnfs/example.org/data/exampleDir GROUP:2000:-sl
-    <lineannotation>(...line continues...)</lineannotation>    EVERYONE@:+l GROUP:1000:+s</screen>
+	  <screen>&dc-prompt-acladmin; <userinput>setfacl /pnfs/example.org/data/exampleDir GROUP:2000:-sl
+    <lineannotation>(...line continues...)</lineannotation>    EVERYONE@:+l GROUP:1000:+s</userinput></screen>
 
 	  <para>
 	    The first &ace; denies any member of group 2000 the
@@ -1188,8 +1188,8 @@ diskCacheV111.services.acl.UnixPermissionHandler</programlisting>
 	    the directory.
 	  </para>
 
-	  <screen>&dc-prompt-acladmin; <userinput>setfacl</userinput> /pnfs/example.org/data/exampleDir USER:3750:+D:d
-    <lineannotation>(...line continues...)</lineannotation>    USER:3750:+d:odf</screen>
+	  <screen>&dc-prompt-acladmin; <userinput>setfacl /pnfs/example.org/data/exampleDir USER:3750:+D:d
+    <lineannotation>(...line continues...)</lineannotation>    USER:3750:+d:odf</userinput></screen>
 
 	  <para>
 	    The first &ace; is <literal>USER:3750:+D:d</literal>.
@@ -1269,7 +1269,7 @@ diskCacheV111.services.acl.UnixPermissionHandler</programlisting>
       <example>
 	<title>Obtain &acl; information by absolute path</title>
 
-	<screen>&dc-prompt-acladmin; <userinput>getfacl</userinput> /pnfs/example.org/data/exampleDir
+	<screen>&dc-prompt-acladmin; <userinput>getfacl /pnfs/example.org/data/exampleDir</userinput>
 ACL: rsId = 00004EEFE7E59A3441198E7EB744B0D8BA54, rsType = DIR
 order = 0, type = A, accessMsk = lfsD, who = USER, whoID = 12457
 order = 1, type = A, flags = f, accessMsk = lfd, who = USER, whoID = 87552

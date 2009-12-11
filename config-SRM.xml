@@ -447,9 +447,9 @@ srm://srm.cern.ch:8443/castor/cern.ch/cms/store/cmsfile23</programlisting>
 	should be set for a 4GB RAM Machine. This can be accomplished by running:
       </para>
 	  
-      <screen>&prompt-root; <command>echo</command> 'kernel.shmmax=1073741824' >>  /etc/sysctl.conf
-&prompt-root; <command>echo</command> 'kernel.shmall=1073741824' >>  /etc/sysctl.conf
-&prompt-root; <command>/bin/sysctl</command> -p</screen>
+      <screen>&prompt-root; <userinput>echo 'kernel.shmmax=1073741824' >>  /etc/sysctl.conf</userinput>
+&prompt-root; <userinput>echo 'kernel.shmall=1073741824' >>  /etc/sysctl.conf</userinput>
+&prompt-root; <userinput>/bin/sysctl -p</userinput></screen>
 
       <para>
 	The exact content of US-CMS T1 &srm;
@@ -595,7 +595,7 @@ srm://srm.cern.ch:8443/castor/cern.ch/cms/store/cmsfile23</programlisting>
       <title>Install &dcache; server.rpm</title>
 
       <para>
-	<screen>&prompt-root; <command>rpm</command> -Uvh <replaceable>dcache.server.rpm</replaceable></screen>
+	<screen>&prompt-root; <userinput>rpm -Uvh <replaceable>dcache.server.rpm</replaceable></userinput></screen>
       </para>
 	 
     </section>
@@ -705,7 +705,7 @@ remoteGsiftpMaxTransfers=2000</programlisting>
 	Run 
       </para>
 
-      <screen>&prompt-root; <command>/opt/d-cache/install/install.sh</command></screen>
+      <screen>&prompt-root; <userinput>/opt/d-cache/install/install.sh</userinput></screen>
     </section>
 
     <section>
@@ -715,7 +715,7 @@ remoteGsiftpMaxTransfers=2000</programlisting>
 	 Run 
       </para>
 
-      <screen>&prompt-root; <command>/opt/d-cache/bin/dcache-core</command> start</screen>
+      <screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache-core start</userinput></screen>
 
       <para>
 	to start &srm; domain.
@@ -725,7 +725,7 @@ remoteGsiftpMaxTransfers=2000</programlisting>
 	 Run 
       </para>
 
-      <screen>&prompt-root; <command>/opt/d-cache/bin/dcache-core</command> stop</screen>
+      <screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache-core stop</userinput></screen>
 
       <para>
 	to stop &srm; domain.
@@ -1322,8 +1322,8 @@ remoteGsiftpMaxTransfers=260</programlisting>
 	link already exists:
       </para>
 
-      <screen>&dc-prompt-pm; psu create linkGroup write-link-group
-&dc-prompt-pm;psu addto linkGroup  write-link-group write-link</screen>
+      <screen>&dc-prompt-pm; <userinput>psu create linkGroup write-link-group</userinput>
+&dc-prompt-pm; <userinput>psu addto linkGroup  write-link-group write-link</userinput></screen>
 
       <para>
 	To tell Space Manager if the LinkGroup will be able to store
@@ -1333,11 +1333,11 @@ remoteGsiftpMaxTransfers=260</programlisting>
 	attributes can be specified with the following commands:
       </para>
 
-      <screen>&dc-prompt-pm; psu set linkGroup custodialAllowed &lt;group name&gt; &lt;true|false&gt;
-&dc-prompt-pm; psu set linkGroup outputAllowed &lt;group name&gt; &lt;true|false&gt;
-&dc-prompt-pm; psu set linkGroup replicaAllowed &lt;group name&gt; &lt;true|false&gt;
-&dc-prompt-pm; psu set linkGroup onlineAllowed &lt;group name&gt; &lt;true|false&gt;
-&dc-prompt-pm; psu set linkGroup nearlineAllowed &lt;group name&gt; &lt;true|false&gt;</screen>
+      <screen>&dc-prompt-pm; <userinput>psu set linkGroup custodialAllowed &lt;group name&gt; &lt;true|false&gt;</userinput>
+&dc-prompt-pm; <userinput>psu set linkGroup outputAllowed &lt;group name&gt; &lt;true|false&gt;</userinput>
+&dc-prompt-pm; <userinput>psu set linkGroup replicaAllowed &lt;group name&gt; &lt;true|false&gt;</userinput>
+&dc-prompt-pm; <userinput>psu set linkGroup onlineAllowed &lt;group name&gt; &lt;true|false&gt;</userinput>
+&dc-prompt-pm; <userinput>psu set linkGroup nearlineAllowed &lt;group name&gt; &lt;true|false&gt;</userinput></screen>
 
        <para>
 	 Please note that that it is up to administrators that the
@@ -1479,8 +1479,8 @@ remoteGsiftpMaxTransfers=260</programlisting>
 	using the following commands:
       </para>
       
-      <screen>&prompt-root; <command>cd</command> <replaceable>pnfsDir</replaceable>
-&prompt-root; <command>cat</command> ".(tags)()"
+      <screen>&prompt-root; <userinput>cd <replaceable>pnfsDir</replaceable></userinput>
+&prompt-root; <userinput>cat ".(tags)()"</userinput>
 .(tag)(OSMTemplate)
 .(tag)(file_family)
 .(tag)(storage_group)
@@ -1496,15 +1496,15 @@ remoteGsiftpMaxTransfers=260</programlisting>
 	together with example outputs:
       </para>
 
-      <screen>&prompt-root; <command>cat</command>  ".(tag)(AccessLatency)" ONLINE
-&prompt-root; <command>cat</command>  ".(tag)(RetentionPolicy)" CUSTODIAL</screen>
+      <screen>&prompt-root; <userinput>cat ".(tag)(AccessLatency)" ONLINE</userinput>
+&prompt-root; <userinput>cat ".(tag)(RetentionPolicy)" CUSTODIAL</userinput></screen>
 
       <para>
 	To create/change the values of the tags, please execute :
       </para>
 
-      <screen>&prompt-root; <command>echo</command>  <replaceable>"New Access Latency"</replaceable> > ".(tag)(AccessLatency)"
-&prompt-root; <command>echo</command>  <replaceable>"New Retention Policy"</replaceable> > ".(tag)(RetentionPolicy)"</screen>
+      <screen>&prompt-root; <userinput>echo <replaceable>"New Access Latency"</replaceable> > ".(tag)(AccessLatency)"</userinput>
+&prompt-root; <userinput>echo  <replaceable>"New Retention Policy"</replaceable> > ".(tag)(RetentionPolicy)"</userinput></screen>
 
       <para>
 	The valid AccessLatency Values are "ONLINE" and "NEARLINE",
@@ -1516,8 +1516,8 @@ remoteGsiftpMaxTransfers=260</programlisting>
 	Below are the reals examples of these commands:
       </para>
 
-      <screen>&prompt-root; <command>echo</command>  "ONLINE" > ".(tag)(AccessLatency)"
-&prompt-root; <command>echo</command>  "REPLICA" > ".(tag)(RetentionPolicy)"</screen>
+      <screen>&prompt-root; <userinput>echo "ONLINE" > ".(tag)(AccessLatency)"</userinput>
+&prompt-root; <userinput>echo "REPLICA" > ".(tag)(RetentionPolicy)"</userinput></screen>
    </section>
 
  </section>
@@ -1707,7 +1707,7 @@ LinkGroup default-LinkGroup
 	    command:
 	  </para>
 	  
-	  <screen>&prompt-root; <command>rpm</command> -Uvh srmwatch-1.0-0.i386.rpm</screen>
+	  <screen>&prompt-root; <userinput>rpm -Uvh srmwatch-1.0-0.i386.rpm</userinput></screen>
 	</listitem>
 	
 	<listitem>
@@ -1732,7 +1732,7 @@ LinkGroup default-LinkGroup
 	    Execute
 	  </para>
 	  
-	  <screen>&prompt-root; <command>export</command> CATALINA_HOME=<replaceable>YOUR_TOMCAT_LOCATION</replaceable></screen>
+	  <screen>&prompt-root; <userinput>export CATALINA_HOME=<replaceable>YOUR_TOMCAT_LOCATION</replaceable></userinput></screen>
 	</listitem>
 	
 	<listitem>
@@ -1740,7 +1740,7 @@ LinkGroup default-LinkGroup
 	    Execute
 	  </para>
 	  
-	  <screen>&prompt-root; <command>/opt/d-cache/srmwatch-1.0/deploy_srmwatch</command></screen>
+	  <screen>&prompt-root; <userinput>/opt/d-cache/srmwatch-1.0/deploy_srmwatch</userinput></screen>
 	</listitem>
 	
 	<listitem>
@@ -1777,7 +1777,7 @@ LinkGroup default-LinkGroup
 	    RPM installation can be performed using this command:
 	  </para>
 
-	  <screen>&prompt-root; <command>rpm</command> -Uvh srmwatch-1.0-0.i386.rpm</screen>
+	  <screen>&prompt-root; <userinput>rpm -Uvh srmwatch-1.0-0.i386.rpm</userinput></screen>
 	</listitem>
 
 	<listitem>

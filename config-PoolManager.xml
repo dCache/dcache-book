@@ -443,14 +443,15 @@
       <replaceable>StoreDescriptor</replaceable> has the syntax
       <literal><replaceable>Store</replaceable>:<replaceable>StorageGroup</replaceable></literal>.
       These can be set within PNFS per directory. Consider for example the
-      following setup:<screen><prompt>[admin] # </prompt><command>cd</command> <filename>/pnfs/<replaceable>domain</replaceable>/<replaceable>experiment-a</replaceable>/</filename>
-<prompt>[admin] # </prompt><command>cat</command> "<filename>.(tag)(OSMTemplate)</filename>"
+      following setup:
+      <screen>&prompt-root; <userinput>cd <filename>/pnfs/<replaceable>domain</replaceable>/<replaceable>experiment-a</replaceable>/</filename></userinput>
+&prompt-root; <userinput>cat "<filename>.(tag)(OSMTemplate)</filename>"</userinput>
 StoreName myStore
-<prompt>[admin] # </prompt><command>cat</command> "<filename>.(tag)(sGroup)</filename>"
+&prompt-root; <userinput>cat "<filename>.(tag)(sGroup)</filename>"</userinput>
 STRING</screen>This is the setup after a fresh installation and it will lead
       to the storage class <literal>myStore:STRING@osm</literal>. An
-      adjustment to more sensible values will look like<screen><prompt>[admin] # </prompt><command>echo</command> "StoreName exp-a" &gt;! "<filename>.(tag)(OSMTemplate)</filename>"
-<prompt>[admin] # </prompt><command>echo</command> "run2004" &gt;! "<filename>.(tag)(sGroup)</filename>"</screen>and
+      adjustment to more sensible values will look like<screen>&prompt-root; <userinput>echo "StoreName exp-a" &gt;! "<filename>.(tag)(OSMTemplate)</filename>"</userinput>
+&prompt-root; <userinput>echo "run2004" &gt;! "<filename>.(tag)(sGroup)</filename>"</userinput></screen>and
       will result in the storage class <literal>exp-a:run2004@osm</literal>.
       To summarize: The storage class will depend on the directory, the data
       is stored in and is configurable.</para>
@@ -475,12 +476,12 @@ STRING</screen>This is the setup after a fresh installation and it will lead
       provide means to accomplish that.</para>
 
       <para>The cache class of a directory is set by the tag
-      <literal>cacheClass</literal> as follows:<screen><prompt>[admin] # </prompt><command>echo</command> "metaData" &gt;! "<filename>.(tag)(cacheClass)</filename>"</screen>In
+      <literal>cacheClass</literal> as follows:<screen>&prompt-root; <userinput>echo "metaData" &gt;! "<filename>.(tag)(cacheClass)</filename>"</userinput></screen>In
       the above example the meta-data is stored in directories which are
       tagged in this way.</para>
 
       <para>There is a nice trick for easy checking of the existing tags in
-      one directory:<screen><prompt>[admin] # </prompt><command>grep</command> '' `<command>cat</command> '.(tags)()'`
+      one directory:<screen>&prompt-root; <userinput>grep '' `cat '.(tags)()'`</userinput>
 .(tag)(OSMTemplate):StoreName exp-a
 .(tag)(sGroup):run2004
 .(tag)(cacheClass):metaData</screen>This only works, if the quote-symbols are
@@ -912,7 +913,7 @@ STRING</screen>This is the setup after a fresh installation and it will lead
 
       E.g.
 
-<screen>&dc-prompt-pm; <command>set pool decision</command> <option>-spacecostfactor=3</option> <option>-cpucostfactor=1</option></screen>
+<screen>&dc-prompt-pm; <userinput>set pool decision <option>-spacecostfactor=3</option> <option>-cpucostfactor=1</option></userinput></screen>
 
       will give the <glossterm linkend="gl-space_cost">space
       cost</glossterm> three times the weight of the <glossterm

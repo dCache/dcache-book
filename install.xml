@@ -103,12 +103,12 @@
         using the command:
       </para>
 
-      <screen>&prompt-root; <command>rpm</command> -ivh dcache-server-<replaceable>version</replaceable>-<replaceable>release</replaceable>.i386.rpm
-&prompt-root; <command>rpm</command> -ivh dcache-client-<replaceable>version</replaceable>-<replaceable>release</replaceable>.i386.rpm</screen>
+      <screen>&prompt-root; <userinput>rpm -ivh dcache-server-<replaceable>version</replaceable>-<replaceable>release</replaceable>.i386.rpm</userinput>
+&prompt-root; <userinput>rpm -ivh dcache-client-<replaceable>version</replaceable>-<replaceable>release</replaceable>.i386.rpm</userinput></screen>
     	<para>
        The actual sources lie at <ulink url="http://www.dcache.org/downloads.shtml"/>.
     	 To install for example Version 1.9.4-2 of the server you would use this:
-    	 <screen>&prompt-root; <command>rpm</command> -ivh http://www.dcache.org/downloads/1.9/dcache-server-1.9.4-2.noarch.rpm</screen>
+    	 <screen>&prompt-root; <userinput>rpm -ivh http://www.dcache.org/downloads/1.9/dcache-server-1.9.4-2.noarch.rpm</userinput></screen>
     	 The Client can be found in the download-section of the above url, too.	
     	</para>	
     
@@ -144,7 +144,7 @@
             the following command:
           </para>
 
-          <screen>&prompt-root; <command>/etc/init.d/postgresql</command> restart</screen>
+          <screen>&prompt-root; <userinput>/etc/init.d/postgresql restart</userinput></screen>
         </important>
 
 
@@ -248,15 +248,15 @@ host    all         all         ::1/128        trust</programlisting>
             Chimera-specific tables and stored procedures:
           </para>
       
-          <screen>&prompt-root; <command>createdb</command> -U postgres chimera
+          <screen>&prompt-root; <userinput>createdb -U postgres chimera</userinput>
 CREATE DATABASE
                 
-&prompt-root; <command>createuser</command> -U postgres --no-superuser --no-createrole --createdb --pwprompt chimera
+&prompt-root; <userinput>createuser -U postgres --no-superuser --no-createrole --createdb --pwprompt chimera</userinput>
 Enter password for new role:
 Enter it again:
 CREATE ROLE
 
-&prompt-root; <command>psql</command> -U chimera chimera -f /opt/d-cache/libexec/chimera/sql/create.sql
+&prompt-root; <userinput>psql -U chimera chimera -f /opt/d-cache/libexec/chimera/sql/create.sql</userinput>
 psql:/opt/d-cache/libexec/chimera/sql/create.sql:23: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_inodes_pkey" for table "t_inodes"
 CREATE TABLE
 psql:/opt/d-cache/libexec/chimera/sql/create.sql:35: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_dirs_pkey" for table "t_dirs"
@@ -283,8 +283,8 @@ psql:/opt/d-cache/libexec/chimera/sql/create.sql:332: NOTICE:  CREATE TABLE / PR
 CREATE TABLE
 CREATE INDEX
 
-&prompt-root; <command>createlang</command> -U postgres plpgsql chimera
-&prompt-root; <command>psql</command> -U chimera chimera -f /opt/d-cache/libexec/chimera/sql/pgsql-procedures.sql
+&prompt-root; <userinput>createlang -U postgres plpgsql chimera</userinput>
+&prompt-root; <userinput>psql -U chimera chimera -f /opt/d-cache/libexec/chimera/sql/pgsql-procedures.sql</userinput>
 CREATE FUNCTION
 CREATE FUNCTION
 CREATE FUNCTION
@@ -350,7 +350,7 @@ CREATE TRIGGER
               On some linux distributions you might have to switch the portmap
               daemon off before starting chimera:
             </para>
-            <screen>&prompt-root; <command>/etc/init.d/portmap</command> stop
+            <screen>&prompt-root; <userinput>/etc/init.d/portmap stop</userinput>
 Stopping portmap: portmap</screen>
           </note>
           
@@ -358,7 +358,7 @@ Stopping portmap: portmap</screen>
             Start it via script:
           </para>
 
-<screen>&prompt-root; <command>/opt/d-cache/libexec/chimera/chimera-nfs-run.sh</command> start</screen>
+<screen>&prompt-root; <userinput>/opt/d-cache/libexec/chimera/chimera-nfs-run.sh start</userinput></screen>
 
           <para>
             To automate the launching of that script at startup time,
@@ -366,25 +366,25 @@ Stopping portmap: portmap</screen>
             announce it to chkconfig:
           </para>
 
-<screen>&prompt-root; <command>chkconfig</command> --add chimera-nfs-run.sh
-&prompt-root; <command>chkconfig</command> chimera-nfs-run.sh on</screen>
+<screen>&prompt-root; <userinput>chkconfig --add chimera-nfs-run.sh</userinput>
+&prompt-root; <userinput>chkconfig chimera-nfs-run.sh on</userinput></screen>
 
           <para>
             First we create the root of the Chimera namespace, called
             'pnfs' for legacy reasons.
           </para>
 
-<screen>&prompt-root; /opt/d-cache/libexec/chimera/chimera-cli.sh Mkdir /pnfs</screen>
+<screen>&prompt-root; <userinput>/opt/d-cache/libexec/chimera/chimera-cli.sh Mkdir /pnfs</userinput></screen>
 
           <para>
             Now we need to add directory tags.
             For more information on tags see <xref linkend="cf-pnfs-tags"/>.:
           </para>
 
-<screen>&prompt-root; /opt/d-cache/libexec/chimera/chimera-cli.sh Mkdir /pnfs/<replaceable>your domain</replaceable>
-&prompt-root; /opt/d-cache/libexec/chimera/chimera-cli.sh Mkdir /pnfs/<replaceable>your domain</replaceable>/data
-&prompt-root; <command>echo</command> "chimera" | /opt/d-cache/libexec/chimera/chimera-cli.sh Writetag /pnfs/<replaceable>your domain</replaceable>/data sGroup 
-&prompt-root; <command>echo</command> "StoreName sql" | /opt/d-cache/libexec/chimera/chimera-cli.sh Writetag /pnfs/<replaceable>your domain</replaceable>/data OSMTemplate
+<screen>&prompt-root; <userinput>/opt/d-cache/libexec/chimera/chimera-cli.sh Mkdir /pnfs/<replaceable>your domain</replaceable></userinput>
+&prompt-root; <userinput>/opt/d-cache/libexec/chimera/chimera-cli.sh Mkdir /pnfs/<replaceable>your domain</replaceable>/data</userinput>
+&prompt-root; <userinput>echo "chimera" | /opt/d-cache/libexec/chimera/chimera-cli.sh Writetag /pnfs/<replaceable>your domain</replaceable>/data sGroup</userinput>
+&prompt-root; <userinput>echo "StoreName sql" | /opt/d-cache/libexec/chimera/chimera-cli.sh Writetag /pnfs/<replaceable>your domain</replaceable>/data OSMTemplate</userinput>
 </screen>
 
           <para>If you plan to use &dcap; with mounted file system
@@ -396,11 +396,11 @@ Stopping portmap: portmap</screen>
             establish wormhole files so &dcap; clients can discover the &dcap; doors.
           </para>
 
-<screen>&prompt-root; <command>mount</command> localhost:/ /mnt
-&prompt-root; <command>mkdir</command> /mnt/admin/etc/config/dCache
-&prompt-root; <command>touch</command> /mnt/admin/etc/config/dCache/dcache.conf
-&prompt-root; <command>touch</command> /mnt/admin/etc/config/dCache/'.(fset)(dcache.conf)(io)(on)'
-&prompt-root; <command>echo</command> "<replaceable>door host</replaceable>:<replaceable>port</replaceable>" > /mnt/admin/etc/config/dCache/dcache.conf</screen>
+<screen>&prompt-root; <userinput>mount localhost:/ /mnt</userinput>
+&prompt-root; <userinput>mkdir /mnt/admin/etc/config/dCache</userinput>
+&prompt-root; <userinput>touch /mnt/admin/etc/config/dCache/dcache.conf</userinput>
+&prompt-root; <userinput>touch /mnt/admin/etc/config/dCache/'.(fset)(dcache.conf)(io)(on)'</userinput>
+&prompt-root; <userinput>echo "<replaceable>door host</replaceable>:<replaceable>port</replaceable>" > /mnt/admin/etc/config/dCache/dcache.conf</userinput></screen>
           <para>
             The default values for ports can be found in <xref linkend="rf-ports"/>. They can be altered in 
             <filename>/opt/d-cache/config/dCacheSetup</filename> 
@@ -410,7 +410,7 @@ Stopping portmap: portmap</screen>
             The configuration is done now, so unmount &chimera;:
           </para>
 
-<screen>&prompt-root; <command>umount</command> /mnt</screen>
+<screen>&prompt-root; <userinput>umount /mnt</userinput></screen>
 
           <para>
             Please note that whenever you need to change the
@@ -423,8 +423,8 @@ Stopping portmap: portmap</screen>
           created on the machine (<filename class="directory">/pnfs</filename>). 
           &chimera; can be mounted manually with:</para>
 
-<screen>&prompt-root; <command>mkdir</command> /pnfs
-&prompt-root; <command>mount</command> localhost:/pnfs /pnfs</screen>
+<screen>&prompt-root; <userinput>mkdir /pnfs</userinput>
+&prompt-root; <userinput>mount localhost:/pnfs /pnfs</userinput></screen>
         </section>
       </section>
 
@@ -438,7 +438,7 @@ Stopping portmap: portmap</screen>
           example:
         </para>
 
-        <screen>&prompt-root; <command>createuser</command> -U postgres --no-superuser --no-createrole --createdb --pwprompt srmdcache</screen>
+        <screen>&prompt-root; <userinput>createuser -U postgres --no-superuser --no-createrole --createdb --pwprompt srmdcache</userinput></screen>
 
         <para>
           Several management components running on the head node as well
@@ -446,7 +446,7 @@ Stopping portmap: portmap</screen>
           <database>dcache</database> for state information:
         </para>
 
-        <screen>&prompt-root; <command>createdb</command> -U srmdcache dcache</screen>
+        <screen>&prompt-root; <userinput>createdb -U srmdcache dcache</userinput></screen>
 
         <para>
           There might be several of these on several hosts. Each is
@@ -454,8 +454,8 @@ Stopping portmap: portmap</screen>
           host.
         </para>
 
-        <screen>&prompt-root; <command>createdb</command> -U srmdcache companion
-&prompt-root; <command>psql</command> -U srmdcache companion -f /opt/d-cache/etc/psql_install_companion.sql</screen>
+        <screen>&prompt-root; <userinput>createdb -U srmdcache companion</userinput>
+&prompt-root; <userinput>psql -U srmdcache companion -f /opt/d-cache/etc/psql_install_companion.sql</userinput></screen>
 
         <para>
           If the resilience feature provided by the <glossterm
@@ -464,8 +464,8 @@ Stopping portmap: portmap</screen>
           on the head node with the command:
         </para>
 
-        <screen>&prompt-root; <command>createdb</command> -U srmdcache replicas
-&prompt-root; <command>psql</command> -U srmdcache replicas -f /opt/d-cache/etc/psql_install_replicas.sql</screen>
+        <screen>&prompt-root; <userinput>createdb -U srmdcache replicas</userinput>
+&prompt-root; <userinput>psql -U srmdcache replicas -f /opt/d-cache/etc/psql_install_replicas.sql</userinput></screen>
 
         <note>
           <para>
@@ -480,7 +480,7 @@ Stopping portmap: portmap</screen>
           <database>billing</database> has to be created:
         </para>
 
-        <screen>&prompt-root; <command>createdb</command> -U srmdcache billing</screen>
+        <screen>&prompt-root; <userinput>createdb -U srmdcache billing</userinput></screen>
 
         <para>
           However, we strongly advise against using the same database
@@ -534,7 +534,7 @@ Stopping portmap: portmap</screen>
         example:
       </para>
 
-      <screen>&prompt-root; <command>/opt/d-cache/install/install.sh</command>
+      <screen>&prompt-root; <userinput>/opt/d-cache/install/install.sh</userinput>
 INFO:Skipping ssh key generation
 
  Checking MasterSetup  ./config/dCacheSetup O.k.
@@ -635,19 +635,19 @@ INFO:Skipping ssh key generation
           An example may help to clarify the use of these commands:         
         </para>
 
-        <screen>&prompt-root; <command>/opt/d-cache/bin/dcache</command> pool create 500G /q/pool1
+        <screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache pool create 500G /q/pool1</userinput>
 Created a 500 GiB pool in /q/pool1. The pool cannot be used until it has
 been added to a domain. Use 'pool add' to do so.
 
 Please note that this script does not set the owner of the pool directory.
 You may need to adjust it.
-&prompt-root; <command>/opt/d-cache/bin/dcache</command> pool add myFirstPool <filename class="directory">/q/pool1/</filename>
+&prompt-root; <userinput>/opt/d-cache/bin/dcache pool add myFirstPool <filename class="directory">/q/pool1/</filename></userinput>
 
 Added pool myFirstPool in /q/pool1 to dcache-vmDomain.
 
 The pool will not be operational until the domain has been started. Use
 'start dcache-vmDomain' to start the pool domain.
-&prompt-user; <command>/opt/d-cache/bin/dcache</command> pool ls
+&prompt-user; <userinput>/opt/d-cache/bin/dcache pool ls</userinput>
 Pool        Domain                       Size   Free Path
 myFirstPool dcache-vmDomain               500    550 /q/pool1
 Disk space is measured in GiB.
@@ -656,10 +656,10 @@ Disk space is measured in GiB.
         
         <para>
           All configured components can now be starting with
-          <command>dcache start</command>, for example:
+          <userinput>dcache start</userinput>, for example:
         </para>
 
-        <screen>&prompt-root; <command>/opt/d-cache/bin/dcache</command> start
+        <screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache start</userinput>
 Starting lmDomain  Done (pid=7514)
 Starting dCacheDomain  Done (pid=7574)
 Starting pnfsDomain  Done (pid=7647)
@@ -738,7 +738,7 @@ Starting dcache-vmDomain  Done (pid=8369)
       1.9.3-1 to 1.9.3-2) may be done by shutting down the server and
       upgrading the packages with
 
-<screen>&prompt-root; <command>rpm</command> -Uvh <replaceable>packageName</replaceable></screen>
+<screen>&prompt-root; <userinput>rpm -Uvh <replaceable>packageName</replaceable></userinput></screen>
 
       Follow this by rerunning <command>install/install.sh</command>.
       For details on the changes, please refer to the change log on

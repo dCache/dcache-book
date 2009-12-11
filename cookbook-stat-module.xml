@@ -211,7 +211,7 @@ create diskCacheV111.services.PoolStatisticsV0 PoolStatistics  \
 	directory and run
       </para>
     
-      <screen>./initPackage.sh</screen>
+      <screen>&prompt-root; <userinput>./initPackage.sh</userinput></screen>
     
       <para>
 	Ignore possible error messages. All necessary links will be
@@ -267,10 +267,10 @@ create diskCacheV111.services.PoolStatisticsV0 PoolStatistics  \
 	<literal>statistics module</literal>.
       </para>
 
-      <screen>&prompt-root; cd /opt/d-cache/jobs
-&prompt-root; ./httpd stop
-&prompt-root; ./httpd start
-&prompt-root; ./statistics start</screen>
+      <screen>&prompt-root; <userinput>cd /opt/d-cache/jobs</userinput>
+&prompt-root; <userinput>./httpd stop</userinput>
+&prompt-root; <userinput>./httpd start</userinput>
+&prompt-root; <userinput>./statistics start</userinput></screen>
 
       <para>
 	Statistics is calculated once per hour at

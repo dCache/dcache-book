@@ -70,7 +70,7 @@
 <!--
       For example, use
 
-<screen>&prompt-root; <command>apt-get</command> install postgresql postgresql-server postgresql-jdbc</screen>
+<screen>&prompt-root; <userinput>apt-get install postgresql postgresql-server postgresql-jdbc</userinput></screen>
 -->
       You can download a suitable package from <ulink
       url="http://www.postgresql.org/ftp/">http://www.postgresql.org/ftp/</ulink>. A
@@ -85,17 +85,17 @@
         start the database server, and make sure that it is started 
         at system start-up. This may be done with
 
-<screen>&prompt-root; <command>/etc/init.d/postgresql</command> start
-&prompt-root; <command>chkconfig</command> postgresql on</screen>
+<screen>&prompt-root; <userinput>/etc/init.d/postgresql start</userinput>
+&prompt-root; <userinput>chkconfig postgresql on</userinput></screen>
 
         If the start-up script does not perform the initialization
         automatically, it might have to be done with
 
-<screen>&prompt-root; <command>initdb</command> -D <filename class="directory">/var/lib/pgsql/data/</filename></screen>
+<screen>&prompt-root; <userinput>initdb -D <filename class="directory">/var/lib/pgsql/data/</filename></userinput></screen>
 
         and the server is started manually with
 
-<screen>&prompt-root; <command>postmaster</command> -i -D <filename class="directory">/var/lib/pgsql/data/</filename> >logfile 2>&amp;1 &amp;</screen>
+<screen>&prompt-root; <userinput>postmaster -i -D <filename class="directory">/var/lib/pgsql/data/</filename> >logfile 2>&amp;1 &amp;</userinput></screen>
     </para>
 
     <para>
@@ -155,7 +155,7 @@ host    all         all         ::1/128   ffff:ffff:ffff:ffff:ffff:ffff:ffff:fff
       Restart the server, e.g. with
     </para>
       
-<screen>&prompt-root; <command>/etc/init.d/postgresql</command> restart</screen>
+<screen>&prompt-root; <userinput>/etc/init.d/postgresql restart</userinput></screen>
 
     <para>
       The configuration of the access rights in
@@ -177,27 +177,27 @@ host    all         all         ::1/128   ffff:ffff:ffff:ffff:ffff:ffff:ffff:fff
         url="http://www.postgresql.org/docs/8.0/static/installation.html">http://www.postgresql.org/docs/8.0/static/installation.html</ulink>
       Here is a short version from that page:
       
-<screen>./configure --prefix=/usr/local/pgsql
-gmake
-su
-gmake install
-adduser postgres
-mkdir /usr/local/pgsql/data
-chown postgres /usr/local/pgsql/data
-su - postgres
-/usr/local/pgsql/bin/initdb -D /usr/local/pgsql/data
-/usr/local/pgsql/bin/postmaster -D /usr/local/pgsql/data > logfile 2&gt;&amp;1 &amp;
-/usr/local/pgsql/bin/createdb test
-/usr/local/pgsql/bin/psql test
+<screen>&prompt-root; <userinput>./configure --prefix=/usr/local/pgsql</userinput>
+&prompt-root; <userinput>gmake</userinput>
+&prompt-root; <userinput>su</userinput>
+&prompt-root; <userinput>gmake install</userinput>
+&prompt-root; <userinput>adduser postgres</userinput>
+&prompt-root; <userinput>mkdir /usr/local/pgsql/data</userinput>
+&prompt-root; <userinput>chown postgres /usr/local/pgsql/data</userinput>
+&prompt-root; <userinput>su - postgres</userinput>
+&prompt-root; <userinput>/usr/local/pgsql/bin/initdb -D /usr/local/pgsql/data</userinput>
+&prompt-root; <userinput>/usr/local/pgsql/bin/postmaster -D /usr/local/pgsql/data > logfile 2&gt;&amp;1 &amp;</userinput>
+&prompt-root; <userinput>/usr/local/pgsql/bin/createdb test</userinput>
+&prompt-root; <userinput>/usr/local/pgsql/bin/psql test</userinput>
 </screen>
 
-      If there is another Postgres installed on your machine, make sure root's path is 
+      If there is another &psql; installed on your machine, make sure root's path is 
       set so that executables, esp. psql, postmaster, and pg_ctl, are called from the
-      V8.x.x Postgres that you intend to use for dCache. (You will be doing most of this
+      V8.x.x &psql; that you intend to use for dCache. (You will be doing most of this
       as root). Another thing is to make sure that the various libpg.so libraries are 
-      not invoked from the other Postgres distribution. "locate libpg.so" will show which
+      not invoked from the other &psql; distribution. "locate libpg.so" will show which
       ones are on your system. Set LD_LIBRARY_PATH for root to insure that the "pnfs" 
-      Postgress libs are seen first! 
+      &psql; libs are seen first! 
     </para>
 
   </section>
@@ -239,16 +239,16 @@ host    all         all         <replaceable>HostIP</replaceable>/32          md
 
       The server is made aware of this with
 
-<screen>&prompt-root; <command>pg_ctl</command> reload</screen>
+<screen>&prompt-root; <userinput>pg_ctl reload</userinput></screen>
 
       It can still be configured with the user <literal>postgres</literal>:
 
-<screen>&prompt-root; <command>su</command> - postgres</screen>
+<screen>&prompt-root; <userinput>su - postgres</userinput></screen>
       
       And the password for e.g. the user <literal>pnfsserver</literal> can be
       set with
 
-<screen>&prompt-user; <command>psql</command> template1 -c "ALTER USER pnfsserver WITH PASSWORD '<replaceable>yourPassword</replaceable>'"</screen>
+<screen>&prompt-user; <userinput>psql template1 -c "ALTER USER pnfsserver WITH PASSWORD '<replaceable>yourPassword</replaceable>'"</userinput></screen>
 
       The &pnfs; server is made aware of this password by changing the variable
       <varname>dbConnectString</varname> in the file
@@ -259,7 +259,7 @@ export dbConnectString="user=pnfsserver password=<replaceable>yourPassword</repl
 
       User access should be prohibited to this file with
 
-<screen>&prompt-root; <command>chmod</command> go-rwx /usr/etc/pnfsSetup</screen>
+<screen>&prompt-root; <userinput>chmod go-rwx /usr/etc/pnfsSetup</userinput></screen>
 
     </para>
   </section>
@@ -273,7 +273,7 @@ export dbConnectString="user=pnfsserver password=<replaceable>yourPassword</repl
       standard installation, the replica manager, the &pnfs;
       companion are not activated by default. The billing cell will
       only write to a file by default. Also, prior to version 1.6.6 of
-      &dcache; only the pnfs server which does not use &psql; was
+      &dcache; only the &pnfs; server which does not use &psql; was
       shipped. In this case, &psql; will only be used if the
       conversion described in <xref linkend="cb-pnfs-postgres"/> was done.
     </para>
@@ -296,53 +296,98 @@ export dbConnectString="user=pnfsserver password=<replaceable>yourPassword</repl
       It is especially useful to use a separate &psql; server for the
       &cell-billing; cell.
     </para>
-    
+
+    <note>
+      <para>
+        The following is <emphasis>work-in-progress</emphasis>.
+      </para>
+    </note>
+    <para>Create &psql; user with the name you will be using to run &pnfs; server.
+      Make sure it has <literal>CREATEDB</literal> privilege.</para>
+    <screen>&prompt-user; <userinput>psql -U postgres template1 -c "CREATE USER johndoe with CREATEDB"</userinput>
+&prompt-user; <userinput>dropuser pnfsserver</userinput>
+&prompt-user; <userinput>createuser --no-adduser --createdb --pwprompt pnfsserver</userinput></screen>
+
+    <table tabstyle="cellattributes">
+	<title>Protocol Overview</title>
+	
+	<tgroup cols="5" align="left">
+	  <colspec colnum="1" colname="Component" colwidth="*"/>
+	  <colspec colnum="2" colname="Database Host" colwidth="3*"/>
+	  <colspec colnum="3" colname="Database Name" colwidth="*"/>
+	  <colspec colnum="4" colname="Database User" colwidth="*" />
+      <colspec colnum="5" colname="Database Password" colwidth="*" />
+          <thead>
+            <row>
+              <entry>
+                Component
+              </entry>
+              <entry>
+                Database Host
+              </entry>
+              <entry>
+                Database Name
+              </entry>
+              <entry>
+                Database User
+              </entry>
+              <entry>
+                Database Password
+              </entry>
+            </row>
+          </thead>
+          <tbody>
+	        <row>
+	          <entry>SRM</entry>
+	          <entry><varname>srmDatabaseHost</varname>or if not set: <varname>srmDbHost</varname> or if not set: <systemitem class="systemname">localhost</systemitem></entry>
+	          <entry>dcache</entry>
+	          <entry><database class="user">srmdcache</database></entry>
+              <entry><userinput>srmdcache</userinput></entry>
+	        </row>
+	        <row>
+	          <entry>pin manag</entry>
+	          <entry><varname>pinManagerDatabaseHost</varname> or if not set: <varname>srmDbHost</varname> or if not set: <systemitem class="systemname">localhost</systemitem></entry>
+	          <entry>dcache</entry>
+	          <entry><database class="user">srmdcache</database></entry>
+              <entry><userinput>srmdcache</userinput></entry>
+	        </row>
+	        <row>
+	          <entry>&cell-spacemngr;</entry>
+	          <entry><varname>spaceManagerDatabaseHost</varname> or if not set: <varname>srmDbHost</varname> or if not set: <systemitem class="systemname">localhost</systemitem></entry>
+	          <entry>dcache</entry>
+	          <entry><database class="user">srmdcache</database></entry>
+              <entry><userinput>srmdcache</userinput></entry>
+	        </row>
+	        <row>
+	          <entry>companion</entry>
+	          <entry><varname>companionDatabaseHost</varname> or if not set: <systemitem class="systemname">localhost</systemitem></entry>
+	          <entry>companion</entry>
+	          <entry><database class="user">srmdcache</database></entry>
+              <entry><userinput>srmdcache</userinput></entry>
+	        </row>
+            <row>
+	          <entry>&cell-replicamngr;</entry>
+	          <entry><varname>replicaManagerDatabaseHost</varname> or if not set: <systemitem class="systemname">localhost</systemitem></entry>
+	          <entry>replicas</entry>
+	          <entry><database class="user">srmdcache</database></entry>
+              <entry><userinput>srmdcache</userinput></entry>
+	        </row>
+            <row>
+	          <entry>&pnfs; server</entry>
+	          <entry><systemitem class="systemname">localhost</systemitem></entry>
+	          <entry>admin, data1, exp0, ...</entry>
+	          <entry><database class="user">pnfsserver</database></entry>
+              <entry>--free--</entry>
+	        </row>
+            <row>
+	          <entry>billing</entry>
+	          <entry><varname>billingDatabaseHost</varname> or if not set: <systemitem class="systemname">localhost</systemitem></entry>
+	          <entry>billing</entry>
+	          <entry><database class="user">srmdcache</database></entry>
+              <entry><userinput>srmdcache</userinput></entry>
+	        </row>
+          </tbody>
+        </tgroup>
+      </table>
   </section>
-
-  <note>
-    <para>
-      The following is <emphasis>work-in-progress</emphasis>.
-    </para>
-  </note>
-
-  <screen>
-2. Create postgres user with the name you will be using to run pnfs server.
-   Make sure it has "CREATEDB" privilege.
-
-      psql -U postgres template1 -c "CREATE USER johndoe with CREATEDB"
-
-      dropuser pnfsserver
-
-      createuser --no-adduser --createdb --pwprompt pnfsserver
-
-
-&psql; in &dcache;:
-
-component  |    Database Host               | Database Name | Database User / Pw
---------------------------------------------------------------------------------
-SRM        | ${srmDatabaseHost}             | dcache        | srmdcache
-           |   or if not set: ${srmDbHost}  |               | srmdcache
-           |     or if not set: localhost   |               |
---------------------------------------------------------------------------------
-pin manag. | ${pinManagerDatabaseHost}      | dcache        | srmdcache
-           |   or if not set: ${srmDbHost}  |               | srmdcache
-           |     or if not set: localhost   |               |
---------------------------------------------------------------------------------
-space man. | ${spaceManagerDatabaseHost}    | dcache        | srmdcache
-           |   or if not set: ${srmDbHost}  |               | srmdcache
-           |     or if not set: localhost   |               |
---------------------------------------------------------------------------------
-companion  | ${companionDatabaseHost}       | companion     | srmdcache
-           |   or if not set: localhost     |               | srmdcache
---------------------------------------------------------------------------------
-replica m. | ${replicaManagerDatabaseHost}  | replicas      | srmdcache
-           |   or if not set: localhost     |               | srmdcache
---------------------------------------------------------------------------------
-pnfs server| localhost                      | admin, data1, | pnfsserver
-           |                                | exp0, ...     | --free--
---------------------------------------------------------------------------------
-billing    | ${billingDatabaseHost}         | billing       | srmdcache
-           |   or if not set: localhost     |               | srmdcache
-  </screen>
-  
 </chapter>

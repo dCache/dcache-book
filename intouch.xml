@@ -28,7 +28,7 @@
       are going to store their data:
     </para>
 
-    <screen>&prompt-user; <command>cd</command> /pnfs/<replaceable>site.de</replaceable>/data/
+    <screen>&prompt-user; <userinput>cd /pnfs/<replaceable>site.de</replaceable>/data/</userinput>
 &prompt-user;</screen>
 
     <para>
@@ -50,9 +50,9 @@
       command:
     </para>
 
-    <screen>&prompt-user; export PATH=/opt/d-cache/dcap/bin/:$PATH
-&prompt-user; <command>cd</command> /pnfs/<replaceable>site.de</replaceable>/data/
-&prompt-user; <command>dccp</command> /bin/sh my-test-file
+    <screen>&prompt-user; <userinput>export PATH=/opt/d-cache/dcap/bin/:$PATH</userinput>
+&prompt-user; <userinput>cd /pnfs/<replaceable>site.de</replaceable>/data/</userinput>
+&prompt-user; <userinput>dccp /bin/sh my-test-file</userinput>
 541096 bytes in 0 seconds</screen>
 
     <para>
@@ -68,7 +68,7 @@
       describing the location of the file using a URL.
     </para>
 
-    <screen>&prompt-user; <command>dccp</command> dcap://<replaceable>adminNode</replaceable>/pnfs/<replaceable>site.de</replaceable>/data/my-test-file /tmp/test.tmp
+    <screen>&prompt-user; <userinput>dccp dcap://<replaceable>adminNode</replaceable>/pnfs/<replaceable>site.de</replaceable>/data/my-test-file /tmp/test.tmp</userinput>
 541096 bytes in 0 seconds</screen>
 
     <para>
@@ -78,8 +78,8 @@
       consequently failing to copy the file.
     </para>
 
-    <screen>&prompt-user; <command>chmod</command> o-r my-test-file
-&prompt-user; <command>dccp</command> dcap://<replaceable>adminNode</replaceable>/pnfs/<replaceable>site.de</replaceable>/data/my-test-file /tmp/test2.tmp
+    <screen>&prompt-user; <userinput>chmod o-r my-test-file</userinput>
+&prompt-user; <userinput>dccp dcap://<replaceable>adminNode</replaceable>/pnfs/<replaceable>site.de</replaceable>/data/my-test-file /tmp/test2.tmp</userinput>
 Command failed!
 Server error message for [1]: "Permission denied" (errno 2).
 Failed open file in the dCache.
@@ -93,7 +93,7 @@ System error: Input/output error</screen>
       able to access the file with the NFS mount:
     </para>
 
-    <screen>&prompt-user; <command>dccp</command> my-test-file /tmp/test2.tmp
+    <screen>&prompt-user; <userinput>dccp my-test-file /tmp/test2.tmp</userinput>
 541096 bytes in 0 seconds</screen>
 
     <para>
@@ -104,17 +104,17 @@ System error: Input/output error</screen>
       of &dcap;:
     </para>
 
-    <screen>&prompt-user; <command>chgrp</command> <replaceable>yourVO</replaceable> my-test-file
-&prompt-user; export LD_LIBRARY_PATH=/opt/d-cache/dcap/lib/:$LD_LIBRARY_PATH
-&prompt-user; <command>dccp</command> gsidcap://<replaceable>adminNode</replaceable>:22128/pnfs/<replaceable>site.de</replaceable>/data/my-test-file /tmp/test3.tmp
+    <screen>&prompt-user; <userinput>chgrp <replaceable>yourVO</replaceable> my-test-file</userinput>
+&prompt-user; <userinput>export LD_LIBRARY_PATH=/opt/d-cache/dcap/lib/:$LD_LIBRARY_PATH</userinput>
+&prompt-user; <userinput>dccp gsidcap://<replaceable>adminNode</replaceable>:22128/pnfs/<replaceable>site.de</replaceable>/data/my-test-file /tmp/test3.tmp</userinput>
 541096 bytes in 0 seconds</screen>
 
     <para>
       Or we let the &srm; negotiate the protocol:
     </para>
 
-    <screen>&prompt-user; export PATH=/opt/d-cache/srm/bin/:$PATH
-&prompt-user; <command>srmcp</command> srm://<replaceable>adminNode</replaceable>:8443/pnfs/desy.de/data/my-test-file file:////tmp/test4.tmp
+    <screen>&prompt-user; <userinput>export PATH=/opt/d-cache/srm/bin/:$PATH</userinput>
+&prompt-user; <userinput>srmcp srm://<replaceable>adminNode</replaceable>:8443/pnfs/desy.de/data/my-test-file file:////tmp/test4.tmp</userinput>
 configuration file not found, configuring srmcp
 created configuration file in ~/.srmconfig/config.xml</screen>
 
@@ -124,9 +124,9 @@ created configuration file in ~/.srmconfig/config.xml</screen>
       available the file can be accessed via &srm;:
     </para>
 
-    <screen>&prompt-user; <command>lcg-cp</command> -v --vo <replaceable>yourVO</replaceable> \
+    <screen>&prompt-user; <userinput>lcg-cp -v --vo <replaceable>yourVO</replaceable> \
 srm://<replaceable>dCacheAdminFQN</replaceable>/pnfs/<replaceable>site.de</replaceable>/data/my-test-file \
-file:///tmp/test5.tmp
+file:///tmp/test5.tmp</userinput>
 Source URL: srm://<replaceable>dCacheAdminFQN</replaceable>/pnfs/<replaceable>site.de</replaceable>/data/my-test-file
 File size: 541096
 Source URL for copy: gsiftp://<replaceable>dCacheAdminFQN</replaceable>:2811//pnfs/site.de/data/my-test-file
@@ -138,7 +138,7 @@ Transfer took 770 ms</screen>
       and it can be deleted with the help of the &srm; interface:
     </para>
 
-    <screen>&prompt-user; <command>srm-advisory-delete</command> srm://<replaceable>dCacheAdminFQN</replaceable>:8443/pnfs/<replaceable>site.de</replaceable>/data/my-test-file
+    <screen>&prompt-user; <userinput>srm-advisory-delete srm://<replaceable>dCacheAdminFQN</replaceable>:8443/pnfs/<replaceable>site.de</replaceable>/data/my-test-file</userinput>
  srmcp error :  advisoryDelete(User [name=...],pnfs/<replaceable>site.de</replaceable>/data/my-test-file)
 Error user User [name=...] has no permission to delete 000100000000000000BAF0C0</screen>
 
@@ -147,15 +147,15 @@ Error user User [name=...] has no permission to delete 000100000000000000BAF0C0<
       user which has permissions to delete the file:
     </para>
 
-    <screen>&prompt-user; <command>chown</command> <replaceable>yourVO</replaceable>001 my-test-file
-&prompt-user; <command>srm-advisory-delete</command> srm://<replaceable>dCacheAdminFQN</replaceable>:8443/pnfs/<replaceable>site.de</replaceable>/data/my-test-file</screen>
+    <screen>&prompt-user; <userinput>chown <replaceable>yourVO</replaceable>001 my-test-file</userinput>
+&prompt-user; <userinput>srm-advisory-delete srm://<replaceable>dCacheAdminFQN</replaceable>:8443/pnfs/<replaceable>site.de</replaceable>/data/my-test-file</userinput></screen>
 
     <para>
       If the grid functionality is not required the file can be
       deleted with the NFS mount of the &pnfs; filesystem:
     </para>
 
-    <screen>&prompt-user; <command>rm</command> <filename>my-test-file</filename></screen>
+    <screen>&prompt-user; <userinput>rm <filename>my-test-file</filename></userinput></screen>
 
   </section>
 
@@ -199,7 +199,7 @@ create diskCacheV111.cells.WebCollectorV3 collector \
       restarted by executing
     </para>
 
-    <screen>&prompt-root; <command>/opt/d-cache/bin/dcache</command> restart httpd</screen>
+    <screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache restart httpd</userinput></screen>
 
     <para>
       More information about the
@@ -259,7 +259,7 @@ create diskCacheV111.cells.WebCollectorV3 collector \
       linkend="gl-domain">domain</glossterm> is restarted:
     </para>
 
-    <screen>&prompt-root; <command>/opt/d-cache/bin/dcache</command> restart <replaceable>domainName</replaceable></screen>
+    <screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache restart <replaceable>domainName</replaceable></userinput></screen>
 
     <para>
       Log files of domains are by default stored in
@@ -309,15 +309,15 @@ create diskCacheV111.cells.WebCollectorV3 collector \
       can be created with
     </para>
 
-    <screen>&prompt-root; <command>cd</command> /opt/d-cache/config/
-&prompt-root; <command>../jobs/initPackage.sh</command></screen>
+    <screen>&prompt-root; <userinput>cd /opt/d-cache/config/</userinput>
+&prompt-root; <userinput>../jobs/initPackage.sh</userinput></screen>
 
     <para>
       Then the old domain can be stopped and the new one started:
     </para>
 
-    <screen>&prompt-root; <command>/opt/d-cache/bin/dache</command> stop <replaceable>domainName</replaceable>
-&prompt-root; <command>/opt/d-cache/bin/dcache</command> start <replaceable>newDomainName</replaceable></screen>
+    <screen>&prompt-root; <userinput>/opt/d-cache/bin/dache stop <replaceable>domainName</replaceable></userinput>
+&prompt-root; <userinput>/opt/d-cache/bin/dcache start <replaceable>newDomainName</replaceable></userinput></screen>
 
     <para>
       More details about domains and cells can be found in <xref
@@ -363,7 +363,7 @@ create diskCacheV111.cells.WebCollectorV3 collector \
       &domain-adminDoor; domain. Connect to it with
     </para>
 
-    <screen>&prompt-user; <command>ssh</command> -c blowfish -p 22223 -l admin <replaceable>headNode</replaceable></screen>
+    <screen>&prompt-user; <userinput>ssh -c blowfish -p 22223 -l admin <replaceable>headNode</replaceable></userinput></screen>
 
     <para>
       The initial password is
@@ -382,11 +382,11 @@ create diskCacheV111.cells.WebCollectorV3 collector \
       The password can now be changed with
     </para>
 
-    <screen>&dc-prompt-local; <command>cd</command> acm
-&dc-prompt-acm; <command>create user</command> admin
-&dc-prompt-acm; <command>set passwd</command> -user=admin <replaceable>newPasswd</replaceable> <replaceable>newPasswd</replaceable>
-&dc-prompt-acm; <command>..</command>
-&dc-prompt-local; <command>logoff</command></screen>
+    <screen>&dc-prompt-local; <userinput>cd acm</userinput>
+&dc-prompt-acm; <userinput>create user admin</userinput>
+&dc-prompt-acm; <userinput>set passwd -user=admin <replaceable>newPasswd</replaceable> <replaceable>newPasswd</replaceable></userinput>
+&dc-prompt-acm; <userinput>..</userinput>
+&dc-prompt-local; <userinput>logoff</userinput></screen>
 
     <para>
       This already illustrates how to navigate within the
@@ -435,7 +435,7 @@ create diskCacheV111.cells.WebCollectorV3 collector \
       homepage</ulink>. It is started by
     </para>
 
-    <screen>&prompt-user; <command>java</command> -jar org.pcells.jar</screen>
+    <screen>&prompt-user; <userinput>java -jar org.pcells.jar</userinput></screen>
 
     <para>
       First, a new session has to be created with
@@ -503,7 +503,7 @@ create diskCacheV111.cells.WebCollectorV3 collector \
     </para>
 
     <!-- TODO: following is too long, needs breaking up -->
-    <screen>&dc-prompt-pm; <command>cm ls</command> <option>-r</option>
+    <screen>&dc-prompt-pm; <userinput>cm ls <option>-r</option></userinput>
 <replaceable>poolName1</replaceable>={R={a=0;m=2;q=0};S={a=0;m=2;q=0};M={a=0;m=100;q=0};PS={a=0;m=20;q=0};PC={a=0;m=20;q=0};
     <lineannotation>(...continues...)</lineannotation>   SP={t=2147483648;f=924711076;p=1222772572;r=0;lru=0;{g=20000000;b=0.5}}}
 <replaceable>poolName1</replaceable>={Tag={{hostname=<replaceable>hostname</replaceable>}};size=0;SC=0.16221282938326134;CC=0.0;}
@@ -537,7 +537,7 @@ create diskCacheV111.cells.WebCollectorV3 collector \
       generated with
     </para>
 
-    <screen>&prompt-user; <command>ssh-keygen</command> -t rsa1 -C 'SSH1 key of <replaceable>user</replaceable>'
+    <screen>&prompt-user; <userinput>ssh-keygen -t rsa1 -C 'SSH1 key of <replaceable>user</replaceable>'</userinput>
 Generating public/private rsa1 key pair.
 Enter file in which to save the key (/home/<replaceable>user</replaceable>/.ssh/identity):
 Enter passphrase (empty for no passphrase):
@@ -556,13 +556,13 @@ c1:95:03:6a:66:21:3c:f3:ee:1b:8d:cb:46:f4:29:6a SSH1 key of <replaceable>user</r
       start it with
     </para>
 
-    <screen>&prompt-user; if [ -S $SSH_AUTH_SOCK ] ; then echo "Already running" ; else eval `ssh-agent` ; fi</screen>
+    <screen>&prompt-user; <userinput>if [ -S $SSH_AUTH_SOCK ] ; then echo "Already running" ; else eval `ssh-agent` ; fi</userinput></screen>
 
     <para>
       and add the key to it with
     </para>
 
-    <screen>&prompt-user; <command>ssh-add</command>
+    <screen>&prompt-user; <userinput>ssh-add</userinput>
 Enter passphrase for SSH1 key of <replaceable>user</replaceable>:
 Identity added: /home/<replaceable>user</replaceable>/.ssh/identity (SSH1 key of <replaceable>user</replaceable>)</screen>
 
@@ -588,7 +588,7 @@ Identity added: /home/<replaceable>user</replaceable>/.ssh/identity (SSH1 key of
       be removed from it with
     </para>
 
-    <screen>&prompt-user; <command>ssh-add</command> -d
+    <screen>&prompt-user; <userinput>ssh-add -d</userinput>
 Identity removed: /home/<replaceable>user</replaceable>/.ssh/identity (RSA1 key of <replaceable>user</replaceable>)</screen>
 
     <para>

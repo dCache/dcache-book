@@ -235,7 +235,7 @@ create dmg.cells.services.login.LoginManager DCap \
 	follows:
       </para>
         
-      <screen>dccp -X-io-queue=queueName <replaceable>source</replaceable> <replaceable>destination</replaceable></screen>
+      <screen>&prompt-user; <userinput>dccp -X-io-queue=queueName <replaceable>source</replaceable> <replaceable>destination</replaceable></userinput></screen>
 
       <para>
         Since &prog-dccp; requests may be quite different from other

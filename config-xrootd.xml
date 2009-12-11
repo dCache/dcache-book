@@ -66,7 +66,7 @@ XROOTD=yes
       After a restart of the &dcache; core-services, done by executing
     </para>
 
-    <screen>&prompt-root; <command>${dCacheHome}/bin/dcache-core</command> restart</screen>
+    <screen>&prompt-root; <userinput>${dCacheHome}/bin/dcache-core restart</userinput></screen>
 
     <para>
       the &xrootd; door should be running. A few minutes later it
@@ -143,9 +143,8 @@ java_options="-server -Xmx512m -XX:MaxDirectMemorySize=512m -Dorg.globus.tcp.por
 	To transfer a single file in and out of &dcache;, just issue
       </para>
 
-      <screen>&prompt-user; <command>xrdcp</command> /bin/sh root://<replaceable>door_hostname</replaceable>//pnfs/<replaceable>site.de</replaceable>/data/xrd_test
-      &prompt-user; <command>xrdcp</command>
-      root://<replaceable>door_hostname</replaceable>//pnfs/<replaceable>site.de</replaceable>/data/xrd_test /dev/null</screen>
+      <screen>&prompt-user; <userinput>xrdcp /bin/sh root://<replaceable>door_hostname</replaceable>//pnfs/<replaceable>site.de</replaceable>/data/xrd_test</userinput>
+      &prompt-user; <userinput>xrdcp root://<replaceable>door_hostname</replaceable>//pnfs/<replaceable>site.de</replaceable>/data/xrd_test /dev/null</userinput></screen>
 
     </section>
     
@@ -201,7 +200,7 @@ TXNetFile**             //pnfs/<replaceable>site.de</replaceable>/data/test.root
 	read-only looks like:
       </para>
 
-      <screen> &prompt-user; xrdcp -d 1 /bin/sh root://ford.desy.de//pnfs/desy.de/data/xrd_test2
+      <screen> &prompt-user; <userinput>xrdcp -d 1 /bin/sh root://ford.desy.de//pnfs/desy.de/data/xrd_test2</userinput>
 Setting debug level 1
 061024 18:43:05 001 Xrd: main: (C) 2004 SLAC INFN xrdcp 0.2 beta
 061024 18:43:05 001 Xrd: Create: (C) 2004 SLAC INFN XrdClient kXR_ver002+kXR_asyncap
@@ -316,18 +315,18 @@ xrootdAllowedPaths=/pnfs/<replaceable>site.de</replaceable>/path1:/pnfs/<replace
       </para>
 
       <screen><lineannotation>Generate new RSA private key</lineannotation>
-&prompt-root; openssl genrsa -rand 12938467 -out key.pem 1024
+&prompt-root; <userinput>openssl genrsa -rand 12938467 -out key.pem 1024</userinput>
 
 <lineannotation>Create certificate request</lineannotation>
-&prompt-root; openssl req -new -inform PEM -key key.pem -outform PEM -out certreq.pem
+&prompt-root; <userinput>openssl req -new -inform PEM -key key.pem -outform PEM -out certreq.pem</userinput>
 
 <lineannotation>Create certificate by self-signing certificate request</lineannotation>
-&prompt-root; openssl x509 -days 3650 -signkey key.pem -in certreq.pem -req -out cert.pem
+&prompt-root; <userinput>openssl x509 -days 3650 -signkey key.pem -in certreq.pem -req -out cert.pem</userinput>
 
 <lineannotation>Extract public key from certificate</lineannotation>
-&prompt-root; openssl x509 -pubkey -in cert.pem -out pkey.pem
-&prompt-root; openssl pkcs8 -in key.pem -topk8 -nocrypt -outform DER -out <replaceable>new_private_key</replaceable>
-&prompt-root; openssl enc -base64 -d -in pkey.pem -out <replaceable>new_public_key</replaceable></screen>
+&prompt-root; <userinput>openssl x509 -pubkey -in cert.pem -out pkey.pem</userinput>
+&prompt-root; <userinput>openssl pkcs8 -in key.pem -topk8 -nocrypt -outform DER -out <replaceable>new_private_key</replaceable></userinput>
+&prompt-root; <userinput>openssl enc -base64 -d -in pkey.pem -out <replaceable>new_public_key</replaceable></userinput></screen>
 			
       <para>
 	Only the last two lines are performing the actual conversion,

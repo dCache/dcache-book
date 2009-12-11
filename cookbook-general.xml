@@ -106,8 +106,8 @@
       on that page (and below for your convenence) and issue
     </para>
 
-    <screen>&prompt-root; ln -s /opt/d-cache/jobs/infoDynamicSE-plugin-dcache /opt/lcg/var/gip/plugin/
-&prompt-root; ln -s /opt/d-cache/jobs/infoDynamicSE-provider-dcache /opt/lcg/var/gip/provider/</screen>
+    <screen>&prompt-root; <userinput>ln -s /opt/d-cache/jobs/infoDynamicSE-plugin-dcache /opt/lcg/var/gip/plugin/</userinput>
+&prompt-root; <userinput>ln -s /opt/d-cache/jobs/infoDynamicSE-provider-dcache /opt/lcg/var/gip/provider/</userinput></screen>
 
     <para>
       The new info provider associates to each VO (as given in the
@@ -119,8 +119,8 @@
       and issue the following commands in the pool manager:
     </para>
 
-    <screen>&dc-prompt-pm; <command>psu create pgroup</command> <replaceable>voName</replaceable>
-&dc-prompt-pm; <command>psu addto pgroup</command> <replaceable>voName</replaceable> <replaceable>voPool</replaceable></screen>
+    <screen>&dc-prompt-pm; <userinput>psu create pgroup <replaceable>voName</replaceable></userinput>
+&dc-prompt-pm; <userinput>psu addto pgroup <replaceable>voName</replaceable> <replaceable>voPool</replaceable></userinput></screen>
 
     <para>
       The actual usage of the pools might differ according to the
@@ -134,8 +134,8 @@
       according to your needs and running
     </para>
 
-    <screen>&prompt-root; /opt/lcg/sbin/lcg-info-static-create -c /opt/lcg/share/doc/lcg-info-templates/lcg-info-static-se.conf \
--t /opt/lcg/etc/GlueSE.template > /opt/lcg/var/gip/ldif/lcg-info-static-se.ldif</screen>
+    <screen>&prompt-root; <userinput>/opt/lcg/sbin/lcg-info-static-create -c /opt/lcg/share/doc/lcg-info-templates/lcg-info-static-se.conf \
+-t /opt/lcg/etc/GlueSE.template > /opt/lcg/var/gip/ldif/lcg-info-static-se.ldif</userinput></screen>
 
     <para>
       Globus MDS is configured to use the new &gip; by changing

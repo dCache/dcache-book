@@ -252,8 +252,7 @@ create dmg.cells.services.login.LoginManager DCap-2 \
              *** \
              -loginBroker=LoginBroker"</screen>
 
-    <screen>#
-dccp -o200 /pnfs/desy.de/data/dteam/private/myfile /dev/null</screen>
+    <screen>&prompt-user; <userinput>dccp -o200 /pnfs/desy.de/data/dteam/private/myfile /dev/null</userinput></screen>
 
     <para>
       If the openTimeout expires while a read transfer is already
@@ -322,8 +321,8 @@ create dmg.cells.services.login.LoginManager DCap-strict \
       <literal>23126</literal> :
     </para>
 
-    <screen>   export DCACHE_DOOR=dcachedoorhost:23126
-   dccp -P -t -1 /pnfs/domain.tv/data/cms/users/waste.txt</screen>
+    <screen>&prompt-user; <userinput>export DCACHE_DOOR=dcachedoorhost:23126</userinput>
+&prompt-user; <userinput>dccp -P -t -1 /pnfs/domain.tv/data/cms/users/waste.txt</userinput></screen>
 
     <para>
       If &prog-dccp; returns <literal>File is not cached</literal> and
@@ -497,7 +496,7 @@ create dmg.cells.services.login.LoginManager DCap-strict \
 	<option>globus_tcp_port_range</option> option:
       </para>
 
-      <screen>&prompt-user; &prog-srmcp; -globus_tcp_port_range=<replaceable>minValue</replaceable>:<replaceable>maxValue</replaceable> ...</screen>
+      <screen>&prompt-user; <userinput>&prog-srmcp; -globus_tcp_port_range=<replaceable>minValue</replaceable>:<replaceable>maxValue</replaceable> ...</userinput></screen>
 
       <para>
 	A range of ports open for &tcp; connections is specified as a
@@ -522,13 +521,13 @@ create dmg.cells.services.login.LoginManager DCap-strict \
 	In sh/bash you do that by invoking the following command:
       </para>
 
-      <screen>&prompt-user; export GLOBUS_TCP_PORT_RANGE="<replaceable>min</replaceable>,<replaceable>max</replaceable>"</screen>
+      <screen>&prompt-user; <userinput>export GLOBUS_TCP_PORT_RANGE="<replaceable>min</replaceable>,<replaceable>max</replaceable>"</userinput></screen>
 
       <para>
 	in csh/tcsh you invoke:
       </para>
 
-      <screen>&prompt-user; setenv GLOBUS_TCP_PORT_RANGE "<replaceable>min</replaceable>,<replaceable>max</replaceable>"</screen>
+      <screen>&prompt-user; <userinput>setenv GLOBUS_TCP_PORT_RANGE "<replaceable>min</replaceable>,<replaceable>max</replaceable>"</userinput></screen>
 
       <para>
 	here <replaceable>min</replaceable> and
@@ -571,8 +570,8 @@ create dmg.cells.services.login.LoginManager DCap-strict \
       &door-dcap; with
     </para>
       
-    <screen>&prompt-root; jobs/door stop
-&prompt-root; jobs/door -logfile=<replaceable>dCacheLocation</replaceable>/log/door.log start</screen>
+    <screen>&prompt-root; <userinput>jobs/door stop</userinput>
+&prompt-root; <userinput>jobs/door -logfile=<replaceable>dCacheLocation</replaceable>/log/door.log start</userinput></screen>
     
   </section>
 

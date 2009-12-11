@@ -57,13 +57,13 @@
       the &pnfs; server. It has to have permissions to create
       databases. We suggest to call it <literal>pnfsserver</literal>:
 
-<screen>&prompt-root; <command>su</command> - postgres
-&prompt-user; <command>createuser</command> --no-adduser --createdb pnfsserver</screen>
+<screen>&prompt-root; <userinput>su - postgres</userinput>
+&prompt-user; <userinput>createuser --no-adduser --createdb pnfsserver</userinput></screen>
 
       Or use
 
-<screen>&prompt-root; <command>su</command> - postgres
-&prompt-user; <command>createuser</command> --no-adduser --createdb --pwprompt pnfsserver</screen>
+<screen>&prompt-root; <userinput>su - postgres</userinput>
+&prompt-user; <userinput>createuser --no-adduser --createdb --pwprompt pnfsserver</userinput></screen>
 
       to set a password if PostgreSQL is configured more securely 
       as described in <xref linkend="cb-postgres"/>.
@@ -88,15 +88,15 @@
       configured in <filename>/usr/etc/pnfsSetup</filename>.
       The actual locations of the database files can be found as follows
 
-<screen>&prompt-root; . /usr/etc/pnfsSetup
-&prompt-root; <command>cat</command> ${database}/D-* | cut -f 5 -d ':'</screen>
+<screen>&prompt-root; <userinput>. /usr/etc/pnfsSetup</userinput>
+&prompt-root; <userinput>cat ${database}/D-* | cut -f 5 -d ':'</userinput></screen>
 
     </para>
 
     <para>
       Shut down the &pnfs; server (after shutting down &dcache;):
 
-<screen>&prompt-root; <command>/opt/pnfs.3.1.10/pnfs/bin/pnfs</command> stop</screen>
+<screen>&prompt-root; <userinput>/opt/pnfs.3.1.10/pnfs/bin/pnfs stop</userinput></screen>
 
       This would be a good time to perform a backup of the database
       files in <filename
@@ -107,14 +107,14 @@
       Check the integrity of these GDBM database files as follows.
       First prepare the environment for the &pnfs; tools as usual:
 
-<screen>&prompt-root; . /usr/etc/pnfsSetup
-&prompt-root; PATH=${pnfs}/tools:$PATH</screen>
+<screen>&prompt-root; <userinput>. /usr/etc/pnfsSetup</userinput>
+&prompt-root; <userinput>PATH=${pnfs}/tools:$PATH</userinput></screen>
 
       Choose a suitable temporary directory <filename
       class="directory"><replaceable>tempDirOld</replaceable></filename>
       where the output of the scan commands is stored and create it
 
-<screen>&prompt-root; <command>mkdir</command> <replaceable>tempDirOld</replaceable>/</screen>
+<screen>&prompt-root; <userinput>mkdir <replaceable>tempDirOld</replaceable>/</userinput></screen>
 
       Perform the
       following three commands for each of the database files in
@@ -122,16 +122,16 @@
       class="directory">/opt/pnfsdb/pnfs/databases/</filename> (or
       whereever you found them as described above):
 
-<screen>&prompt-root; <command>md3tool</command> scan /opt/pnfsdb/pnfs/databases/<replaceable>dbName</replaceable> &gt; <replaceable>tempDirOld</replaceable>/<replaceable>dbName</replaceable>.scan 2&gt;&amp;1
-&prompt-root; <command>md3tool</command> scandir /opt/pnfsdb/pnfs/databases/<replaceable>dbName</replaceable> &gt; <replaceable>tempDirOld</replaceable>/<replaceable>dbName</replaceable>.scandir 2&gt;&amp;1
-&prompt-root; <command>md3tool</command> scandirs /opt/pnfsdb/pnfs/databases/<replaceable>dbName</replaceable> &gt; <replaceable>tempDirOld</replaceable>/<replaceable>dbName</replaceable>.scandirs 2&gt;&amp;1</screen>
+<screen>&prompt-root; <userinput>md3tool scan /opt/pnfsdb/pnfs/databases/<replaceable>dbName</replaceable> &gt; <replaceable>tempDirOld</replaceable>/<replaceable>dbName</replaceable>.scan 2&gt;&amp;1</userinput>
+&prompt-root; <userinput>md3tool scandir /opt/pnfsdb/pnfs/databases/<replaceable>dbName</replaceable> &gt; <replaceable>tempDirOld</replaceable>/<replaceable>dbName</replaceable>.scandir 2&gt;&amp;1</userinput>
+&prompt-root; <userinput>md3tool scandirs /opt/pnfsdb/pnfs/databases/<replaceable>dbName</replaceable> &gt; <replaceable>tempDirOld</replaceable>/<replaceable>dbName</replaceable>.scandirs 2&gt;&amp;1</userinput></screen>
 
       Have a look at the output. It should contain no error
       messages. You can do that with
 
-<screen>&prompt-root; <command>grep</command> -v "^ ID" <replaceable>tempDirOld</replaceable>/<replaceable>dbName</replaceable>.scan
-&prompt-root; <command>grep</command> -v "^Scan" <replaceable>tempDirOld</replaceable>/<replaceable>dbName</replaceable>.scandir
-&prompt-root; <command>grep</command> -v "^Dir" <replaceable>tempDirOld</replaceable>/<replaceable>dbName</replaceable>.scandirs</screen>
+<screen>&prompt-root; <userinput>grep -v "^ ID" <replaceable>tempDirOld</replaceable>/<replaceable>dbName</replaceable>.scan</userinput>
+&prompt-root; <userinput>grep -v "^Scan" <replaceable>tempDirOld</replaceable>/<replaceable>dbName</replaceable>.scandir</userinput>
+&prompt-root; <userinput>grep -v "^Dir" <replaceable>tempDirOld</replaceable>/<replaceable>dbName</replaceable>.scandirs</userinput></screen>
 
       The output of these three commands should look like 
 
@@ -182,7 +182,7 @@
       - as the scan reveals - the system will continue to run
       fine. Restart the server with
 
-<screen>&prompt-root; <command>/opt/pnfs.3.1.10/pnfs/bin/pnfs</command> start</screen>
+<screen>&prompt-root; <userinput>/opt/pnfs.3.1.10/pnfs/bin/pnfs start</userinput></screen>
 
       since the conversion as described below will not work porperly.  In this
       case contact <email>support@dcache.org</email> for guidance in converting to
@@ -197,19 +197,19 @@
       Move the &pnfs; databases to a secure backup directory
       <replaceable>backupDir</replaceable>:
 
-<screen>&prompt-root; <command>mv</command> /opt/pnfsdb/pnfs/databases  <replaceable>backupDir</replaceable>/databases</screen>
+<screen>&prompt-root; <userinput>mv /opt/pnfsdb/pnfs/databases  <replaceable>backupDir</replaceable>/databases</userinput></screen>
 
       It is also a good idea to backup the central configuration file
       <filename>/usr/etc/pnfsSetup</filename>:
 
-<screen>&prompt-root; <command>cp</command> /usr/etc/pnfsSetup <replaceable>backupDir</replaceable>/pnfsSetup</screen>
+<screen>&prompt-root; <userinput>cp /usr/etc/pnfsSetup <replaceable>backupDir</replaceable>/pnfsSetup</userinput></screen>
 
     </para>
 
     <para>
       Remove the old version of the &pnfs; software:
 
-<screen>&prompt-root; <command>rpm</command> -e pnfs</screen>
+<screen>&prompt-root; <userinput>rpm -e pnfs</userinput></screen>
 
     </para>
 
@@ -222,9 +222,9 @@
       <filename>data1</filename>, ... , <filename>dataN</filename> are
       the original database file names, then do
 
-<screen>&prompt-root; <command>mkdir</command> /opt/pnfsdb/pnfs/databases
-&prompt-root; <command>cd</command> /opt/pnfsdb/pnfs/databases
-&prompt-root; <command>touch</command> admin data1 data2 ... dataN</screen>
+<screen>&prompt-root; <userinput>mkdir /opt/pnfsdb/pnfs/databases</userinput>
+&prompt-root; <userinput>cd /opt/pnfsdb/pnfs/databases</userinput>
+&prompt-root; <userinput>touch admin data1 data2 ... dataN</userinput></screen>
     </para>
 
     <para>
@@ -261,7 +261,7 @@
     <para>
       Install the PostgreSQL version of &pnfs; with something like
 
-<screen>&prompt-root; <command>rpm</command> -ivh pnfs-postgresql-3.1.10-1.i386.rpm</screen>
+<screen>&prompt-root; <userinput>rpm -ivh pnfs-postgresql-3.1.10-1.i386.rpm</userinput></screen>
 
       it contains everything necessary for the conversion as described in the
       next section
@@ -287,7 +287,7 @@
       <filename><replaceable>backupDir</replaceable>/databases/<replaceable>gdbmFile</replaceable></filename> 
       is done with the following command:
 
-<screen>&prompt-root; <command>gdbm2psql</command> -r -o -i <replaceable>backupDir</replaceable>/databases/<replaceable>gdbmFile</replaceable></screen>
+<screen>&prompt-root; <userinput>gdbm2psql -r -o -i <replaceable>backupDir</replaceable>/databases/<replaceable>gdbmFile</replaceable></userinput></screen>
 
       It is necessary to use the full path to the file. A new database
       in the PostgreSQL server will be created and the data from the
@@ -315,7 +315,7 @@ There are 3671 records in the database.</programlisting>
       database key, so you have to do it in a separate step. For each
       database created during the conversion run
 
-<screen>&prompt-root; <command>psql</command> -U pnfsserver -c 'ALTER TABLE pnfs ADD primary key (pnfsid)' <replaceable>dbName</replaceable></screen>
+<screen>&prompt-root; <userinput>psql -U pnfsserver -c 'ALTER TABLE pnfs ADD primary key (pnfsid)' <replaceable>dbName</replaceable></userinput></screen>
 
       (or use the script
       <filename>${pnfs}/tools/make-key.sh</filename>).  This also can
@@ -337,11 +337,11 @@ There are 3671 records in the database.</programlisting>
       comparing the results with those of the old tests. For smaller
       installations this is done with
 
-<screen>&prompt-root; <command>conversion-scan.sh</command> <replaceable>oldPnfsDatabaseDir</replaceable> <replaceable>newPnfsDatabaseDir</replaceable></screen>
+<screen>&prompt-root; <userinput>conversion-scan.sh <replaceable>oldPnfsDatabaseDir</replaceable> <replaceable>newPnfsDatabaseDir</replaceable></userinput></screen>
 
       e.g.
 
-<screen>&prompt-root; <command>conversion-scan.sh</command> <replaceable>backupDir</replaceable>/databases /opt/pnfsdb/pnfs/databases</screen>
+<screen>&prompt-root; <userinput>conversion-scan.sh <replaceable>backupDir</replaceable>/databases /opt/pnfsdb/pnfs/databases</userinput></screen>
 
       The output of the scans performed by this script can be found in
       <filename>/tmp/pnfs-conversion-scan-<replaceable>PID</replaceable>/old/</filename>
@@ -362,7 +362,7 @@ There are 3671 records in the database.</programlisting>
       If all the tests succeeded, the &pnfs; server may be started
       as usual:
 
-<screen>&prompt-root; <command>${pnfs}/bin/pnfs</command> start</screen>
+<screen>&prompt-root; <userinput>${pnfs}/bin/pnfs start</userinput></screen>
 
       Make sure that the PostgreSQL server is always started before
       the &pnfs; server - especially at system start-up. You also

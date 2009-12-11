@@ -81,7 +81,7 @@
 	  to the database. This has to be done manually when upgrading:
 	</para>
 
-	<screen>&prompt-root; <command>psql</command> -U srmdcache -d replicas -f /opt/d-cache/etc/psql_install_replicas.sql</screen>
+	<screen>&prompt-root; <userinput>psql -U srmdcache -d replicas -f /opt/d-cache/etc/psql_install_replicas.sql</userinput></screen>
 
         <para>
 	  You can safely ignore the errors produced by this command.

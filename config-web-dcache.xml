@@ -81,7 +81,7 @@
       <listitem>   
 	<para>
 	  Install binary rpm. Installation can be performed using this
-	  command: <screen>&prompt-root; <command>rpm</command> -Uvh web-dcache-*-i386.rpm</screen>
+	  command: <screen>&prompt-root; <userinput>rpm -Uvh web-dcache-*-i386.rpm</userinput></screen>
 	</para>
       </listitem>
     
@@ -96,7 +96,7 @@
 	  Untar <filename>web-dcache.tgz</filename> archive into
 	  &tomcat; <filename class="directory">webapps/</filename>
 	  directory. This should be done by
-	  <screen>&prompt-root; <command>tar</command> xfz /opt-dcache/web-dcache/web-dcache.tgz</screen>
+	  <screen>&prompt-root; <userinput>tar xfz /opt-dcache/web-dcache/web-dcache.tgz</userinput></screen>
 	</para>
       </listitem>
 		
@@ -113,7 +113,7 @@
 	    <para>
 	      Untar <filename>lps.tgz</filename> archive. This should
 	      be done by
-	      <screen>&prompt-root; <command>tar</command> xfz /opt-dcache/web-dcache/lps.tgz</screen>
+	      <screen>&prompt-root; <userinput>tar xfz /opt-dcache/web-dcache/lps.tgz</userinput></screen>
 	    </para>
 	  </listitem>
 			
@@ -121,7 +121,7 @@
 	    <para>
 	      Untar <filename>plots.tar</filename> archive. This
 	      should be done by
-	      <screen>&prompt-root; <command>tar</command> xf /opt-dcache/web-dcache/plots.tar</screen>
+	      <screen>&prompt-root; <userinput>tar xf /opt-dcache/web-dcache/plots.tar</userinput></screen>
 	    </para>
 	  </listitem>
 	</orderedlist>
@@ -142,7 +142,7 @@
 	  <filename>...webapps/web-dcache/META-INF/context.xml</filename>
 	  put your real database name, database username and the
 	  password.  Set its protection to 0600
-	  <screen>&prompt-root; <command>chmod</command> 0600 ...webapps/web-dcache/META-INF/context.xml</screen>
+	  <screen>&prompt-root; <userinput>chmod 0600 ...webapps/web-dcache/META-INF/context.xml</userinput></screen>
 	</para>
       </listitem>
     

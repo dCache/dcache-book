@@ -140,10 +140,10 @@
       the database server do:
     </para>
 
-    <screen>&prompt-root; su postgres
-&prompt-user; createdb -U srmdcache replicas
-&prompt-user; psql -U srmdcache -d replicas -f /opt/d-cache/etc/psql_install_replicas.sql
-&prompt-user; exit</screen>
+    <screen>&prompt-root; <userinput>su postgres</userinput>
+&prompt-user; <userinput>createdb -U srmdcache replicas</userinput>
+&prompt-user; <userinput>psql -U srmdcache -d replicas -f /opt/d-cache/etc/psql_install_replicas.sql</userinput>
+&prompt-user; <userinput>exit</userinput></screen>
       
     <para>
       The start-up script <filename>bin/dcache-core</filename> already
@@ -153,13 +153,13 @@
       The replica manager may also be started separately by 
     </para>
 
-    <screen>&prompt-root; /opt/d-cache/jobs/replica -logfile=/opt/d-cache/log/replica.log start</screen>
+    <screen>&prompt-root; <userinput>/opt/d-cache/jobs/replica -logfile=/opt/d-cache/log/replica.log start</userinput></screen>
 
     <para>
       and stopped by
     </para>
 
-    <screen>&prompt-root; /opt/d-cache/jobs/replica stop</screen>
+    <screen>&prompt-root; <userinput>/opt/d-cache/jobs/replica stop</userinput></screen>
 
     <para>
       In the default configuration, all pools of the &dcache;
@@ -1037,7 +1037,7 @@ psu addto  pgroup ResilientPools <replaceable>myPoolName003</replaceable></scree
 	    start the &tomcat;:
 	  </para>
 	      
-	  <screen><command>tomcat/apache-tomcat-5.5.x/bin/startup.sh</command></screen>
+	  <screen><userinput>tomcat/apache-tomcat-5.5.x/bin/startup.sh</userinput></screen>
 	</listitem>
       </itemizedlist>
 

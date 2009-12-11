@@ -49,7 +49,7 @@
       The &pnfs; filesystem may also be mounted by clients. This
       should be done by
 
-<screen>&prompt-root; mount -o intr,hard,rw <replaceable>pnfs-server</replaceable>:/pnfs /pnfs/<replaceable>site.de</replaceable></screen>
+<screen>&prompt-root; <userinput>mount -o intr,hard,rw <replaceable>pnfs-server</replaceable>:/pnfs /pnfs/<replaceable>site.de</replaceable></userinput></screen>
 
       (assuming the system is configured as described in the
       installation instructions).  Users may then access the meta-data
@@ -79,7 +79,7 @@
       For example, the following prints the pnfsID of the file
       <filename>/pnfs/site.de/some/dir/file.dat</filename>:
 
-      <screen>&prompt-user; cat /pnfs/site.de/any/sub/directory/'.(id)(file.dat)' 
+      <screen>&prompt-user; <userinput>cat /pnfs/site.de/any/sub/directory/'.(id)(file.dat)' </userinput>
 0004000000000000002320B8
 &prompt-user; </screen> 
 
@@ -103,7 +103,7 @@
       command-files are listed when they appear in the argument list
       of <command>ls</command> as in
 
-<screen>&prompt-user; <command>ls</command> -l '<filename>.(tag)(sGroup)</filename>'
+<screen>&prompt-user; <userinput>ls -l '<filename>.(tag)(sGroup)</filename>'</userinput>
 -rw-r--r--   11 root     root            7 Aug  6  2004 .(tag)(sGroup)</screen>
 
       Only a subset of file operations are allowed on
@@ -139,13 +139,13 @@
       operations. For example, the name of a file can be obtained from
       the pnfsID with the command <literal>nameof</literal> as follows:
 
-<screen>&prompt-user; cd /pnfs/site.de/any/sub/directory/
-&prompt-user; cat '.(nameof)(0004000000000000002320B8)'
+<screen>&prompt-user; <userinput>cd /pnfs/site.de/any/sub/directory/</userinput>
+&prompt-user; <userinput>cat '.(nameof)(0004000000000000002320B8)'</userinput>
 file.dat</screen>
 
       And the pnfsID of the directory it resides in is obtained by:
 
-<screen>&prompt-user; cat '.(parent)(0004000000000000002320B8)'
+<screen>&prompt-user; <userinput>cat '.(parent)(0004000000000000002320B8)'</userinput>
 0004000000000000001DC9E8
 </screen>
 
@@ -153,10 +153,10 @@ file.dat</screen>
       from the pnfsID. Precisely this is done by the tool
       <command>pathfinder</command>:
 
-<screen>&prompt-user; . /usr/etc/pnfsSetup
-&prompt-user; PATH=$PATH:$pnfs/tools
-&prompt-user; cd /pnfs/site.de/another/dir/
-&prompt-user; pathfinder 0004000000000000002320B8
+<screen>&prompt-user; <userinput>. /usr/etc/pnfsSetup</userinput>
+&prompt-user; <userinput>PATH=$PATH:$pnfs/tools</userinput>
+&prompt-user; <userinput>cd /pnfs/site.de/another/dir/</userinput>
+&prompt-user; <userinput>pathfinder 0004000000000000002320B8</userinput>
 0004000000000000002320B8 file.dat
 0004000000000000001DC9E8 directory
 000400000000000000001060 sub
@@ -176,7 +176,7 @@ file.dat</screen>
       class="directory">/pnfs/site.de/</filename>). The pnfsID
       corresponding to the mountpoint may be obtained with
 
-<screen>&prompt-user; cat '.(get)(cursor)'
+<screen>&prompt-user; <userinput>cat '.(get)(cursor)'</userinput>
 dirID=0004000000000000001DC9E8
 dirPerm=0000001400000020
 mountID=000000000000000000001080
@@ -197,18 +197,18 @@ mountID=000000000000000000001080
       In the &pnfs; filesystem, each directory has a number of
       tags. The existing tags may be listed with
 
-<screen>&prompt-user; <command>cat</command> '<filename>.(tags)()</filename>'
+<screen>&prompt-user; <userinput>cat '<filename>.(tags)()</filename>'</userinput>
 .(tag)(OSMTemplate)
 .(tag)(sGroup)</screen>
 
       and the content of a tag can be read with
 
-<screen>&prompt-user; <command>cat</command> '<filename>.(tag)(OSMTemplate)</filename>'
+<screen>&prompt-user; <userinput>cat '<filename>.(tag)(OSMTemplate)</filename>'</userinput>
 StoreName myStore</screen>
 
       A nice trick to list all tags with their contents is 
 
-      <screen>&prompt-user; <userinput><command>grep</command> "" $(cat ".(tags)()")</userinput>
+      <screen>&prompt-user; <userinput>grep "" $(cat ".(tags)()")</userinput>
 .(tag)(OSMTemplate):StoreName myStore
 .(tag)(sGroup):STRING
 </screen>
@@ -232,8 +232,8 @@ StoreName myStore</screen>
       two tags are set to default values:
     </para>
 
-    <screen>&prompt-user; <userinput><command>cd</command> /pnfs/<replaceable>site.de</replaceable>/data/</userinput>
-&prompt-user; <userinput><command>grep</command> "" $(cat ".(tags)()")</userinput>
+    <screen>&prompt-user; <userinput>cd /pnfs/<replaceable>site.de</replaceable>/data/</userinput>
+&prompt-user; <userinput>grep "" $(cat ".(tags)()")</userinput>
 .(tag)(OSMTemplate):StoreName myStore
 .(tag)(sGroup):STRING</screen>
 
@@ -330,7 +330,7 @@ StoreName myStore</screen>
       command-file as in
     </para>
 
-    <screen>&prompt-user; <command>echo</command> '<replaceable>content</replaceable>' > '<filename>.(tag)(<replaceable>tagName</replaceable>)</filename>'</screen>
+    <screen>&prompt-user; <userinput>echo '<replaceable>content</replaceable>' > '<filename>.(tag)(<replaceable>tagName</replaceable>)</filename>'</userinput></screen>
 
     <para>
       one has to take care not to treat the command-files in the
@@ -443,7 +443,7 @@ StoreName myStore</screen>
       <filename>'.(config)()'/</filename> by e.g.:
     </para>
 
-    <screen>&prompt-root; <command>touch</command> '.(config)()/.(fset)(serverRoot)(io)(on)'</screen>
+    <screen>&prompt-root; <userinput>touch '.(config)()/.(fset)(serverRoot)(io)(on)'</userinput></screen>
 
     <para>
       After that, you will notice that the file is empty. Therefore,
@@ -590,12 +590,12 @@ StoreName myStore</screen>
     <para>
       Prepare the environment with
 
-<screen>&prompt-root; <command>.</command> /usr/etc/pnfsSetup
-&prompt-root; PATH=${pnfs}/tools:$PATH</screen>
+<screen>&prompt-root; <userinput>. /usr/etc/pnfsSetup</userinput>
+&prompt-root; <userinput>PATH=${pnfs}/tools:$PATH</userinput></screen>
 
       To get a list of currently existing databases, issue
 
-<screen>&prompt-root; <command>mdb</command> show
+<screen>&prompt-root; <userinput>mdb show</userinput>
 ID Name Type Status Path
 -------------------------------
 0 admin r enabled (r) /opt/pnfsdb/pnfs/databases/admin
@@ -607,17 +607,17 @@ ID Name Type Status Path
       a placeholder for the PostgreSQL version of &pnfs;) and create
       it with
 
-<screen>&prompt-root; <command>mdb</command> create <replaceable>databaseName</replaceable> <replaceable>databaseFilePath</replaceable></screen>
+<screen>&prompt-root; <userinput>mdb create <replaceable>databaseName</replaceable> <replaceable>databaseFilePath</replaceable></userinput></screen>
 	
       e.g.
 
-<screen>&prompt-root; <command>mdb</command> create data2 /opt/pnfsdb/pnfs/databases/data2</screen>
+<screen>&prompt-root; <userinput>mdb create data2 /opt/pnfsdb/pnfs/databases/data2</userinput></screen>
 
       Make sure the file
       <filename><replaceable>databaseFilePath</replaceable></filename>
       exists with
 
-<screen>&prompt-root; <command>touch</command> <replaceable>databaseFilePath</replaceable></screen>
+<screen>&prompt-root; <userinput>touch <replaceable>databaseFilePath</replaceable></userinput></screen>
 
       This might seem a little strange. The reason is that the
       PostgreSQL version of the &pnfs; server only uses the file as
@@ -627,12 +627,12 @@ ID Name Type Status Path
     <para>
       In order to refresh database information run
 
-<screen>&prompt-root; <command>mdb</command> update
+<screen>&prompt-root; <userinput>mdb update</userinput>
 Starting data2</screen>
 
       Running command <command>mdb show</command> shows the new database:
 
-<screen>&prompt-root; <command>mdb</command> show
+<screen>&prompt-root; <userinput>mdb show</userinput>
 ID Name Type Status Path
 -------------------------------
 0 admin r enabled (r) /opt/pnfsdb/pnfs/databases/admin
@@ -642,8 +642,8 @@ ID Name Type Status Path
 
       In the &pnfs; filesystem tree, create the new directory in the following way
 
-<screen>&prompt-root; <command>cd</command> /pnfs/<replaceable>site.de</replaceable>/<replaceable>some/sub/dir</replaceable>/
-&prompt-root; <command>mkdir</command> '.(<replaceable>newDbID</replaceable>)(<replaceable>newDirectory</replaceable>)'</screen>
+<screen>&prompt-root; <userinput>cd /pnfs/<replaceable>site.de</replaceable>/<replaceable>some/sub/dir</replaceable>/</userinput>
+&prompt-root; <userinput>mkdir '.(<replaceable>newDbID</replaceable>)(<replaceable>newDirectory</replaceable>)'</userinput></screen>
 
       where <replaceable>newDbID</replaceable> is the
       <literal>ID</literal> of the new database as listed in the
@@ -651,8 +651,8 @@ ID Name Type Status Path
       <replaceable>newDirectory</replaceable> is the name of the new
       directory. E.g.
 
-<screen>&prompt-root; <command>cd</command> /pnfs/desy.de/data/zeus/
-&prompt-root; <command>mkdir</command> '.(2)(mcdata)'</screen>
+<screen>&prompt-root; <userinput>cd /pnfs/desy.de/data/zeus/</userinput>
+&prompt-root; <userinput>mkdir '.(2)(mcdata)'</userinput></screen>
 
       The new database does not know anything about the <link
       linkend="cf-pnfs-wormholes">wormhole</link>
@@ -661,27 +661,27 @@ ID Name Type Status Path
       class="directory">/pnfs/fs/admin/etc/config/</filename>) has to
       be specified. It can be found out with
 
-<screen>&prompt-root; <command>sclient</command> getroot ${shmkey} 0
+<screen>&prompt-root; <userinput>sclient getroot ${shmkey} 0</userinput>
 0 000000000000000000001000 <replaceable>wormholePnfsId</replaceable></screen>
 
       The last pnfsID is the one of the wormhole directory of the
       database with ID 0 (already set correctly). Now you can set this ID with
 
-<screen>&prompt-root; <command>sclient</command> getroot ${shmkey} <replaceable>newDbID</replaceable> <replaceable>wormholePnfsId</replaceable>
+<screen>&prompt-root; <userinput>sclient getroot ${shmkey} <replaceable>newDbID</replaceable> <replaceable>wormholePnfsId</replaceable></userinput>
 <replaceable>newDbID</replaceable> 000000000000000000001000 <replaceable>wormholePnfsId</replaceable></screen>
 
       For example, do the following
 
-<screen>&prompt-root; <command>sclient</command> getroot ${shmkey} 0
+<screen>&prompt-root; <userinput>sclient getroot ${shmkey} 0</userinput>
 0 000000000000000000001000 0000000000000000000010E0
-&prompt-root; <command>sclient</command> getroot ${shmkey} 2 0000000000000000000010E0
+&prompt-root; <userinput>sclient getroot ${shmkey} 2 0000000000000000000010E0</userinput>
 2 000000000000000000001000 0000000000000000000010E0</screen>
 
       Finally, add directory tags for the new directories. The default tags are added by
 
-<screen>&prompt-root; <command>cd</command> /pnfs/<replaceable>site.de</replaceable>/<replaceable>some/sub/dir</replaceable>/<replaceable>newDirectory</replaceable>
-&prompt-root; <command>echo</command> 'StoreName myStore' > '.(tag)(OSMTemplate)'
-&prompt-root; <command>echo</command> 'STRING' > '.(tag)(sGroup)'</screen>
+<screen>&prompt-root; <userinput>cd /pnfs/<replaceable>site.de</replaceable>/<replaceable>some/sub/dir</replaceable>/<replaceable>newDirectory</replaceable></userinput>
+&prompt-root; <userinput>echo 'StoreName myStore' > '.(tag)(OSMTemplate)'</userinput>
+&prompt-root; <userinput>echo 'STRING' > '.(tag)(sGroup)'</userinput></screen>
 
     </para>
     

@@ -1041,10 +1041,8 @@ useGPlazmaAuthorizationCell=true</programlisting>
 	on the node which is running &cell-gplazma;. It is enough to do
       </para>
       
-      <blockquote>
-	mkdir /etc/grid-security/vomsdir
-        touch /etc/grid-security/vomsdir/empty-cert.pem
-      </blockquote>
+      <screen><command>mkdir /etc/grid-security/vomsdir</command>
+<command>touch /etc/grid-security/vomsdir/empty-cert.pem</command></screen>
       
       <para>
       to create the non-empty directory.

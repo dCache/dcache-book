@@ -70,7 +70,7 @@
 		  <option>gss_expected_name</option> should be
 		  <literal>srm</literal>.
 	
-		  <screen>&prompt-user; <command>srmcp</command> --gss_expected_name=srm <replaceable>sourceUrl</replaceable> <replaceable>destinationUrl</replaceable></screen>
+		  <screen>&prompt-user; <userinput>srmcp --gss_expected_name=srm <replaceable>sourceUrl</replaceable> <replaceable>destinationUrl</replaceable></userinput></screen>
 
 	      </para>
 	    </informalexample>
@@ -96,7 +96,7 @@
 	      <para>
 		<literal>globus_tcp_port_range=40000:50000</literal>
 	
-		<screen>&prompt-user; <command>srmcp</command> --globus_tcp_port_range=<replaceable>minVal</replaceable>:<replaceable>maxVal</replaceable> <replaceable>sourceUrl</replaceable> <replaceable>destinationUrl</replaceable> </screen>
+		<screen>&prompt-user; <userinput>srmcp --globus_tcp_port_range=<replaceable>minVal</replaceable>:<replaceable>maxVal</replaceable> <replaceable>sourceUrl</replaceable> <replaceable>destinationUrl</replaceable></userinput></screen>
 
 	      </para>
 	    </informalexample>
@@ -112,7 +112,7 @@
 	      mode is used, otherwise extended block mode is used.
 
 	      <informalexample>
-		<screen>&prompt-user; <command>srmcp</command> --streams_num=1 <replaceable>sourceUrl</replaceable> <replaceable>destinationUrl</replaceable></screen>
+		<screen>&prompt-user; <userinput>srmcp --streams_num=1 <replaceable>sourceUrl</replaceable> <replaceable>destinationUrl</replaceable></userinput></screen>
 	      </informalexample>
 	    </para>
 	  </listitem>
@@ -135,7 +135,7 @@
 	    </para>
 
 	    <informalexample>
-	      <screen>&prompt-user; <command>srmcp</command> --streams_num=1 --server_mode=active <replaceable>sourceUrl</replaceable> <replaceable>destinationUrl</replaceable> </screen>
+	      <screen>&prompt-user; <userinput>srmcp --streams_num=1 --server_mode=active <replaceable>sourceUrl</replaceable> <replaceable>destinationUrl</replaceable></userinput></screen>
 
 	    </informalexample>
 	  </listitem>
