@@ -31,6 +31,7 @@ div.toc {
     border: 1px solid darkgreen;
     padding: 5px;
     margin: 30px 50px;
+    max-width: 40em;
 }
 
 
@@ -53,6 +54,7 @@ pre.programlisting {
     white-space: pre;
     margin-right: 15px;
     font-family: monospace;
+    max-width: 60em;
 }
 
 pre.screen { 
@@ -63,12 +65,14 @@ pre.screen {
     margin-right: 15px;
     white-space: pre;
     font-family: monospace;
+    max-width: 60em;
 }
 
 
 span.lineannotation {
     font-family: serif;
     white-space: normal;
+    font-size: 8pt;
 }
 
 .inlineeq { 
@@ -103,34 +107,43 @@ div.informalequation p,td {
   margin: 0px;
  }
 
-div.example p.title{ 
-    background: #FFFFFF; 
-    border: none; 
-    padding: 0px;
-    margin: 0px 0px 10px 0px;
-    font-weight: bold;
-    font-size: 14pt;
-}
-
-div.example p { 
+div.example { 
     background: #FAFAFA; 
-    border: 1px solid yellow; 
-    margin-top: 5px;
+    border: 1px solid #040;
+    margin: 5px 5px 5px 1em;
+    padding: 0.2em 0.2em 0.2em 0.5em;
+    max-width: 45em;
 }
 
-div.informalexample p.title{ 
-    background: #FFFFFF; 
+div.example p {
+    margin-left: 0px;
+    font-size: 11pt;
+}
+
+div.example p.title { 
     border: none; 
-    padding: 0px;
+    padding: 5px;
     margin: 0px 0px 10px 0px;
     font-weight: bold;
     font-size: 14pt;
+    max-width: 30em;
 }
 
-div.informalexamplebody { 
+div.informalexample { 
     background: #FCFCFC; 
     border: 1px solid lightgrey; 
     padding: 10px;
+    margin: 20px 10px 10px 1.8em;
+    max-width: 45em;
+}
+
+
+div.informalexample p.title{ 
+    border: none; 
+    padding: 0px;
+    margin: 0px 0px 10px 0px;
+    font-weight: bold;
+    font-size: 14pt;
 }
 
 div.informalexamplebody p {
@@ -138,8 +151,18 @@ div.informalexamplebody p {
     margin: 0px;
 }
 
-div.informalexample {
-    margin: 5px 0px 30px 0px;
+
+/**
+ *  Format the various admonitions: note
+ *  tip, warning, causion, important
+ */
+div.note, div.tip, div.warning, div.caution, div.important {
+    font-size: 11pt;
+    max-width: 45em;
+}
+div.note p, div.tip p, div.warning p, div.caution p, div.important p {
+    font-size: 11pt;
+    margin-left: 0px;
 }
 
 
