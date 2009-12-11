@@ -34,7 +34,7 @@
     <glossterm linkend="gl-replicamanager">replica
     manager</glossterm>, the <glossterm
     linkend="gl-pnfscompanion">&pnfs; companion</glossterm>, the
-    <glossterm linkend="gl-billing">billing cell</glossterm>, and the
+    <glossterm linkend="gl-billing">&cell-billing;</glossterm>, and the
     &pnfs; server might make use of one or more databases in a single
     or several separate &psql; servers.
   </para>
@@ -43,7 +43,7 @@
     The &srm;, the pin manager, the space manager, the replica
     manager, and the &pnfs; companion will use the &psql; database as
     configured at cell start-up in the corresponding batch files. The
-    billing cell will only write the accounting information into a
+    &cell-billing; will only write the accounting information into a
     database if it is configured with the option
     <option>-useSQL</option>. The &pnfs; server will use a &psql;
     server if the <literal>pnfs-posgresql</literal> version is
@@ -191,13 +191,17 @@ host    all         all         ::1/128   ffff:ffff:ffff:ffff:ffff:ffff:ffff:fff
 &prompt-root; <userinput>/usr/local/pgsql/bin/psql test</userinput>
 </screen>
 
-      If there is another &psql; installed on your machine, make sure root's path is 
-      set so that executables, esp. psql, postmaster, and pg_ctl, are called from the
-      V8.x.x &psql; that you intend to use for dCache. (You will be doing most of this
-      as root). Another thing is to make sure that the various libpg.so libraries are 
-      not invoked from the other &psql; distribution. "locate libpg.so" will show which
-      ones are on your system. Set LD_LIBRARY_PATH for root to insure that the "pnfs" 
-      &psql; libs are seen first! 
+      If there is another &psql; installed on your machine, make sure 
+      <systemitem class="username">root</systemitem>'s path is set so that executables, 
+      esp. <command role="daemon">psql</command>, <command role="daemon">postmaster</command>, and 
+      <command role="daemon">pg_ctl</command>, are called from the V8.x.x &psql; that you 
+      intend to use for &dcache;. (You will be doing most of this as 
+      <systemitem class="username">root</systemitem>). Another thing is to make sure 
+      that the various <filename class="libraryfile">libpg.so</filename> libraries 
+      are not invoked from the other &psql; distribution. 
+      <userinput>locate libpg.so</userinput> will show which ones are on your system. Set 
+      <envar>LD_LIBRARY</envar> for <systemitem class="username">root</systemitem> to 
+      insure that the &pnfs; &psql; libs are seen first! 
     </para>
 
   </section>
@@ -270,8 +274,8 @@ export dbConnectString="user=pnfsserver password=<replaceable>yourPassword</repl
     <para>
       On small systems it should never be a problem to use one single
       &psql; server for all the functions listed above. In the
-      standard installation, the replica manager, the &pnfs;
-      companion are not activated by default. The billing cell will
+      standard installation, the &cell-replicamngr;, the &pnfs;
+      companion are not activated by default. The &cell-billing; will
       only write to a file by default. Also, prior to version 1.6.6 of
       &dcache; only the &pnfs; server which does not use &psql; was
       shipped. In this case, &psql; will only be used if the

@@ -485,7 +485,7 @@ Stopping portmap: portmap</screen>
         <para>
           However, we strongly advise against using the same database
           server for &chimera; and the billing information.  For how
-          to configure the billing cell to write into this database,
+          to configure the &cell-billing; to write into this database,
           see below.
         </para>
       </section>

@@ -1037,7 +1037,7 @@ psu addto  pgroup ResilientPools <replaceable>myPoolName003</replaceable></scree
 	    start the &tomcat;:
 	  </para>
 	      
-	  <screen><userinput>tomcat/apache-tomcat-5.5.x/bin/startup.sh</userinput></screen>
+	  <screen>&prompt-root; <userinput>tomcat/apache-tomcat-5.5.x/bin/startup.sh</userinput></screen>
 	</listitem>
       </itemizedlist>
 

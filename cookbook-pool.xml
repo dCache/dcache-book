@@ -770,7 +770,7 @@ Running tasks:
     <para>
       You may pin a file locally within the private pool repository:
 
-<screen><userinput>rep set sticky <replaceable>pnfsid</replaceable> <option>on|off</option></userinput></screen>
+<screen>&dc-prompt-pool; <userinput>rep set sticky <replaceable>pnfsid</replaceable> <option>on|off</option></userinput></screen>
 
       the 'sticky' mode will stay with the file as long as the file
       is in the pool.  If the file is removed from the pool and
@@ -781,7 +781,7 @@ Running tasks:
       You may use the same mechanism globally:  in the command line
       interface (local mode) there is the command
 
-<screen><userinput>set sticky <replaceable>pnfsid</replaceable></userinput></screen>
+<screen>&dc-prompt-pool; <userinput>set sticky <replaceable>pnfsid</replaceable></userinput></screen>
 
       This command does:
       <orderedlist>

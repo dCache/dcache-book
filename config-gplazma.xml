@@ -1041,7 +1041,7 @@ useGPlazmaAuthorizationCell=true</programlisting>
 	on the node which is running &cell-gplazma;. It is enough to do
       </para>
       
-      <screen><command>mkdir /etc/grid-security/vomsdir</command>
+      <screen>&prompt-root; <command>mkdir /etc/grid-security/vomsdir</command>
 <command>touch /etc/grid-security/vomsdir/empty-cert.pem</command></screen>
       
       <para>
