@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
+
 <!--  Common XSL 
 
   These declarations are common to all output formats.
@@ -14,11 +15,18 @@
   <xsl:param name="refentry.xref.manvolnum" select="0"/>
 
   <xsl:param name="generate.section.toc.level" select="0"/>
-
  
   <xsl:param name="draft.mode" select="'no'"/>
   <xsl:param name="draft.watermark.image" select="''"/>
 
+
+  <!-- Convert typed "straight" apostrophes to the "curly" type if in a para or title -->
+  <xsl:template match="para/text()|title/text()">
+    <xsl:value-of select="translate(.,&quot;&apos;&quot;,&apos;&#x2019;&apos;)"/>
+  </xsl:template>
+  <xsl:template match="para/text()|title/text()" mode="no.anchor.mode">
+    <xsl:value-of select="translate(.,&quot;&apos;&quot;,&apos;&#x2019;&apos;)"/>
+  </xsl:template>
 
 
   <!-- Work-around where the DTD automatically adds class="trade" -->
