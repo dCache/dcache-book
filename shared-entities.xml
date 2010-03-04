@@ -36,6 +36,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY domain-dcache    "<literal>dCacheDomain</literal>">
 <!ENTITY domain-utility   "<literal>utility</literal>">
 <!ENTITY domain-srm       "<literal>srm</literal>">
+<!ENTITY domain-info-provider "<literal>infoProviderDomain</literal>">
 
 
 <!-- Various cells -->
@@ -54,6 +55,9 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY cell-replicamngr "<literal>ReplicaManager</literal>">
 <!ENTITY cell-system    "<literal>System</literal>">
 <!ENTITY cell-acladmin  "<literal>acladmin</literal>">
+<!ENTITY cell-httpd     "<literal>httpd</literal>">
+<!ENTITY cell-info      "<literal>info</literal>">
+<!ENTITY cell-info-provider "<literal>infoProvider</literal>">
 
 <!-- Various protocols: TODO: should these names be prefixed by "protocol-" ? -->
 <!ENTITY dcap     "<systemitem class='protocol'>dCap</systemitem>">
@@ -74,6 +78,8 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!-- Various formats -->
 <!ENTITY ascii    "<acronym>ASCII</acronym>">
 <!ENTITY html     "<acronym>HTML</acronym>">
+<!ENTITY ldif     "<acronym>LDIF</acronym>">
+<!ENTITY rpm     "<acronym>RPM</acronym>">
 
 <!-- Other network concepts -->
 <!ENTITY url      "<acronym>URL</acronym>">

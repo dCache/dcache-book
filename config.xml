@@ -13,7 +13,7 @@
   <?dbhtml filename="index.shtml" ?>
 
   <title>Configuration of <productname>dCache</productname></title>
-  
+
   <partintro>
     <para>
       This part contains descriptions of the components of &dcache;,
@@ -35,6 +35,7 @@
   <xi:include href="config-SRM.xml"/>
   <xi:include href="config-web-dcache.xml"/>
   <xi:include href="config-acl.xml"/>
+  <xi:include href="config-info-provider.xml"/>
 
 </part>
 

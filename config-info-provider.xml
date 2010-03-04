@@ -1,0 +1,722 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+%sharedents;
+
+<!ENTITY bdii     "<acronym>BDII</acronym>">
+<!ENTITY glue     "<acronym>GLUE</acronym>">
+<!ENTITY ldap     "<acronym>LDAP</acronym>">
+<!ENTITY gip      "<acronym>GIP</acronym>">
+<!ENTITY wlcg     "<acronym>WLCG</acronym>">
+<!ENTITY host-localhost "<systemitem class='systemname'>localhost</systemitem>">
+]>
+
+<chapter id="cf-glue">
+  <title>&glue; info provider</title>
+
+  <para>
+    This chapter describes how to configure the GLUE information
+    provider supplied with &dcache; so it provides the correct
+    information.  This is necessary so that &wlcg; infrastructure
+    (such as FTS) and clients using &wlcg; tools can correctly use the
+    &dcache; instance.
+  </para>
+
+  <para>
+    The process is designed to be the minimum overhead so it can
+    easily be performed manually; however, you may choose to use an
+    automatic configuration tool, such as &yaim;.
+  </para>
+
+  <warning>
+    <para>
+      Please be aware that changing information provider may result in
+      a brief interruption to published information.  This may have an
+      adverse affect on client software that make use of this
+      information.
+    </para>
+  </warning>
+
+  <section id="cf-glue-info">
+    <title>Ensuring &dcache; information is available</title>
+
+    <para>
+      Make sure that both the &cell-httpd; and &cell-info; services
+      are running; both are required for publishing information.  By
+      default, the &cell-info; service is started as an admin-node
+      responsibility; but it is possible to configure &dcache; so it
+      runs on a different node.  You should run only one info service
+      per &dcache; instance.
+    </para>
+
+    <note>
+      <title>The &cell-info; service is not the &cell-info-provider;
+      service</title>
+
+      <para>
+	The info-provider needs accurate, up-to-date information about
+	a &dcache; instance so it can publish correct values.  A
+	component of &dcache;, rather confusingly also called
+	&cell-info-provider;, used to provide this up-to-date
+	information.  By default, the &cell-info-provider; would run
+	in its own domain (&domain-info-provider;) and could be
+	started and stopped like any other domain.
+      </para>
+
+      <para>
+	The job of collecting accurate, up-to-date information is now
+	handled by the &cell-info; service.  This is completely
+	independent of the &cell-info-provider; service, so the latter
+	is no longer needed and may be switched off.
+      </para>
+
+      <para>
+	For more details please see <xref
+	linkend="cf-glue-decommission"/>.
+      </para>
+    </note>
+
+    <para>
+      If necessary, you may start the info service manually:
+    </para>
+
+    <screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache start infoDomain</userinput>
+Starting infoDomain done</screen>
+
+    <para>
+      You can check which services are running on the local node using
+      the status command:
+    </para>
+
+    <screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache status</userinput>
+Domain                    Status       PID
+dCacheDomain              running    30582
+dirDomain                 running    30625
+adminDoorDomain           running    30667
+httpdDomain               running    30711
+utilityDomain             running    30760
+gPlazma-dcache-hostDomain running    30844
+namespaceDomain           running    30921
+dcache-hostDomain         running    30971
+infoDomain                running    15530</screen>
+
+    <note>
+      <title>Output may look different</title>
+
+      <para>
+	One feature of &dcache; is that domains may be run on
+	different nodes.  Because of this, the list of domains running
+	on the node running the &cell-info; service may be different.
+      </para>
+    </note>
+
+    <para>
+      You can also verify both services (&cell-httpd; and &cell-info;)
+      are running with the following <command>wget</command> command.
+      This command assumes that you run it on the node that has the
+      &cell-httpd; service (by default, the admin node).  If may run
+      the command on any node by replacing <systemitem
+      class="systemname">localhost</systemitem> with the hostname of
+      the node running the &cell-httpd; service.
+    </para>
+
+    <para>
+      The following example shows the output when the &cell-info;
+      service is running correctly
+    </para>
+
+    <screen>&prompt-root; <userinput>wget -O/dev/null http://localhost:2288/info</userinput>
+--17:57:38--  http://localhost:2288/info
+Resolving localhost... 127.0.0.1
+Connecting to localhost|127.0.0.1|:2288... connected.
+HTTP request sent, awaiting response... 200 Document follows
+Length: 372962 (364K) [application/xml]
+Saving to: `/dev/null'
+
+100%[===========================================================================
+===>] 372,962     --.-K/s   in 0.001s
+
+17:57:38 (346 MB/s) - `/dev/null' saved [372962/372962]</screen>
+
+    <para>
+      If the &cell-httpd; service isn't running then the command will
+      generate the following output:
+    </para>
+
+    <screen>&prompt-root; <userinput>wget -O/dev/null http://localhost:2288/info</userinput>
+  --10:05:35--  http://localhost:2288/info
+             => `/dev/null'
+  Resolving localhost... 127.0.0.1
+  Connecting to localhost|127.0.0.1|:2288... failed: Connection refused.</screen>
+
+    <para>
+      To fix the problem, start the &cell-httpd; service with the
+      following command on the appropriate &dcache; node.
+    </para>
+
+    <screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache start httpdDomain</userinput>
+Starting httpdDomain done</screen>
+
+    <para>
+      If running the <command>wget</command> command gives the
+      following output:
+    </para>
+
+    <screen>&prompt-root; <userinput>wget -O/dev/null http://localhost:2288/info</userinput>
+  --10:03:13--  http://localhost:2288/info
+             => `/dev/null'
+  Resolving localhost... 127.0.0.1
+  Connecting to localhost|127.0.0.1|:2288... connected.
+  HTTP request sent, awaiting response... 503 Unable to contact the info cell.  Pl
+ease ensure the info cell is running.
+  10:03:13 ERROR 503: Unable to contact the info cell.  Please ensure the info cel
+l is running..</screen>
+
+    <para>
+      then the &cell-info; service is not running.  Instructions for
+      starting the &cell-info; service are given above.
+    </para>
+  </section>
+
+
+  <section id="cf-glue-cf-info-provider">
+    <title>Configuring the info provider</title>
+
+    <para>
+      In the directory <filename
+      class="directory">/opt/d-cache/etc</filename> you will find a
+      template file <filename>glue-1.3.xml.template</filename>.  Copy
+      this file as <filename>glue-1.3.xml</filename> in the same
+      directory.
+    </para>
+
+    <para>
+      Edit <filename>glue-1.3.xml</filename> with your favourite text
+      editor.
+    </para>
+
+    <para>
+      The file is split into two parts.  The first part contains the
+      configuration that a site will typically need to configure.
+      Most sites may leave the second part alone.  The two parts are
+      separated by the comment:
+    </para>
+
+    <programlisting><![CDATA[  <!--+
+      |    YOU SHOULD NOT NEED TO EDIT ANYTHING BELOW THIS POINT.
+      +-->]]></programlisting>
+
+    <para>
+      Take care when editing the file!  After changing the contents,
+      the file must remain valid, well-formed &xml;.  In particular,
+      be very careful not to add a less-than symbol
+      (<literal>&lt;</literal>) that isn't part of an &xml; element,
+      or an ampersand symbol (<literal>&amp;</literal>) that isn't
+      part of an entity markup.  If you wish to either symbol you must
+      use the marked-up version: <literal>&amp;lt;</literal> and
+      <literal>&amp;amp;</literal> respectively.  For example:
+    </para>
+
+    <programlisting><![CDATA[<constant id="SE-NAME">Simple &amp; small dCache instance for small VOs
+(typically &lt; 20 users)</constant>]]></programlisting>
+
+    <para>
+      As a further hint, you should <emphasis>only</emphasis> edit
+      text between two elements or add more elements (for lists and
+      mappings).  You should <emphasis>never</emphasis> alter the text
+      inside double-quote marks.  For example, with the following
+      element definition:
+    </para>
+
+    <programlisting><![CDATA[<constant id="SITE-UNIQUE-ID">EXAMPLESITE-ID</constant>]]></programlisting>
+
+    <para>
+      you should review the contents between the elements
+      (<literal>EXAMPLESITE-ID</literal>) and edit the contents
+      accordingly.  You should <emphasis>never</emphasis> edit the
+      <literal>SITE-UNIQUE-ID</literal> as it is in double-quote
+      marks.  A valid, edited value is:
+    </para>
+
+    <programlisting><![CDATA[<constant id="SITE-UNIQUE-ID">DESY-HH</constant>]]></programlisting>
+  </section>
+
+  <section id="cf-glue-testing-info-provider">
+    <title>Testing the info provider</title>
+
+    <para>
+      Once you have configured <filename>glue-1.3.xml</filename> to
+      reflect your site's configuration, you may test that the info
+      provider produces meaningful results.
+    </para>
+
+    <para>
+      Run the info-provider script should produce &glue; information
+      in &ldif; format; for example:
+    </para>
+
+    <screen>&prompt-root; <userinput>/opt/d-cache/libexec/infoProvider/info-based-infoProvider.sh</userinput>
+  #
+  #  LDIF generated by Xylophone v0.1
+  #
+  #  XSLT processing using libxslt 1.0 (http://xmlsoft.org/XSLT/)
+  #
+
+
+  dn: GlueSEUniqueID=dcache-host.example.org,mds-vo-name=resource,o=grid
+  objectClass: GlueSETop
+  objectClass: GlueSE
+  objectClass: GlueKey
+  objectClass: GlueSchemaVersion
+  GlueSEStatus: Production
+  GlueSEUniqueID: dcache-host.example.org
+  GlueSEArchitecture: multidisk
+  GlueSEImplementationName: dcache
+<lineannotation>Many similar lines follow</lineannotation></screen>
+
+    <para>
+      The actual values you see will be site-specific and depend on
+      the contents of the <filename>glue-1.3.xml</filename> file and
+      your &dcache; configuration.
+    </para>
+
+    <para>
+      To verify that there are no problems, redirect standard-out to
+      <filename class="devicefile">/dev/null</filename> to show only
+      the error messages:
+    </para>
+
+    <screen>&prompt-root; <userinput>/opt/d-cache/libexec/infoProvider/info-based-infoProvider.sh >/dev/null</userinput></screen>
+
+    <para>
+      If you see two error messages, which may be repeated several times, of the form:
+    </para>
+
+    <screen>&prompt-root; <userinput>/opt/d-cache/libexec/infoProvider/info-based-infoProvider.sh >/dev/null</userinput>
+  error : Operation in progress
+  warning: failed to load external entity "http://localhost:2288/info"</screen>
+
+    <para>
+      then it is likely that either the &cell-httpd; or &cell-info;
+      service have not been started.  Use the above
+      <command>wget</command> test to check that both services are
+      running.  You can also see which services are available by
+      running the command: <userinput>dcache status</userinput>.
+    </para>
+  </section>
+
+  <section id="cf-glue-decommission">
+    <title>Decommissioning the old info provider</title>
+
+    <para>
+      Sites that were previously using the old (Java-based) info
+      provider should ensure that they no longer using it.  This is
+      because, if so configured, &gip; will obtain information from
+      both the (new) info-based info provider and the Java-based info
+      provider and attempt to merge the results.  This will likely
+      lead to a confusing description of &dcache;, which may prevent
+      clients from working correctly.
+    </para>
+
+    <para>
+      The Java-based info provider has two configuration files and a
+      symbolic link within &gip;.  They are:
+
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    The file <filename>/opt/lcg/var/gip/ldif/lcg-info-static-SE.ldif</filename>,
+	  </para>
+	</listitem>
+
+	<listitem>
+	  <para>
+	    The file: <filename>/opt/lcg/var/gip/ldif/lcg-info-static-dSE.ldif</filename>,
+	  </para>
+	</listitem>
+
+	<listitem>
+	  <para>
+	    The symbolic link
+	    <filename class="symlink">/opt/glite/etc/gip/plugin</filename>, which
+	    points to
+	    <filename>/opt/d-cache/jobs/infoDynamicSE-plugin-dcache</filename>.
+	  </para>
+	</listitem>
+      </itemizedlist>
+    </para>
+
+    <para>
+      The two files (<filename>lcg-info-static-SE.ldif</filename> and
+      <filename>lcg-info-static-dSE.ldif</filename>) may appear within
+      a different directory if the <varname>static_dir</varname>
+      variable is configured.  You will find the
+      <varname>static_dir</varname> variable in one of two
+      configuration files: either
+      <filename>/opt/glite/etc/gip/glite-info-generic.conf</filename>
+      or <filename>/opt/lcg/etc/lcg-info-generic.conf</filename>.
+    </para>
+
+    <para>
+      Delete the above three entries:
+      <filename>lcg-info-static-SE.ldif</filename>,
+      <filename>lcg-info-static-dSE.ldif</filename> and the <filename
+      class="symlink">plugin</filename> symbolic link.
+    </para>
+
+    <para>
+      The directory defined in the <varname>static_dir</varname>
+      variable (<filename
+      class="directory">/opt/lcg/var/gip/ldif</filename> by default)
+      may contain other static &ldif; entries that are relics of
+      previous info-providers.  These may have filenames like
+      <filename>static-file-SE.ldif</filename>.
+    </para>
+
+    <para>
+      Delete any such files that contain information about &dcache;.
+      All &ldif; information now comes directly from the info-provider
+      and there should be no static &ldif; files.
+    </para>
+
+    <para>
+      The &cell-info-provider; component of &dcache;, usually running
+      in its own domain (&domain-info-provider;), collects information
+      for the <application>infoDynamicSE-plugin-dcache</application>
+      program.  Since this program is now obsolete the
+      &domain-info-provider; should be switched off.  This may be
+      achieved with the <command>dcache</command> script:
+    </para>
+
+    <screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache stop infoProviderDomain</userinput>
+Stopping infoProviderDomain (pid=15528) 0 done</screen>
+
+    <para>
+      You can confirm that the &domain-info-provider; domain is no
+      longer running by querying the current status of the components:
+
+      <screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache status | grep ^infoProvider</userinput>
+  infoProviderDomain      stopped         /var/log/infoProviderDomain.log</screen>
+    </para>
+
+    <para>
+      To prevent &dcache; from starting the &domain-info-provider;
+      domain when the machine next reboots, you should edit
+      <filename>/opt/d-cache/etc/node_config</filename> and ensure
+      that the <varname>infoProvider</varname> option is configured to
+      <literal>no</literal>.  You can verify that
+      &domain-info-provider; is no longer listed as a service with the
+      following command:
+      <screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache services | grep ^infoProvider</userinput></screen>
+    </para>
+
+    <para>
+      You should see no output from running the command.
+    </para>
+  </section>
+
+  <section id="cf-glue-publishing">
+    <title>Publishing information from the info-provider</title>
+
+    <para>
+      By default &bdii; obtains fresh information by querying &gip;.  To
+      allow &bdii; to obtain the &glue; information, you must tell &gip;
+      where to find this information.  This is achieved by either
+      copying the above script into the directory <filename
+      class="directory">/opt/glite/etc/gip/provider/</filename>
+    </para>
+
+    <screen>&prompt-root; <userinput>cp /opt/d-cache/libexec/infoProvider/info-based-infoProvider.sh \
+/opt/glite/etc/gip/provider/</userinput></screen>
+
+    <para>
+      or by symbolically linking the script in there:
+    </para>
+
+    <screen>&prompt-root; <userinput>ln -s /opt/d-cache/libexec/infoProvider/info-based-infoProvider.sh
+/opt/glite/etc/gip/provider/</userinput></screen>
+
+    <para>
+      If &gip; (available in the <literal>glite-info-generic</literal>
+      &rpm; package) and &bdii; are installed, and the &bdii; daemons
+      are running, then you will see the information appear in &bdii;
+      after a short delay; by default, this is 60 seconds.
+    </para>
+
+    <para>
+      You can verify the information is present with the query:
+    </para>
+
+    <screen>&prompt-root; <userinput>ldapsearch -LLL -x -H ldap://<replaceable>dcache-host</replaceable>:2170 \
+-b o=grid</userinput>
+dn: o=grid
+objectClass: organization
+o: grid
+
+dn: Mds-Vo-name=local,o=grid
+objectClass: Mds
+Mds-Vo-name: local
+
+dn: Mds-Vo-name=resource,o=grid
+objectClass: Mds
+Mds-Vo-name: resource
+
+dn: GlueSEUniqueID=dcache-host.example.org,Mds-Vo-name=resource,o=grid
+GlueSEStatus: Production
+objectClass: GlueSETop
+objectClass: GlueSE
+objectClass: GlueKey
+objectClass: GlueSchemaVersion
+GlueSETotalNearlineSize: 2000
+GlueSEArchitecture: tape
+GlueSEName: SRM-DEVEL
+GlueSchemaVersionMinor: 3
+GlueSEUsedNearlineSize: 0
+GlueChunkKey: GlueSEUniqueID=dcache-host.example.org
+GlueForeignKey: GlueSiteUniqueID=EXAMPLE-SITE
+GlueSchemaVersionMajor: 1
+GlueSEImplementationName: dCache
+GlueSEUniqueID: dcache-host.example.org
+GlueSETotalOnlineSize: 4832
+GlueSESizeTotal: 4832
+GlueSESizeFree: 4832
+GlueSEUsedOnlineSize: 0
+GlueSEImplementationVersion: 1.9.5-16 (ns=Chimera)
+
+dn: GlueSALocalID=tape-atlas,GlueSEUniqueID=dcache-host.example.org,Mds-Vo-name=reso
+ urce,o=grid
+GlueSATotalNearlineSize: 1000
+objectClass: GlueSATop
+objectClass: GlueSA
+objectClass: GlueSAAccessControlBase
+objectClass: GlueSAState
+objectClass: GlueSchemaVersion
+objectClass: GlueKey
+GlueSAExpirationMode: neverExpire
+GlueChunkKey: GlueSEUniqueID=dcache-host.example.org
+GlueSAReservedOnlineSize: 0
+GlueSACapability: InstalledOnlineCapacity=0
+GlueSACapability: InstalledNearlineCapacity=1000
+GlueSchemaVersionMinor: 3
+GlueSAUsedNearlineSize: 0
+GlueSAName: Tapes for ATLAS
+GlueSAUsedOnlineSize: 0
+GlueSAFreeOnlineSize: 0
+GlueSAFreeNearlineSize: 1000
+GlueSAReservedNearlineSize: 1000
+GlueSchemaVersionMajor: 1
+GlueSAAccessControlBaseRule: VO:atlas
+GlueSALocalID: tape-atlas
+
+<lineannotation>There are likely many further objects defined.  These
+objects have been omitted for brevity.</lineannotation></screen>
+
+    <note>
+      <title>Don't use <systemitem class="systemname">localhost</systemitem></title>
+
+      <para>
+	It's tempting to use &host-localhost; as the hostname in the
+	<command>ldapsearch</command> command above.  Unfortunately,
+	for some versions of &bdii; this will not work.  Recent
+	versions of &bdii; bind to the ethernet device (e.g.,
+	<hardware>eth0</hardware>).  Typically, &host-localhost; is
+	associated with the loopback device (<hardware>lo</hardware>),
+	so the &ldap; server part of &bdii; will not hear the
+	connection request and the query will fail.
+      </para>
+    </note>
+
+    <para>
+      You should be able to compare this output with the output from
+      running the info-provider script manually.  If the info-provider
+      output includes &ldap; objects that are absent in the &bdii;
+      output then there is a problem somewhere.  The &bdii; log file
+      will likely explain why this object was not accepted; for
+      example, due to a badly formatted attribute.
+    </para>
+
+    <para>
+      Unfortunately, the order of the &ldap; objects and the order of
+      the attributes within the object (other than the distinguished
+      name, DN, which must be first) are not required to be in any
+      particular order.  Because of this one cannot use the
+      <command>diff</command> command to look for changes.
+    </para>
+  </section>
+
+
+  <section id="cf-glue-updating">
+    <title>Updating information</title>
+
+    <para>
+      The information contained within the &cell-info; service may
+      take a short time to achieve a complete overview of &dcache;'s
+      state.  For certain gathered information it may take a few
+      minutes before the information stabilises.  This delay is
+      intentional and prevents the gathering of information from
+      adversely affecting &dcache;'s performance.
+    </para>
+
+    <para>
+      The information presented by the &ldap; server is updated, by
+      &bdii;, periodically by requesting fresh information from the
+      info-provider.  The info-provider obtains this information by
+      requesting &dcache;'s current status from &cell-info; service.
+      By default, &bdii; will query the info-provider every 60
+      seconds.  This will introduce an additional delay between a
+      change in &dcache;'s state and that information propagating.
+    </para>
+
+    <para>
+      A few pieces of information are hard-coded within the
+      <filename>glue-1.3.xml</filename> file; that is, you will need
+      to edit this file before the published value(s) will change.
+      These values are ones that typically a site-admin must choose
+      independently of &dcache;'s current operations.
+    </para>
+  </section>
+
+  <section id="cf-glue-troubleshooting">
+    <title>Troubleshooting &bdii; problems</title>
+
+    <para>
+      The &bdii; log files may show entries like:
+    </para>
+
+<programlisting>   ==> slapadd: could not parse entry (line=26)
+   Error nearby dn:
+   GlueVOInfoLocalID=atl<lineannotation>[...]</lineannotation>,o=grid ==>
+   str2entry: invalid value for attributeType GlueSATotalOnlineSize #0
+   (syntax 1.3.6.1.4.1.1466.115.121.1.27)</programlisting>
+
+   <para>
+     This kind of problem comes when &bdii; is attempting to inject
+     new information into the <application>OpenLDAP</application>
+     server.  This server is rejecting some of that information
+     because it is badly formatted.  In this example,
+     <literal>1.3.6.1.4.1.1466.115.121.1.27</literal> is &ldap;-speak
+     for <quote>an integer number</quote>.  The offending attribute
+     has a value of <literal>#0</literal>, which isn't an integer
+     number as it starts with the hash symbol (<literal>#</literal>).
+   </para>
+
+   <para>
+     The <literal>nearby dn</literal> description of the report should
+     be ignored.  It is unclear how
+     <application>OpenLDAP</application> decides which object is
+     <quote>nearby</quote>, but it's usually inaccurate.  Instead, the
+     important piece of information is the line number
+     (<literal>line=26</literal> in above).  &bdii; injects fresh
+     information into the <application>OpenLDAP</application> server
+     from a file and the line number mentioned in the error message is
+     from this file.
+   </para>
+
+   <para>
+     The following two sections describe how to locate the injection
+     file for &bdii; v4 and v5.  In those sections, when mentioning
+     file locations, the default location has been included in
+     parentheses.  Since many sites deploy &bdii; with minimal changes
+     the default locations are likely correct.
+   </para>
+
+   <section id="cf-glue-troubleshooting-locate-bdii-4">
+     <title>Locating &bdii; v4 injection &ldif; files</title>
+
+     <para>
+       The default location is
+       <filename>/opt/bdii/var/cache/1/GIP.ldif</filename>
+     </para>
+
+     <para>
+       The file <filename>/opt/bdii/etc/bdii.conf</filename> contains
+       various configuration options for &bdii;; for example, if this
+       file has the line <literal>BDII_DIR=/opt/bdii</literal> then
+       <varname>BDII_DIR</varname> will take the value
+       <literal>/opt/bdii</literal>.
+     </para>
+
+     <para>
+       The file
+       <filename><replaceable>BDII_DIR</replaceable>/etc/bdii-update.conf</filename>
+       (<filename>/opt/bdii/etc/bdii-update.conf</filename>) contains
+       a list describing methods for obtaining &ldif; information.
+       When updating the contents of a server, &bdii; will obtain
+       &ldif; information from each source and attempt to inject the
+       data into the <application>OpenLDAP</application> server.  The
+       <filename>bdii-update.conf</filename> file will likely contain
+       a single line:
+     </para>
+
+     <programlisting>GIP file:///opt/glite/libexec/glite-info-wrapper</programlisting>
+
+     <para>
+       Each line in <filename>bdii-update.conf</filename> has two
+       parts.  The second part is a URI describing how to obtain the
+       data.  If the URI starts <literal>file://</literal> (as in the
+       above example) then the file is executed and the &ldif; is
+       taken from the standard-output of the process.  The first part
+       (<literal>GIP</literal> in above example) is used to specify
+       the file-name for the combined output
+       (<filename>GIP.ldif</filename>) within the <filename
+       class="directory"><replaceable>BDII_VAR_DIR</replaceable>/cache</filename>
+       directory (<filename
+       class="directory">/opt/bdii/var/cache</filename>) hierarchy.
+     </para>
+
+     <para>
+       The output from the various sources (as defined in the
+       <filename>bdii-update.conf</filename> file) are stored as files
+       within the <filename
+       class="directory"><replaceable>BDII_VAR_DIR</replaceable>/cache/0</filename>
+       directory (<filename
+       class="directory">/opt/bdii/var/cache/0</filename>).  After
+       fresh data is injected, the cache directories are advanced one
+       place, so the directory <filename
+       class="directory">cache/0</filename> becomes <filename
+       class="directory">cache/1</filename>, directory <filename
+       class="directory">cache/1</filename> becomes <filename
+       class="directory">cache/2</filename>, and so on.  The result is
+       that, after injecting, the &ldif; output will be in directory
+       <filename
+       class="directory"><replaceable>BDII_VAR_DIR</replaceable>/cache/1</filename>
+       (<filename class="directory">/opt/bdii/var/cache/1</filename>)
+       and will be contained within the file
+       <filename>GIP.ldif</filename>.
+     </para>
+   </section>
+
+   <section id="cf-glue-troubleshooting-locate-bdii-5">
+     <title>Locating BDII v5 injection LDIF files</title>
+
+     <para>
+       The default location is <filename>/var/bdii/old.ldif</filename>
+     </para>
+
+     <para>
+       As with &bdii; v4, the file
+       <filename>/opt/bdii/etc/bdii.conf</filename> contains
+       configuration, such as in which directories information will be
+       stored.
+     </para>
+
+     <para>
+       The update process in &bdii; v5 is different from v4, so the
+       generated files are different.  With v5, &bdii; maintains
+       knowledge of the current state of the LDAP server in the file
+       <filename><varname>BDII_VAR_DIR</varname>/old.ldif</filename>
+       (<filename>/var/bdii/old.ldif</filename>).  It uses this
+       information to generate a description of how to modify the
+       local &bdii; server (by adding, removing and modifying
+       attributes and objects as necessary).
+     </para>
+   </section>
+
+   <para>
+     Once the injection &ldif; file is located, the line number may be
+     used to discover which object is causing the problem, so enabling
+     further investigation.
+   </para>
+ </section>
+</chapter>
