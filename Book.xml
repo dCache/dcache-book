@@ -8,9 +8,10 @@
 <book id="dCacheBook"
       xmlns:xi="http://www.w3.org/2001/XInclude">
 
-  <title>The dCache Book</title>
-  <titleabbrev>dCache Book</titleabbrev>
-  
+  <title>The &dcache; Book</title>
+  <subtitle>for versions prior to 1.9.7-1</subtitle>
+  <titleabbrev>&dcache; Book</titleabbrev>
+
   <bookinfo>
     <abstract>
       <para>
@@ -33,7 +34,7 @@
       <firstname>Mathias</firstname>
       <surname>de Riese</surname>
     </author>
-    
+
     <author>
       <firstname>Patrick</firstname>
       <surname>Fuhrmann</surname>
@@ -43,7 +44,7 @@
       <firstname>Tigran</firstname>
       <surname>Mkrtchyan</surname>
     </author>
-    
+
     <author>
       <firstname>Michael</firstname>
       <surname>Ernst</surname>
@@ -68,17 +69,17 @@
       <firstname>Neha</firstname>
       <surname>Sharma</surname>
     </author>
-    
+
     <author>
       <firstname>Dmitry</firstname>
       <surname>Litvintsev</surname>
     </author>
-    
+
     <author>
       <firstname>Timur</firstname>
       <surname>Perelmutov</surname>
     </author>
-    
+
     <author>
       <firstname>Ted</firstname>
       <surname>Hesselroth</surname>
@@ -87,17 +88,17 @@
     <mediaobject>
       <imageobject role="fo">
 	<imagedata fileref="images/dCache-book-logo.svg"
-		   format="SVG" align="center" contentwidth="10cm"/> 
+		   format="SVG" align="center" contentwidth="10cm"/>
       </imageobject>
     </mediaobject>
 
   </bookinfo>
-  
+
   <toc/>
 
   <xi:include href="start.xml"/>
   <xi:include href="config.xml"/>
   <xi:include href="cookbook.xml"/>
-  <xi:include href="reference.xml"/>  
+  <xi:include href="reference.xml"/>
 </book>
-  
+
