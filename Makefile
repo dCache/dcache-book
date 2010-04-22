@@ -45,8 +45,9 @@ ALL_TEST_INSTALLED = $(ALL:%=%__TEST_INSTALL__)
 
 
 WWW_SERVER = www.dcache.org
-WWW_LOCATION = /data/www/dcache.org/manuals/Book/
-WWW_TEST_LOCATION = /data/www/dcache.org/manuals/Book-test/
+WWW_SERVER_BASE_DIR = /data/www/dcache.org
+WWW_LOCATION = /manuals/Book-1.9.8/
+WWW_TEST_LOCATION = /manuals/Book-1.9.8-test/
 
 # NB we don't do deps on txt as it depends on html-single output.  This
 #    is cheating, but hey, it works.
@@ -86,8 +87,8 @@ info:
 	@echo "  html        -- build HTML pages"
 	@echo "  txt         -- build text version"
 	@echo "  man         -- build man pages"
-	@echo "  deploy      -- use scp to deploy files at www.dCache.org"
-	@echo "  test-deploy -- use scp to deploy files at www.dCache.org in a test location"
+	@echo "  deploy      -- use scp to deploy files to http://${WWW_SERVER}${WWW_LOCATION}"
+	@echo "  test-deploy -- use scp to deploy files to http://${WWW_SERVER}${WWW_TEST_LOCATION}"
 	@echo
 	@echo "More specific build targets:"
 	@echo
@@ -172,24 +173,24 @@ test-deploy: $(ALL_TEST_INSTALLED)
 
 %__INSTALL__: %
 	chmod a+r,g+w $<
-	scp $< $(WWW_SERVER):$(WWW_LOCATION)
+	scp -p $< $(WWW_SERVER):$(WWW_SERVER_BASE_DIR)$(WWW_LOCATION)
 
 %__TEST_INSTALL__: %
 	chmod a+r,g+w $<
-	scp $< $(WWW_SERVER):$(WWW_TEST_LOCATION)
+	scp -p $< $(WWW_SERVER):$(WWW_SERVER_BASE_DIR)$(WWW_TEST_LOCATION)
 
 #  Unfortunately, we need a special case here.
 Book__INSTALL__: Book/index.$(HTML_EXT)
 	chmod -R a+Xr,g+w Book/*
 	chmod g+s Book
 	find Book -type d -exec chmod g+s \{\} \;
-	scp -r Book/* $(WWW_SERVER):$(WWW_LOCATION)
+	scp -pr Book/* $(WWW_SERVER):$(WWW_SERVER_BASE_DIR)$(WWW_LOCATION)
 
 Book__TEST_INSTALL__: Book/index.$(HTML_EXT)
 	chmod -R a+Xr,g+w Book/*
 	chmod g+s Book
 	find Book -type d -exec chmod g+s \{\} \;
-	scp -r Book/* $(WWW_SERVER):$(WWW_TEST_LOCATION)
+	scp -pr Book/* $(WWW_SERVER):$(WWW_SERVER_BASE_DIR)$(WWW_TEST_LOCATION)
 
 
 
