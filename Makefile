@@ -46,8 +46,8 @@ ALL_TEST_INSTALLED = $(ALL:%=%__TEST_INSTALL__)
 
 WWW_SERVER = www.dcache.org
 WWW_SERVER_BASE_DIR = /data/www/dcache.org
-WWW_LOCATION = /manuals/Book-1.9.8/
-WWW_TEST_LOCATION = /manuals/Book-1.9.8-test/
+WWW_LOCATION = /manuals/Book-1.9.9/
+WWW_TEST_LOCATION = /manuals/Book-1.9.9-test/
 
 # NB we don't do deps on txt as it depends on html-single output.  This
 #    is cheating, but hey, it works.
