@@ -54,6 +54,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY cell-gplazma   "<literal>gPlazma</literal>">
 <!ENTITY cell-replicamngr "<literal>ReplicaManager</literal>">
 <!ENTITY cell-system    "<literal>System</literal>">
+<!ENTITY cell-pinmngr   "<literal>PinManager</literal>">
 <!ENTITY cell-acladmin  "<literal>acladmin</literal>">
 <!ENTITY cell-httpd     "<literal>httpd</literal>">
 <!ENTITY cell-info      "<literal>info</literal>">
