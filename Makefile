@@ -168,8 +168,14 @@ xsl/fo-titlepage.xsl: xsl/fo-titlepage.xml
 #
 
 deploy: $(ALL_INSTALLED)
+	@echo
+	@echo "Book now updated at http://${WWW_SERVER}${WWW_LOCATION}"
+	@echo
 
 test-deploy: $(ALL_TEST_INSTALLED)
+	@echo
+	@echo "Book now updated at http://${WWW_SERVER}${WWW_TEST_LOCATION}"
+	@echo
 
 %__INSTALL__: %
 	chmod a+r,g+w $<
