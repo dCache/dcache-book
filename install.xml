@@ -625,8 +625,13 @@ INFO:Skipping ssh key generation
         <note>
           <para>The default gap for poolsizes is 4GiB. This means you should
           make a bigger pool than 4GiB otherwise you would have to change this gap
-          in the &dcache; admin tool see <xref linkend="intouch-admin"/>.
+          in the &dcache; admin tool. See the example below.
+          See also <xref linkend="intouch-admin"/>.
           </para>
+
+          <screen>&dc-prompt-local; <userinput>cd <replaceable>poolName</replaceable></userinput>
+&dc-prompt-pool; <userinput>set gap 2G</userinput>
+&dc-prompt-pool; <userinput>save</userinput></screen>
         </note>
         
         <informalexample>
