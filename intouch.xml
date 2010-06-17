@@ -501,40 +501,6 @@ namespaceDomain</screen>
     </para>
 
     <para>
-      Instead of using <command>ssh</command> to access the admin
-      interface, the &dcache; graphical user interface can be used. If
-      it is not included in the &dcache; distribution, it can be
-      downloaded from the <ulink url="http://www.dcache.org/">&dcache;
-      homepage</ulink>. It is started by
-    </para>
-
-    <screen>&prompt-user; <userinput>java -jar org.pcells.jar</userinput></screen>
-
-    <para>
-      First, a new session has to be created with
-
-      <menuchoice>
-        <guimenu>Session</guimenu>
-        <guimenuitem>New...</guimenuitem>
-      </menuchoice>.
-
-      After giving the session a name of your choice, a login mask
-      appears. The session is configured with the
-      <guibutton>Setup</guibutton> button. The only thing that needs
-      to be configured is the hostname. After clicking
-      <guibutton>Apply</guibutton> and <guibutton>Quit</guibutton> you
-      are ready to log in. Pressing the right mouse button clicking
-      <guibutton>Login</guibutton> will scan the &dcache; instance for
-      domains. Cells can be reached by clicking on their name and the
-      same commands can be entered as in the SSH login.
-    </para>
-
-    <para>
-      The other tabs of the GUI are very useful for monitoring the
-      &dcache; system.
-    </para>
-
-    <para>
       The most useful command of the pool cells is <xref
         linkend="cmd-rep_ls"/>. It lists the files which are stored in the pool
       by their &pnfs; IDs:
@@ -697,6 +663,45 @@ echo -e 'cd <replaceable>pool_1</replaceable>\nrep ls\n<lineannotation>(more com
   | tr -d '\r' &gt; rep_ls.out</programlisting>
 
   </section>
+
+  <section id="intouch-gui">
+  <title>The Graphical User Interface</title>
+
+    <para>
+      Instead of using <command>ssh</command> to access the admin
+      interface, the &dcache; graphical user interface can be used. If
+      it is not included in the &dcache; distribution, it can be
+      downloaded from the <ulink url="http://www.dcache.org/">&dcache;
+      homepage</ulink>. It is started by
+    </para>
+
+    <screen>&prompt-user; <userinput>java -jar org.pcells.jar</userinput></screen>
+
+    <para>
+      First, a new session has to be created with
+
+      <menuchoice>
+        <guimenu>Session</guimenu>
+        <guimenuitem>New...</guimenuitem>
+      </menuchoice>.
+
+      After giving the session a name of your choice, a login mask
+      appears. The session is configured with the
+      <guibutton>Setup</guibutton> button. The only thing that needs
+      to be configured is the hostname. After clicking
+      <guibutton>Apply</guibutton> and <guibutton>Quit</guibutton> you
+      are ready to log in. Pressing the right mouse button clicking
+      <guibutton>Login</guibutton> will scan the &dcache; instance for
+      domains. Cells can be reached by clicking on their name and the
+      same commands can be entered as in the SSH login.
+    </para>
+
+    <para>
+      The other tabs of the GUI are very useful for monitoring the
+      &dcache; system.
+    </para>
+
+   </section>
 
 
   <!--
