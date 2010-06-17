@@ -418,11 +418,83 @@ create diskCacheV111.cells.WebCollectorV3 collector \
       output in the following cells: &cell-poolmngr;, &cell-pnfsmngr;,
       and the pool cells (e.g., &cell-pool-eg;).
     </para>
+    
+    <para>
+       If you want to find out which cells are running on a certain domain,
+       you can issue the command <command>ps</command> in the &cell-system;
+       cell of the domain. For example, if you want to list the cells running
+       on the &domain-adminDoor;, <command>cd</command> to its &cell-system;
+       cell and issue the <command>ps</command> command.
+    </para>
+
+    <screen>&dc-prompt-local; <userinput>cd System@adminDoorDomain</userinput>
+&dc-prompt-admindoor; <userinput>ps</userinput>
+  Cell List
+------------------
+acm
+alm
+skm
+c-dCacheDomain-101-102
+System
+c-dCacheDomain-101
+RoutingMgr
+alm-admin-103
+pam
+lm</screen>
+
+    <para>
+    The cells in the domain can be accessed using <command>cd</command>
+    together with the cell-name scoped by the domain-name. So first, one has to
+    get back to the local prompt, as the <command>cd</command> command will not
+    work otherwise.
+    </para>
+
+    <screen>&dc-prompt-admindoor; <userinput>..</userinput>
+&dc-prompt-local; <userinput>cd skm@adminDoorDomain</userinput>
+&dc-prompt-skmadmin;</screen>
+
+    <note>
+    <para>
+    If the cells are <firstterm>well-known</firstterm>, they can be accessed
+    without adding the domain-scope. See <xref linkend="cf-cellpackage" /> for
+    more information.
+    </para>
+    </note>
+
+    <para>
+        The domains that are running on the &dcache;-instance, can be viewed
+        in the layout-configuration (see <xref linkend="in" />). Additionally,
+        there is the &cell-topo; cell, which keeps track of the instance's
+        domain topology. If it is running, it can be used to obtain the list of
+        domains the following way:
+    </para>
+    
+    <screen>&dc-prompt-local; <userinput>cd topo</userinput>
+&dc-prompt-topo; <userinput>ls</userinput>
+dirDomain
+infoDomain
+adminDoorDomain
+spacemanagerDomain
+utilityDomain
+gPlazmaDomain
+nfsDomain
+dCacheDomain
+httpdDomain
+statisticsDomain
+namespaceDomain</screen>
+
+    <note>
+    <para>
+	The &cell-topo; cell rescans periodically which domains are running, so
+       it can take some time until <command>ls</command> displays the full
+       domain list.
+    </para>
+    </note>
 
     <para>
       There also is the command <command>help</command> for listing all
       commands the cell knows and their parameters. However, many of the
-      commands are only used for debuging and
+      commands are only used for debugging and
       development purposes. Only commands described in this documentation
       should be used for the administration of a &dcache; system.
     </para>
