@@ -59,6 +59,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY cell-httpd     "<literal>httpd</literal>">
 <!ENTITY cell-info      "<literal>info</literal>">
 <!ENTITY cell-info-provider "<literal>infoProvider</literal>">
+<!ENTITY cell-topo          "<literal>topo</literal>">
 
 <!-- Various protocols: TODO: should these names be prefixed by "protocol-" ? -->
 <!ENTITY dcap     "<systemitem class='protocol'>dCap</systemitem>">
@@ -119,10 +120,13 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY dc-prompt-srcpool "<prompt>(<replaceable>sourcePool</replaceable>) admin &gt;</prompt>">
 <!ENTITY dc-prompt-cpymngr "<prompt>(<replaceable>copyManagerCell</replaceable>) admin &gt;</prompt>">
 <!ENTITY dc-prompt-acladmin "<prompt>(acladmin) admin &gt;</prompt>">
+<!ENTITY dc-prompt-skmadmin "<prompt>(skm) admin &gt;</prompt>">
+<!ENTITY dc-prompt-topo "<prompt>(topo) admin &gt;</prompt>">
 
 
 <!ENTITY dc-prompt-pnfsmngr "<prompt>(PnfsManager) admin &gt;</prompt>">
 <!ENTITY dc-prompt-acm   "<prompt>(acm) admin &gt;</prompt>">
+<!ENTITY dc-prompt-admindoor "<prompt>(System@adminDoorDomain) admin &gt;</prompt>">
 
 <!-- Shell prompts -->
 <!ENTITY prompt-user   "<prompt>[user] $</prompt>">
