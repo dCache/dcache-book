@@ -21,8 +21,8 @@
     it via the &xrootd; protocol, allowing &xrootd;-Clients like
     ROOT's TXNetfile and xrdcp to do file operations against a
     &dcache; instance in a transparent manner. The current
-    implementation in &dcache; 1.7.0 is based on the most recent
-    production version of the &xrootd; protocol (2.4.5).
+    implementation in &dcache; 1.9.9 is based on the most recent
+    production version of the &xrootd; protocol (2.9.6).
   </para>
 
   <section id="cf-xrootd-setup">
@@ -40,36 +40,44 @@
       xrootd server-implementation (produced by SLAC), the
       &door-xrootd; refers to the <literal>redirector node</literal>.
     </para>
-		
-    <!-- 
-		<section id="cf-xrootd-setup-yaim">
-			<title>YAIM-based setup</title>
-			<para>
-				In your <filename>site-info.def</filename>, just uncomment the following line which will
-				enable the xrootd-Door
-				<programlisting>..
-XROOTD=yes
+
+    <para>
+      To enable the &door-xrootd;, you have to change the layout file
+      corresponding to your &dcache;-instance.  Enable the
+      xrootd-service within the domain that you want to run it by adding the
+      following line
+    </para>
+
+    <programlisting>..
+[<replaceable>domainName</replaceable>/xrootd]
 ..</programlisting>
-			</para>
-		</section> -->
+
+    <informalexample>
+    <para>
+        For example, if your &dcache;-instance is configured to be a head-node
+        and you want to run the &door-xrootd; within the 
+        <literal>xrootd-${host.name}Domain</literal>, add/uncomment the
+        following lines in <filename>${dCacheHome}/etc/layouts/head.conf</filename>:
+    </para>
+    
+        <programlisting>..
+[xrootd-${host.name}Domain]
+[xrootd-${host.name}Domain/xrootd]
+..</programlisting>
+    
+    </informalexample>
 
     <para>
-      To enable the &door-xrootd;, just change the config file
-      <filename>${dCacheHome}/etc/node_config</filename> so that it
-      contains the line
+      After a restart of the domain running the &door-xrootd;, done e.g. by
+      executing
     </para>
 
-    <programlisting>..  XROOTD=yes
-      ..</programlisting>
+    <screen>&prompt-root; <userinput>${dCacheHome}/bin/dcache restart xrootd-babelfishDomain</userinput>
+Stopping xrootd-babelfishDomain (pid=30246) 0 1 2 3 4 5 6 7 done
+Starting xrootd-babelfishDomain done</screen>
 
     <para>
-      After a restart of the &dcache; core-services, done by executing
-    </para>
-
-    <screen>&prompt-root; <userinput>${dCacheHome}/bin/dcache-core restart</userinput></screen>
-
-    <para>
-      the &xrootd; door should be running. A few minutes later it
+      the &door-xrootd; should be running. A few minutes later it
       should appear at the web monitoring interface under "Cell
       Services" (see <xref linkend="intouch-web" />).
     </para>
@@ -89,32 +97,56 @@ XROOTD=yes
       
       <para>
 	The default port the &door-xrootd; is listening on is
-	1094. This can be changed in
-	<filename>${dCacheHome}/config/dCacheSetup</filename> by
-	setting the variable "xrootdPort" to the desired value (again
-	restart required).
-      </para>
-			
+	1094. This can be changed two ways:
+	</para>
+	<orderedlist>
+	<listitem>
+    <para>
+    <emphasis>Per door:</emphasis> Edit your instance's layout file, for
+    example
+    <filename>${dCacheHome/etc/layouts/head.conf</filename> and add the
+    desired port for the &door-xrootd; in a separate line (a restart of the
+    domain(s) running the &door-xrootd; is required):
+    </para>
+    <screen>..
+[xrootd-${host.name}Domain]
+[xrootd-${host.name}Domain/xrootd]
+    port = 1095
+..</screen>
+    </listitem>
+	<listitem>
+	<para>
+	<emphasis>Globally:</emphasis> Edit
+	<filename>${dCacheHome}/etc/dcache.conf</filename> and
+	add the variable <varname>xrootd/port</varname> with the desired value (a
+	restart of the domain(s) running the &door-xrootd; is required):
+    </para>
+      <screen>..
+xrootd/port=1095
+..</screen>
+    </listitem>
+    </orderedlist>
+
       <para>
-	The number of parallel &xrootd; file transfers per pool node
-	is limited by the portrange defined in
-	<filename>${dCacheHome}/config/dCacheSetup</filename>, since
-	each transfer occupies one (not firewalled) port for its
-	own. The portrange can be set via the property
-	"<literal>org.dcache.net.tcp.portrange</literal>" in the line
-      </para>
-				
+    The number of parallel &xrootd; file transfers per pool node
+    is limited by the defined portrange. This is due to each transfer occupying
+    one (not firewalled) port for its own. The portrange can be set by adding
+    the properties <literal>net.lan.port.min</literal> and
+    <literal>net.lan.port.max</literal> to 
+    <filename>${dCacheHome}/etc/dcache.conf</filename>. The default values
+    can be viewed in <filename>${dCacheHome}/share/defaults/dcache.properties</filename>.
+    </para>
+                
       <programlisting>..
-java_options="-server -Xmx512m -XX:MaxDirectMemorySize=512m -Dorg.globus.tcp.port.range=50000,52000 
--Dsun.net.inetaddr.ttl=1800 -Djava.net.preferIPv4Stack=true -Dorg.dcache.dcap.port=0 
--Dorg.dcache.net.tcp.portrange=33115:33145 "
+        net.lan.port.min=30100
+        net.lan.port.max=30200
 ..</programlisting>
 
       <para>
-	In the above example, the maximum would be 30 simultaneous
-	&xrootd; transfers per pool. Any change to the door port or
-	the portrange requires a dDache-core- or accordingly
-	dCache-pool- restart.
+    In the above example, the maximum would be 100 simultaneous
+    &xrootd; transfers per pool. Any change to the door port or
+    the portrange requires a restart of the dcache domain running the
+    &door-xrootd; or the pool respectively.
       </para>
 
     </section>
@@ -143,8 +175,8 @@ java_options="-server -Xmx512m -XX:MaxDirectMemorySize=512m -Dorg.globus.tcp.por
 	To transfer a single file in and out of &dcache;, just issue
       </para>
 
-      <screen>&prompt-user; <userinput>xrdcp /bin/sh root://<replaceable>door_hostname</replaceable>//pnfs/<replaceable>site.de</replaceable>/data/xrd_test</userinput>
-      &prompt-user; <userinput>xrdcp root://<replaceable>door_hostname</replaceable>//pnfs/<replaceable>site.de</replaceable>/data/xrd_test /dev/null</userinput></screen>
+      <screen>&prompt-user; <userinput>xrdcp /bin/sh root://<replaceable>xrootd-door.example.org</replaceable>/pnfs/<replaceable>example.org</replaceable>/data/xrd_test</userinput>
+&prompt-user; <userinput>xrdcp root://<replaceable>xrootd-door.example.org</replaceable>/pnfs/<replaceable>example.org</replaceable>/data/xrd_test /dev/null</userinput></screen>
 
     </section>
     
@@ -158,7 +190,7 @@ java_options="-server -Xmx512m -XX:MaxDirectMemorySize=512m -Dorg.globus.tcp.por
 
       <screen>root [0] TH1F h("testhisto", "test", 100, -4, 4);
 root [1] h->FillRandom("gaus", 10000);
-root [2] TFile *f = new TXNetFile("root://<replaceable>door_hostname</replaceable>//pnfs/<replaceable>site.de</replaceable>/data/test.root","new");
+root [2] TFile *f = new TXNetFile("root://<replaceable>door_hostname</replaceable>//pnfs/<replaceable>example.org</replaceable>/data/test.root","new");
 061024 12:03:52 001 Xrd: Create: (C) 2004 SLAC INFN XrdClient 0.3
 root [3] h->Write();
 root [4] f->Write();
@@ -178,10 +210,10 @@ root [6] 061101 15:57:42 14991 Xrd: XrdClientSock::RecvRaw: Error reading from s
 	To read it back into ROOT from &dcache;:
       </para>
 
-      <screen>root [7] TFile *reopen = TXNetFile ("root://<replaceable>door_hostname</replaceable>//pnfs/<replaceable>site.de</replaceable>/data/test.root","read");
+      <screen>root [7] TFile *reopen = TXNetFile ("root://<replaceable>door_hostname</replaceable>//pnfs/<replaceable>example.org</replaceable>/data/test.root","read");
 root [8] reopen->ls();
-TXNetFile**             //pnfs/<replaceable>site.de</replaceable>/data/test.root
- TXNetFile*             //pnfs/<replaceable>site.de</replaceable>/data/test.root
+TXNetFile**             //pnfs/<replaceable>example.org</replaceable>/data/test.root
+ TXNetFile*             //pnfs/<replaceable>example.org</replaceable>/data/test.root
   KEY: TH1F     testhisto;1     test</screen>
 
     </section>
@@ -215,8 +247,8 @@ Setting debug level 1
 Error accessing path/file for root://ford//pnfs/desy.de/data/asdfas</screen>
 			
       <para>
-	To enable read-write access, edit the following line in
-	<filename>${dCacheHome}/config/dCacheSetup</filename>
+	To enable read-write access, add the following line to
+	<filename>${dCacheHome}/etc/dcache.conf</filename>
       </para>
 
       <programlisting>..
@@ -224,7 +256,7 @@ xrootdIsReadOnly=false
 ..</programlisting>
 
       <para>
-	and do a restart of the dCache core services. 
+	and restart any domain(s) running a &door-xrootd;.
       </para>
 
       <para>
@@ -240,31 +272,43 @@ xrootdIsReadOnly=false
     </section>
 		
     <section id="cf-xrootd-sec-selected">
-      <title>Permitting write access on selected &pnfs; directories</title>
+      <title>Permitting read/write access on selected &pnfs; directories</title>
 
       <para>
-	To overcome the security issue of uncontrolled &xrootd; write
+	To overcome the security issue of uncontrolled &xrootd; read and write
 	access mentioned in the previous section, it is possible to
-	restrict write access on a per-directory basis (including
+	restrict read and write access on a per-directory basis (including
 	subdirectories). This feature is available from &dcache;
-	1.7.0-36 on.
+	1.7.0-36 on for controlling write access and since version 1.9.8-1 for
+	controlling read access.
       </para>
 
       <para>
 	To activate this feature, a colon-seperated list containing
-	the full &pnfs; paths of authorized directories must be provided
-	in <filename>${dCacheHome}/config/dCacheSetup</filename>:
+	the full &pnfs; paths of authorized directories must be added
+	to <filename>${dCacheHome}/etc/dcache.conf</filename>. If both read and
+	write access should be authorized for certain directories, add the
+	following line to <filename>${dCacheHome}/etc/dcache.conf</filename>:
       </para>
 
       <programlisting>..
-xrootdAllowedPaths=/pnfs/<replaceable>site.de</replaceable>/path1:/pnfs/<replaceable>site.de</replaceable>/path2
+xrootdAllowedPaths=/pnfs/<replaceable>example.org</replaceable>/path1:/pnfs/<replaceable>example.org</replaceable>/path2
+..</programlisting>
+
+       <para>
+        If you want to split permissions depending on whether the operation is
+        reading or writing, add the following lines instead:
+       </para>
+       
+       <programlisting>..
+xrootdAllowedReadPaths=/pnfs/<replaceable>example.org</replaceable>/rpath1:/pnfs/<replaceable>example.org</replaceable>/rpath2
+xrootdAllowedWritePaths=/pnfs/<replaceable>example.org</replaceable>/wpath1:/pnfs/<replaceable>example.org</replaceable>/wpath2
 ..</programlisting>
 
       <para>
 	A restart of the &door-xrootd; is required to make the changes
-	take effect. As soon as
-	<emphasis>${xrootdAllowedPaths}</emphasis> is set, all write
-	requests to directories not matching the allowed path list
+	take effect. As soon as any of the above options is set, all read or write
+	requests to directories not matching the allowed path lists
 	will be refused.
       </para>
 
@@ -336,9 +380,9 @@ xrootdAllowedPaths=/pnfs/<replaceable>site.de</replaceable>/path1:/pnfs/<replace
       </para>
 			
       <para>
-	To enable the plugin, it is necessary to uncomment and
-	customize the following two lines in the file
-	<filename>${dCacheHome}/config/dCacheSetup</filename>, so that
+	To enable the plugin, it is necessary to add the following two lines to
+	the file
+	<filename>${dCacheHome}/etc/dcache.conf</filename>, so that
 	it looks like
       </para>
 
@@ -348,7 +392,7 @@ xrootdAllowedPaths=/pnfs/<replaceable>site.de</replaceable>/path1:/pnfs/<replace
 	..</programlisting>
 			
       <para>
-	After doing a restart of &dcache;-core, any requests without
+	After doing a restart of &dcache;, any requests without
 	an appropriate token should result in an error saying
 	"<literal>authorization check failed: No authorization token
 	found in open request, access denied.(error code:
