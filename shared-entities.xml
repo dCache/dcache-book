@@ -26,6 +26,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY yaim         "<abbrev>YAIM</abbrev>">
 <!ENTITY jvm          "<abbrev>JVM</abbrev>">
 <!ENTITY psql         "<productname>PostgreSQL</productname>">
+<!ENTITY java         "<productname>Java</productname>">
 <!ENTITY tomcat       "<productname>Tomcat</productname>">
 
 <!-- Various domains -->
@@ -37,6 +38,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY domain-utility   "<literal>utility</literal>">
 <!ENTITY domain-srm       "<literal>srm</literal>">
 <!ENTITY domain-info-provider "<literal>infoProviderDomain</literal>">
+<!ENTITY domain-gplazma   "<literal>gPlazmaDomain</literal>">
 
 
 <!-- Various cells -->
@@ -60,6 +62,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY cell-info      "<literal>info</literal>">
 <!ENTITY cell-info-provider "<literal>infoProvider</literal>">
 <!ENTITY cell-topo          "<literal>topo</literal>">
+<!ENTITY cell-nfsv3         "<literal>nfsv3</literal>">
 
 <!-- Various protocols: TODO: should these names be prefixed by "protocol-" ? -->
 <!ENTITY dcap     "<systemitem class='protocol'>dCap</systemitem>">
@@ -74,6 +77,8 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY ip       "<systemitem class='protocol'>IP</systemitem>">
 <!ENTITY http     "<systemitem class='protocol'>HTTP</systemitem>">
 <!ENTITY xrootd   "<systemitem class='protocol'>xrootd</systemitem>">
+<!ENTITY nfs3     "<systemitem class='protocol'>NFS-3</systemitem>">
+<!ENTITY nfs      "<systemitem class='protocol'>NFS</systemitem>">
 
 
 

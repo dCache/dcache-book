@@ -47,10 +47,10 @@
   </para>
 
   <section id="in-install">
-    <title>Installing a Single Node &dcache; Instance</title>
+    <title>Installing a &dcache; instance</title>
 
     <para>
-      In the following the installation of a single node &dcache;
+      In the following the installation of a &dcache;
       instance will be described.  The &chimera; name space provider,
       some management components, and the &srm; need a &psql; server
       installed. We recommend running this &psql; on the local
@@ -105,15 +105,15 @@
 
       <screen>&prompt-root; <userinput>rpm -ivh dcache-server-<replaceable>version</replaceable>-<replaceable>release</replaceable>.i386.rpm</userinput>
 &prompt-root; <userinput>rpm -ivh dcache-client-<replaceable>version</replaceable>-<replaceable>release</replaceable>.i386.rpm</userinput></screen>
-    	<para>
+       <para>
        The actual sources lie at <ulink url="http://www.dcache.org/downloads.shtml"/>.
-    	 To install for example Version 1.9.4-2 of the server you would use this:
-    	 <screen>&prompt-root; <userinput>rpm -ivh http://www.dcache.org/downloads/1.9/dcache-server-1.9.4-2.noarch.rpm</userinput></screen>
-    	 The Client can be found in the download-section of the above url, too.	
-    	</para>	
-    
+       To install for example Version 1.9.7-1 of the server you would use this:
+        <screen>&prompt-root; <userinput>rpm -ivh http://www.dcache.org/downloads/1.9/dcache-server-1.9.7-1.noarch.rpm</userinput></screen>
+        The client can be found in the download-section of the above url, too.
+        </para>
+
     </section>
-	
+
 
     <section>
       <title>Readying the &psql; server</title>
@@ -150,13 +150,13 @@
 
         <section>
           <title>Enabling &tcp; connections</title>
-          
+
           <para>
             <important>For Versions of &psql; newer than 8.0 the &tcp;
             connections are already enabled and this section has to be
-            ignored.</important>             
-          </para>         
-          
+            ignored.</important>
+          </para>
+
           <para>
             When connecting to &psql;, &dcache; will always use &tcp;
             connections.  So, for &dcache; to use &psql;, support for
@@ -226,7 +226,7 @@ host    all         all         ::1/128        trust</programlisting>
         <title>Configuring &chimera;</title>
 
         <para>
-          &chimera; is a library providing a hierarhical name space
+          &chimera; is a library providing a hierarchical name space
           with associated meta data. Where pools in &dcache; store the
           content of files, &chimera; stores the names and meta data
           of those files. &chimera; itself stores the data in a
@@ -247,10 +247,10 @@ host    all         all         ::1/128        trust</programlisting>
             Create the <database>Chimera</database> user and database and add the
             Chimera-specific tables and stored procedures:
           </para>
-      
+
           <screen>&prompt-root; <userinput>createdb -U postgres chimera</userinput>
 CREATE DATABASE
-                
+
 &prompt-root; <userinput>createuser -U postgres --no-superuser --no-createrole --createdb --pwprompt chimera</userinput>
 Enter password for new role:
 Enter it again:
@@ -315,21 +315,31 @@ CREATE TRIGGER
         </section>
 
         <section>
-          <title>Mounting Chimera through NFS</title>
+          <title>Mounting &chimera; through &nfs;</title>
 
           <para>
-            Although most components in &dcache; access the &chimera;
-            database directly, some rely on a mounted file system for
-            access. The mounted file system is also nice for
-            administrative access. This offers the opportunity to use
+            Since release 1.9.7, &dcache; does not need the &chimera;
+            filesystem to be mounted any longer. But a mounted file
+            system can be nice for administrative access.
+            This offers the opportunity to use
             OS-level tools like ls and mkdir for Chimera. However,
-            direct I/O-operations like cp are not possible, since the
-            NFSV3 interface provides the namespace part only. This
-            section describes how to start the &chimera; NFS3 server
+            direct I/O-operations like <command>cp</command> are not possible,
+            since the &nfs3; interface provides the namespace part only. This
+            section describes how to start the &chimera; &nfs3; server
             and mount the name space.
           </para>
 
-          <para>Chimera NFS server uses
+          <note>
+          <para>
+            Since &dcache; version 1.9.7, &chimera; does not need to be started
+            with an init script any more; instead &chimera; is available as the
+            &cell-nfsv3; service and can be added to and edited in the &dcache;
+            <firstterm>layout</firstterm> file
+            (see <xref linkend="in-install-layout" />).
+          </para>
+          </note>
+
+          <para>The &chimera; &nfs; server uses the
           <filename>/etc/exports</filename> file to manage
           exports. So it has to exist or be created.
           The typical <filename>exports</filename> file looks like this:</para>
@@ -338,41 +348,16 @@ CREATE TRIGGER
 /pnfs
 # or
 # /pnfs *.my.domain(rw)</programlisting>
-          
-          <para>
-            Since &chimera; is coupled with &dcache; it uses the same configuration file
-            and won't start without it. So copy the <filename>/opt/d-cache/etc/dCacheSetup.template</filename> to
-            <filename>/opt/d-cache/config/dCacheSetup</filename>. 
-          </para>
 
           <note>
             <para>
-              On some linux distributions you might have to switch the portmap
-              daemon off before starting chimera:
+              On some Linux distributions you might have to switch the
+              <systemitem class='service'>portmap</systemitem> daemon off
+              before starting &chimera;:
             </para>
             <screen>&prompt-root; <userinput>/etc/init.d/portmap stop</userinput>
 Stopping portmap: portmap</screen>
           </note>
-          
-          <para>
-            Start it via script:
-          </para>
-
-<screen>&prompt-root; <userinput>/opt/d-cache/libexec/chimera/chimera-nfs-run.sh start</userinput></screen>
-
-          <para>
-            To automate the launching of that script at startup time,
-            link to it from <filename>/etc/init.d/</filename>. Then
-            announce it to chkconfig:
-          </para>
-
-<screen>&prompt-root; <userinput>chkconfig --add chimera-nfs-run.sh</userinput>
-&prompt-root; <userinput>chkconfig chimera-nfs-run.sh on</userinput></screen>
-
-          <para>
-            First we create the root of the Chimera namespace, called
-            'pnfs' for legacy reasons.
-          </para>
 
 <screen>&prompt-root; <userinput>/opt/d-cache/libexec/chimera/chimera-cli.sh Mkdir /pnfs</userinput></screen>
 
@@ -389,10 +374,10 @@ Stopping portmap: portmap</screen>
 
           <para>If you plan to use &dcap; with mounted file system
           instead of the URL-syntax (e.g. &prog-dccp;
-          <filename>/pnfs/desy.de/data/file1</filename>
+          <filename>/pnfs/example.org/data/file1</filename>
           <filename>/tmp/file1</filename>), we need to mount the
             root of &chimera; locally
-            (remote mounts are not allowed yet). This will allow us to 
+            (remote mounts are not allowed yet). This will allow us to
             establish wormhole files so &dcap; clients can discover the &dcap; doors.
           </para>
 
@@ -402,12 +387,14 @@ Stopping portmap: portmap</screen>
 &prompt-root; <userinput>touch /mnt/admin/etc/config/dCache/'.(fset)(dcache.conf)(io)(on)'</userinput>
 &prompt-root; <userinput>echo "<replaceable>door host</replaceable>:<replaceable>port</replaceable>" > /mnt/admin/etc/config/dCache/dcache.conf</userinput></screen>
           <para>
-            The default values for ports can be found in <xref linkend="rf-ports"/>. They can be altered in 
-            <filename>/opt/d-cache/config/dCacheSetup</filename> 
+            The default values for ports can be found in <xref linkend="rf-ports"/> and in the
+            file
+            <filename>/opt/d-cache/share/defaults/dcache.properties</filename>. They can be altered in
+            <filename>/opt/d-cache/etc/dcache.conf</filename>
           </para>
 
           <para>
-            The configuration is done now, so unmount &chimera;:
+            When the configuration is complete you can unmount &chimera;:
           </para>
 
 <screen>&prompt-root; <userinput>umount /mnt</userinput></screen>
@@ -417,14 +404,6 @@ Stopping portmap: portmap</screen>
             configuration, you have to remount the root
             <literal>localhost:/</literal> to a temporary location like <filename class="directory">/mnt</filename>.
           </para>
-
-          <para>The <quote>user's view</quote> of Chimera is automatically mounted
-          by the &dcache; init script. You have to make sure that the mountpoint is
-          created on the machine (<filename class="directory">/pnfs</filename>). 
-          &chimera; can be mounted manually with:</para>
-
-<screen>&prompt-root; <userinput>mkdir /pnfs</userinput>
-&prompt-root; <userinput>mount localhost:/pnfs /pnfs</userinput></screen>
         </section>
       </section>
 
@@ -492,33 +471,60 @@ Stopping portmap: portmap</screen>
     </section>
 
     <section>
-      <title>Installing &dcache; Components</title>
+      <title>Configuring &dcache;</title>
 
       <para>
-        The main configuration file of a &dcache; instance is
-        <filename>/opt/d-cache/config/dCacheSetup</filename>. Set the
-        variable <varname>java</varname> to the binary of the Java VM
-        and the variable <varname>serviceLocatorHost</varname> to the
-        hostname of the single node running &dcache;.
+        In the setup of &dcache; 1.9.7 and newer, there is one main
+        configuration file:
+        <filename>/opt/d-cache/etc/dcache.conf</filename>. Initially, it
+        contains only a reference to the <firstterm>layout</firstterm> of the
+        instance, but is otherwise empty. That is because &dcache;
+        stores default settings separately. These default configuration values
+        can be viewed in the files in
+        <filename class="directory">/opt/d-cache/share/default/</filename>.
+      </para>
+      <para>
+        If any of the default configurations values needs to be changed, copy it
+        to <filename>/opt/d-cache/etc/dcache.conf</filename> and update the
+        value.
       </para>
 
+      <important>
       <para>
-        Use the templates of the configuration files found in
-        <filename class="directory">/opt/d-cache/etc/</filename> to
-        create the following files.
+        Do not update configuration values in the files in the default folders,
+        since changes to these files will be overwritten by updates.
       </para>
-          
-      <para>
-        The installation and start-up scripts use the information in
-        <filename>/opt/d-cache/etc/node_config</filename>. First copy it from the template.
-        For a setup with a single node, set <varname>NODE_TYPE</varname> to
-        <quote>admin</quote>. To enable doors on this node, add the
-        respective doors to <varname>SERVICES</varname>, for instance
-        <quote>dcap</quote> or <quote>gridftp</quote>. Set
-        <varname>NAMESPACE</varname> to <quote>chimera</quote>.
-      </para>
+      </important>
 
-      <para>
+      <note>
+        <para>
+            As &dcache; no longer parses any of the configuration files from
+            the shell scripts, the location of the &java; binary cannot be
+            defined in the configuration files. &dcache; will search for &java;
+            on the system path first; if it is found there, no further action
+            is needed. If &java; is not on the system path, the environment
+            variable <envar>JAVA_HOME</envar> to define the location of the
+            &java; installation directory. Alternatively, the environment
+            variable <envar>JAVA</envar> can be used to point to the &java;
+            executable directly.
+        </para>
+
+        <para>
+            If <envar>JAVA_HOME</envar> or <envar>JAVA</envar> cannot be
+            defined as global environment variables
+            in the operating system, then they can be defined in either
+            <filename>/etc/default/dcache</filename> or <filename>/etc/dcache.env</filename>.
+            These two files are sourced by the init script and allow
+            <envar>JAVA_HOME</envar>, <envar>JAVA</envar> and
+            <envar>DCACHE_HOME</envar> to be defined.
+        </para>
+      </note>
+   </section>
+
+    <section>
+        <title>Grid user authorization</title>
+
+        <para>
         For authorization of grid users the file
         <filename>/opt/d-cache/etc/dcache.kpwd</filename> is
         needed. You can simply copy the template that is in the same directory. Note that it may be generated from the standard
@@ -526,101 +532,129 @@ Stopping portmap: portmap</screen>
         tool <filename>grid-mapfile2dcache-kpwd</filename> which is
         distributed with the WLCG software.
       </para>
+    </section>
 
+    <section id="in-install-layout">
+      <title>Defining services and domains</title>
       <para>
-        We proceed by finalising the initial configuration by
-        executing
-        <command>/opt/d-cache/install/install.sh</command>, for
-        example:
+        Depending on your site, you may have requirements upon the doors that
+        you want to configure and domains within which you want to organise
+        them. Since release 1.9.7, &dcache; keeps lists of the domains and the
+        services which are to be run within them in special files, so
+        called <firstterm>layout-files</firstterm>. Layout files may also
+        contain domain- and
+        service-specific configuration values.
       </para>
 
-      <screen>&prompt-root; <userinput>/opt/d-cache/install/install.sh</userinput>
-INFO:Skipping ssh key generation
+      <para>
+        There are several layout files in the layout directory, but only one
+        of them is read by &dcache; when starting up. This layout file is
+        configured in <filename>/opt/d-cache/etc/dcache.conf</filename> using
+        the <varname>dcache.layout</varname> property. Keep in mind that the
+        property value has to point to a file with the same name, suffixed by
+        <literal>.conf</literal>. That means, if you set the
+        <varname>dcache.layout</varname> property to <literal>mylayout</literal>,
+        make sure that the file
+        <filename>/opt/d-cache/etc/layouts/mylayout.conf</filename> exists.
+      </para>
 
- Checking MasterSetup  ./config/dCacheSetup O.k.
+      <informalexample>
+      <para>
+        For a single node &dcache;
+        setup, specify <varname>dcache.layout=single</varname> in
+        <filename>/opt/d-cache/etc/dcache.conf</filename>. This
+        will instruct dCache to read the layout file
+        <filename>/opt/d-cache/etc/layouts/single.conf</filename> when starting
+        up.
+      </para>
+      </informalexample>
 
-   Sanning dCache batch files
+      <para>
+        Besides defining domains and the services to run in a domain,
+        a layout can define domain- and service- specific configuration
+        parameters.
+        Any property that can be assigned in
+        <filename>/opt/d-cache/etc/dcache.conf</filename> can be assigned a
+        new value per domain or per service in the layout file.
+      </para>
 
-    Processing adminDoor
-    Processing chimera
-    Processing dCache
-    Processing dir
-    Processing door
-    Processing gPlazma
-    Processing gridftpdoor
-    Processing gsidcapdoor
-    Processing httpd
-    Processing info
-    Processing infoProvider
-    Processing lm
-    Processing maintenance
-    Processing chimera
-    Processing pool
-    Processing replica
-    Processing srm
-    Processing statistics
-    Processing utility
-    Processing xrootdDoor
+      <informalexample>
+      <para>
+        Consider the following segment of the <filename>head.conf</filename>
+        layout file:
+      </para>
+      <programlisting>[gPlazmaDomain]
+[gPlazmaDomain/gplazma]
 
+[utilityDomain]
+[utilityDomain/gsi-pam]
+[utilityDomain/pinmanager]</programlisting>
 
- Checking Users database .... Ok
- Checking Security       .... Ok
- Checking JVM ........ Ok
- Checking Cells ...... Ok
- dCacheVersion ....... Version production-1-9-3-1
-        </screen>
+      <para>
+        A name in square brackets, without a forward-slash
+        (<literal>/</literal>) defines a domain.
+        For example, <literal>[gPlazmaDomain]</literal> defines a domain
+        called &domain-gplazma;. A name in square brackets with
+        a forward slash defines a service that is to run in a domain.
+        For example, <literal>[gPlazmaDomain/gplazma]</literal> declares that
+        the &cell-gplazma; service is to be run in the &domain-gplazma; domain.
+        A domain must be defined if services are to run in that domain.
+        The order that services are defined determines in which order the
+        services are started; however, this order doesn't matter.
+      </para>
+      <para>
+        Lines starting with a hash-symbol (<literal>#</literal>) are comments
+        and will be ignored by &dcache;.
+      </para>
+      </informalexample>
+    </section>
+
+    <section>
+           <title>Configuring pools</title>
 
         <para>
-          No pools have been created on the node yet. Adding pools to
-          a node is a two step process:
+          &dcache; will need to write the files it keeps onto pools.
+          These pools are a service of &dcache;. Hence, they are added to the
+          layout file of your &dcache; instance, like any other
+          service as well.
         </para>
 
-        <orderedlist>
-          <listitem>
-            <para>
-              The directory layout of the pool is created and filled
-              with a skeleton configuration using <command>dcache pool
-              create <replaceable>poolSize</replaceable>
-              <replaceable>poolDirectory</replaceable></command>,
-              where <replaceable>poolDirectory</replaceable> is the
-              full path to the directory which will contain the data
-              files as well as some of the configuration of the pool,
-              and <replaceable>poolSize</replaceable> is the size of
-              the pool, specified in bytes or with a M, G, or T suffix
-              (for mibibytes, gibibytes and tibibytes, respectively).
-            </para>
+         <para>
+            Consider the following example for adding a pool to a
+            &dcache;-layout file:
+         </para>
+<informalexample>
+                <programlisting>[myPoolDomain/pool]
+name=pool1
+path=/san/pool1
+waitForFiles=<replaceable>path</replaceable>/data
+maxDiskSpace=2T</programlisting>
 
             <para>
-              Make sure that there is always enough space under
-              <replaceable>poolDirectory</replaceable>. Be aware that
-              only pure data content is counted by &dcache;. Leave enough
-              room for configuration files and filesystem overhead.
+                The only required parameters are <varname>name</varname> and
+                <varname>path</varname>. The <varname>path</varname>
+                property defines in which
+                directory files are to be stored. The <varname>name</varname>
+                defines the name of the pool; in the above example
+                <literal>pool1</literal>.
+                With this
+                name, the pool can also be addressed from administrative
+                components (see <xref linkend="intouch-admin" /> or
+                <xref linkend="intouch-web" />). The option <varname>
+                waitForFiles</varname> instructs the pool to block during
+                startup until the specified directory is available. The
+                example pool waits for the data directory
+                (<filename><replaceable>path</replaceable>/data</filename>)
+                to become available. The last option,
+                <varname>maxDiskSpace</varname>, defines the maximum disk usage
+                for the pool. In the example above, the pool has 2 Tebibytes.
             </para>
-
-            <para>
-              Creating a pool does not modify the &dcache;
-              configuration.
-            </para>
-          </listitem>
-          <listitem>
-            <para>
-              The pool is given a unique name and added to the
-              &dcache; configuration using <command>dcache pool add
-              <replaceable>poolName</replaceable>
-              <replaceable>poolDirectory</replaceable></command>,
-              where <replaceable>poolDirectory</replaceable> is the
-              directory in which the pool was created and
-              <replaceable>poolName</replaceable> is a name for the
-              pool. The name must be unique throughout the whole
-              &dcache; installation, not just on the node.
-            </para>
+</informalexample>
             <para>
               Adding a pool to a configuration does not modify the
               pool or the data in it and can thus safely be undone or
               repeated.
-            </para>
-          </listitem>
-        </orderedlist>
+        </para>
 
         <note>
           <para>The default gap for poolsizes is 4GiB. This means you should
@@ -633,32 +667,7 @@ INFO:Skipping ssh key generation
 &dc-prompt-pool; <userinput>set gap 2G</userinput>
 &dc-prompt-pool; <userinput>save</userinput></screen>
         </note>
-        
-        <informalexample>
-        
-        <para>
-          An example may help to clarify the use of these commands:         
-        </para>
 
-        <screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache pool create 500G /q/pool1</userinput>
-Created a 500 GiB pool in /q/pool1. The pool cannot be used until it has
-been added to a domain. Use 'pool add' to do so.
-
-Please note that this script does not set the owner of the pool directory.
-You may need to adjust it.
-&prompt-root; <userinput>/opt/d-cache/bin/dcache pool add myFirstPool <filename class="directory">/q/pool1/</filename></userinput>
-
-Added pool myFirstPool in /q/pool1 to dcache-vmDomain.
-
-The pool will not be operational until the domain has been started. Use
-'start dcache-vmDomain' to start the pool domain.
-&prompt-user; <userinput>/opt/d-cache/bin/dcache pool ls</userinput>
-Pool        Domain                       Size   Free Path
-myFirstPool dcache-vmDomain               500    550 /q/pool1
-Disk space is measured in GiB.
-        </screen>
-        </informalexample>
-        
         <para>
           All configured components can now be starting with
           <userinput>dcache start</userinput>, for example:
@@ -677,62 +686,52 @@ Starting infoProviderDomain  Done (pid=8081)
 Starting dcap-dcache-vmDomain  Done (pid=8154)
 Starting gridftp-dcache-vmDomain  Done (pid=8221)
 Starting gsidcap-dcache-vmDomain  Done (pid=8296)
-Starting dcache-vmDomain  Done (pid=8369)
-        </screen>
+Starting dcache-vmDomain  Done (pid=8369)</screen>
 
       </section>
+
+      <section>
+    <title>Installing &dcache; on several nodes</title>
+
+    <para>
+        Installing &dcache; on several nodes is not much more complicated
+        than installing it on a single node.
+        Think about how &dcache; should be organised regarding services and
+        domains. Then adapt the layout files, as
+        described in <xref linkend="in-install-layout" />, to the layout that
+        you have in mind. The files <filename>/opt/d-cache/etc/layouts/head.conf</filename>
+        and <filename>/opt/d-cache/etc/layouts/pool.conf</filename> contain
+        examples for a &dcache; head-node and a &dcache; pool respectively.
+    </para>
+
+    <tip>
+        <para>
+            On &dcache; nodes running only pool services you do not need to
+            install &psql;. If your current node hosts only these services,
+            the installation of &psql; can be skipped.
+        </para>
+    </tip>
+
+    <note>
+        <para>
+          Neither &chimera; nor the pools need to be mounted anymore.
+          Having a mount on the
+          &chimera;/&nfs3;-server node itself is always a good idea as it
+          eases maintenance.
+        </para>
+    </note>
+
+    <para>
+      On any other nodes than the head node, <varname>broker.host</varname>
+      has to be added to
+      <filename>/opt/d-cache/etc/dcache.conf</filename>.
+      <varname>broker.host</varname> should point to the host running your
+      &dcache; broker. Usually that is the host containing the special
+      domain &domain-dcache;, because that domain acts implicitly as a
+      broker.
+    </para>
+
   </section>
-
-  <section id="in-multinode">
-    <title>Installing a Multi Node dCache Instance</title>
-
-    <para>
-      The previous section decsribed how to install a single node
-      &dcache; installation. A typically medium-sized &dcache;
-      installation will however have a single head node hosting the
-      name space provider and other central components, and a number
-      of pool nodes. It is common to also use pool nodes as FTP and
-      DCAP doors.
-    </para>
-
-    <para>
-      The &chimera; file system must be mounted on all nodes running
-      either the &srm; or &gridftp;. Client nodes relying on &dcap;
-      access without using URLs also need to mount &chimera;. Pools do
-      not need a mount anymore. Having a mount on the
-      Chimera/NFS3-server node itself is always a good idea as it
-      eases maintenance.
-    </para>
-
-    <para>
-      To mount the &chimera; file system, either modify
-      <filename>config/chimera-config.xml</filename> such that it
-      points towards the correct &psql; host and start a local Chimera
-      NFSv3 server locally, or mount the NFS file system exported from
-      the head node. In the latter case, set
-      <varname>NAMESPACE_NODE</varname> in
-      <filename>etc/node_config</filename> to the host running the
-      Chimera NFSv3 server.
-    </para>
-
-    <para>
-      For the head node, follow the description of the previous
-      chapter, but do not create any pools. For pools and for &dcap;
-      or &gridftp; doors, &psql; is not needed and installation of
-      &psql; can be skipped on nodes that only hosts these
-      services. Proceed by creating
-      <filename>config/dCacheSetup</filename>;
-      <varname>serviceLocatorHost</varname> has to be set to the name
-      of the head node. In <filename>etc/node_config</filename> leave
-      <varname>NODE_TYPE</varname> empty. Add any doors you want to
-      start on this node to <varname>SERVICES</varname> and set
-      <varname>NAMESPAE</varname> to <quote>chimera</quote>. Run
-      <filename>install/install.sh</filename> to finish the
-      installation. Finally, use <command>dcache pool create</command>
-      and <command>dcache pool add</command> to create and add pools
-      on this node.
-    </para>
-
   </section>
 
   <section id="in-upgrade">
@@ -744,10 +743,6 @@ Starting dcache-vmDomain  Done (pid=8369)
       upgrading the packages with
 
 <screen>&prompt-root; <userinput>rpm -Uvh <replaceable>packageName</replaceable></userinput></screen>
-
-      Follow this by rerunning <command>install/install.sh</command>.
-      For details on the changes, please refer to the change log on
-      the download page.
     </para>
   </section>
 
