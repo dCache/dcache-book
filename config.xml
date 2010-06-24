@@ -36,6 +36,7 @@
   <xi:include href="config-web-dcache.xml"/>
   <xi:include href="config-acl.xml"/>
   <xi:include href="config-info-provider.xml"/>
+  <xi:include href="config-stage-protection.xml"/>
 
 </part>
 
