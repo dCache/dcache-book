@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
+<!DOCTYPE stylesheet [
+   <!ENTITY % build-entities SYSTEM "../build-entities.xml">
+   %build-entities;
+]>
+
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 version="1.0">
 
@@ -30,7 +35,7 @@
     <xsl:variable name="chunkfn">
       <xsl:apply-templates mode="recursive-chunk-filename" select="."/>
     </xsl:variable>
-    
+
     <xsl:if test="$level &gt; $chunk.section.depth">
       <p class="returntotop">
 	<xsl:text>[</xsl:text>
@@ -81,15 +86,11 @@
   </xsl:template>
 
   <xsl:template name="user.header.navigation">
-    <xsl:comment>#include virtual="/template/l3-docs-book-header.shtml"</xsl:comment>
+    <xsl:comment>#include virtual="&location-l3-template;"</xsl:comment>
   </xsl:template>
 
   <xsl:template name="user.footer.navigation">
-    <xsl:comment>#include virtual="/template/frags/footer.shtml"</xsl:comment>
+    <xsl:comment>#include virtual="&location-frag-footer;"</xsl:comment>
   </xsl:template>
-
-
-
-
 
 </xsl:stylesheet>
