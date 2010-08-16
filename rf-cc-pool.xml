@@ -560,29 +560,126 @@ t      data amount in TBytes</screen>
 
       <para>The operation is idempotent, that is, it can safely be
       repeated without creating extra copies of the files. If the
-      replica exists on any of the target pools, then it is not
-      copied again. If the target pool with the existing replica
-      fails to respond, then the operation is retried indefinitely,
-      unless the job is marked as eager.</para>
+      replica exists on any of the target pools, then it is not copied
+      again. If the target pool with the existing replica fails to
+      respond, then the operation is retried indefinitely, unless the
+      job is marked as eager.</para>
 
-      <para>Both the state of the local replica and that of the
-      target replica can be specified. If the target replica already
-      exists, the state is updated to be at least as strong as the
-      specified target state, that is, the lifetime of sticky bits
-      is extended, but never reduced, and cached can be changed to
-      precious, but never the opposite.</para>
+      <para>Please notice that a job is only idempotent as long as the
+      set of target pools does not change. If pools go offline or are
+      excluded as a result of an exclude or include expression then
+      the job may stop being idempotent.</para>
+
+      <para>Both the state of the local replica and that of the target
+      replica can be specified. If the target replica already exists,
+      the state is updated to be at least as strong as the specified
+      target state, that is, the lifetime of sticky bits is extended,
+      but never reduced, and cached can be changed to precious, but
+      never the opposite.</para>
+
+      <para>Transfers are subject to the checksum computiton policy of
+      the target pool. Thus checksums are verified if and only if the
+      target pool is configured to do so. For existing replicas, the
+      checksum is only verified if the verify option was specified on
+      the migration job.</para>
 
       <para>Jobs can be marked permanent. Permanent jobs never
       terminate and are stored in the pool setup file with the
-      'save' command. Permanent jobs watch the repository for state
-      changes and copy any replicas that match the selection
-      criteria, even replicas added after the job was
-      created. Notice that any state change will cause a replica to
-      be reconsidered and enqueued if it matches the selection
-      criteria - also replicas that have been copied before.</para>
+      <command>save</command> command. Permanent jobs watch the
+      repository for state changes and copy any replicas that match
+      the selection criteria, even replicas added after the job was
+      created. Notice that any state change will cause a replica to be
+      reconsidered and enqueued if it matches the selection criteria
+      &mdash; also replicas that have been copied before.</para>
+
+      <para>Several options allow an expression to be specified. The
+      following operators are recognized: <literal>&lt;</literal>,
+      <literal>&lt;=</literal>, <literal>==</literal>,
+      <literal>!=</literal>, <literal>>=</literal>,
+      <literal>></literal>, <literal>lt</literal>,
+      <literal>le</literal>, <literal>eq</literal>,
+      <literal>ne</literal>, <literal>ge</literal>,
+      <literal>gt</literal>, <literal>~=</literal>,
+      <literal>!~</literal>, <literal>+</literal>,
+      <literal>-</literal>, <literal>*</literal>,
+      <literal>/</literal>, <literal>%</literal>,
+      <literal>div</literal>, <literal>mod</literal>,
+      <literal>|</literal>, <literal>&amp;</literal>,
+      <literal>^</literal>, <literal>~</literal>,
+      <literal>&amp;&amp;</literal>, <literal>||</literal>,
+      <literal>!</literal>, <literal>and</literal>,
+      <literal>or</literal>, <literal>not</literal>,
+      <literal>?:</literal>, <literal>=</literal>. Literals may be
+      integer literals, floating point literals, single or double
+      quoted string literals, and boolean true and false.  Depending
+      on the context, the expression may refer to constants.</para>
+
+      <para>Please notice that the list of supported operators may
+      change in future releases. For permanent jobs we recommend to
+      limit expressions to the basic operators
+      <literal>&lt;</literal>, <literal>&lt;=</literal>,
+      <literal>==</literal>, <literal>!=</literal>,
+      <literal>>=</literal>, <literal>></literal>,
+      <literal>+</literal>, <literal>-</literal>,
+      <literal>*</literal>, <literal>/</literal>,
+      <literal>&amp;&amp;</literal>, <literal>||</literal> and
+      <literal>!</literal>.</para>
 
       <variablelist>
         <title>Options</title>
+        <varlistentry>
+          <term>-accessed=<replaceable>n</replaceable>|[<replaceable>n</replaceable>]..[<replaceable>m</replaceable>]</term>
+          <listitem>
+            <para>
+              Only copy replicas accessed <replaceable>n</replaceable>
+              seconds ago, or accessed within the given, possibly
+              open-ended, interval;
+              e.g. <literal>-accessed=0..60</literal> matches files
+              accessed within the last minute;
+              <literal>-accesed=60..</literal> matches files accessed
+              one minute or more ago.
+            </para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>-al=ONLINE|NEARLINE</term>
+          <listitem>
+            <para>
+              Only copy replicas with the given access latency.
+            </para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>-pnfsid=<replaceable>pnfsid</replaceable>[,<replaceable>pnfsid</replaceable>] ...</term>
+          <listitem>
+            <para>
+              Only copy replicas with one of the given PNFS IDs.
+            </para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>-rp=CUSTODIAL|REPLICA|OUTPUT</term>
+          <listitem>
+            <para>
+              Only copy replicas with the given retention policy.
+            </para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>-size=<replaceable>n</replaceable>|[<replaceable>n</replaceable>]..[<replaceable>m</replaceable>]</term>
+          <listitem>
+            <para>
+              Only copy replicas with size
+              <replaceable>n</replaceable>, or a size within the
+              given, possibly open-ended, interval.
+            </para>
+          </listitem>
+        </varlistentry>
+
         <varlistentry>
           <term>-state=cached|precious</term>
           <listitem>
@@ -591,6 +688,7 @@ t      data amount in TBytes</screen>
             </para>
           </listitem>
         </varlistentry>
+
         <varlistentry>
           <term>-sticky[=<replaceable>owner</replaceable>[,<replaceable>owner</replaceable>...]]</term>
           <listitem>
@@ -612,37 +710,80 @@ t      data amount in TBytes</screen>
         </varlistentry>
 
         <varlistentry>
-          <term>-pnfsid=<replaceable>pnfsid</replaceable>[,<replaceable>pnfsid</replaceable>] ...</term>
+          <term>-concurrency=<replaceable>concurrency</replaceable></term>
           <listitem>
             <para>
-              Only copy replicas with one of the given PNFS IDs.
+              Specifies how many concurrent transfers to perform.
+              Defaults to 1.
             </para>
           </listitem>
         </varlistentry>
 
         <varlistentry>
-          <term>-accessed=<replaceable>n</replaceable>|[<replaceable>n</replaceable>]..[<replaceable>m</replaceable>]</term>
+          <term>-order=[-]size|[-]lru</term>
           <listitem>
             <para>
-              Only copy replicas accessed n seconds ago, or accessed
-              within the given, possibly open-ended, interval. E.g.
-              -accessed=0..60 matches files accessed within the last
-              minute; -accesed=60.. matches files accessed one minute
-              or more ago.
+              Sort transfer queue. By default transfers are placed in
+              ascending order, that is, smallest and least recently used
+              first. Transfers are placed in descending order if the key
+              is prefixed by a minus sign. Failed transfers are placed at
+              the end of the queue for retry regardless of the order. This
+              option cannot be used for permanent jobs. Notice that for
+              pools with a large number of files, sorting significantly
+              increases the initialization time of the migration job.
+
+              <variablelist>
+                <varlistentry>
+                  <term>size</term>
+                  <listitem>
+                    <para>
+                      Sort according to file size.
+                    </para>
+                  </listitem>
+                </varlistentry>
+                <varlistentry>
+                  <term>lru</term>
+                  <listitem>
+                    <para>
+                      Sort according to last access time.
+                    </para>
+                  </listitem>
+                </varlistentry>
+              </variablelist>
             </para>
           </listitem>
         </varlistentry>
 
         <varlistentry>
-          <term>-size=<replaceable>n</replaceable>|[<replaceable>n</replaceable>]..[<replaceable>m</replaceable>]</term>
+          <term>-pins=move|keep</term>
           <listitem>
             <para>
-              Only copy replicas with size n, or a size within the
-              given, possibly open-ended, interval.
+              Controls how sticky flags owned by the &cell-pinmngr;
+              are handled:
+
+              <variablelist>
+                <varlistentry>
+                  <term>move</term>
+                  <listitem>
+                    <para>
+                      Ask &cell-pinmngr; to move pins to the target
+                      pool.
+                    </para>
+                  </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                  <term>keep</term>
+                  <listitem>
+                    <para>
+                      Keep pins on the source pool.
+                    </para>
+                  </listitem>
+                </varlistentry>
+              </variablelist>
             </para>
           </listitem>
         </varlistentry>
-
 
         <varlistentry>
           <term>-smode=same|cached|precious|removable|delete[+<replaceable>owner</replaceable>[(<replaceable>lifetime</replaceable>)] ...]</term>
@@ -749,33 +890,138 @@ t      data amount in TBytes</screen>
           </listitem>
         </varlistentry>
 
+        <varlistentry>
+          <term>-verify</term>
+          <listitem>
+            Force checksum computation when an existing target is updated.
+          </listitem>
+        </varlistentry>
 
         <varlistentry>
-          <term>-pins=move|keep</term>
+          <term>-eager</term>
           <listitem>
             <para>
-              Controls how sticky flags owned by the pin manager is
-              handled:
+              Copy replicas rather than retrying when pools with
+              existing replicas fail to respond.
+            </para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>-exclude=<replaceable>pool</replaceable>[,<replaceable>pool</replaceable>...]</term>
+          <listitem>
+            <para>
+              Exclude target pools. Single character
+              (<literal>?</literal>) and multi character
+              (<literal>*</literal>) wildcards may be used.
+            </para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>-exclude-when=<replaceable>expression</replaceable></term>
+          <listitem>
+            <para>
+              Exclude target pools for which the expression evaluates
+              to true. The expression may refer to the following
+              constants:
 
               <variablelist>
                 <varlistentry>
-                  <term>move</term>
+                  <term>source.name or target.name</term>
                   <listitem>
                     <para>
-                      Ask pin manager to move pins to the target pool.
+                      pool name
                     </para>
                   </listitem>
                 </varlistentry>
 
                 <varlistentry>
-                  <term>keep</term>
+                  <term>source.spaceCost or target.spaceCost</term>
                   <listitem>
                     <para>
-                      Keep pin on the source pool.
+                      space cost
+                    </para>
+                  </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                  <term>source.cpuCost or target.cpuCost</term>
+                  <listitem>
+                    <para>
+                      cpu cost
+                    </para>
+                  </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                  <term>source.free or target.free</term>
+                  <listitem>
+                    <para>
+                      free space in bytes
+                    </para>
+                  </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                  <term>source.total or target.total</term>
+                  <listitem>
+                    <para>
+                      total space in bytes
+                    </para>
+                  </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                  <term>source.removable or target.removable</term>
+                  <listitem>
+                    <para>
+                      removable space in bytes
+                    </para>
+                  </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                  <term>source.used or target.used</term>
+                  <listitem>
+                    <para>
+                      used space in bytes
                     </para>
                   </listitem>
                 </varlistentry>
               </variablelist>
+            </para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>-include=<replaceable>pool</replaceable>[,<replaceable>pool</replaceable>...]</term>
+          <listitem>
+            <para>
+              Only include target pools matching any of the
+              patterns. Single character (<literal>?</literal>) and
+              multi character (<literal>*</literal>) wildcards may be
+              used.
+            </para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>-include-when=<replaceable>expression</replaceable></term>
+          <listitem>
+            <para>Only include target pools for which the expression
+            evaluates to true. See the description of -exclude-when
+            for the list of allowed constants.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>-refresh=<replaceable>time</replaceable></term>
+          <listitem>
+            <para>
+              Specifies the period in seconds of when target pool
+              information is queried from the pool manager. The
+              default is 300 seconds.
             </para>
           </listitem>
         </varlistentry>
@@ -833,47 +1079,108 @@ t      data amount in TBytes</screen>
         </varlistentry>
 
         <varlistentry>
-          <term>-refresh=<replaceable>time</replaceable></term>
+          <term>-pause-when=<replaceable>expression</replaceable></term>
           <listitem>
             <para>
-              Specifies the period in seconds of when target pool
-              information is queried from the pool manager. The
-              default is 300 seconds.
+              Pauses the job when the expression becomes true. The job
+              continues when the expression once again evaluates to
+              false.  The following constants are defined for this
+              pool:
+
+              <variablelist>
+                <varlistentry>
+                  <term>queue.files</term>
+                  <listitem>
+                    <para>
+                      The number of files remaining to be transferred.
+                    </para>
+                  </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                  <term>queue.bytes</term>
+                  <listitem>
+                    <para>
+                      The number of bytes remaining to be transferred.
+                    </para>
+                  </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                  <term>source.name</term>
+                  <listitem>
+                    <para>
+                      Pool name.
+                    </para>
+                  </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                  <term>source.spaceCost</term>
+                  <listitem>
+                    <para>
+                      Space cost.
+                    </para>
+                  </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                  <term>source.cpuCost</term>
+                  <listitem>
+                    <para>
+                      CPU cost.
+                    </para>
+                  </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                  <term>source.free</term>
+                  <listitem>
+                    <para>
+                      Free space in bytes.
+                    </para>
+                  </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                  <term>source.total</term>
+                  <listitem>
+                    <para>
+                      Total space in bytes.
+                    </para>
+                  </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                  <term>source.removable</term>
+                  <listitem>
+                    <para>
+                      Removable space in bytes.
+                    </para>
+                  </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                  <term>source.used</term>
+                  <listitem>
+                    <para>
+                      Used space in bytes.
+                    </para>
+                  </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                  <term>targets</term>
+                  <listitem>
+                    <para>
+                      The number of target pools.
+                    </para>
+                  </listitem>
+                </varlistentry>
+              </variablelist>
             </para>
           </listitem>
         </varlistentry>
-
-
-        <varlistentry>
-          <term>-exclude=<replaceable>pool</replaceable>[,<replaceable>pool</replaceable>...]</term>
-          <listitem>
-            <para>
-              Exclude target pools.
-            </para>
-          </listitem>
-        </varlistentry>
-
-
-        <varlistentry>
-          <term>-concurrency=<replaceable>concurrency</replaceable></term>
-          <listitem>
-            <para>
-              Specifies how many concurrent transfers to perform.
-              Defaults to 1.
-            </para>
-          </listitem>
-        </varlistentry>
-
-        <varlistentry>
-          <term>-eager</term>
-          <listitem>
-            <para>
-              Copy replicas rather than retrying when pools with
-              existing replicas fail to respond.
-            </para>
-          </listitem>
-        </varlistentry>
-
 
         <varlistentry>
           <term>-permanent</term>
@@ -884,7 +1191,17 @@ t      data amount in TBytes</screen>
           </listitem>
         </varlistentry>
 
-
+        <varlistentry>
+          <term>-stop-when=<replaceable>expression</replaceable></term>
+          <listitem>
+            <para>
+              Terminates the job when the expression becomes
+              true. This option cannot be used for permanent jobs. See
+              the description of -pause-when for the list of constants
+              allowed in the expression.
+            </para>
+          </listitem>
+        </varlistentry>
       </variablelist>
     </refsect1>
   </refentry>
@@ -937,6 +1254,26 @@ t      data amount in TBytes</screen>
         </varlistentry>
 
         <varlistentry>
+          <term>PAUSED</term>
+          <listitem>
+            <para>
+              Pause expression evaluates to true; no tasks are
+              scheduled for 10 seconds.
+            </para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>STOPPING</term>
+          <listitem>
+            <para>
+              Stop expression evaluated to true; waiting for tasks to
+              stop.
+            </para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
           <term>SUSPENDED</term>
           <listitem>
             <para>
@@ -968,6 +1305,15 @@ t      data amount in TBytes</screen>
           <listitem>
             <para>
               Job completed
+            </para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>FAILED</term>
+          <listitem>
+            <para>
+              Job failed. Please check the log file for details.
             </para>
           </listitem>
         </varlistentry>
@@ -1143,11 +1489,11 @@ t      data amount in TBytes</screen>
     <refsect1><title>DESCRIPTION</title>
 
     <para>Moves replicas to other pools. The source replica is
-    deleted. Caches replicas on other pools. Similar to
-    <command>migration copy</command>, but with different
-    defaults.  Accepts the same options as <command>migration
-    copy</command>. Equivalent to: <command>migration
-    copy</command> -smode=delete -tmode=same -pins=move
+    deleted. Similar to <command>migration copy</command>, but with
+    different defaults.  Accepts the same options as
+    <command>migration copy</command>. Equivalent to:
+    <command>migration copy</command> -smode=delete -tmode=same
+    -pins=move
     </para>
     </refsect1>
   </refentry>

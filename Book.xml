@@ -85,6 +85,16 @@
       <surname>Hesselroth</surname>
     </author>
 
+    <author>
+      <firstname>Gerd</firstname>
+      <surname>Behrmann</surname>
+    </author>
+
+    <author>
+      <firstname>Thomas</firstname>
+      <surname>Zangerl</surname>
+    </author>
+
     <mediaobject>
       <imageobject role="fo">
 	<imagedata fileref="images/dCache-book-logo.svg"

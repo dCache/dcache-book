@@ -492,16 +492,16 @@
         migration jobs.  Each job operates on a set of files on the
         pool on which it is executed and can copy or move those files
         to other pools. The migration module provides filters for
-        defining the set of the files on which a job operates.
+        defining the set of files on which a job operates.
       </para>
 
       <para>
-        The act of copying or moving a file is called a migration
-        task. A task selects a target pool and asks it to perform a
-        pool to pool transfer from the source pool. The actual
-        transfer is performed by the same component performing other
-        pool to pool transfers. The migration module does not perform
-        the transfer; it only orchestrates it.
+        The act of copying or moving a single file is called a
+        migration task. A task selects a target pool and asks it to
+        perform a pool to pool transfer from the source pool. The
+        actual transfer is performed by the same component performing
+        other pool to pool transfers. The migration module does not
+        perform the transfer; it only orchestrates it.
       </para>
 
       <para>
@@ -531,7 +531,7 @@
       <para>
         All operations are idempotent. This means that a migration job
         can be safely rerun, and as long as everything else is
-        unchanged, files will not be transferred a again. Because jobs
+        unchanged, files will not be transferred again. Because jobs
         are idempotent they do not need to maintain persistent state,
         which in turns means the migration module becomes simpler and
         more robust. Should a pool crash during a migration job, the
@@ -547,11 +547,11 @@
         migration job has been initialized, even though the selection
         filters would match the new state of the file. The exception
         to the rule is when files are deleted from the pool or change
-        state such that they do no longer match the selection
-        filter. Such files will be excluded from the migration job,
-        unless the file was already processed. Rerunning a migration
-        job will force it to pick up any new files. Because the job is
-        idempotent, any files copied before are not copied again.
+        state so that they no longer match the selection filter. Such
+        files will be excluded from the migration job, unless the file
+        was already processed. Rerunning a migration job will force it
+        to pick up any new files. Because the job is idempotent, any
+        files copied before are not copied again.
       </para>
 
       <para>
