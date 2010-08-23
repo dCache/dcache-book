@@ -63,6 +63,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY cell-info-provider "<literal>infoProvider</literal>">
 <!ENTITY cell-topo          "<literal>topo</literal>">
 <!ENTITY cell-nfsv3         "<literal>nfsv3</literal>">
+<!ENTITY cell-webDAV         "<literal>WebDAV</literal>">
 
 <!-- Various protocols: TODO: should these names be prefixed by "protocol-" ? -->
 <!ENTITY dcap     "<systemitem class='protocol'>dCap</systemitem>">

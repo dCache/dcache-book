@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+%sharedents;
+]>
+
+
+<chapter id="cf-webadmin">
+
+  <title>&dcache; Webadmin-Interface</title>
+
+  <chapterinfo>
+    <author>
+      <firstname>Jan</firstname>
+      <surname>Schaefer</surname>
+    </author>
+  </chapterinfo>
+
+  <para>
+    This part describes how to configure the webadmin-interface which
+    is a replacement for the old &cell-httpd;-service and offers additional
+    features to act as an adminservice to admins.
+  </para>
+
+
+  <para>
+	The webadmin-interface uses a Jetty-Server which is embedded in an odinary &dcache;-cell.
+	It is using apache-wicket (a webfrontend-framework) and <abbrev>YAML</abbrev> (a CSS-Template Framework).
+	The application is wired up by a Spring IOC-Container. It receives the information from
+	&dcache; infoservice as &xml; which are parsed and presented. For authentication and
+	authorisation it offers usage of username/password(currently KAuth-File) or
+	the grid-certificate talking to &cell-gplazma;. It also offers a guest-login with viewing
+	rights only.
+  </para>
+
+  <para>
+	If you are logged in as admin it is possible to send a command to multiple pools or
+	a whole	poolgroup in one go. It is even possible to send a command to any &dcache;-Cell.
+  </para>
+
+  <section id="cf-webadmin-install">
+    <title>Installation</title>
+
+
+    <para>
+      To enable your &dcache; to run the webadmin-interface your system has to run
+      the infoservice and &cell-gplazma;
+    </para>
+    <para>
+      A host certificate has to be imported into the &dcache;-keystore already.
+      In the grid-world hostcertificates are usually signed by national grid-CAs. Refer to 
+      the documentation provided by the Grid-CA to find out how to request a certificate. To
+      import them into the &dcache;-keystore use this command:
+      <screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache import hostcert</userinput></screen>
+      Now you have to initialise your truststore (this is the certificate-store used
+      for the SSL connections) by using this command:
+      <screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache import cacerts</userinput></screen>
+      Webadmin-interface uses the same truststore as &cell-webDAV;, so maybe you can skip
+      this step.
+    </para>
+    <para>
+      Now you can enable the webadmin-interface to run on your system by adding e.g. this
+      to your layouts file:
+      <screen>
+	    [webadminDomain]
+	    [webadminDomain/webadmin]
+	    webadminHttpsPort=8443
+	    webadminHttpPort=8080
+	    webadminDCacheInstanceName=coolName
+      </screen>
+	</para>
+	<para>
+	  Another important value is this one, because it configures who is allowed to act as
+	  an admin, which certainly should not be everyone:
+	  <screen>
+	   #  ---- GID a user has to have to be considered an Admin of webadmininterface
+	   #
+	   #   When a user has this GID he can become an Admin for webadmininterface
+	   webadminAdminGid=1000
+      </screen>
+    </para>
+  </section>
+
+</chapter>
