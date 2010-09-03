@@ -3,17 +3,17 @@
                       "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
 <!ENTITY % sharedents SYSTEM "shared-entities.xml" >
 %sharedents;
-]> 
+]>
 
 <part id="start" xmlns:xi="http://www.w3.org/2001/XInclude">
   <?dbhtml dir="start"?>
 
   <title>Getting started</title>
-  
+
   <partintro>
     <para>
-      In this part is intended for people who are new to &dcache;. It
-      gives an introduction to &dcache;, including how configure a
+      This part is intended for people who are new to &dcache;. It
+      gives an introduction to &dcache;, including how to configure a
       simple setup and details some simple and routine administrative
       operations.
     </para>

@@ -79,8 +79,8 @@
 
         <listitem>
           <para>
-           &dcache; 1.9 requires Java 1.5 or 1.6 SDK. We recommend
-           Java 1.6. It is recommended to use the newest Java release
+           &dcache; requires Java 1.6 JRE. It is recommended to use
+	   the newest Java release
            available within the release series used.
           </para>
         </listitem>
@@ -134,62 +134,6 @@
           &dcache; can use it.
         </para>
 
-        <important>
-          <title>Restarting &psql;</title>
-
-          <para>
-            If you have edited &psql; configuration files, you
-            <emphasis>must</emphasis> restart &psql; for those changes
-            to take effect.  On many systems, this can be done with
-            the following command:
-          </para>
-
-          <screen>&prompt-root; <userinput>/etc/init.d/postgresql restart</userinput></screen>
-        </important>
-
-
-        <section>
-          <title>Enabling &tcp; connections</title>
-
-          <para>
-            <important>For Versions of &psql; newer than 8.0 the &tcp;
-            connections are already enabled and this section has to be
-            ignored.</important>
-          </para>
-
-          <para>
-            When connecting to &psql;, &dcache; will always use &tcp;
-            connections.  So, for &dcache; to use &psql;, support for
-            &tcp; sockets must be enabled. We realize UNIX domain
-            sockets are easier to work with from a security point of
-            view, however there is no way to use UNIX domain sockets
-            from a Java application.
-          </para>
-
-          <para>
-            In contrast to &dcache;, the &psql; stand-alone client
-            application <command>psql</command> can connect using
-            either a &tcp; socket or via a UNIX domain socket.
-            Because of this, it is common for &psql; to disable &tcp;
-            sockets by default, requiring the admin to explicitly
-            configure &psql; so connecting via a &tcp; socket is
-            supported.
-          </para>
-
-          <para>
-            To enable &tcp; sockets, edit the &psql; configuration
-            file <filename>postgresql.conf</filename>.  This is often
-            found in the <filename
-            class="directory">/var/lib/pgsql/data</filename>, but may
-            be located elsewhere.  You should ensure that the line
-            <literal>tcpip_socket</literal> is set to
-            <literal>true</literal>; for example:
-          </para>
-
-          <programlisting>tcpip_socket = true</programlisting>
-        </section>
-
-
         <section>
           <title>Enabling local trust</title>
 
@@ -198,6 +142,15 @@
             password-less access to the database and the following
             documentation assumes this is so.
           </para>
+
+          <note>
+            <para>
+              Please note it is also possible to run &dcache; with all
+              &psql; accounts requiring passwords. See <xref
+              linkend="cb-postgres-configure"/> for
+              more advice on the configuration of &psql;.
+            </para>
+          </note>
 
           <para>
             To allow local users to access &psql; without requiring a
@@ -211,16 +164,25 @@
 host    all         all         127.0.0.1/32   trust
 host    all         all         ::1/128        trust</programlisting>
 
-          <note>
-            <para>
-              Please note it is also possible to run &dcache; with all
-              &psql; accounts requiring passwords.
-            </para>
-          </note>
+
         </section>
 
       </section>
 
+      <important>
+          <title>Restarting &psql;</title>
+
+          <para>
+            If you have edited &psql; configuration files, you
+            <emphasis>must</emphasis> restart &psql; for those changes
+            to take effect.  On many systems, this can be done with
+            the following command:
+          </para>
+
+          <screen>&prompt-root; <userinput>/etc/init.d/postgresql restart</userinput>
+Stopping postgresql service:                               [  OK  ]
+Starting postgresql service:                               [  OK  ]</screen>
+        </important>
 
       <section>
         <title>Configuring &chimera;</title>
@@ -351,7 +313,7 @@ CREATE TRIGGER
 
           <note>
             <para>
-              On some Linux distributions you might have to switch the
+              In general you should switch the
               <systemitem class='service'>portmap</systemitem> daemon off
               before starting &chimera;:
             </para>
@@ -359,11 +321,14 @@ CREATE TRIGGER
 Stopping portmap: portmap</screen>
           </note>
 
-<screen>&prompt-root; <userinput>/opt/d-cache/libexec/chimera/chimera-cli.sh Mkdir /pnfs</userinput></screen>
-
+	  <para>
+	    First you create the root of the Chimera namespace, called
+	    <filename class="directory">pnfs</filename> for legacy reasons.
+	    <screen>&prompt-root; <userinput>/opt/d-cache/libexec/chimera/chimera-cli.sh Mkdir /pnfs</userinput></screen>
+	  </para>
           <para>
-            Now we need to add directory tags.
-            For more information on tags see <xref linkend="cf-pnfs-tags"/>.:
+            Now you need to add directory tags.
+            For more information on tags see <xref linkend="cf-pnfs-tags"/>.
           </para>
 
 <screen>&prompt-root; <userinput>/opt/d-cache/libexec/chimera/chimera-cli.sh Mkdir /pnfs/<replaceable>your domain</replaceable></userinput>
@@ -610,68 +575,80 @@ Stopping portmap: portmap</screen>
     </section>
 
     <section>
-           <title>Configuring pools</title>
+      <title>Configuring pools</title>
 
-        <para>
-          &dcache; will need to write the files it keeps onto pools.
-          These pools are a service of &dcache;. Hence, they are added to the
-          layout file of your &dcache; instance, like any other
-          service as well.
-        </para>
+      <para>
+	&dcache; will need to write the files it keeps in pools.
+	These pools are defined as services within &dcache;. Hence, they are added
+	to the layout file of your &dcache; instance, like all other
+	services.
+      </para>
 
-         <para>
-            Consider the following example for adding a pool to a
-            &dcache;-layout file:
-         </para>
-<informalexample>
-                <programlisting>[myPoolDomain/pool]
+      <para>
+	Consider the following example for adding a pool to a
+	&dcache;-layout file:
+      </para>
+
+      <informalexample>
+	<programlisting>[myPoolDomain/pool]
 name=pool1
 path=/san/pool1
-waitForFiles=<replaceable>path</replaceable>/data
+waitForFiles=${path}/data
 maxDiskSpace=2T</programlisting>
 
-            <para>
-                The only required parameters are <varname>name</varname> and
-                <varname>path</varname>. The <varname>path</varname>
-                property defines in which
-                directory files are to be stored. The <varname>name</varname>
-                defines the name of the pool; in the above example
-                <literal>pool1</literal>.
-                With this
-                name, the pool can also be addressed from administrative
-                components (see <xref linkend="intouch-admin" /> or
-                <xref linkend="intouch-web" />). The option <varname>
-                waitForFiles</varname> instructs the pool to block during
-                startup until the specified directory is available. The
-                example pool waits for the data directory
-                (<filename><replaceable>path</replaceable>/data</filename>)
-                to become available. The last option,
-                <varname>maxDiskSpace</varname>, defines the maximum disk usage
-                for the pool. In the example above, the pool has 2 Tebibytes.
-            </para>
-</informalexample>
-            <para>
-              Adding a pool to a configuration does not modify the
-              pool or the data in it and can thus safely be undone or
-              repeated.
-        </para>
+        <para>
+	  The only required properties are <varname>name</varname> and
+	  <varname>path</varname>.  The <varname>path</varname>
+	  property defines in which directory files are to be stored.
+	  The <varname>name</varname> defines the name of the
+	  pool. With this name, the pool can also be addressed from
+	  administrative components (see <xref
+	  linkend="intouch-admin"/> or <xref linkend="intouch-web"
+	  />).  The property <varname>waitForFiles</varname> instructs
+	  the pool not to start up until the specified file or
+	  directory is available.  This is recommended as it prevents
+	  problems should the underlying storage be unavailable (e.g.,
+	  if a RAID device is offline).  The property
+	  <varname>maxDiskSpace</varname> defines the maximum disk
+	  usage for the pool.
+	 </para>
 
-        <note>
-          <para>The default gap for poolsizes is 4GiB. This means you should
-          make a bigger pool than 4GiB otherwise you would have to change this gap
-          in the &dcache; admin tool. See the example below.
-          See also <xref linkend="intouch-admin"/>.
-          </para>
+	 <para>
+	  In the example above the name of the pool is
+	  <literal>pool1</literal> and the pool has 2 Tebibytes.  The
+	  example pool waits for the data directory (<filename
+	  class='directory'>${path}/data</filename>) to become
+	  available.  The <literal>${path}</literal> will expand to
+	  the value of the <varname>path</varname> property, so the
+	  example <varname>waitForFiles</varname> value is always
+	  correct.
+	</para>
+      </informalexample>
 
-          <screen>&dc-prompt-local; <userinput>cd <replaceable>poolName</replaceable></userinput>
+      <para>
+	Adding a pool to a configuration does not modify the pool or
+	the data in it and can thus safely be undone or repeated.
+      </para>
+
+       <note>
+
+        <title>Mind the Gap!</title>
+	<para>
+	  The default gap for poolsizes is 4GiB. This means you should
+	  make a bigger pool than 4GiB otherwise you would have to
+	  change this gap in the &dcache; admin tool. See the example
+	  below.  See also <xref linkend="intouch-admin"/>.
+	</para>
+
+	<screen>&dc-prompt-local; <userinput>cd <replaceable>poolName</replaceable></userinput>
 &dc-prompt-pool; <userinput>set gap 2G</userinput>
 &dc-prompt-pool; <userinput>save</userinput></screen>
-        </note>
+	  </note>
 
-        <para>
-          All configured components can now be started with
-          <userinput>dcache start</userinput>, for example:
-        </para>
+	  <para>
+	    All configured components can now be started with
+	    <userinput>dcache start</userinput>, for example:
+	  </para>
 
         <screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache start</userinput>
 Starting lmDomain  Done (pid=7514)
