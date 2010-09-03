@@ -66,23 +66,14 @@
 
     <para>
       Install the &psql; server, client and JDBC support with the
-      tools of the operating system. 
-<!--
-      For example, use
+      tools of the operating system.
 
-<screen>&prompt-root; <userinput>apt-get install postgresql postgresql-server postgresql-jdbc</userinput></screen>
--->
-      You can download a suitable package from <ulink
-      url="http://www.postgresql.org/ftp/">http://www.postgresql.org/ftp/</ulink>. A
-      version that is suitable for current versions of Scientific
-      Linux 3 can be found at <ulink
-      url="http://www.postgresql.org/ftp/binary/v8.1.0/linux/rpms/redhat/rhel-es-3.0/">http://www.postgresql.org/ftp/binary/v8.1.0/linux/rpms/redhat/rhel-es-3.0/</ulink>.
     </para>
 
       <para>
-        Initialize the database directory (usually 
-        <filename class="directory">/var/lib/pgsql/data/</filename>), 
-        start the database server, and make sure that it is started 
+        Initialize the database directory (usually
+        <filename class="directory">/var/lib/pgsql/data/</filename>),
+        start the database server, and make sure that it is started
         at system start-up. This may be done with
 
 <screen>&prompt-root; <userinput>/etc/init.d/postgresql start</userinput>
@@ -98,111 +89,6 @@
 <screen>&prompt-root; <userinput>postmaster -i -D <filename class="directory">/var/lib/pgsql/data/</filename> >logfile 2>&amp;1 &amp;</userinput></screen>
     </para>
 
-    <para>
-      The server has to be configured to admit TCP/IP connections from
-      <literal>localhost</literal>. This is the default for version 8
-      of &psql;. 
-
-<!--  For earlier versions make sure,
-      <filename>/var/lib/pgsql/data/postgresql.conf</filename>
-      contains
-
-<programlisting>...
-tcpip_socket = true
-...</programlisting>
-
-      (this option is not recognised by version 8). -->
-
-    </para>
-
-    <para>
-      For &dcache; version 1.6.6 release 1, please make sure the file
-      <filename>/var/lib/pgsql/data/postgresql.conf</filename>
-      contains
-    </para>
-
-<programlisting>...
-add_missing_from = on
-...</programlisting>
-
-    <para>
-      This will not be necessary in future releases.
-    </para>
-
-    <para>
-      The file <filename>/var/lib/pgsql/data/pg_hba.conf</filename>
-      should contain
-
-<programlisting>...
-local   all         all                        trust
-host    all         all         127.0.0.1/32   trust
-host    all         all         ::1/128        trust</programlisting>
-
-      <!-- for &psql; version 8. -->
-
-<!-- and
-
-<programlisting>...
-local   all         all                                                           trust
-host    all         all         127.0.0.1 255.255.255.255                         trust
-host    all         all         ::1/128   ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff trust</programlisting>
-
-      for earlier versions. -->
-
-    </para>
-
-    <para>
-      Restart the server, e.g. with
-    </para>
-      
-<screen>&prompt-root; <userinput>/etc/init.d/postgresql restart</userinput></screen>
-
-    <para>
-      The configuration of the access rights in
-      <filename>/var/lib/pgsql/data/pg_hba.conf</filename> is rather
-      liberal: Any user on the local machine may connect to the
-      &psql; server as any database user without specifying a
-      password. This way, you can be sure that problems will not be
-      due to wrong access rights or passwords. See <xref
-      linkend="cb-postgres-configure"/> of the &dcache; book for more
-      advice on configuring &psql;.
-    </para>
-
-    <para>
-      If a current version of &psql; is not available for the
-      distribution, it can be compiled as follows:
-      You can download the source code from the official web site: <ulink
-        url="http://www.postgresql.org/download">http://www.postgresql.org/download</ulink> and
-      build it following the instruction: <ulink
-        url="http://www.postgresql.org/docs/8.0/static/installation.html">http://www.postgresql.org/docs/8.0/static/installation.html</ulink>
-      Here is a short version from that page:
-      
-<screen>&prompt-root; <userinput>./configure --prefix=/usr/local/pgsql</userinput>
-&prompt-root; <userinput>gmake</userinput>
-&prompt-root; <userinput>su</userinput>
-&prompt-root; <userinput>gmake install</userinput>
-&prompt-root; <userinput>adduser postgres</userinput>
-&prompt-root; <userinput>mkdir /usr/local/pgsql/data</userinput>
-&prompt-root; <userinput>chown postgres /usr/local/pgsql/data</userinput>
-&prompt-root; <userinput>su - postgres</userinput>
-&prompt-root; <userinput>/usr/local/pgsql/bin/initdb -D /usr/local/pgsql/data</userinput>
-&prompt-root; <userinput>/usr/local/pgsql/bin/postmaster -D /usr/local/pgsql/data > logfile 2&gt;&amp;1 &amp;</userinput>
-&prompt-root; <userinput>/usr/local/pgsql/bin/createdb test</userinput>
-&prompt-root; <userinput>/usr/local/pgsql/bin/psql test</userinput>
-</screen>
-
-      If there is another &psql; installed on your machine, make sure 
-      <systemitem class="username">root</systemitem>'s path is set so that executables, 
-      esp. <command role="daemon">psql</command>, <command role="daemon">postmaster</command>, and 
-      <command role="daemon">pg_ctl</command>, are called from the V8.x.x &psql; that you 
-      intend to use for &dcache;. (You will be doing most of this as 
-      <systemitem class="username">root</systemitem>). Another thing is to make sure 
-      that the various <filename class="libraryfile">libpg.so</filename> libraries 
-      are not invoked from the other &psql; distribution. 
-      <userinput>locate libpg.so</userinput> will show which ones are on your system. Set 
-      <envar>LD_LIBRARY</envar> for <systemitem class="username">root</systemitem> to 
-      insure that the &pnfs; &psql; libs are seen first! 
-    </para>
 
   </section>
 
@@ -223,6 +109,8 @@ local   all         all                                             trust
 host    all         all         127.0.0.1/32                        trust
 host    all         all         ::1/128                             trust
 host    all         all         <replaceable>HostIP</replaceable>/32          trust</programlisting>
+
+
 <!-- host    all         all   <replaceable>srmHostIP</replaceable>      255.255.255.255   trust -->
 
       This gives access to all databases in the &psql; server to all users

@@ -45,8 +45,8 @@
 
   <para>
     Another performance feature of &dcache; is hot-spot data
-    migration.  In this process, &dcache; will detect when a few file
-    are being requested very often.  If this happens, &dcache; can
+    migration.  In this process, &dcache; will detect when files
+    are requested very often. If this happens, &dcache; can
     make duplicate copies of the popular files on other computers.
     This allows the load to be spread across multiple machines, so
     increasing throughput.
@@ -117,7 +117,7 @@
       &dcache; comes with a set of domain definitions, each specifying
       a useful set of cells to run within that domain to achieve a
       certain goal.  These goals include storing data, providing a
-      front-end to the storage, recording filenames, and so on.  The
+      front-end to the storage, recording file names, and so on. The
       list of cells to run within these domains are recommended
       deployments: the vast majority of &dcache; deployments do not
       need to alter these lists.
