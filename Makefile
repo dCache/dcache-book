@@ -20,6 +20,7 @@ STYLESHEETS_CHUNK := xsl/html-chunk.xsl xsl/html-common.xsl xsl/common.xsl
 STYLESHEETS_HTML := xsl/html-single.xsl xsl/html-common.xsl xsl/common.xsl
 STYLESHEETS_FO := xsl/fo.xsl xsl/fo-titlepage.xsl xsl/common.xsl 
 STYLESHEETS_MAN := xsl/man.xsl xsl/common.xsl
+STYLESHEETS_EPUB := xsl/epub.xsl xsl/common.xsl
 
 
 #########  Some derived locations: output files
@@ -38,8 +39,10 @@ FO_DEPS = $(FO_FILES:%=.%.d)
 HTML_SINGLE_DEPS = $(HTML_SINGLE_FILES:%=.%.d)
 HTML_CHUNK_DEPS = $(SOURCES:%.xml=.%-chunk.d)
 
+EPUB_FILES = $(SOURCES:%.xml=%.epub)
+
 # Used by deploy target
-ALL = $(HTML_SINGLE_FILES) $(PDF_FILES) $(HTML_ALL_CHUNK_FILES) book.css
+ALL = $(HTML_SINGLE_FILES) $(PDF_FILES) $(HTML_ALL_CHUNK_FILES) $(EPUB_FILES) book.css
 ALL_INSTALLED = $(ALL:%=%__INSTALL__)
 ALL_TEST_INSTALLED = $(ALL:%=%__TEST_INSTALL__)
 
@@ -87,6 +90,7 @@ info:
 	@echo "  html        -- build HTML pages"
 	@echo "  txt         -- build text version"
 	@echo "  man         -- build man pages"
+	@echo "  epub        -- build EPUB version"
 	@echo "  deploy      -- use scp to deploy files to http://${WWW_SERVER}${WWW_LOCATION}"
 	@echo "  test-deploy -- use scp to deploy files to http://${WWW_SERVER}${WWW_TEST_LOCATION}"
 	@echo
@@ -100,7 +104,7 @@ info:
 	@echo "  distclean   -- remove all generated files"
 	@echo
 
-all: pdf html txt man
+all: pdf html txt man epub
 
 
 ###### HTML targets
@@ -143,6 +147,18 @@ man: Book.xml $(STYLESHEETS_MAN) shared-entities.xml
 	@[ ! -d man ] && mkdir man || :
 	$(XSLTPROC) $(XSLT_FLAGS) --output man/ xsl/man.xsl $<
 
+
+###### EPUB targets
+#
+
+## TODO: we should autogenerate dependencies, like with other targets
+epub: $(EPUB_FILES)
+
+%.epub: %.xml $(STYLESHEETS_EPUB) shared-entities.xml
+	$(XSLTPROC) $(XSLT_FLAGS) xsl/epub.xsl $<
+	echo application/epub+zip > mimetype
+	zip -rn mimetype $@ mimetype META-INF OEBPS
+	rm -rf mimetype META-INF OEBPS
 
 ###### FO-based targets
 #
