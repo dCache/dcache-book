@@ -669,7 +669,7 @@ maxDiskSpace=2T</programlisting>
         </note>
 
         <para>
-          All configured components can now be starting with
+          All configured components can now be started with
           <userinput>dcache start</userinput>, for example:
         </para>
 
