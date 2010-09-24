@@ -30,8 +30,8 @@
 	The application is wired up by a Spring IOC-Container. It receives the information from
 	&dcache; infoservice as &xml; which are parsed and presented. For authentication and
 	authorisation it offers usage of username/password(currently KAuth-File) or
-	the grid-certificate talking to &cell-gplazma;. It also offers a guest-login with viewing
-	rights only.
+	the grid-certificate talking to &cell-gplazma;. It also offers a non-authenticated,
+	read-only mode.
   </para>
 
   <para>
@@ -45,11 +45,14 @@
 
     <para>
       To enable your &dcache; to run the webadmin-interface your system has to run
-      the infoservice and &cell-gplazma;
+      the infoservice. For the authenticated mode a configured &cell-gplazma; is also
+      required. For information on &cell-gplazma; configuration have a look at
+      <xref linkend="cf-gplazma"/>. The KAuth-File has to be on the
+      same machine then the webadmin for this to work.
     </para>
     <para>
-      A host certificate has to be imported into the &dcache;-keystore already.
-      In the grid-world hostcertificates are usually signed by national grid-CAs. Refer to 
+      For authenticated mode a host certificate has to be imported into the &dcache;-keystore.
+      In the grid world host certificates are usually signed by national Grid-CAs. Refer to
       the documentation provided by the Grid-CA to find out how to request a certificate. To
       import them into the &dcache;-keystore use this command:
       <screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache import hostcert</userinput></screen>
@@ -68,6 +71,7 @@
 	    webadminHttpsPort=8443
 	    webadminHttpPort=8080
 	    webadminDCacheInstanceName=coolName
+	    webadminAuthenticated=true
       </screen>
 	</para>
 	<para>
@@ -79,6 +83,14 @@
 	   #   When a user has this GID he can become an Admin for webadmininterface
 	   webadminAdminGid=1000
       </screen>
+      To see all webadmin specific property values have a look at
+      <code>${dcache.home}/share/defaults/webadmin.properties</code>
+
+      After startup of webadmin you can reach it via <literal>http://example.com:8080/webadmin</literal>.
+      Since webadmin bases on the &cell-info; it takes some time until all values are populated,
+      because &cell-info; needs to collect them first. We are working on making this process
+      faster in future releases. It is recommended to let info run on the same machine then
+      webadmin.
     </para>
   </section>
 
