@@ -18,14 +18,14 @@
   </chapterinfo>
 
   <para>
-    This part describes how to configure the webadmin-interface which
+    This part describes how to configure the &cell-webadmin;-interface which
     is a replacement for the old &cell-httpd;-service and offers additional
     features to act as an adminservice to admins.
   </para>
 
 
   <para>
-	The webadmin-interface uses a Jetty-Server which is embedded in an odinary &dcache;-cell.
+	The &cell-webadmin;-interface uses a Jetty-Server which is embedded in an odinary &dcache;-cell.
 	It is using apache-wicket (a webfrontend-framework) and <abbrev>YAML</abbrev> (a CSS-Template Framework).
 	The application is wired up by a Spring IOC-Container. It receives the information from
 	&dcache; infoservice as &xml; which are parsed and presented. For authentication and
@@ -41,14 +41,13 @@
 
   <section id="cf-webadmin-install">
     <title>Installation</title>
-
-
     <para>
-      To enable your &dcache; to run the webadmin-interface your system has to run
-      the infoservice. For the authenticated mode a configured &cell-gplazma; is also
-      required. For information on &cell-gplazma; configuration have a look at
-      <xref linkend="cf-gplazma"/>. The KAuth-File has to be on the
-      same machine then the webadmin for this to work.
+      To enable your &dcache; to run the &cell-webadmin;-interface your system has to run
+      the &cell-info; service. For the authenticated mode a configured &cell-gplazma; is also
+      required. The KAuth-File has to be on the same machine then the &cell-webadmin; for
+      this to work. For a non-authenticated &cell-webadmin; you just need to give the &cell-webadmin;
+      service to a domain and maybe configure the port &cell-webadmin; will listen on
+	<varname>webadminHttpPort</varname>.
     </para>
     <para>
       For authenticated mode a host certificate has to be imported into the &dcache;-keystore.
@@ -63,34 +62,35 @@
       this step.
     </para>
     <para>
-      Now you can enable the webadmin-interface to run on your system by adding e.g. this
-      to your layouts file:
-      <screen>
-	    [webadminDomain]
-	    [webadminDomain/webadmin]
-	    webadminHttpsPort=8443
-	    webadminHttpPort=8080
-	    webadminDCacheInstanceName=coolName
-	    webadminAuthenticated=true
-      </screen>
+You can enable the &cell-webadmin; interface by adding the service (&cell-webadmin;) to a domain;
+for example:
+      <programlisting>[webadminDomain]
+[webadminDomain/webadmin]
+webadminHttpsPort=8443
+webadminHttpPort=8080
+webadminDCacheInstanceName=coolName
+webadminAuthenticated=true
+webadminAdminGid=1000</programlisting>
 	</para>
 	<para>
-	  Another important value is this one, because it configures who is allowed to act as
-	  an admin, which certainly should not be everyone:
-	  <screen>
-	   #  ---- GID a user has to have to be considered an Admin of webadmininterface
-	   #
-	   #   When a user has this GID he can become an Admin for webadmininterface
-	   webadminAdminGid=1000
-      </screen>
+	  The most important value is <varname>webadminAdminGid</varname>, because it configures who is allowed to
+	  alter dCache behaviour, which certainly should not be everyone:
+	  <programlisting>#  ---- GID a user has to have to be considered an Admin of webadmininterface
+#
+#   When a user has this GID he can become an Admin for webadmininterface
+webadminAdminGid=1000</programlisting>
       To see all webadmin specific property values have a look at
-      <code>${dcache.home}/share/defaults/webadmin.properties</code>
+      <filename>${dcache.home}/share/defaults/webadmin.properties</filename>
 
-      After startup of webadmin you can reach it via <literal>http://example.com:8080/webadmin</literal>.
+	  For information on &cell-gplazma; configuration have a look at
+      <xref linkend="cf-gplazma"/> and for a special example
+      <xref linkend="cf-gplazma-webadmin-example"/>.
+
+      After startup of webadmin you can reach it via <uri>http://example.com:8080/webadmin</uri>.
       Since webadmin bases on the &cell-info; it takes some time until all values are populated,
       because &cell-info; needs to collect them first. We are working on making this process
-      faster in future releases. It is recommended to let info run on the same machine then
-      webadmin.
+      faster in future releases. It is recommended to let &cell-info; run on the same machine then
+      &cell-webadmin;.
     </para>
   </section>
 

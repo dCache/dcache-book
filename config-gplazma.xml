@@ -1075,5 +1075,64 @@ useGPlazmaAuthorizationCell=true</programlisting>
       </para>
     </section>
   </section>
+  <section id="cf-gplazma-webadmin-example">
+    <title>&cell-gplazma; config example to work with authenticated webadmin</title>
+	<para>
+In this section an example configuration of &cell-gplazma; is presented to enable working with
+&cell-webadmin; in authenticated mode and give a user admin-rights.
+The <filename>/opt/d-cache/etc/dcachesrm-gplazma.policy</filename> file would look like this:
+<programlisting width="80"># Switches
+xacml-vo-mapping="OFF"
+saml-vo-mapping="OFF"
+kpwd="ON"
+grid-mapfile="OFF"
+gplazmalite-vorole-mapping="OFF"
 
+# Priorities
+xacml-vo-mapping-priority="5"
+saml-vo-mapping-priority="1"
+kpwd-priority="3"
+grid-mapfile-priority="4"
+gplazmalite-vorole-mapping-priority="2"
+
+# Configurable Options for Plugins|Services
+# #################################################################################
+# Path to local or remotely accessible authorization repositories|services.
+# A valid path is required if corresponding switch is ON.
+
+# dcache.kpwd
+kpwdPath="/opt/d-cache/etc/dcache.kpwd"
+
+# #################################################################################
+# END</programlisting>
+
+The <filename>/opt/d-cache/etc/dcache.kpwd</filename> file would look like this:
+<programlisting width="80">version 2.1
+
+mapping "/C=DE/O=GermanGrid/OU=DESY/CN=Jan Schaefer" jans
+# the following are the user auth records
+login jans read-write 17506 1000 / / /
+ /C=DE/O=GermanGrid/OU=DESY/CN=Jan Schaefer
+
+# set pwd
+passwd jans 8402480 read-write 17506 1000 / / /</programlisting>
+
+This maps the subject part of a Grid-Certificate
+<literal>subject=/C=DE/O=GermanGrid/OU=DESY/CN=Jan Schaefer</literal>
+to the User <systemitem class="username">jans</systemitem> and the entry
+<programlisting width="80">login jans read-write 17506 1000 / / /
+ /C=DE/O=GermanGrid/OU=DESY/CN=Jan Schaefer</programlisting>
+applies unix-like values to <systemitem class="username">jans</systemitem>,
+most important is the <literal>1000</literal>, because it is the assigned
+GID. This must match the value af the <varname>webadminAdminGid</varname> configured in your webadmin.
+This is sufficient for login using a certificate. The entry
+<programlisting width="80">passwd jans 8402480 read-write 17506 1000 / / /</programlisting>
+ enables Username/Password login, such as a valid login would be user
+ <systemitem class="username">jans</systemitem> with the
+ password <literal>blub</literal>. The password <literal>blub</literal> is written in an
+ obfuscated fashion, as <literal>8402480</literal> with the
+ algorithm of the kpwd file (also see <xref linkend="cf-gplazma-kpwd"/>).
+ Again the <literal>1000</literal> here is the assigned GID.
+	</para>
+  </section>
 </chapter>
