@@ -16,9 +16,10 @@ HTML_EXT = shtml
 
 # All stylesheets used by various outputs
 #
+STYLESHEETS_TITLEPAGE := xsl/fo-titlepage.xsl
 STYLESHEETS_CHUNK := xsl/html-chunk.xsl xsl/html-common.xsl xsl/common.xsl
 STYLESHEETS_HTML := xsl/html-single.xsl xsl/html-common.xsl xsl/common.xsl
-STYLESHEETS_FO := xsl/fo.xsl xsl/fo-titlepage.xsl xsl/common.xsl 
+STYLESHEETS_FO := xsl/fo.xsl $(STYLESHEETS_TITLEPAGE) xsl/common.xsl 
 STYLESHEETS_MAN := xsl/man.xsl xsl/common.xsl
 STYLESHEETS_EPUB := xsl/epub.xsl xsl/common.xsl
 
@@ -177,7 +178,7 @@ pdf: $(PDF_FILES)
 	$(FOP) -fo $< -pdf $@
 
 # The title page is FO-specific; the format is derived from an XML file.
-xsl/fo-titlepage.xsl: xsl/fo-titlepage.xml
+%.xsl: %.xml
 	$(XSLTPROC) $(XSLT_FLAGS) --output $@ http://docbook.sourceforge.net/release/xsl/current/template/titlepage.xsl $<
 
 ###### Deployment targets
@@ -223,7 +224,7 @@ clean:
 	rm -rf *~ *.bak
 
 distclean: clean
-	rm -rf $(WEB_LOCATION) $(TXT_FILES) $(PDF_FILES) $(DEP_FILES) $(HTML_SINGLE_FILES) $(HTML_ALL_CHUNK_FILES)
+	rm -rf $(WEB_LOCATION) $(TXT_FILES) $(PDF_FILES) $(FO_FILES) $(DEP_FILES) $(HTML_SINGLE_FILES) $(HTML_ALL_CHUNK_FILES) $(STYLESHEETS_TITLEPAGE) $(EPUB_FILES)
 
 
 ###### Create (dynamic) Makefile dependencies
