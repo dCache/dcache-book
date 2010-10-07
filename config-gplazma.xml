@@ -21,9 +21,9 @@
     information to it, receiving the authorization decision and
     site-specific user information such as uid, gid, and rootpath in
     return.
-  </para> 
-  
-  
+  </para>
+
+
   <para>
     The acronym stands for Grid-aware PLuggable AuthoriZation
     Management, and supports the use of plugins which implement
@@ -53,7 +53,7 @@
 	the uid, gid, and rootpath.
       </para>
     </listitem>
- 
+
     <listitem>
       <para>
 	gplazmalite-vorole-mapping : In this method the mapping to the
@@ -63,7 +63,7 @@
 	gid, and rootpath is through the storage-authzdb file.
       </para>
     </listitem>
- 
+
     <listitem>
       <para>
 	saml-vo-mapping : The DN and Role are mapped to a username via
@@ -79,7 +79,7 @@
   <para>
     The following describes how to use gPlazma in dCache.
   </para>
-  
+
   <section id="cf-gplazma-install">
     <title>Installation</title>
 
@@ -104,7 +104,7 @@
       site-specific information for the &dcache; on which it is
       deployed.
     </para>
-    
+
   </section>
 
 
@@ -202,7 +202,7 @@ kpwdPath="/opt/d-cache/etc/dcache.kpwd"</programlisting>
       Two file locations are defined in the policy file for this
       plugin:
     </para>
-    
+
     <blockquote>
       <programlisting width="80"># grid-mapfile
 gridMapFilePath="/etc/grid-security/grid-mapfile"
@@ -240,7 +240,7 @@ storageAuthzPath="/etc/grid-security/storage-authzdb"</programlisting>
 
   <section id="cf-gplazma-authzdb">
     <title>Configuring storage-authzdb</title>
- 
+
     <para>
       In &cell-gplazma;, except for the dcache.kpwd plugin,
       authorization mapping is a two-step process. First, a username
@@ -251,7 +251,7 @@ storageAuthzPath="/etc/grid-security/storage-authzdb"</programlisting>
 
     <section>
       <title>Preparing storage-authzdb</title>
- 
+
       <para>
 	The location of storage-authzdb is
 	<filename>/etc/grid-security/storage-authzdb</filename>. The
@@ -260,7 +260,7 @@ storageAuthzPath="/etc/grid-security/storage-authzdb"</programlisting>
       </para>
 
       <blockquote><programlisting width="80">version 2.1</programlisting></blockquote>
-      
+
       <para>
 	The other lines in the file each contain eight fields: the
 	string "authorize", followed by the username, read-write
@@ -299,15 +299,15 @@ storageAuthzPath="/etc/grid-security/storage-authzdb"</programlisting>
 	path. The first path is always defined as being relative to
 	the second path.
       </para>
-      
+
       <para>
         Starting with &dcache; 1.9, multiple gids can be assigned by using comma-separated values for the GID file, as in
       </para>
-      
+
       <blockquote>
 	<programlisting width="80">authorize uscms01 read-write 60076 5063,5071,6843 / / /</programlisting>
-      </blockquote>   
-      
+      </blockquote>
+
       <para>
 	The lines of the storage-authzdb file are similar to the
 	<quote>login</quote> lines of the
@@ -329,7 +329,7 @@ storageAuthzPath="/etc/grid-security/storage-authzdb"</programlisting>
 
     <section>
       <title>Support for the Priority Field in storage-authzdb</title>
- 
+
       <para>
 	In the future, &dcache; services may support the use of
 	priorites, to be assigned in storage-authzdb. To assign
@@ -455,7 +455,7 @@ gridVoRoleStorageAuthzPath="/etc/grid-security/storage-authzdb"</programlisting>
 	in which case other roles will be disregarded.
       </para>
     </section>
-    
+
     <section>
       <title>Authorizing a VO</title>
 
@@ -551,7 +551,7 @@ gridVoRoleStorageAuthzPath="/etc/grid-security/storage-authzdb"</programlisting>
 	and the role which reads the data maps to
 	<literal>cmsuser</literal>.
       </para>
-      
+
       <blockquote>
 	<programlisting width="80">"*" "/cms/uscms/Role=cmsprod" cmsprod
 "*" "/cms/uscms/Role=cmsuser" cmsuser</programlisting>
@@ -680,7 +680,7 @@ saml-vo-mapping-cache-lifetime="60"</programlisting>
 
   <section id="cf-gplazma-xacml">
     <title>Configuring the xacml-vo-mapping Plugin</title>
-    
+
     <para>
      Beginning with &dcache; version 1.9.2, gPlazma includes a new authorization plugin,
      to support the XACML
@@ -692,7 +692,7 @@ saml-vo-mapping-cache-lifetime="60"</programlisting>
      configuration files are still compatible with gPlazma. If the
      installation is an upgrade it will change /opt/d-cache/config/gPlazma.batch.
      It is normally not necessary to change this file, but if you have customized
-     the previous copy, transfer your changes to the new batch file.    
+     the previous copy, transfer your changes to the new batch file.
     </para>
 
     <para>
@@ -701,17 +701,17 @@ saml-vo-mapping-cache-lifetime="60"</programlisting>
     </para>
 
     <blockquote>
-      <programlisting width="80"># XACML-based grid VO role mapping 
+      <programlisting width="80"># XACML-based grid VO role mapping
 XACMLmappingServiceUrl="https://fledgling09.fnal.gov:8443/gums/services/GUMSXACMLAuthorizationServicePort"
 # Time in seconds to cache the mapping in memory
 xacml-vo-mapping-cache-lifetime="180"
 </programlisting>
     </blockquote>
-    
+
 for a <ulink url="http://grid.racf.bnl.gov/GUMS/">GUMS</ulink> server, or, for an SCAS server,
 
     <blockquote>
-      <programlisting width="80"># XACML-based grid VO role mapping 
+      <programlisting width="80"># XACML-based grid VO role mapping
 XACMLmappingServiceUrl="https://scas.europeansite.eu:8443"
 # Time in seconds to cache the mapping in memory
 xacml-vo-mapping-cache-lifetime="180"
@@ -732,13 +732,11 @@ xacml-vo-mapping-cache-lifetime="180"
       does not return a username, the convention in  &cell-gplazma; is to use "uid:gid"
       for the username, where uid is the string representation of the uid returned by
       SCAS, and gid is the string representation of the primary GID returned by SCAS.
-      Thus a line such as 
+      Thus a line such as
     </para>
-    
-    <blockquote>
-    authorize 13160:9767 read-write 13160 9767 / /pnfs/fnal.gov/data /
-    </blockquote>
-    
+
+    <programlisting>authorize 13160:9767 read-write 13160 9767 / /pnfs/fnal.gov/data /</programlisting>
+
     <para>
     in <filename>/etc/grid-security/storage-authzdb</filename> will serve to
     assign the user mapped by SCAS to uid=13160 and primary gid=9767 the rootpath
@@ -769,7 +767,7 @@ xacml-vo-mapping-cache-lifetime="180"
     </para>
 
   </section>
-  
+
   <section id="cf-gplazma-example">
     <title>An example policy file</title>
 
@@ -988,7 +986,7 @@ useGPlazmaAuthorizationCell=true</programlisting>
 
     <section>
       <title>Validating User Attributes in &dcache; 1.8</title>
- 
+
       <para>
 	A user's roles (Fully Qualified Attribute Names) are read from
 	the certificate chain found within the proxy. These attributes
@@ -1014,10 +1012,10 @@ useGPlazmaAuthorizationCell=true</programlisting>
       </para>
 
     </section>
-    
+
     <section>
       <title>Validating User Attributes in &dcache; 1.9</title>
- 
+
       <para>
 	In version 1.9, VOMS attribute validation in &cell-gplazma;
 	uses a method in which installation of the voms server certificate
@@ -1027,7 +1025,7 @@ useGPlazmaAuthorizationCell=true</programlisting>
 	write configuration directories and "*.lsc" files in
 	<filename>/etc/grid-security/vomsdir</filename> for each authorized voms
 	server according to
-	<ulink url="https://twiki.cern.ch/twiki/bin/view/LCG/VomsFAQforServiceManagers">these instructions</ulink> 
+	<ulink url="https://twiki.cern.ch/twiki/bin/view/LCG/VomsFAQforServiceManagers">these instructions</ulink>
 	and in <filename>/opt/d-cache/etc/dcachesrm-gplazma.policy</filename> set
       </para>
 
@@ -1040,10 +1038,10 @@ useGPlazmaAuthorizationCell=true</programlisting>
 	validation is on or not, there must be a non-empty /etc/grid-security/vomsdir
 	on the node which is running &cell-gplazma;. It is enough to do
       </para>
-      
+
       <screen>&prompt-root; <command>mkdir /etc/grid-security/vomsdir</command>
 <command>touch /etc/grid-security/vomsdir/empty-cert.pem</command></screen>
-      
+
       <para>
       to create the non-empty directory.
       </para>
@@ -1052,7 +1050,7 @@ useGPlazmaAuthorizationCell=true</programlisting>
 
     <section id="cf-gplazma-ops-del">
       <title>Delegation to &cell-gplazma;</title>
- 
+
       <para>
 	In &dcache; version 1.7, &srm; or the &door-gridftp; delegated
 	the user's credentials to &cell-gplazma;, and the user's
