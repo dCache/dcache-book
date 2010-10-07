@@ -219,29 +219,38 @@ Enter it again:
 CREATE ROLE
 
 &prompt-root; <userinput>psql -U chimera chimera -f /opt/d-cache/libexec/chimera/sql/create.sql</userinput>
-psql:/opt/d-cache/libexec/chimera/sql/create.sql:23: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_inodes_pkey" for table "t_inodes"
+psql:/opt/d-cache/libexec/chimera/sql/create.sql:23: NOTICE:  CREATE TABLE / PRIMARY KEY will create
+implicit index "t_inodes_pkey" for table "t_inodes"
 CREATE TABLE
-psql:/opt/d-cache/libexec/chimera/sql/create.sql:35: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_dirs_pkey" for table "t_dirs"
+psql:/opt/d-cache/libexec/chimera/sql/create.sql:35: NOTICE:  CREATE TABLE / PRIMARY KEY will create
+implicit index "t_dirs_pkey" for table "t_dirs"
 CREATE TABLE
-psql:/opt/d-cache/libexec/chimera/sql/create.sql:45: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_inodes_data_pkey" for table "t_inodes_data"
+psql:/opt/d-cache/libexec/chimera/sql/create.sql:45: NOTICE:  CREATE TABLE / PRIMARY KEY will create
+implicit index "t_inodes_data_pkey" for table "t_inodes_data"
 <lineannotation>many more like this...</lineannotation>
 INSERT 0 1
 <lineannotation>many more like this...</lineannotation>
 INSERT 0 1
 CREATE INDEX
 CREATE INDEX
-psql:/opt/d-cache/libexec/chimera/sql/create.sql:256: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_storageinfo_pkey" for table "t_storageinfo"
+psql:/opt/d-cache/libexec/chimera/sql/create.sql:256: NOTICE:  CREATE TABLE / PRIMARY KEY will create
+implicit index "t_storageinfo_pkey" for table "t_storageinfo"
 CREATE TABLE
-psql:/opt/d-cache/libexec/chimera/sql/create.sql:263: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_access_latency_pkey" for table "t_access_latency"
+psql:/opt/d-cache/libexec/chimera/sql/create.sql:263: NOTICE:  CREATE TABLE / PRIMARY KEY will create
+implicit index "t_access_latency_pkey" for table "t_access_latency"
 CREATE TABLE
-psql:/opt/d-cache/libexec/chimera/sql/create.sql:270: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_retention_policy_pkey" for table "t_retention_policy"
+psql:/opt/d-cache/libexec/chimera/sql/create.sql:270: NOTICE:  CREATE TABLE / PRIMARY KEY will create
+implicit index "t_retention_policy_pkey" for table "t_retention_policy"
 CREATE TABLE
-psql:/opt/d-cache/libexec/chimera/sql/create.sql:295: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_locationinfo_pkey" for table "t_locationinfo"
+psql:/opt/d-cache/libexec/chimera/sql/create.sql:295: NOTICE:  CREATE TABLE / PRIMARY KEY will create
+implicit index "t_locationinfo_pkey" for table "t_locationinfo"
 CREATE TABLE
-psql:/opt/d-cache/libexec/chimera/sql/create.sql:311: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_locationinfo_trash_pkey" for table "t_locationinfo_trash"
+psql:/opt/d-cache/libexec/chimera/sql/create.sql:311: NOTICE:  CREATE TABLE / PRIMARY KEY will create
+implicit index "t_locationinfo_trash_pkey" for table "t_locationinfo_trash"
 CREATE TABLE
 CREATE INDEX
-psql:/opt/d-cache/libexec/chimera/sql/create.sql:332: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_acl_pkey" for table "t_acl"
+psql:/opt/d-cache/libexec/chimera/sql/create.sql:332: NOTICE:  CREATE TABLE / PRIMARY KEY will create
+implicit index "t_acl_pkey" for table "t_acl"
 CREATE TABLE
 CREATE INDEX
 
@@ -267,7 +276,8 @@ CREATE TRIGGER
 
 <screen>&lt;?xml version="1.0"?&gt;
 &lt;config&gt;
-        &lt;db fsid="0" url="jdbc:postgresql://localhost/chimera?prepareThreshold=3" drv="org.postgresql.Driver" user="chimera" pass="" dialect="PgSQL" /&gt;
+        &lt;db fsid="0" url="jdbc:postgresql://localhost/chimera?prepareThreshold=3" drv="org.postgresql
+.Driver" user="chimera" pass="" dialect="PgSQL" /&gt;
         &lt;nfs&gt;
                 &lt;port&gt;2049&lt;/port&gt;
                 &lt;logLevel&gt;0&lt;/logLevel&gt;
@@ -333,8 +343,10 @@ Stopping portmap: portmap</screen>
 
 <screen>&prompt-root; <userinput>/opt/d-cache/libexec/chimera/chimera-cli.sh Mkdir /pnfs/<replaceable>your domain</replaceable></userinput>
 &prompt-root; <userinput>/opt/d-cache/libexec/chimera/chimera-cli.sh Mkdir /pnfs/<replaceable>your domain</replaceable>/data</userinput>
-&prompt-root; <userinput>echo "chimera" | /opt/d-cache/libexec/chimera/chimera-cli.sh Writetag /pnfs/<replaceable>your domain</replaceable>/data sGroup</userinput>
-&prompt-root; <userinput>echo "StoreName sql" | /opt/d-cache/libexec/chimera/chimera-cli.sh Writetag /pnfs/<replaceable>your domain</replaceable>/data OSMTemplate</userinput>
+&prompt-root; <userinput>echo "chimera" | /opt/d-cache/libexec/chimera/chimera-cli.sh Writetag /pnfs/<replaceable>your domain</replaceable>
+/data sGroup</userinput>
+&prompt-root; <userinput>echo "StoreName sql" | /opt/d-cache/libexec/chimera/chimera-cli.sh Writetag /pnfs/<replaceable>your do
+main</replaceable>/data OSMTemplate</userinput>
 </screen>
 
           <para>If you plan to use &dcap; with mounted file system

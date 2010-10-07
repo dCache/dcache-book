@@ -54,7 +54,7 @@
       interface, thus allowing for a uniform access to heterogeneous
       storage elements.
     </para>
-    
+
     <section>
       <title>General SRM Concepts </title>
 
@@ -69,7 +69,7 @@
 	Page</ulink> to see the &srm; Version 1.1 and &srm; Version
 	2.2 protocol specification documents.
       </para>
-      
+
       <section>
 	<title>&surl;s</title>
 
@@ -239,7 +239,7 @@ srm://srm.cern.ch:8443/castor/cern.ch/cms/store/cmsfile23</programlisting>
 	  url="http://sdm.lbl.gov/srm-wg/doc/SRM.v2.2.html"> SRM
 	  Version 2.2 Specification</ulink>.
 	</para>
-    
+
       </section>
 
 
@@ -331,7 +331,7 @@ srm://srm.cern.ch:8443/castor/cern.ch/cms/store/cmsfile23</programlisting>
 	  than one pool group, no Pool Group belongs to more than one
 	  Link and no Link belongs to more than one LinkGroup.
 	</para>
-    
+
 	<para>
 	  Files written into a space made within a particular link
 	  group will end up on one of the pools referred to by this
@@ -381,7 +381,7 @@ srm://srm.cern.ch:8443/castor/cern.ch/cms/store/cmsfile23</programlisting>
 	  used. If the space reservation is not used and no LinkGroups
 	  are specified, the system behavior will be exactly the same
 	  as in &dcache; 1.7.
-	</para>    
+	</para>
       </section>
 
       <section>
@@ -443,10 +443,10 @@ srm://srm.cern.ch:8443/castor/cern.ch/cms/store/cmsfile23</programlisting>
       </para>
 
       <para>
-	The kernel.shmmax=1073741824 and kernel.shmall=1073741824  kernel parameters 
+	The kernel.shmmax=1073741824 and kernel.shmall=1073741824  kernel parameters
 	should be set for a 4GB RAM Machine. This can be accomplished by running:
       </para>
-	  
+
       <screen>&prompt-root; <userinput>echo 'kernel.shmmax=1073741824' >>  /etc/sysctl.conf</userinput>
 &prompt-root; <userinput>echo 'kernel.shmall=1073741824' >>  /etc/sysctl.conf</userinput>
 &prompt-root; <userinput>/bin/sysctl -p</userinput></screen>
@@ -456,20 +456,20 @@ srm://srm.cern.ch:8443/castor/cern.ch/cms/store/cmsfile23</programlisting>
 	<filename>sysctl.conf</filename> is:
       </para>
 
-      <programlisting>          kernel.core_uses_pid = 1
-	  kernel.sysrq = 1
-	  kernel.panic = 60
-	  fs.file-max = 131072
-	  net.ipv4.ip_forward = 0
-	  vm.vfs_cache_pressure = 10000
-	  # Keep this amount of memory free for emergency, IRQ and atomic allocations.
-	  vm.min_free_kbytes = 65535
-	  # Network tune parameters
-	  net.ipv4.tcp_timestamps = 0
-	  net.ipv4.tcp_sack = 0
-	  net.ipv4.tcp_window_scaling = 1
-	  kernel.shmmax=1073741824
-	  kernel.shmall=1073741824</programlisting>
+      <programlisting>kernel.core_uses_pid = 1
+kernel.sysrq = 1
+kernel.panic = 60
+fs.file-max = 131072
+net.ipv4.ip_forward = 0
+vm.vfs_cache_pressure = 10000
+# Keep this amount of memory free for emergency, IRQ and atomic allocations.
+vm.min_free_kbytes = 65535
+# Network tune parameters
+net.ipv4.tcp_timestamps = 0
+net.ipv4.tcp_sack = 0
+net.ipv4.tcp_window_scaling = 1
+kernel.shmmax=1073741824
+kernel.shmall=1073741824</programlisting>
 
     </section>
   </section>
@@ -479,7 +479,7 @@ srm://srm.cern.ch:8443/castor/cern.ch/cms/store/cmsfile23</programlisting>
      #            Configuring Postgres Database                   #
      ##############################################################
    -->
- 
+
   <section id="cf-srm-psql">
     <title>Configuring Postgres Database</title>
 
@@ -504,85 +504,81 @@ srm://srm.cern.ch:8443/castor/cern.ch/cms/store/cmsfile23</programlisting>
       To provide seamless local access to the database please make the
       following modifications:
     </para>
-     
+
     <para>
       The file <filename>/var/lib/pgsql/data/pg_hba.conf</filename>
-      should contain
+      should contain the following lines
     </para>
 
-    <programlisting>	...
-	local   all         all                        trust
-	host    all         all         127.0.0.1/32   trust
-	host    all         all         ::1/128        trust</programlisting>
+    <programlisting>local   all         all                        trust
+host    all         all         127.0.0.1/32   trust
+host    all         all         ::1/128        trust</programlisting>
 
     <para>
       If &srm; or srm monitoring is going to be installed on a
       separate node, you need to add entry for this node as well:
     </para>
 
-    <programlisting>        host    all         all       <replaceable>monitoring node</replaceable>    trust
-        host    all         all       <replaceable>srm node</replaceable>    trust</programlisting>
+    <programlisting>host    all         all       <replaceable>monitoring node</replaceable>    trust
+host    all         all       <replaceable>srm node</replaceable>    trust</programlisting>
 
-    <para>     
+    <para>
      The <filename>postgresql.conf</filename> should contain the following:
     </para>
 
-    <programlisting>	#to enable network connection on the default port
-	max_connections = 100
-	port = 5432
-	...
-	shared_buffers = 114688
-	...
-	work_mem = 10240
-	...
-	#to enable autovacuuming
-	stats_row_level = on
-		autovacuum = on
-		autovacuum_vacuum_threshold = 500       # min # of tuple updates before
-	                                        # vacuum
-	autovacuum_analyze_threshold = 250      # min # of tuple updates before
-        	                                # analyze
-	autovacuum_vacuum_scale_factor = 0.2    # fraction of rel size before
-	                                        # vacuum
-	autovacuum_analyze_scale_factor = 0.1   # fraction of rel size before
-	# 
-	# setting vacuum_cost_delay might be useful to avoid
-	# autovacuum penalize general performance
-	# it is not set in US-CMS T1 at Fermilab
-	#
-	# In IN2P3 add_missing_from = on 
-	# In Fermilab it is commented out
-	
-	# - Free Space Map -
-	max_fsm_pages = 500000
-	
-	In the postgresql.conf file
-	
-	# - Planner Cost Constants -
-	
-	effective_cache_size = 16384            # typically 8KB each
-	.......................</programlisting>
+    <programlisting>#to enable network connection on the default port
+max_connections = 100
+port = 5432
+...
+shared_buffers = 114688
+...
+work_mem = 10240
+...
+#to enable autovacuuming
+stats_row_level = on
+autovacuum = on
+autovacuum_vacuum_threshold = 500  # min # of tuple updates before
+                                   # vacuum
+autovacuum_analyze_threshold = 250      # min # of tuple updates before
+                                        # analyze
+autovacuum_vacuum_scale_factor = 0.2    # fraction of rel size before
+                                        # vacuum
+autovacuum_analyze_scale_factor = 0.1   # fraction of rel size before
+#
+# setting vacuum_cost_delay might be useful to avoid
+# autovacuum penalize general performance
+# it is not set in US-CMS T1 at Fermilab
+#
+# In IN2P3 add_missing_from = on
+# In Fermilab it is commented out
+
+# - Free Space Map -
+max_fsm_pages = 500000
+
+# - Planner Cost Constants -
+effective_cache_size = 16384            # typically 8KB each</programlisting>
 
      <para>
-       To enable &dcache; &srm; components access to the database server
-       with the user "srmdcache":
+       To enable &dcache; &srm; components access to the database
+       server with the user <database class='user'>srmdcache</database>:
      </para>
 
      <screen>&prompt-root; createuser -U postgres --no-superuser --no-createrole --createdb --pwprompt srmdcache</screen>
 
      <para>
-       &srm; will use the database "dcache" for storing its state information:
+       &srm; will use the database <database>dcache</database> for
+       storing its state information:
      </para>
 
      <screen>&prompt-root; createdb -U srmdcache dcache</screen>
-  </section>  
+  </section>
 
   <!--
      ##############################################################
      #            Configuring SRM Domain                          #
      ##############################################################
    -->
-     
+
   <section id="cf-srm-srm">
     <title>Configuring &srm; Domain</title>
 
@@ -597,7 +593,7 @@ srm://srm.cern.ch:8443/castor/cern.ch/cms/store/cmsfile23</programlisting>
       <para>
 	<screen>&prompt-root; <userinput>rpm -Uvh <replaceable>dcache.server.rpm</replaceable></userinput></screen>
       </para>
-	 
+
     </section>
 
     <section>
@@ -620,8 +616,8 @@ SRM=yes
     </section>
 
     <section>
-      <title>srm_setup.env</title> 
-      
+      <title>srm_setup.env</title>
+
       <para>
 	Edit <filename>/opt/d-cache/etc/srm_setup.env</filename>
       </para>
@@ -629,15 +625,15 @@ SRM=yes
       <itemizedlist>
 	<listitem>
 	  <para>
-	    Make sure that JAVA_HOME is set to correct value, for
-	    example
+	    Make sure that <envar>JAVA_HOME</envar> is set to correct
+	    value, for example
 	    <programlisting>JAVA_HOME=/usr/java/jdk1.5.0_07</programlisting>
 	  </para>
 	</listitem>
 
 	<listitem>
 	  <para>
-	    Tomcat port does not interfere with with services that are 
+	    Tomcat port does not interfere with with services that are
 	    already using network
 	  </para>
 	  <programlisting>TOMCAT_PORT=8080</programlisting>
@@ -664,7 +660,7 @@ JAVA_OPTS="-Xmx512m -Djava.awt.headless=true"</programlisting>
 	edit it so that, serviceLocatorHost and serviceLocatorPort
 	point to central dcache node:
       </para>
-      
+
       <programlisting>serviceLocatorHost=<replaceable>host of central node</replaceable>
 serviceLocatorPort=<replaceable>11111</replaceable></programlisting>
 
@@ -672,21 +668,21 @@ serviceLocatorPort=<replaceable>11111</replaceable></programlisting>
 	following &srm; parameters should be configured as following:
       </para>
 
-      <programlisting>	srmVacuum=false
-	srmDbName=dcache
-	srmDbUser=srmdcache</programlisting>
+      <programlisting>srmVacuum=false
+srmDbName=dcache
+srmDbUser=srmdcache</programlisting>
 
       <para>
-	Make sure that both srmCopyReqThreadPoolSize and
-	remoteGsiftpMaxTransfers are set to the same values and the
+	Make sure that both <varname>srmCopyReqThreadPoolSize</varname> and
+	<varname>remoteGsiftpMaxTransfers</varname> are set to the same values and the
 	common value should be the roughly equal to the maximum number
 	of the &srm; - to -&srm; copies your system can sustain.  So
 	if you think about 3 gridftp transfer per pool and you have 30
 	pools than the number should be 3x30=90.
       </para>
-	
-      <programlisting>       srmCopyReqThreadPoolSize=90
-       remoteGsiftpMaxTransfers=90</programlisting>
+
+      <programlisting>srmCopyReqThreadPoolSize=90
+remoteGsiftpMaxTransfers=90</programlisting>
 
       <para>
 	Note US-CMS T1 has:
@@ -702,7 +698,7 @@ remoteGsiftpMaxTransfers=2000</programlisting>
       <title>Tomcat/axis deployment</title>
 
       <para>
-	Run 
+	Run
       </para>
 
       <screen>&prompt-root; <userinput>/opt/d-cache/install/install.sh</userinput></screen>
@@ -712,7 +708,7 @@ remoteGsiftpMaxTransfers=2000</programlisting>
       <title>Starting and stopping &srm; domain</title>
 
       <para>
-	 Run 
+	 Run
       </para>
 
       <screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache-core start</userinput></screen>
@@ -722,7 +718,7 @@ remoteGsiftpMaxTransfers=2000</programlisting>
       </para>
 
       <para>
-	 Run 
+	 Run
       </para>
 
       <screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache-core stop</userinput></screen>
@@ -745,7 +741,7 @@ remoteGsiftpMaxTransfers=2000</programlisting>
 	<filename>/opt/d-cache/libexec/apache-tomcat-5.5.20/logs/catalina.out</filename>.
       </para>
     </section>
-  </section>  
+  </section>
 
   <!--
      ##############################################################
@@ -762,15 +758,15 @@ remoteGsiftpMaxTransfers=2000</programlisting>
     </para>
 
     <section>
-      <title>srmSpaceManagerEnabled </title>
+      <title>srmSpaceManagerEnabled</title>
 
       <para>
-	<emphasis>srmSpaceManagerEnabled </emphasis>tells if the space
+	<varname>srmSpaceManagerEnabled</varname> tells if the space
 	management is activated in &srm;.
       </para>
 
       <para>
-	Possible values are <quote>yes</quote> and <quote>no</quote>. Default is <quote>yes</quote>.
+	Possible values are <literal>yes</literal> and <literal>no</literal>. Default is <literal>yes</literal>.
       </para>
 
       <para>
@@ -784,16 +780,17 @@ remoteGsiftpMaxTransfers=2000</programlisting>
       <title>srmImplicitSpaceManagerEnabled</title>
 
       <para>
-	<emphasis>srmImplicitSpaceManagerEnabled </emphasis> tells if
+	<varname>srmImplicitSpaceManagerEnabled</varname> tells if
 	the space should be reserved for &srm; Version 1 transfers and
 	for &srm; Version 2 transfers that have no space token
 	specified. Will have effect only if srmSpaceManagerEnabled.
       </para>
 
       <para>
-	Possible values are <quote>yes</quote> and <quote>no</quote>. This is enabled by
-	default, disabled if srmSpaceManagerEnabled is set to
-	<quote>no</quote>.
+	Possible values are <literal>yes</literal> and
+	<literal>no</literal>. This is enabled by default, disabled if
+	<varname>srmSpaceManagerEnabled</varname> is set to
+	<literal>no</literal>.
       </para>
 
       <para>
@@ -804,38 +801,42 @@ remoteGsiftpMaxTransfers=2000</programlisting>
     </section>
 
     <section>
-      <title>overwriteEnabled </title>
+      <title>overwriteEnabled</title>
 
       <para>
-	<emphasis>overwriteEnabled </emphasis> tells to &srm; and
-	gridftp servers if the overwrite is allowed. If enabled on
-	&srm; node, should be enabled on all gridftp nodes.
+	<varname>overwriteEnabled</varname> tells to &srm; and
+	&gridftp; servers if the overwrite is allowed. If enabled on
+	&srm; node, should be enabled on all &gridftp; nodes.
       </para>
 
       <para>
-	Possible values are <quote>yes</quote> and <quote>no</quote>. Default is <quote>no</quote>.
+	Possible values are <literal>yes</literal> and
+	<literal>no</literal>. Default is <literal>no</literal>.
       </para>
 
       <para>
 	Usage example:
       </para>
-      
+
       <programlisting>overwriteEnabled=yes</programlisting>
     </section>
 
     <section>
-      <title>srmOverwriteByDefault </title>
+      <title>srmOverwriteByDefault</title>
 
       <para>
-	<emphasis>srmOverwriteByDefault </emphasis>Set this to true if
-	you want overwrite to be enabled for &srm; v1.1 interface as
-	well as for &srm; v2.2 interface when client does not specify
-	desired overwrite mode.This option will be considered only if
-	overwriteEnabled is set to yes.
+	<varname>srmOverwriteByDefault</varname> Set this to
+	<literal>true</literal> if you want overwrite to be enabled
+	for &srm; v1.1 interface as well as for &srm; v2.2 interface
+	when client does not specify desired overwrite mode. This
+	option will be considered only if
+	<varname>overwriteEnabled</varname> is set to
+	<literal>yes</literal>.
       </para>
 
       <para>
-	Possible values are <quote>true</quote> and <quote>false</quote>. Default is <quote>false</quote>.
+	Possible values are <literal>true</literal> and
+	<literal>false</literal>. Default is <literal>false</literal>.
       </para>
 
       <para>
@@ -849,59 +850,59 @@ remoteGsiftpMaxTransfers=2000</programlisting>
       <title>srmDatabaseHost</title>
 
       <para>
-	<emphasis>srmDatabaseHost </emphasis>tells to &srm; which
+	<varname>srmDatabaseHost</varname> tells to &srm; which
 	database host to connect to. Do not change unless you know
 	what you are doing.
       </para>
 
       <para>
-	Default value is  <quote>localhost</quote>.
+	Default value is <literal>localhost</literal>.
       </para>
 
       <para>
 	Usage example:
       </para>
 
-      <programlisting>srmDatabaseHost=database.mydomain.org</programlisting>
+      <programlisting>srmDatabaseHost=database-host.example.org</programlisting>
     </section>
 
     <section>
       <title>spaceManagerDatabaseHost</title>
 
       <para>
-	<emphasis>spaceManagerDatabaseHost </emphasis>tells to &srm;
+	<varname>spaceManagerDatabaseHost</varname> tells to &srm;
 	Space Manager which database host to connect to. Do not change
 	unless you know what you are doing.
       </para>
 
       <para>
-	Default value is  <quote>localhost</quote>.	
+	Default value is <literal>localhost</literal>.
       </para>
 
       <para>
 	Usage example:
       </para>
 
-      <programlisting>spaceManagerDatabaseHost=database.mydomain.org</programlisting>
+      <programlisting>spaceManagerDatabaseHost=database-host.example.org</programlisting>
     </section>
 
     <section>
       <title>pinManagerDatabaseHost</title>
       <para>
-	<emphasis>pinManagerDatabaseHost </emphasis> tells to &srm;
-	Pin Manager which database host to connect to. Do not change
+	<varname>pinManagerDatabaseHost</varname> tells to &srm; Pin
+	Manager which database host to connect to. Do not change
 	unless you know what you are doing.
       </para>
 
       <para>
-	Default value is  <quote>localhost</quote>.	
+	Default value is <literal>localhost</literal>.
       </para>
 
       <para>
 	Usage example:
       </para>
 
-      <programlisting>pinManagerDatabaseHost=database.mydomain.org</programlisting>
+      <programlisting>pinManagerDatabaseHost=database-host.example.org</programlisting>
     </section>
 
     <section>
@@ -914,7 +915,7 @@ remoteGsiftpMaxTransfers=2000</programlisting>
       </para>
 
       <para>
-	Default value is  <quote>dcache</quote>.	
+	Default value is  <literal>dcache</literal>.
       </para>
 
       <para>
@@ -928,44 +929,46 @@ remoteGsiftpMaxTransfers=2000</programlisting>
       <title>srmDbUser</title>
 
       <para>
-	<emphasis>srmDbUser </emphasis>tells to &srm; which database
+	<varname>srmDbUser</varname> tells to &srm; which database
 	user name to use when connecting to database. Do not change
 	unless you know what you are doing.
       </para>
 
       <para>
-	Default value is  <quote>srmdcache</quote>.
+	Default value is <literal>srmdcache</literal>.
       </para>
 
       <para>
 	Usage example:
       </para>
+
       <programlisting>srmDbUser=srmdcache</programlisting>
     </section>
 
     <section>
-      <title> srmDbPassword </title>
+      <title>srmDbPassword</title>
+
       <para>
-	<emphasis>srmDbPassword </emphasis> tells to &srm; which
-	database password to use when connecting to database. Do not
-	change unless you know what you are doing.
+	<varname>srmDbPassword</varname> tells to &srm; which database
+	password to use when connecting to database. Do not change
+	unless you know what you are doing.
       </para>
 
       <para>
 	Usage example:
       </para>
 
-      <programlisting>srmDbPassword=*********</programlisting>
+      <programlisting>srmDbPassword=NotVerySecret</programlisting>
     </section>
 
     <section>
       <title>srmPasswordFile</title>
 
       <para>
-	<emphasis> srmPasswordFile </emphasis> tells to &srm; which
+	<varname>srmPasswordFile</varname> tells to &srm; which
 	database password file to use when connecting to database.  Do
 	not change unless you know what you are doing. It is
-	recommended that MD5 authentication method is used.To learn
+	recommended that MD5 authentication method is used. To learn
 	about file format please see <ulink
 	url="http://www.postgresql.org/docs/8.1/static/libpq-pgpass.html"/>. To
 	learn more about authentication methods please visit <ulink
@@ -981,24 +984,25 @@ remoteGsiftpMaxTransfers=2000</programlisting>
       <para>
 	Usage example:
       </para>
-      
+
       <programlisting>srmPasswordFile=/root/.pgpass</programlisting>
     </section>
 
     <section>
       <title>srmJdbsMonitoringLogEnabled</title>
+
       <para>
-	<emphasis> srmJdbsMonitoringLogEnabled </emphasis>
-	srmJdbsMonitoringLogEnabled tells to &srm; to store the
-	history of the &srm; request executions in the database. This
-	option is useful if you are using SRMWatch web monitoring
-	tool. Activation of this option might lead to the increase of
-	the database activity, so if the postgreSQL load generated by
-	&srm; is excessive, disable it.
+	<varname>srmJdbsMonitoringLogEnabled</varname> tells the &srm;
+	to store the history of the &srm; request executions in the
+	database. This option is useful if you are using SRMWatch web
+	monitoring tool. Activation of this option might lead to the
+	increase of the database activity, so if the &psql; load
+	generated by &srm; is excessive, disable it.
       </para>
 
       <para>
-	Possible values are <quote>true</quote> and <quote>false</quote>. Default is <quote>false</quote>.	
+	Possible values are <literal>true</literal> and
+	<literal>false</literal>. Default is <literal>false</literal>.
       </para>
 
       <para>
@@ -1012,16 +1016,17 @@ remoteGsiftpMaxTransfers=2000</programlisting>
       <title>srmDbLogEnabled</title>
 
       <para>
-	<emphasis> srmDbLogEnabled </emphasis>tells to &srm; to store
-	the information about the remote (copy, srmCopy) transfer
-	details in the database. This option is useful if you are
-	using SRMWatch web monitoring tool. Activation of this option
-	might lead to the increase of the database activity, so if the
+	<varname>srmDbLogEnabled</varname> tells to &srm; to store the
+	information about the remote (copy, srmCopy) transfer details
+	in the database. This option is useful if you are using
+	SRMWatch web monitoring tool. Activation of this option might
+	lead to the increase of the database activity, so if the
 	&psql; load generated by &srm; is excessive, diable it.
       </para>
 
       <para>
-	Possible values are <quote>true</quote> and <quote>false</quote>. Default is <quote>false</quote>.
+	Possible values are <literal>true</literal> and
+	<literal>false</literal>. Default is <literal>false</literal>.
       </para>
 
       <para>
@@ -1033,34 +1038,37 @@ remoteGsiftpMaxTransfers=2000</programlisting>
 
     <section>
       <title>srmVersion</title>
+
       <para>
-	<emphasis>srmVersion </emphasis> not used by &srm;, it was
+	<varname>srmVersion</varname> not used by &srm;, it was
 	mentioned that this value us used by some publishing scritps.
       </para>
 
       <para>
-	Default is <quote>version1</quote>.
-      </para>  
+	Default is <literal>version1</literal>.
+      </para>
     </section>
 
     <section>
       <title>pnfsSrmPath</title>
 
       <para>
-	<emphasis>pnfsSrmPath </emphasis> tells to &srm; what is the
-	root of all &srm; paths is in pnfs. &srm; will prepend path to
-	all the local &surl; paths passed to it by &srm; client. So if
-	the pnfsSrmPath is set to
-	<quote>/pnfs/fnal.gov/THISISTHEPNFSSRMPATH</quote> and someone requests the
-	read of srm://srm:8443//file1, &srm; will translate the &surl;
-	path <quote>/file1</quote> into
-	<quote>/pnfs/fnal.gov/THISISTHEPNFSSRMPATH/file1</quote>. Setting this
-	variable to something different from <quote>/</quote> is equivalent of
-	performing Unix chroot for all &srm; operations.
+	<varname>pnfsSrmPath</varname> tells to &srm; what is the root
+	of all &srm; paths is in pnfs. &srm; will prepend path to all
+	the local &surl; paths passed to it by &srm; client. So if the
+	<varname>pnfsSrmPath</varname> is set to
+	<literal>/pnfs/fnal.gov/THISISTHEPNFSSRMPATH</literal> and
+	someone requests the read of
+	<uri>srm://srm.example.org:8443/file1</uri>, &srm; will
+	translate the &surl; path <filename>/file1</filename> into
+	<filename>/pnfs/fnal.gov/THISISTHEPNFSSRMPATH/file1</filename>. Setting
+	this variable to something different from <literal>/</literal>
+	is equivalent of performing Unix <command>chroot</command> for
+	all &srm; operations.
       </para>
 
       <para>
-	Default value is <quote>/</quote>.
+	Default value is <literal>/</literal>.
       </para>
 
       <para>
@@ -1074,17 +1082,17 @@ remoteGsiftpMaxTransfers=2000</programlisting>
       <title>parallelStreams</title>
 
       <para>
-	<emphasis>parallelStreams </emphasis>specifies the number of
-	the parallel streams that &srm; will use when performing third
-	party transfers between this system and remote gsiftp servers,
-	in response to &srm; v1.1 copy or &srm; V2.2 srmCopy
+	<varname>parallelStreams</varname> specifies the number of the
+	parallel streams that &srm; will use when performing third
+	party transfers between this system and remote &gsiftp;
+	servers, in response to &srm; v1.1 copy or &srm; V2.2 srmCopy
 	function. This will have no effect on srmPrepareToPut and
-	srmPrepareToGet command results and parameters of gridftp
+	srmPrepareToGet command results and parameters of &gridftp;
 	transfers driven by the &srm; clients.
       </para>
 
       <para>
-	Default value is <quote>10</quote>.
+	Default value is <literal>10</literal>.
       </para>
 
       <para>
@@ -1098,17 +1106,17 @@ remoteGsiftpMaxTransfers=2000</programlisting>
       <title>srmBufferSize</title>
 
       <para>
-	<emphasis>srmBufferSize </emphasis>specifies the number of
-	bytes to use for the in memory buffers for performing third
-	party transfers between this system and remote gsiftp servers,
-	in response to &srm; v1.1 copy or &srm; V2.2 srmCopy
+	<varname>srmBufferSize</varname> specifies the number of bytes
+	to use for the in memory buffers for performing third party
+	transfers between this system and remote &gsiftp; servers, in
+	response to &srm; v1.1 copy or &srm; V2.2 srmCopy
 	function. This will have no effect on srmPrepareToPut and
-	srmPrepareToGet command results and parameters of gridftp
+	srmPrepareToGet command results and parameters of &gridftp;
 	transfers driven by the &srm; clients.
       </para>
 
       <para>
-	Default value is <quote>1048576</quote>.
+	Default value is <literal>1048576</literal>.
       </para>
 
       <para>
@@ -1122,17 +1130,17 @@ remoteGsiftpMaxTransfers=2000</programlisting>
       <title>srmTcpBufferSize</title>
 
       <para>
-	<emphasis>srmTcpBufferSize </emphasis> specifies the number of
+	<varname>srmTcpBufferSize</varname> specifies the number of
 	bytes to use for the tcp buffers for performing third party
-	transfers between this system and remote gsiftp servers, in
+	transfers between this system and remote &gsiftp; servers, in
 	response to &srm; v1.1 copy or &srm; V2.2 srmCopy
 	function. This will have no effect on srmPrepareToPut and
-	srmPrepareToGet command results and parameters of gridftp
+	srmPrepareToGet command results and parameters of &gridftp;
 	transfers driven by the &srm; clients.
       </para>
 
       <para>
-	Default value is <quote>1048576</quote>.	
+	Default value is <literal>1048576</literal>.
       </para>
 
       <para>
@@ -1146,15 +1154,15 @@ remoteGsiftpMaxTransfers=2000</programlisting>
       <title>srmAuthzCacheLifetime</title>
 
       <para>
-	<emphasis> srmAuthzCacheLifetime </emphasis>specifies the
+	<varname>srmAuthzCacheLifetime</varname> specifies the
 	duration that authorizations will be cached. Caching decreases
 	the volume of messages to the &cell-gplazma; cell or other
 	authorization mechanism.  To turn off caching, set the value
-	to 0.
+	to <literal>0</literal>.
       </para>
-      
+
       <para>
-	Default value is 120.
+	Default value is <literal>120</literal>.
       </para>
 
       <para>
@@ -1169,16 +1177,17 @@ remoteGsiftpMaxTransfers=2000</programlisting>
       <title>srmGetLifeTime, srmPutLifeTime and srmCopyLifeTime</title>
 
       <para>
-	<emphasis>srmGetLifeTime, srmPutLifeTime and
-	srmCopyLifeTime</emphasis> specify the lifetimes of the
-	srmPrepareToGet (srmBringOnline) srmPrepareToPut and srmCopy
-	requests lifetimes in millisecond. If the system is unable to
-	fulfill the requests before the request lifetimes expire, the
-	requests are automatically garbage collected.
+	<varname>srmGetLifeTime</varname>,
+	<varname>srmPutLifeTime</varname> and
+	<varname>srmCopyLifeTime</varname> specify the lifetimes of
+	the srmPrepareToGet (srmBringOnline) srmPrepareToPut and
+	srmCopy requests lifetimes in millisecond. If the system is
+	unable to fulfill the requests before the request lifetimes
+	expire, the requests are automatically garbage collected.
       </para>
-      
+
       <para>
-	Default value is <quote>14400000</quote> (4 hours)
+	Default value is <literal>14400000</literal> (4 hours)
       </para>
 
       <para>
@@ -1194,19 +1203,20 @@ srmCopyLifeTime=14400000</programlisting>
       <title>srmGetReqMaxReadyRequests, srmPutReqMaxReadyRequests, srmGetReqReadyQueueSize and srmPutReqReadyQueueSize </title>
 
       <para>
-	<emphasis>    
-	  srmGetReqMaxReadyRequests and srmPutReqMaxReadyRequests
-	  </emphasis> specify the maximum number of the files for
-	  which the transfer urls will be be computed and given to the
-	  users in responce to &srm; get (srmPrepareToGet) and put
-	  (srmPrepareToPut) requests. The rest of the files that are
-	  ready to be transfered are put on the <quote>Ready</quote> queues, the
-	  maximum length of these queues are controlled by <emphasis>
-	  srmGetReqReadyQueueSize and srmPutReqReadyQueueSize
-	  </emphasis> parameters. These parameters should be set
-	  according to the capacity of the system, and are usually
-	  greater than the maximum number of the gridftp transfers
-	  that this &dcache; instance gridftp doors can sustain.
+	<varname>srmGetReqMaxReadyRequests</varname> and
+	<varname>srmPutReqMaxReadyRequests</varname> specify the
+	maximum number of the files for which the transfer &url;s will
+	be be computed and given to the users in responce to &srm; get
+	(srmPrepareToGet) and put (srmPrepareToPut) requests. The rest
+	of the files that are ready to be transfered are put on the
+	<literal>Ready</literal> queues, the maximum length of these
+	queues are controlled by
+	<varname>srmGetReqReadyQueueSize</varname> and
+	<varname>srmPutReqReadyQueueSize</varname> parameters. These
+	parameters should be set according to the capacity of the
+	system, and are usually greater than the maximum number of the
+	&gridftp; transfers that this &dcache; instance &gridftp;
+	doors can sustain.
       </para>
 
       <para>
@@ -1223,13 +1233,13 @@ srmPutReqMaxReadyRequests=1000</programlisting>
       <title>srmCopyReqThreadPoolSize and remoteGsiftpMaxTransfers</title>
 
       <para>
-	<emphasis>srmCopyReqThreadPoolSize and
-	remoteGsiftpMaxTransfers.  </emphasis>
+	<varname>srmCopyReqThreadPoolSize</varname> and
+	<varname>remoteGsiftpMaxTransfers</varname>.
 	srmCopyReqThreadPoolSize is used to specify how many parallel
 	srmCopy file copies to execute simultaneously. Once the this
 	&srm; contacted remote &srm; system, and obtained a Transfer
 	&url; (usually &gsiftp; &url;), it contact a Copy Manager
-	module (Usually RemoteGsiftpTransferManager), and asks it to
+	module (usually RemoteGsiftpTransferManager), and asks it to
 	perform a &gridftp; transfer between remote &gridftp; server
 	and a &dcache; pool. The maximum number of the simultaneous
 	transfers that RemoteGsiftpTransferManager will support is
@@ -1250,16 +1260,16 @@ remoteGsiftpMaxTransfers=260</programlisting>
       <title>srmCustomGetHostByAddr</title>
 
       <para>
-	<emphasis>srmCustomGetHostByAddr</emphasis>
+	<varname>srmCustomGetHostByAddr</varname>
 	srmCustomGetHostByAddr enables using the BNL developed
-	procedure for host by ip resolution if standard InetAddress
+	procedure for host by IP resolution if standard InetAddress
 	method failed.
       </para>
 
       <para>
 	Usage example:
       </para>
-      
+
       <programlisting>srmCustomGetHostByAddr=true</programlisting>
     </section>
 
@@ -1267,13 +1277,13 @@ remoteGsiftpMaxTransfers=260</programlisting>
       <title>RecursiveDirectoryCreation</title>
 
       <para>
-	<emphasis> RecursiveDirectoryCreation </emphasis> allows or
+	<varname>RecursiveDirectoryCreation</varname> allows or
 	disallows automatic creation of directories via &srm;,
 	allow=true, disallow=false.
       </para>
 
       <para>
-	Automatic directory creation is allowed by default.	
+	Automatic directory creation is allowed by default.
       </para>
 
       <para>
@@ -1299,11 +1309,11 @@ remoteGsiftpMaxTransfers=260</programlisting>
 
       <para>
 	Space Manager is making reservations agains space in
-	LinkGroups, LinkGroup is an object created by the &cell-poolmngr;,
-	that consists of several "Links". The total space available in
-	the given LinkGroup is a sum of available spaces in all
-	links.An available space in each link is a sum of the
-	available spaces in all pools assinged to a given
+	LinkGroups, LinkGroup is an object created by the
+	&cell-poolmngr;, that consists of several Links. The total
+	space available in the given LinkGroup is a sum of available
+	spaces in all links. The available space in each link is a sum
+	of the available spaces in all pools assinged to a given
 	link. Therefore for the space reservation to work correctly it
 	is essential that each pool belongs to one and only one link,
 	and each link belongs to only one LinkGroup. LinkGroups are
@@ -1315,6 +1325,7 @@ remoteGsiftpMaxTransfers=260</programlisting>
 
     <section>
       <title>Definition of the LinkGroups in the PoolManager.conf</title>
+
       <para>
 	To configure &cell-poolmngr; to create the new LinkGroup (a new
 	reservable entity in &dcache;), please use following example
@@ -1350,6 +1361,7 @@ remoteGsiftpMaxTransfers=260</programlisting>
 
     <section>
       <title>Activating &srm; Space Manager</title>
+
       <para>
 	In order to enable the new space reservation: add (uncomment)
 	the following definition in <filename>dCacheSetup</filename>
@@ -1367,18 +1379,19 @@ remoteGsiftpMaxTransfers=260</programlisting>
 	<para>
 	  If space reservation request does not specify retention
 	  policy we will assign
-	  <emphasis>SpaceManagerDefaultRetentionPolicy </emphasis>
+	  <varname>SpaceManagerDefaultRetentionPolicy</varname>
 	  retention policy by default.
 	</para>
 
 	<para>
-	  Possible values are REPLICA, OUTPUT and CUSTODIAL.
+	  Possible values are <literal>REPLICA</literal>,
+	  <literal>OUTPUT</literal> and <literal>CUSTODIAL</literal>.
 	</para>
 
 	<para>
 	  Usage example:
 	</para>
-	
+
 	<programlisting>SpaceManagerDefaultRetentionPolicy=CUSTODIAL</programlisting>
       </section>
 
@@ -1387,12 +1400,14 @@ remoteGsiftpMaxTransfers=260</programlisting>
 
 	<para>
 	  If space reservation request does not specify access latency
-	  we will assign <emphasis> SpaceManagerDefaultAccessLatency
-	  </emphasis> this access latency by default.
+	  we will assign
+	  <varname>SpaceManagerDefaultAccessLatency</varname> this
+	  access latency by default.
 	</para>
 
 	<para>
-	  Possible values are ONLINE  and NEARLINE.
+	  Possible values are <literal>ONLINE</literal> and
+	  <literal>NEARLINE</literal>.
 	</para>
 
 	<para>
@@ -1405,15 +1420,16 @@ remoteGsiftpMaxTransfers=260</programlisting>
 	<title>SpaceManagerReserveSpaceForNonSRMTransfers</title>
 	<para>
 	  If
-	  <emphasis>SpaceManagerReserveSpaceForNonSRMTransfers</emphasis>
-	  is set to true, and if the transfer request come from the
-	  door, and there was not prior space reservation made for
-	  this file,Space Manager will try to reserve space before
-	  satisfying the request.
+	  <varname>SpaceManagerReserveSpaceForNonSRMTransfers</varname>
+	  is set to <literal>true</literal>, and if the transfer
+	  request come from the door, and there was not prior space
+	  reservation made for this file, Space Manager will try to
+	  reserve space before satisfying the request.
 	</para>
 
 	<para>
-	  Possible values are true and false.
+	  Possible values are <literal>true</literal> and
+	  <literal>false</literal>.
 	</para>
 
 	<para>
@@ -1427,9 +1443,9 @@ remoteGsiftpMaxTransfers=260</programlisting>
 	<title>SpaceManagerLinkGroupAuthorizationFileName</title>
 
 	<para>
-	  <emphasis>SpaceManagerLinkGroupAuthorizationFileName
-	  </emphasis> specifies a file that contains the list of FQANs
-	  that are allowed to make space reservations in a given link
+	  <varname>SpaceManagerLinkGroupAuthorizationFileName</varname>
+	  specifies a file that contains the list of FQANs that are
+	  allowed to make space reservations in a given link
 	  group. The file syntax is described in the next section.
 	</para>
 
@@ -1451,34 +1467,36 @@ remoteGsiftpMaxTransfers=260</programlisting>
      <title>Implicit Space Reservations</title>
 
       <para>
-	As it was described in <xref linkend="cf-srm-intro"/>, &dcache;
-	can perform implicit space reservations for &srm; Version 1
-	data transfers and for &srm; Version 2.2 data transfers that
-	are not given the space token explicitly. The parameter that
-	enables this behavior is srmImplicitSpaceManagerEnabled, which
-	is described in <xref linkend="cf-srm-expert-config"/>. In
-	case of &srm; version 1.1 data transfers, when the Access
-	Latency and Retention Policy cannot be specified, and in case
-	of &srm; V2.2 clients, when Access Latency and Retention
-	Policy are not specified, the default values will be
-	used. First &srm; will attempt to use the values of
-	"AccessLatency" and "RetentionPolicy" tags from PNFS namespace
-	from the directory to which a file is being written. If the
-	tags are present, then the values of Access Latency and
-	Retention Policy will be set on basis of the system wide
-	defaults, which are controlled by
-	SpaceManagerDefaultRetentionPolicy and
-	SpaceManagerDefaultAccessLatency variables in dCacheSetup;
-	these variable are described in details in the previous
-	section "SRM Space Manager Parameters in dCacheSetup".
+	As it was described in <xref linkend="cf-srm-intro"/>,
+	&dcache; can perform implicit space reservations for &srm;
+	Version 1 data transfers and for &srm; Version 2.2 data
+	transfers that are not given the space token explicitly. The
+	parameter that enables this behavior is
+	<varname>srmImplicitSpaceManagerEnabled</varname>, which is
+	described in <xref linkend="cf-srm-expert-config"/>. In case
+	of &srm; version 1.1 data transfers, when the Access Latency
+	and Retention Policy cannot be specified, and in case of &srm;
+	V2.2 clients, when Access Latency and Retention Policy are not
+	specified, the default values will be used. First &srm; will
+	attempt to use the values of <literal>AccessLatency</literal>
+	and <literal>RetentionPolicy</literal> tags from the directory
+	to which a file is being written. If the tags are present,
+	then the Access Latency and Retention Policy will be set on
+	basis of the system wide defaults, which are controlled by
+	<varname>SpaceManagerDefaultRetentionPolicy</varname> and
+	<varname>SpaceManagerDefaultAccessLatency</varname> variables
+	in dCacheSetup; these variable are described in details in the
+	previous section "SRM Space Manager Parameters in
+	dCacheSetup".
+	<!-- TODO better link here -->
       </para>
 
       <para>
-	If you have a direct access to pnfs namespace, you can check
-	if the AccessLatency and RetentionPolicy tags are present by
+	If you have a direct access to the namespace, you can check if
+	the AccessLatency and RetentionPolicy tags are present by
 	using the following commands:
       </para>
-      
+
       <screen>&prompt-root; <userinput>cd <replaceable>pnfsDir</replaceable></userinput>
 &prompt-root; <userinput>cat ".(tags)()"</userinput>
 .(tag)(OSMTemplate)
@@ -1486,7 +1504,7 @@ remoteGsiftpMaxTransfers=260</programlisting>
 .(tag)(storage_group)
 .(tag)(AccessLatency)
 .(tag)(RetentionPolicy)</screen>
-     
+
       <para>
 	If the output contains the lines saying
 	<literal>(tag)(AccessLatency)</literal> and
@@ -1507,9 +1525,11 @@ remoteGsiftpMaxTransfers=260</programlisting>
 &prompt-root; <userinput>echo  <replaceable>"New Retention Policy"</replaceable> > ".(tag)(RetentionPolicy)"</userinput></screen>
 
       <para>
-	The valid AccessLatency Values are "ONLINE" and "NEARLINE",
-	valid RetentionLatency Values are "REPLICA", "OUTPUT" and
-	"CUSTODIAL".
+	The valid <literal>AccessLatency</literal> values are
+	<literal>ONLINE</literal> and <literal>NEARLINE</literal>,
+	valid <literal>RetentionLatency</literal> values are
+	<literal>REPLICA</literal>, <literal>OUTPUT</literal> and
+	<literal>CUSTODIAL</literal>.
       </para>
 
       <para>
@@ -1528,7 +1548,7 @@ remoteGsiftpMaxTransfers=260</programlisting>
      #            SRM Space Manager VO bases Access control      #
      ##############################################################
    -->
-   
+
     <section id="cf-srm-space-ac">
     <title>&srm; Space Manager Virtual Organization based access control configuration</title>
 
@@ -1545,23 +1565,27 @@ remoteGsiftpMaxTransfers=260</programlisting>
       <itemizedlist>
 	<listitem>
 	  <para>
-	    User needs to be registered with the VO
+	    User needs to be registered with the VO.
 	  </para>
 	</listitem>
+
 	<listitem>
 	  <para>
-	    User needs to use voms-proxy-init to create a vo proxy
+	    User needs to use <command>voms-proxy-init</command> to
+	    create a vo proxy.
 	  </para>
 	</listitem>
+
 	<listitem>
 	  <para>
 	    &dcache; needs to use &cell-gplazma; and not
-	    &cell-gplazma; with dcache.kpwd plugin, but other modules
-	    that know how to extract VO attributes from the
-	    proxy. (see <xref linkend="cf-gplazma"/>, have a look at
-	    gplazmalite-vorole-mapping Plugin).
+	    &cell-gplazma; with <literal>dcache.kpwd</literal> plugin,
+	    but other modules that know how to extract VO attributes
+	    from the proxy. (see <xref linkend="cf-gplazma"/>, have a
+	    look at <literal>gplazmalite-vorole-mapping</literal>
+	    plugin.
 	  </para>
-	</listitem> 
+	</listitem>
       </itemizedlist>
 
       <para>
@@ -1571,37 +1595,40 @@ remoteGsiftpMaxTransfers=260</programlisting>
 
       <para>
 	If a client uses a regular grid proxy, created with
-	grid-proxy-init, and not a Virtual Organization (VO) proxy,
-	which is created with the voms-proxy-init, when he is
-	communicating with &srm; server in &dcache;, then the VO
-	attributes can not be extracted its
-	credential. voms-proxy-init adds a Fully Qualified Attribute
-	Name (FQAN) section(s) to the grid proxy, which contain
-	informaton about user's VO membership, in particular it
-	contain VO Group name and VO Role that the client intends to
-	play at this time. In this case the name of the user is
-	extracted on basis of the direct Distinguished Name (DN) to
-	use name mapping. For the purposes of the space reservation
-	the name of the user is used as its VO Group name, and the VO
-	Role is left empty.
+	<command>grid-proxy-init</command>, and not a Virtual
+	Organization (VO) proxy, which is created with the
+	<command>voms-proxy-init</command>, when he is communicating
+	with &srm; server in &dcache;, then the VO attributes can not
+	be extracted its
+	credential. <command>voms-proxy-init</command> adds a Fully
+	Qualified Attribute Name (FQAN) section(s) to the grid proxy,
+	which contain informaton about user's VO membership, in
+	particular it contain VO Group name and VO Role that the
+	client intends to play at this time. In this case the name of
+	the user is extracted on basis of the direct Distinguished
+	Name (DN) to use name mapping. For the purposes of the space
+	reservation the name of the user is used as its VO Group name,
+	and the VO Role is left empty.
       </para>
     </section>
 
     <section>
-      <title> VO based Access Control configuration</title>
+      <title>VO based Access Control configuration</title>
 
       <para>
 	&dcache; Space Reservation Functionality Access Control is
 	currently performed at the level of the LinkGroups. The access
 	to making reservations in each LinkGroup is controlled by the
-	<emphasis> SpaceManagerLinkGroupAuthorizationFile </emphasis>.
+	<varname>SpaceManagerLinkGroupAuthorizationFile</varname>
+	property.
       </para>
 
       <section>
-	<title> SpaceManagerLinkGroupAuthorizationFile syntax </title>
+	<title>SpaceManagerLinkGroupAuthorizationFile syntax </title>
 
 	<para>
-	  <emphasis> SpaceManagerLinkGroupAuthorizationFile</emphasis>
+	  The file described by
+	  <varname>SpaceManagerLinkGroupAuthorizationFile</varname>
 	  has following syntax:
 	</para>
 
@@ -1624,16 +1651,16 @@ remoteGsiftpMaxTransfers=260</programlisting>
 	<programlisting>SpaceManagerLinkGroupAuthorizationFileName=<replaceable>FILENAME</replaceable></programlisting>
 
 	<para>
-	  in the dCacheSetup 
-	</para> 
+	  in the dCacheSetup
+	</para>
 
       </section>
 
       <section>
 	<title>Example of the SpaceManagerLinkGroupAuthorizationFile </title>
-	
+
 	<programlisting># this is comment and is ignored
-	 
+
 LinkGroup LFSOnly-LinkGroup
 /atlas/Role=/atlas/role1
 
@@ -1653,10 +1680,10 @@ LinkGroup default-LinkGroup
 	  url="http://trac.dcache.org/trac.cgi/wiki/manuals/index">
 	  &dcache; WIKI documentation pages </ulink>.
 	</para>
-      </section> 
-      
+      </section>
+
     </section>
-    
+
     </section>
 
 
@@ -1666,7 +1693,7 @@ LinkGroup default-LinkGroup
      #            SRMWatch, SRM Monitoring Tool                   #
      ##############################################################
    -->
-   
+
    <section id="cf-srm-monitor">
     <title>SRMWatch, &srm; Monitoring Tool</title>
 
@@ -1685,7 +1712,7 @@ LinkGroup default-LinkGroup
 	    Install JDK1.5
 	  </para>
 	</listitem>
-	
+
 	<listitem>
 	  <para>
 	    Download, install and start latest tomcat 5.5 from
@@ -1693,63 +1720,63 @@ LinkGroup default-LinkGroup
 	    </ulink>
 	  </para>
 	</listitem>
-	
+
 	<listitem>
 	  <para>
 	    Download srmwatch RPM from <ulink
 	    url="http://www.dcache.org"/>.
 	  </para>
 	</listitem>
-	
+
 	<listitem>
 	  <para>
 	    Install RPM. Installation can be performed using this
 	    command:
 	  </para>
-	  
+
 	  <screen>&prompt-root; <userinput>rpm -Uvh srmwatch-1.0-0.i386.rpm</userinput></screen>
 	</listitem>
-	
+
 	<listitem>
 	  <para>
 	    Edit configuration file
 	    <filename>/opt/d-cache/srmwatch-1.0/WEB-INF/web.xml</filename>
 	    in the line saying:
 	  </para>
-	  
+
 	  <programlisting>&lt;param-value&gt;jdbc:postgresql://localhost/dcache&lt;/param-value&gt;</programlisting>
-	  
+
 	  <para>
 	    Make sure that the localhost is in jdbc url substitutes
 	    with &srm; database host name. For example:
 	  </para>
-	  
+
 	  <programlisting>&lt;param-value&gt;jdbc:postgresql://fledgling06.fnal.gov/dcache&lt;/param-value&gt;</programlisting>
 	</listitem>
-	
+
 	<listitem>
 	  <para>
 	    Execute
 	  </para>
-	  
+
 	  <screen>&prompt-root; <userinput>export CATALINA_HOME=<replaceable>YOUR_TOMCAT_LOCATION</replaceable></userinput></screen>
 	</listitem>
-	
+
 	<listitem>
 	  <para>
 	    Execute
 	  </para>
-	  
+
 	  <screen>&prompt-root; <userinput>/opt/d-cache/srmwatch-1.0/deploy_srmwatch</userinput></screen>
 	</listitem>
-	
+
 	<listitem>
 	  <para>
 	    &srm; Monitoring page should be visible at
 	    http://<replaceable>srm-monitoring-node</replaceable>:8080/srmwatch/
 	  </para>
 	</listitem>
-      </itemizedlist>  
+      </itemizedlist>
     </section>
 
 
