@@ -64,7 +64,7 @@
     </listitem>
   </itemizedlist>
 
-  <!-- TODO 
+  <!-- TODO
   <section id="cf-hopping-config">
     <title>File Hopping by configuration</title>
 
@@ -151,7 +151,7 @@
     <section>
       <title>File mode of replicated files</title>
 
-      <para>   
+      <para>
 	The mode of a replicated file can either be determined by
 	settings in the destination pool or by the &cell-hopmngr;.
       </para>
@@ -184,7 +184,7 @@
 
     <section>
       <title>File Hopping managed by the PoolManager</title>
-      <para>   
+      <para>
 	File hopping configuration instructs a pool to send a
 	'replicateFile' request to the &cell-poolmngr; as the result
 	of a file arriving on that pool from some external client. All
@@ -192,7 +192,7 @@
 	will process this request by trying to find a 'link' with the
 	following attributes :
       </para>
-    
+
       <table>
 	<title>&cell-poolmngr; Hopping Request Attributes</title>
 
@@ -210,7 +210,7 @@
 	    </row>
 	  </thead>
 	  <tbody>
-	    <row> 
+	    <row>
 	      <entry>Pool 2 Pool</entry>
 	      <entry>dCap/3</entry>
 	      <entry>Class of file</entry>
@@ -218,15 +218,15 @@
 	    </row>
 	  </tbody>
 	</tgroup>
-      </table>      
-      
+      </table>
+
       <para>
 	In order to get pool 2 pool enabled for a particular pool, the
 	corresponding entry of that pool in the
 	<filename>XXX.poollist</filename> file has to be extended by
 	the replicateOnArrival key-value pair.
       </para>
-	
+
       <screen><command><replaceable>PoolName</replaceable> <replaceable>PoolPath</replaceable>  replicateOnArrival=PoolManager,<replaceable>ip-number</replaceable> ... </command></screen>
 
       <para>
@@ -247,91 +247,94 @@
 
     <section>
       <title>Example for File Hopping by the PoolManager only</title>
+
       <para>
 	We assume that we want of have all files, arriving on pool
-	'ocean' of host 'earth' to be immediately replicated to a
-	subset of read pools. This subset of pools is described by
-	pool group 'ocean-copies'. No other pool is member of pool
-	group 'ocean-copies'. Other than that, files arriving at pool
-	'mountain' should be replicated to all read pools from which
-	farm nodes on the 131.169.10 subnet are allowed to read.
+	<literal>ocean</literal> of host <systemitem
+	class='systemname'>earth</systemitem> to be immediately
+	replicated to a subset of read pools. This subset of pools is
+	described by pool group <literal>ocean-copies</literal>. No
+	other pool is member of pool group
+	<literal>ocean-copies</literal>. Other than that, files
+	arriving at pool <literal>mountain</literal> should be
+	replicated to all read pools from which farm nodes on the
+	<systemitem class='ipaddress'>131.169.10.0/24</systemitem>
+	subnet are allowed to read.
       </para>
 
       <para>
 	The <filename>earth.poollist</filename> file must be modified as followes.
       </para>
 
-      <screen>       ...
-       ocean     /bigdisk/pools/ocean     replicateOnArrival=PoolManager,192.1.1.1    <replaceable>more options</replaceable>
-       mountain  /bigdisk/pools/mountain  replicateOnArrival=PoolManager,131.169.10.1 <replaceable>more options</replaceable>
-       ...</screen>
+      <screen>ocean     /bigdisk/pools/ocean     replicateOnArrival=PoolManager,192.1.1.1    <replaceable>more options</replaceable>
+mountain  /bigdisk/pools/mountain  replicateOnArrival=PoolManager,131.169.10.1 <replaceable>more options</replaceable></screen>
 
        <para>
-	 While 131.169.10.1 is a legal ip address e.g. of one of you
-	 farm nodes, the 192.1.1.1 ip number must not exist anywhere
-	 at your site.
+	 While <systemitem class='ipaddress'>131.169.10.1</systemitem>
+	 is a legal IP address e.g. of one of you farm nodes, the
+	 <systemitem class='ipaddress'>192.1.1.1</systemitem> IP
+	 address must not exist anywhere at your site.
        </para>
 
        <para>
 	 Add the following lines to the
 	 <filename>PoolManager.conf</filename> in order to instruct
 	 the &cell-poolmngr; to replicate files, arriving at the
-	 'ocean' pool to be replicated to the 'ocean-copies' subset of
-	 your read pools.
+	 <literal>ocean</literal> pool to be replicated to the
+	 <literal>ocean-copies</literal> subset of your read pools.
        </para>
 
-    <screen>    #
-    #  define the read-pools pool group and add pool members
-    #
-    psu create pgroup farm-read-pools
-    #
-    psu addto pgroup farm-read-pools read-pool-1
-    psu addto pgroup farm-read-pools read-pool-2
-    psu addto pgroup farm-read-pools read-pool-3
-    psu addto pgroup farm-read-pools read-pool-4
-    ...
-    #
-    psu create unit -net 131.169.10.0/255.255.255.0
-    #
-    psu create ugroup farm-network
-    #
-    psu addto ugroup farm-network  131.169.10.0/255.255.255.0
-    #
-    psu create link farm-read-link any-store any-protocol farm-network
-    #
-    psu addto link farm-read-link farm-read-pools
-    #
-    psu set link farm-read-link -p2ppref=100 -readpref=100 -writepref=0 -cachepref=XXX...
-    #
-    #
-    #--------------------------------------------------------------
-    #
-    # create the faked net unit
-    #
-    psu create unit -net 192.1.1.1/255.255.255.255
-    #
-    psu create ugroup ocean-copy-network
-    #
-    psu addto ugroup ocean-copy-network  192.1.1.1/255.255.255.255
-    #
-    # we assume that 'any-protocol' and 'any-store' is already defined.
-    #
-    psu create link ocean-copy-link any-store any-protocol ocean-copy-network
-    #
-    psu addto link ocean-copy-link ocean-copy-pools
-    #
-    #  define the ocean-copy pool group and add pool members
-    #
-    psu create pgroup ocean-copy-pools
-    #
-    psu addto pgroup ocean-copy-pools  read-pool-1
-    ...
-    #
-    psu set link ocean-copy-link -p2ppref=100 -readpref=100 -writepref=0 -cachepref=XXX...
-    #
-    #
-    #
-    #</screen>
+    <screen>#
+#  define the read-pools pool group and add pool members
+#
+psu create pgroup farm-read-pools
+#
+psu addto pgroup farm-read-pools read-pool-1
+psu addto pgroup farm-read-pools read-pool-2
+psu addto pgroup farm-read-pools read-pool-3
+psu addto pgroup farm-read-pools read-pool-4
+
+#
+psu create unit -net 131.169.10.0/255.255.255.0
+#
+psu create ugroup farm-network
+#
+psu addto ugroup farm-network  131.169.10.0/255.255.255.0
+#
+psu create link farm-read-link any-store any-protocol farm-network
+#
+psu addto link farm-read-link farm-read-pools
+#
+psu set link farm-read-link -p2ppref=100 -readpref=100 -writepref=0 -cachepref=XXX...
+#
+#
+#--------------------------------------------------------------
+#
+# create the faked net unit
+#
+psu create unit -net 192.1.1.1/255.255.255.255
+#
+psu create ugroup ocean-copy-network
+#
+psu addto ugroup ocean-copy-network  192.1.1.1/255.255.255.255
+#
+# we assume that 'any-protocol' and 'any-store' is already defined.
+#
+psu create link ocean-copy-link any-store any-protocol ocean-copy-network
+#
+psu addto link ocean-copy-link ocean-copy-pools
+#
+#  define the ocean-copy pool group and add pool members
+#
+psu create pgroup ocean-copy-pools
+#
+psu addto pgroup ocean-copy-pools  read-pool-1
+#
+psu set link ocean-copy-link -p2ppref=100 -readpref=100 -writepref=0 -cachepref=XXX...
+#
+#
+#
+#</screen>
 
     </section>
 
@@ -428,7 +431,7 @@
         <screen>           ...
            ocean     /bigdisk/pools/ocean     replicateOnArrival=HoppingManager  <replaceable>more options</replaceable>
            ...</screen>
-     
+
       </section>
 
       <section>
@@ -565,7 +568,7 @@
 	<para>
 	  <command>source</command> Don't use.
 	</para>
-	
+
 	<para>
 	  <command>host, protType</command> This is the 'host ip
 	  number' and 'protocol type'used by the PoolManager in order
