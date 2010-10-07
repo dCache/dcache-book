@@ -243,7 +243,7 @@ create diskCacheV111.hsmControl.flush.HsmFlushControlManager <replaceable>FlushM
 	    details on configuration and usage.
 	  </para>
 	</listitem>
-      </itemizedlist> 
+      </itemizedlist>
     </section>
   </section>
 
@@ -260,7 +260,7 @@ create diskCacheV111.hsmControl.flush.HsmFlushControlManager <replaceable>FlushM
       pools to not allow transfers to clients but doing pool to pool
       transfers first.
     </para>
-    
+
     <section>
       <title>Configuration</title>
 
@@ -364,7 +364,7 @@ create diskCacheV111.hsmControl.flush.HsmFlushControlManager <replaceable>FlushM
 	    </row>
 	  </tbody>
 	</tgroup>
-      </table> 
+      </table>
     </section>
 
     <section>
@@ -407,7 +407,7 @@ create diskCacheV111.hsmControl.flush.HsmFlushControlManager <replaceable>FlushM
 	  hardware unit complies with these contrains.
 	</para>
 
-	<para>       
+	<para>
 	  The hardware unit, a pool belongs to, is set by the
 	  'tag.hostname' field in the
 	  <filename>config/<replaceable>hostname</replaceable></filename>
@@ -455,7 +455,7 @@ create diskCacheV111.hsmControl.flush.HsmFlushControlManager <replaceable>FlushM
         results in overflowing write pools.
       </para>
      </section>
-     
+
      <section>
        <title>Driver interactions with the flush web portal or the GUI</title>
 
@@ -512,26 +512,24 @@ create diskCacheV111.hsmControl.flush.HsmFlushControlManager <replaceable>FlushM
        </para>
      </section>
    </section>
-     
+
    <section id="cf-gui">
      <title>Setting up and using the flush control web pages.</title>
+
      <para>
        In order to keep track on the flush activities the flush
        control web pages need to be activated. Add a new <literal>set
-       alias</literal>directive somewhere between the <command>define
+       alias</literal> directive somewhere between the <command>define
        context httpdSetup endDefine</command> and the
        <command>endDefine</command> command in the
        <filename>/opt/d-cache/config/httpd.batch</filename> file.
      </para>
-       
-     <programlisting>   define context httpdSetup endDefine
-             ***
-             
-           set alias flushManager class diskCacheV111.hsmControl.flush.HttpHsmFlushMgrEngineV1 mgr=<replaceable>FlushManagerName</replaceable>
-          
-             ***
-             
-       endDefine</programlisting>
+
+     <programlisting>define context httpdSetup endDefine
+...
+set alias flushManager class diskCacheV111.hsmControl.flush.HttpHsmFlushMgrEngineV1 mgr=<replaceable>FlushManagerName</replaceable>
+...
+endDefine</programlisting>
 
      <para>
        Additional flush managers may just be added to this command,
@@ -574,9 +572,9 @@ create diskCacheV111.hsmControl.flush.HsmFlushControlManager <replaceable>FlushM
 	 check the information on the individual driver how far this
 	 is supported.
        </para>
-     </warning>  
+     </warning>
    </section>
-   
+
    <section id="cf-flushing-examples">
      <title>Examples</title>
 
@@ -601,7 +599,7 @@ psu addto pgroup flushPoolGroup migration-pool-1
 psu addto pgroup flushPoolGroup migration-pool-2
 #</programlisting>
 
-       </blockquote>  
+       </blockquote>
 
        <blockquote>
 	 <title>Setting up the central flush batch file.</title>
@@ -611,7 +609,7 @@ psu addto pgroup flushPoolGroup migration-pool-2
 	   <filename>/opt/d-cache/config/hsmcontrol.batch</filename>
 	   with the following content :
 	 </para>
-        
+
 	 <programlisting>#
 set printout default 3
 set printout CellGlue none
@@ -648,8 +646,8 @@ create diskCacheV111.hsmControl.flush.HsmFlushControlManager FlushManager  \
 	  the central service run
 	</para>
 
-	<programlisting>	  cd /opt/d-cache/jobs
-       ./hsmcontrol start</programlisting>
+	<screen>cd /opt/d-cache/jobs
+./hsmcontrol start</screen>
 
         <para>
 	  This setup will produce quite some output in
@@ -657,8 +655,8 @@ create diskCacheV111.hsmControl.flush.HsmFlushControlManager FlushManager  \
 	  output level if this is not required.
 	</para>
 
-	<programlisting>set printout default errors</programlisting>
-       </blockquote>   
+	<screen>set printout default errors</screen>
+       </blockquote>
 
        <blockquote>
 	 <title>Setting up the driver properties file</title>

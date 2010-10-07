@@ -271,12 +271,12 @@ create diskCacheV111.cells.WebCollectorV3 collector \
       content:
     </para>
 
-    <screen>/var/log/*Domain.log {
+    <programlisting>/var/log/*Domain.log {
     compress
     rotate 100
     missingok
     copytruncate
-}</screen>
+}</programlisting>
 
     <para>
       The files
@@ -468,7 +468,7 @@ lm</screen>
         domain topology. If it is running, it can be used to obtain the list of
         domains the following way:
     </para>
-    
+
     <screen>&dc-prompt-local; <userinput>cd topo</userinput>
 &dc-prompt-topo; <userinput>ls</userinput>
 dirDomain
