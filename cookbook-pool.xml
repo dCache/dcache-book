@@ -742,21 +742,50 @@ Running tasks:
       Even if the pool contains precious files, this is no problem, since
       we will register them again in a moment. The files might not be available
       for a short moment, though.
-      Log out of the pool, and stop the service:
+      Log out of the pool, and stop the domain running the pool:
 
-<screen>&prompt-root; <userinput>jobs/pool<footnote>
-            <para>
-              Filenames will always be relative to the &dcache; installation
-              directory, which defaults to
-              <filename>/opt/d-cache/</filename>.
-            </para>
-      </footnote> -pool=<replaceable>poolDomainName</replaceable> stop</userinput></screen>
+<screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache stop <replaceable>poolDomain</replaceable></userinput>
+Stopping <replaceable>poolDomain</replaceable> (pid=6070) 0 1 2 3 done
+&prompt-root;</screen>
 
-      Rename the pool in the
-      <filename><replaceable>poolDomain</replaceable>.poollist</filename>-file.
-      Restart the service:
+      <para>
+      Adapt the name of the pool in the layout files of your dCache installation
+      to include your new pool-name. For a general overview of layout-files see
+      <xref linkend="in-install-layout" />.
+      </para>
+      <informalexample>
+      <para>
+      For example, to rename a pool from
+      <literal>swimmingPool</literal> to <literal>carPool</literal>, change
+      your layout file from
+      </para>
 
-<screen>&prompt-root; <userinput>jobs/pool -pool=<replaceable>poolDomainName</replaceable> -logfile=<replaceable>dCacheLocation</replaceable>/log/<replaceable>poolDomainName</replaceable>Domain.log start</userinput></screen>
+      <programlisting>[<replaceable>poolDomain</replaceable>]
+[<replaceable>poolDomain</replaceable>/pool]
+name=swimmingPool
+path=/pool/</programlisting>
+
+      <para>
+      to
+      </para>
+
+      <programlisting>[<replaceable>poolDomain</replaceable>]
+[<replaceable>poolDomain</replaceable>/pool]
+name=carPool
+path=/pool/</programlisting>
+      </informalexample>
+
+      <warning>
+      <para>
+        Be careful about renaming pools in the layout after users have already
+        been writing to them. This can cause
+        inconsistencies in other components of &dcache;, if they are relying
+        on pool names to provide their functionality. An example of such a
+        component is the &chimera; cache info.
+      </para>
+      </warning>
+
+
 
       Register the files on the pool with
       <screen>&dc-prompt-pool; <userinput>pnfs register</userinput></screen>
