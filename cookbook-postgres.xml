@@ -47,11 +47,7 @@
     database if it is configured with the option
     <option>-useSQL</option>. The &pnfs; server will use a &psql;
     server if the <literal>pnfs-posgresql</literal> version is
-    used. It will use several databases in the &psql; server, just as
-    the gdbm version of the &pnfs; server uses serveral database
-    files. How to convert the gdbm files of an existing &pnfs; server
-    into &psql; databases is described in <xref
-    linkend="cb-pnfs-postgres"/>.
+    used. It will use several databases in the &psql; server.
   </para>
 
   <section id="cb-postgres-install">
@@ -276,10 +272,7 @@ export dbConnectString="user=pnfsserver password=<replaceable>yourPassword</repl
       &psql; server for all the functions listed above. In the
       standard installation, the &cell-replicamngr;, the &pnfs;
       companion are not activated by default. The &cell-billing; will
-      only write to a file by default. Also, prior to version 1.6.6 of
-      &dcache; only the &pnfs; server which does not use &psql; was
-      shipped. In this case, &psql; will only be used if the
-      conversion described in <xref linkend="cb-pnfs-postgres"/> was done.
+      only write to a file by default.
     </para>
 
     <para>
