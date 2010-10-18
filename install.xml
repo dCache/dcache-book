@@ -107,8 +107,8 @@
 &prompt-root; <userinput>rpm -ivh dcache-client-<replaceable>version</replaceable>-<replaceable>release</replaceable>.i386.rpm</userinput></screen>
        <para>
        The actual sources lie at <ulink url="http://www.dcache.org/downloads.shtml"/>.
-       To install for example Version 1.9.7-1 of the server you would use this:
-        <screen>&prompt-root; <userinput>rpm -ivh http://www.dcache.org/downloads/1.9/dcache-server-1.9.7-1.noarch.rpm</userinput></screen>
+       To install for example Version 1.9.8-1 of the server you would use this:
+        <screen>&prompt-root; <userinput>rpm -ivh http://www.dcache.org/downloads/1.9/dcache-server-1.9.8-1.noarch.rpm</userinput></screen>
         The client can be found in the download-section of the above url, too.
         </para>
 
@@ -183,6 +183,11 @@ host    all         all         ::1/128        trust</programlisting>
 Stopping postgresql service:                               [  OK  ]
 Starting postgresql service:                               [  OK  ]</screen>
         </important>
+
+	<para>
+	  Make sure that &psql; will be started automatically after booting.
+	  <screen>&prompt-root; <userinput>chkconfig postgresql on</userinput></screen>
+	</para>
 
       <section>
         <title>Configuring &chimera;</title>
@@ -336,51 +341,16 @@ Stopping portmap: portmap</screen>
 &prompt-root; <userinput>echo "chimera" | /opt/d-cache/libexec/chimera/chimera-cli.sh Writetag /pnfs/<replaceable>your domain</replaceable>/data sGroup</userinput>
 &prompt-root; <userinput>echo "StoreName sql" | /opt/d-cache/libexec/chimera/chimera-cli.sh Writetag /pnfs/<replaceable>your domain</replaceable>/data OSMTemplate</userinput>
 </screen>
+	</section>
+        <section>
+         <title>Creating users and databases for &dcache;</title>
 
-          <para>If you plan to use &dcap; with mounted file system
-          instead of the URL-syntax (e.g. &prog-dccp;
-          <filename>/pnfs/example.org/data/file1</filename>
-          <filename>/tmp/file1</filename>), we need to mount the
-            root of &chimera; locally
-            (remote mounts are not allowed yet). This will allow us to
-            establish wormhole files so &dcap; clients can discover the &dcap; doors.
-          </para>
-
-<screen>&prompt-root; <userinput>mount localhost:/ /mnt</userinput>
-&prompt-root; <userinput>mkdir /mnt/admin/etc/config/dCache</userinput>
-&prompt-root; <userinput>touch /mnt/admin/etc/config/dCache/dcache.conf</userinput>
-&prompt-root; <userinput>touch /mnt/admin/etc/config/dCache/'.(fset)(dcache.conf)(io)(on)'</userinput>
-&prompt-root; <userinput>echo "<replaceable>door host</replaceable>:<replaceable>port</replaceable>" > /mnt/admin/etc/config/dCache/dcache.conf</userinput></screen>
-          <para>
-            The default values for ports can be found in <xref linkend="rf-ports"/> and in the
-            file
-            <filename>/opt/d-cache/share/defaults/dcache.properties</filename>. They can be altered in
-            <filename>/opt/d-cache/etc/dcache.conf</filename>
-          </para>
-
-          <para>
-            When the configuration is complete you can unmount &chimera;:
-          </para>
-
-<screen>&prompt-root; <userinput>umount /mnt</userinput></screen>
-
-          <para>
-            Please note that whenever you need to change the
-            configuration, you have to remount the root
-            <literal>localhost:/</literal> to a temporary location like <filename class="directory">/mnt</filename>.
-          </para>
-        </section>
-      </section>
-
-      <section>
-        <title>Creating users and databases for &dcache;</title>
-
-        <para>
+         <para>
           The &dcache; components will access the database server with
           the user <database class="user">srmdcache</database> which can
           be created with the <command>createuser</command>; for
           example:
-        </para>
+         </para>
 
         <screen>&prompt-root; <userinput>createuser -U postgres --no-superuser --no-createrole --createdb --pwprompt srmdcache</userinput></screen>
 
@@ -397,9 +367,6 @@ Stopping portmap: portmap</screen>
           used by the &dcache; components running on the respective
           host.
         </para>
-
-        <screen>&prompt-root; <userinput>createdb -U srmdcache companion</userinput>
-&prompt-root; <userinput>psql -U srmdcache companion -f /opt/d-cache/etc/psql_install_companion.sql</userinput></screen>
 
         <para>
           If the resilience feature provided by the <glossterm
@@ -432,6 +399,47 @@ Stopping portmap: portmap</screen>
           to configure the &cell-billing; to write into this database,
           see below.
         </para>
+
+        <para>
+	Start &dcache;.
+        </para>
+
+<screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache start</userinput></screen>
+        </section>
+
+          <para>
+	    If you plan to use &dcap; with mounted file system
+	    instead of the URL-syntax (e.g. &prog-dccp;
+	    <filename>/pnfs/example.org/data/file1</filename>
+	    <filename>/tmp/file1</filename>), we need to mount the
+            root of &chimera; locally
+            (remote mounts are not allowed yet). This will allow us to
+            establish wormhole files so &dcap; clients can discover the &dcap; doors.
+          </para>
+
+<screen>&prompt-root; <userinput>mount localhost:/ /mnt</userinput>
+&prompt-root; <userinput>mkdir /mnt/admin/etc/config/dCache</userinput>
+&prompt-root; <userinput>touch /mnt/admin/etc/config/dCache/dcache.conf</userinput>
+&prompt-root; <userinput>touch /mnt/admin/etc/config/dCache/'.(fset)(dcache.conf)(io)(on)'</userinput>
+&prompt-root; <userinput>echo "<replaceable>door host</replaceable>:<replaceable>port</replaceable>" > /mnt/admin/etc/config/dCache/dcache.conf</userinput></screen>
+          <para>
+            The default values for ports can be found in <xref linkend="rf-ports"/> (for &dcap; the default port is <literal>22125</literal>)  and in the
+            file
+            <filename>/opt/d-cache/share/defaults/dcache.properties</filename>. They can be altered in
+            <filename>/opt/d-cache/etc/dcache.conf</filename>
+          </para>
+
+          <para>
+            When the configuration is complete you can unmount &chimera;:
+          </para>
+
+<screen>&prompt-root; <userinput>umount /mnt</userinput></screen>
+
+          <note>
+            Please note that whenever you need to change the
+            configuration, you have to remount the root
+            <literal>localhost:/</literal> to a temporary location like <filename class="directory">/mnt</filename>.
+          </note>
       </section>
     </section>
 
