@@ -42,8 +42,10 @@ HTML_CHUNK_DEPS = $(SOURCES:%.xml=.%-chunk.d)
 
 EPUB_FILES = $(SOURCES:%.xml=%.epub)
 
+GFX_FILES = images/important.png images/warning.png images/caution.png images/note.png images/tip.png
+
 # Used by deploy target
-ALL = $(HTML_SINGLE_FILES) $(PDF_FILES) $(HTML_ALL_CHUNK_FILES) $(EPUB_FILES) book.css
+ALL = $(HTML_SINGLE_FILES) $(PDF_FILES) $(HTML_ALL_CHUNK_FILES) $(EPUB_FILES) book.css $(GFX_FILES)
 ALL_INSTALLED = $(ALL:%=%__INSTALL__)
 ALL_TEST_INSTALLED = $(ALL:%=%__TEST_INSTALL__)
 
