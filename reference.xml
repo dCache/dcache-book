@@ -67,6 +67,5 @@
   <xi:include href="rf-dvl.xml"/>
   -->
   <xi:include href="rf-glossary.xml"/>
-  <xi:include href="rf-changelog.xml"/>
 </part>
 
