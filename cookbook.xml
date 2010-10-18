@@ -28,7 +28,6 @@
 
   <xi:include href="cookbook-general.xml"/>  
   <xi:include href="cookbook-pool.xml"/>
-  <xi:include href="cookbook-pnfs-postgres.xml"/>
 
   <xi:include href="cookbook-classic-se-to-dcache.xml"/>
   <xi:include href="cookbook-postgres.xml"/>
