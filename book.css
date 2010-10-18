@@ -6,11 +6,16 @@ h1, h2, h3, h4, h5 {
     font-family: sans-serif; 
 }
 
+hr {
+  clear: right;
+}
+
 p,ul,ol,li,div,td,th,address,nobr,b,i { font-size:12pt; }
 
 body p {
   margin-left: 15px;
   max-width: 50em;
+  overflow: auto;
 }
 
 .replaceable { color: #009000; }
@@ -46,26 +51,27 @@ div.toc span.section {
   margin-left: 0px;
 }
 
+code.literal, pre.programlisting, pre.screen {
+    font-size: 10pt;
+    font-family: monospace;
+    white-space: pre;
+    overflow: auto;
+}
+
+pre.programlisting, pre.screen {
+    max-width: 60em;
+    margin-right: 15px;
+    padding: 5px 15px 5px 15px; 
+}
+
 pre.programlisting { 
     background: #FFFFF8;
     border: 1px solid #8fbc8f;
-    padding: 5px 15px 5px 15px; 
-    font-size: 10pt;
-    white-space: pre;
-    margin-right: 15px;
-    font-family: monospace;
-    max-width: 60em;
 }
 
 pre.screen { 
     background: #FDFFFD;
     border: 1px solid #8fbc8f; 
-    padding: 5px 15px 5px 15px; 
-    font-size: 10pt;
-    margin-right: 15px;
-    white-space: pre;
-    font-family: monospace;
-    max-width: 60em;
 }
 
 
@@ -113,11 +119,11 @@ div.example {
     margin: 5px 5px 5px 1em;
     padding: 0.2em 0.2em 0.2em 0.5em;
     max-width: 45em;
+    font-size: 10pt;
 }
 
 div.example p {
     margin-left: 0px;
-    font-size: 11pt;
 }
 
 div.example p.title { 
@@ -154,15 +160,73 @@ div.informalexamplebody p {
 
 /**
  *  Format the various admonitions: note
- *  tip, warning, causion, important
+ *  tip, warning, causion, important.
+ *
+ *  NB it would be nice to use the original SVG images;
+ *  however, browser support for CSS SVG is poor; for
+ *  example, Firefox is scheduled to get this with
+ *  Firefox v4.0 
  */
+
+/* Properties common to all admonitions */
 div.note, div.tip, div.warning, div.caution, div.important {
-    font-size: 11pt;
+    font-size: 10pt;
     max-width: 45em;
+    margin: 20px 10px 10px 1.8em;
+    padding: 0px 10px 0px 120px;
+    border-style: solid;
+    border-width: 1px;
+    background-repeat: no-repeat;
+    clear: right;
+    overflow: auto;
 }
+
 div.note p, div.tip p, div.warning p, div.caution p, div.important p {
-    font-size: 11pt;
+    font-size: 10pt;
     margin-left: 0px;
+}
+
+/* tip and note have some common properies */
+div.tip, div.note {
+    background-color: #f9fff9;
+    border-color: #80c080;
+    width: 25em;
+    float: right;
+}
+
+/* Likewise, warning and caution have some common properties */
+div.warning, div.caution {
+    background-color: #ffe4e1;
+    border-color: #ff8080;
+}
+
+/* Admonition-specific properties */
+div.tip {
+    background-image: url(tip.png);
+    background-position: 15px 2px;
+    min-height: 115px;
+}
+div.note {
+    background-image: url(note.png);
+    background-position: 0px 15px;
+    min-height: 50px;
+}
+div.important {
+    background-image: url(important.png);
+    background-position: 25px 13px;
+    background-color: #fff8dc;
+    border-color: #c0b090;
+    min-height: 100px;
+}
+div.warning {
+    background-image: url(warning.png);
+    background-position: 10px 15px;
+    min-height: 100px;
+}
+div.caution {
+    background-image: url(caution.png);
+    background-position: 10px 15px;
+    min-height: 100px;
 }
 
 
