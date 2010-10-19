@@ -94,7 +94,14 @@
       <firstname>Thomas</firstname>
       <surname>Zangerl</surname>
     </author>
-
+    <author>
+      <firstname>Paul</firstname>
+      <surname>Millar</surname>
+    </author>
+    <author>
+      <firstname>Owen</firstname>
+      <surname>Synge</surname>
+    </author>
     <mediaobject>
       <imageobject role="fo">
 	<imagedata fileref="images/dCache-book-logo.svg"
