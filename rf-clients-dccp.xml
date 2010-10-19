@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+%sharedents;
+]>
+
+<chapter id="rf-clients">
+
+  <title>&dcache; Clients</title>
+
+  <section id="rf-clients-dccp">
+    <title>&prog-dccp;</title>
+    <refentry id="cmd-dccp">
+      <refmeta><refentrytitle><command>&prog-dccp;</command></refentrytitle></refmeta>
+      <refnamediv><refname><command>&prog-dccp;</command></refname>
+      <refpurpose>Copy a file from or to a &dcache; server.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv id="rf-clients-dccp-synopsis">
+        <title>Synopsis</title>
+          <cmdsynopsis><command>&prog-dccp;</command>
+          <arg rep="repeat"><option>option</option></arg>
+            <arg choice="req"><replaceable>sourceUrl</replaceable></arg>
+            <arg choice="req"><replaceable>destUrl</replaceable></arg>
+          </cmdsynopsis>
+      </refsynopsisdiv>
+      <refsect1 id="rf-clients-dccp-synopsis-options">
+        <title>Arguments</title>
+        <para>The following arguments are required:</para>
+        <variablelist>
+          <varlistentry>
+            <term><option>sourceUrl</option></term>
+            <listitem>
+              <para>
+                The &url; of the source file.
+              </para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term><option>destUrl</option></term>
+            <listitem>
+              <para>
+                The &url; of the destination file.
+              </para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+      </refsect1>
+      <refsect1 id="rf-clients-dccp-synopsis-description">
+        <title>Description</title>
+        <para>The &prog-dccp; utility provides a <command>cp</command>(1) like
+           functionality on the pnfs file system.
+           The source must be a single file while the destination could be
+           a directory name as well as a file name. If the directory is a
+           destination, a new file with the same name as the source name will be
+           created there and the contents of the source will be copied. If the
+           final destination file exists in &dcache;, it won't be overwritten and an
+           error code will be returned. Files in regular file systems will always
+           be overwritten if the <option>-i</option> option is not specified. If
+           the source and the final destination file are located on a regular file
+           system, the &prog-dccp; utility can be used similar to the
+           <command>cp</command>(1) program.
+        </para>
+      </refsect1>
+      <refsect1 id="rf-clients-dccp-synopsis-optional">
+        <title>Options</title>
+        <para>The following arguments are optional:</para>
+        <variablelist>
+          <varlistentry>
+            <term><arg>-a</arg></term>
+            <listitem>
+              <para>
+                Enable read-ahead functionality.
+              </para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term><arg>-b</arg> <replaceable>bufferSize</replaceable></term>
+            <listitem>
+              <para>
+                Set read-ahead buffer size. The default value is <literal>1048570</literal> 
+                Bytes. To disable the buffer this can be set to any value below the default.
+                dccp will attempt to allocate the buffer size so very large values should 
+                be used with care.
+              </para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term><arg>-B</arg> <replaceable>bufferSize</replaceable></term>
+            <listitem>
+              <para>
+                Set buffer size. The size of the buffer is requested in each request, larger 
+                buffers will be needed to saturate higher bandwidth connections. The optimum
+                value is network dependent. Too large a value will lead to excessive memory 
+                usage, too small a value will lead to excessive network communication.
+              </para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term><arg>-d</arg> <replaceable>debug level</replaceable></term>
+            <listitem>
+              <para>
+                Set the debug level. This is a integer binary byte mask between <literal>0</literal>
+                and <literal>127</literal> the values are shown below.
+              </para>
+              <orderedlist numeration="lowerroman">
+                <listitem>
+                  <para>0</para>
+                  <para>no_output</para>
+                </listitem>
+                <listitem>
+                  <para>1</para>
+                  <para>error messages only</para>
+                </listitem>
+                <listitem>
+                  <para>2</para>
+                  <para>info messages</para>
+                </listitem>
+                <listitem>
+                  <para>4</para>
+                  <para>speed information</para>
+                </listitem>
+                <listitem>
+                  <para>8</para>
+                  <para>trace information for developers</para>
+                </listitem>
+                <listitem>
+                  <para>16</para>
+                  <para>function call sequence information</para>
+                </listitem>
+                <listitem>
+                  <para>32</para>
+                  <para>io information</para>
+                </listitem>
+                <listitem>
+                  <para>64</para>
+                  <para>thread information</para>
+                </listitem>
+              </orderedlist>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term><arg>-h</arg> <replaceable>replyHostName</replaceable></term>
+            <listitem>
+              <para>
+                Bind the callback connection to the specific hostname interface.
+              </para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term><arg>-i</arg></term>
+            <listitem>
+              <para>
+                Secure mode. Do not overwrite the existing files.
+              </para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term><arg>-l</arg> <replaceable>location</replaceable></term>
+            <listitem>
+              <para>
+                Set location for pre-stage. if the location is not specified, 
+                the local host of the door will be used. This option must be used 
+                with the -P option.
+              </para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term><arg>-p</arg> <replaceable>first_port</replaceable>:<replaceable>last_port</replaceable></term>
+            <listitem>
+              <para>
+                Bind the callback data connection to the specified TCP port/rangeSet port range. 
+                Delimited by the ':' character, the <replaceable>first_port</replaceable> 
+                is required but the <replaceable>last_port</replaceable> is optional.
+              </para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term><arg>-P</arg></term>
+            <listitem>
+              <para>
+                Pre-stage. Do not copy the file to a local host but make sure the file is 
+                on disk on the &dcache; server.
+              </para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term><arg>-r</arg> <replaceable>bufferSize</replaceable></term>
+            <listitem>
+              <para>
+                TCP receive buffer size. The default is <literal>256K</literal>. Setting to 0 
+                uses the system default value. Memorry useage will increase with higher values, 
+                but performance better 
+              </para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term><arg>-s</arg> <replaceable>bufferSize</replaceable></term>
+            <listitem>
+              <para>
+                TCP send buffer size. The default is <literal>256K</literal>. Setting to 0 
+                uses the system default value.
+              </para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term><arg>-t</arg> <replaceable>time</replaceable></term>
+            <listitem>
+              <para>
+                Stage timeout in seconds. This option must be used with the -P option.
+              </para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+      </refsect1>
+      <refsect1 id="rf-clients-dccp-example">
+        <title>Example:</title>
+        <para>To copy a file to &dcache;:</para>
+        <screen>&prog-dccp; /etc/group dcap://example.org/pnfs/desy.de/gading/</screen>
+        <para>To copy a file from &dcache;:</para>
+        <screen>&prog-dccp; dcap://example.org/pnfs/desy.de/gading/group /tmp/</screen>
+        <para>Pre-Stage request:</para>
+        <screen>dccp -P -t 3600 -l example.org /acs/user_space/data_file</screen>
+        <para>stdin:</para>
+        <screen>tar cf - data_dir | dccp - /acs/user_space/data_arch.tar</screen>
+        <para>stdout:</para>
+        <screen>dccp /acs/user_space/data_arch.tar - | tar xf - </screen>
+      </refsect1>
+      <refsect1 id="rf-clients-dccp-seealso">
+        <title>See also</title>
+        <para><citerefentry>
+          <refentrytitle>cp</refentrytitle>
+          <manvolnum>1</manvolnum>
+        </citerefentry>
+        </para>
+      </refsect1>
+    </refentry>
+  </section>
+</chapter>

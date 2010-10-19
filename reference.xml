@@ -11,6 +11,7 @@
   <title>Reference</title>
 
   <xi:include href="rf-clients-srm.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+  <xi:include href="rf-clients-dccp.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
 
 <!--
   <chapter id="rf-setup">
