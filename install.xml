@@ -3,6 +3,7 @@
                          "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
 <!ENTITY % sharedents SYSTEM "shared-entities.xml" >
 %sharedents;
+<!ENTITY chimera-cli  "/opt/d-cache/bin/chimera-cli.sh">
 ]>
 
 <chapter id="in">
@@ -329,17 +330,17 @@ Stopping portmap: portmap</screen>
 	  <para>
 	    First you create the root of the Chimera namespace, called
 	    <filename class="directory">pnfs</filename> for legacy reasons.
-	    <screen>&prompt-root; <userinput>/opt/d-cache/libexec/chimera/chimera-cli.sh Mkdir /pnfs</userinput></screen>
+	    <screen>&prompt-root; <userinput>&chimera-cli; Mkdir /pnfs</userinput></screen>
 	  </para>
           <para>
             Now you need to add directory tags.
             For more information on tags see <xref linkend="cf-pnfs-tags"/>.
           </para>
 
-<screen>&prompt-root; <userinput>/opt/d-cache/libexec/chimera/chimera-cli.sh Mkdir /pnfs/<replaceable>your domain</replaceable></userinput>
-&prompt-root; <userinput>/opt/d-cache/libexec/chimera/chimera-cli.sh Mkdir /pnfs/<replaceable>your domain</replaceable>/data</userinput>
-&prompt-root; <userinput>echo "chimera" | /opt/d-cache/libexec/chimera/chimera-cli.sh Writetag /pnfs/<replaceable>your domain</replaceable>/data sGroup</userinput>
-&prompt-root; <userinput>echo "StoreName sql" | /opt/d-cache/libexec/chimera/chimera-cli.sh Writetag /pnfs/<replaceable>your domain</replaceable>/data OSMTemplate</userinput>
+<screen>&prompt-root; <userinput>&chimera-cli; Mkdir /pnfs/<replaceable>your domain</replaceable></userinput>
+&prompt-root; <userinput>&chimera-cli; Mkdir /pnfs/<replaceable>your domain</replaceable>/data</userinput>
+&prompt-root; <userinput>echo "chimera" | &chimera-cli; Writetag /pnfs/<replaceable>your domain</replaceable>/data sGroup</userinput>
+&prompt-root; <userinput>echo "StoreName sql" | &chimera-cli; Writetag /pnfs/<replaceable>your domain</replaceable>/data OSMTemplate</userinput>
 </screen>
 	</section>
         <section>
