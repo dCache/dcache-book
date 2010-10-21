@@ -328,7 +328,7 @@ backend_version:production-1-9-1-11</screen>
             <para>Usage:
             <cmdsynopsis>get-space-tokens <arg>command line options</arg> <arg><replaceable>srmUrl</replaceable></arg></cmdsynopsis>
             </para>
-            <informalexample>
+            <example>
               <title>Example surveying's the space tokens available in a directory.</title>
               <screen>&prompt-user; <userinput>srm-get-space-tokens srm://srm-door.example.org:8443/pnfs/example.org/data/dteam -srm_protocol_version=2</userinput></screen>
               <para>A successful result:</para>
@@ -345,8 +345,8 @@ Space Reservation Tokens:
 148289
 148231
 148352</screen>
-            </informalexample>
-            <informalexample>
+            </example>
+            <example>
               <title>Example of listing the space tokens for a &srm;:</title>
               <screen>&prompt-user; <userinput>srm-get-space-tokens srm://srm-door.example.org:8443</userinput>
 Space Reservation Tokens:
@@ -359,7 +359,7 @@ Space Reservation Tokens:
 145607
 28839
 145589</screen>
-            </informalexample>
+            </example>
           </section>
           <section id="cb-clients-srm-st-reserve">
             <title>Space Reservation</title>
@@ -443,7 +443,7 @@ Space Reservation with token=120049
           <cmdsynopsis>
             srmls <arg>command line options</arg> <arg choice='plain' rep='repeat'><replaceable>srmUrl</replaceable></arg>
           </cmdsynopsis>
-          <informalexample>
+          <example>
           <title>Example of using <userinput>srmls -l</userinput>:</title>
           <screen>&prompt-user; <userinput>srmls srm://srm-door.example.org:8443/pnfs/example.org/data/dteam/testdir  -2</userinput>
   0 /pnfs/example.org/data/dteam/testdir/
@@ -452,8 +452,8 @@ Space Reservation with token=120049
       31 /pnfs/example.org/data/dteam/testdir/testFile3
       31 /pnfs/example.org/data/dteam/testdir/testFile4
       31 /pnfs/example.org/data/dteam/testdir/testFile5</screen>
-          </informalexample>
-          <informalexample>
+          </example>
+          <example>
             <title>Example of using <userinput>srmls -l</userinput>:</title>
           <note>
             <userinput>srmls -l</userinput> is a long format mode and may result in dramatic increase in execution time.
@@ -499,7 +499,7 @@ Space Reservation with token=120049
             If you have more than <literal>1000</literal> entries in your directory, please use the following
             parameters:
           </para>
-          </informalexample>
+          </example>
          <variablelist><title>srmls parameters</title>
           <varlistentry><term>-count=<replaceable>integer</replaceable></term>
             <listitem>

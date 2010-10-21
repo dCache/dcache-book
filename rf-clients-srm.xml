@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
                          "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
 <!ENTITY % sharedents SYSTEM "shared-entities.xml" >
 %sharedents;
 ]>
 
-<chapter id="rf-clients">
-
-  <title>&dcache; Clients</title>
-  
   <section id="rf-clients-srm">
     <title>The &srm; Client Suite</title>
 
@@ -187,8 +183,4 @@
       
     </refsection>
   </refentry>
-
 </section>
-
-</chapter>
-  

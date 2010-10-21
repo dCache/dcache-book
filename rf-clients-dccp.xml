@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
                          "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
 <!ENTITY % sharedents SYSTEM "shared-entities.xml" >
 %sharedents;
 ]>
 
-<chapter id="rf-clients">
-
-  <title>&dcache; Clients</title>
-
-  <section id="rf-clients-dccp">
+<section id="rf-clients-dccp">
     <title>&prog-dccp;</title>
     <refentry id="cmd-dccp">
       <refmeta><refentrytitle><command>&prog-dccp;</command></refentrytitle></refmeta>
@@ -236,5 +232,4 @@
         </para>
       </refsect1>
     </refentry>
-  </section>
-</chapter>
+</section>
