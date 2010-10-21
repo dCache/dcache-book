@@ -4,17 +4,17 @@
 <!ENTITY % sharedents SYSTEM "shared-entities.xml" >
 %sharedents;
 ]>
-  
+
 <section id="rf-cc-pnfsm">
   <title>&cell-pnfsmngr; Commands</title>
-  
-  <refentry id="cmd-pnfsidof">        
+
+  <refentry id="cmd-pnfsidof">
     <refmeta><refentrytitle><command>pnfsidof</command></refentrytitle></refmeta>
     <refnamediv><refname><command>pnfsidof</command></refname>
     <refpurpose>Print the &pnfs; id of a file given by its global
     path.</refpurpose>
     </refnamediv>
-    
+
     <refsynopsisdiv>
       <cmdsynopsis>
         <command>pnfsidof</command>
@@ -24,26 +24,26 @@
         <!-- <arg choice="opt" rep="repeat">file</arg> -->
       </cmdsynopsis>
     </refsynopsisdiv>
-    
+
     <refsection>
       <title>Description</title>
-      
+
       <para>
         Print the &pnfs; id of a file given by its global path. The
         global path always starts with the
         <quote>VirtualGlobalPath</quote> as given by the
         <quote><command>info</command></quote>-command.
       </para>
-      
+
     </refsection>
   </refentry>
-  
-  <refentry id="cmd-flags_remove">        
+
+  <refentry id="cmd-flags_remove">
     <refmeta><refentrytitle><command>flags remove</command></refentrytitle></refmeta>
     <refnamediv><refname><command>flags remove</command></refname>
       <refpurpose>Remove a flag from a file.</refpurpose>
     </refnamediv>
-    
+
     <refsynopsisdiv>
       <cmdsynopsis>
         <command>flags remove</command>
@@ -76,24 +76,24 @@
         </varlistentry>
       </variablelist>
     </refsynopsisdiv>
-    
+
     <refsection>
       <title>Description</title>
-      
+
       <para>
       </para>
-      
+
     </refsection>
   </refentry>
-  
-  
-    
-  <refentry id="cmd-flags_ls">        
+
+
+
+  <refentry id="cmd-flags_ls">
     <refmeta><refentrytitle><command>flags ls</command></refentrytitle></refmeta>
     <refnamediv><refname><command>flags ls</command></refname>
       <refpurpose>List the flags of a file.</refpurpose>
     </refnamediv>
-    
+
     <refsynopsisdiv>
       <cmdsynopsis>
         <command>flags ls</command>
@@ -116,19 +116,19 @@
 
     <refsection>
       <title>Description</title>
-      
+
       <para>
       </para>
-      
+
     </refsection>
   </refentry>
 
-  <refentry id="cmd-flags_set">        
+  <refentry id="cmd-flags_set">
     <refmeta><refentrytitle><command>flags set</command></refentrytitle></refmeta>
     <refnamediv><refname><command>flags set</command></refname>
       <refpurpose>Set a flag for a file.</refpurpose>
     </refnamediv>
-    
+
     <refsynopsisdiv>
       <cmdsynopsis>
         <command>flags set</command>
@@ -167,45 +167,45 @@
         </varlistentry>
       </variablelist>
     </refsynopsisdiv>
-  
+
     <refsection>
       <title>Description</title>
-      
+
       <para>
       </para>
-      
+
     </refsection>
   </refentry>
 
 <!--
-  <refentry id="cmd-get_stat">        
+  <refentry id="cmd-get_stat">
     <refmeta><refentrytitle><command>get stat</command></refentrytitle></refmeta>
     <refnamediv><refname><command>get stat</command></refname>
       <refpurpose>get method call counter - NOCLUE</refpurpose>
     </refnamediv>
-    
+
     <refsynopsisdiv>
       <cmdsynopsis>
         <command>get stat</command>
       </cmdsynopsis>
     </refsynopsisdiv>
-    
+
     <refsection>
       <title>Description</title>
-      
+
       <para>
       </para>
-      
+
     </refsection>
   </refentry>
 -->
-  
-  <refentry id="cmd-metadataof">        
+
+  <refentry id="cmd-metadataof">
     <refmeta><refentrytitle><command>metadataof</command></refentrytitle></refmeta>
     <refnamediv><refname><command>metadataof</command></refname>
       <refpurpose>Print the meta-data of a file.</refpurpose>
     </refnamediv>
-    
+
     <refsynopsisdiv>
       <cmdsynopsis>
         <command>metadataof</command>
@@ -247,23 +247,23 @@
 -->
       </variablelist>
     </refsynopsisdiv>
-   
+
     <refsection>
       <title>Description</title>
-      
+
       <para>
       </para>
-      
+
     </refsection>
   </refentry>
 
 <!--
-  <refentry id="cmd-g2l">        
+  <refentry id="cmd-g2l">
     <refmeta><refentrytitle><command>g2l</command></refentrytitle></refmeta>
     <refnamediv><refname><command>g2l</command></refname>
       <refpurpose>NOCLUE</refpurpose>
     </refnamediv>
-    
+
     <refsynopsisdiv>
       <cmdsynopsis>
         <command>g2l</command>
@@ -279,23 +279,23 @@
         </varlistentry>
       </variablelist>
     </refsynopsisdiv>
-    
+
     <refsection>
       <title>Description</title>
-      
+
       <para>
       </para>
-      
+
     </refsection>
   </refentry>
 -->
 
-  <refentry id="cmd-pathfinder">        
+  <refentry id="cmd-pathfinder">
     <refmeta><refentrytitle><command>pathfinder</command></refentrytitle></refmeta>
     <refnamediv><refname><command>pathfinder</command></refname>
       <refpurpose>Print the global or local path of a file from its PNFS id.</refpurpose>
     </refnamediv>
-    
+
     <refsynopsisdiv>
       <cmdsynopsis>
         <command>pathfinder</command>
@@ -323,23 +323,23 @@
         </varlistentry>
       </variablelist>
     </refsynopsisdiv>
-  
+
     <refsection>
       <title>Description</title>
-      
+
       <para>
       </para>
-      
+
     </refsection>
   </refentry>
-  
-  
-  <refentry id="cmd-set_meta">        
+
+
+  <refentry id="cmd-set_meta">
     <refmeta><refentrytitle><command>set meta</command></refentrytitle></refmeta>
     <refnamediv><refname><command>set meta</command></refname>
       <refpurpose>Set the meta-data of a file.</refpurpose>
     </refnamediv>
-    
+
     <refsynopsisdiv>
       <cmdsynopsis>
         <command>set meta</command>
@@ -384,20 +384,20 @@
 
       <refsection>
 	<title>Description</title>
-	
+
 	<para>
 	</para>
-	
+
       </refsection>
   </refentry>
-  
-  
-  <refentry id="cmd-storageinfoof">        
+
+
+  <refentry id="cmd-storageinfoof">
     <refmeta><refentrytitle><command>storageinfoof</command></refentrytitle></refmeta>
     <refnamediv><refname><command>storageinfoof</command></refname>
       <refpurpose>Print the storage info of a file.</refpurpose>
     </refnamediv>
-    
+
     <refsynopsisdiv>
       <cmdsynopsis>
         <command>storageinfoof</command>
@@ -438,20 +438,20 @@
 
     <refsection>
       <title>Description</title>
-      
+
       <para>
       </para>
-      
+
     </refsection>
   </refentry>
- 
-  <refentry id="cmd-cacheinfoof">        
+
+  <refentry id="cmd-cacheinfoof">
     <refmeta><refentrytitle><command>cacheinfoof</command></refentrytitle></refmeta>
-    
+
     <refnamediv><refname><command>cacheinfoof</command></refname>
       <refpurpose>Print the cache info of a file.</refpurpose>
     </refnamediv>
-    
+
     <refsynopsisdiv>
       <cmdsynopsis>
         <command>cacheinfoof</command>
@@ -475,11 +475,11 @@
 
     <refsection>
       <title>Description</title>
-      
+
       <para>
       </para>
-      
+
     </refsection>
   </refentry>
-  
+
 </section>
