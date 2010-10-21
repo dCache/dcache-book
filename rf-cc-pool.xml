@@ -105,7 +105,7 @@ t      data amount in TBytes</screen>
     <refsynopsisdiv>
       <cmdsynopsis>
         <command>st set max active</command>
-        <arg choice="req"><replaceable>maxActiveStoreTransfers</replaceable></arg>
+        <arg choice="plain"><replaceable>maxActiveStoreTransfers</replaceable></arg>
       </cmdsynopsis>
       <variablelist>
         <varlistentry>
@@ -141,7 +141,7 @@ t      data amount in TBytes</screen>
     <refsynopsisdiv>
       <cmdsynopsis>
         <command>rh set max active</command>
-        <arg choice="req"><replaceable>maxActiveRetoreTransfers</replaceable></arg>
+        <arg choice="plain"><replaceable>maxActiveRetoreTransfers</replaceable></arg>
       </cmdsynopsis>
       <variablelist>
         <varlistentry>
@@ -176,7 +176,7 @@ t      data amount in TBytes</screen>
     <refsynopsisdiv>
       <cmdsynopsis>
         <command>mover set max active</command>
-        <arg choice="req"><replaceable>maxActiveClientTransfers</replaceable></arg>
+        <arg choice="plain"><replaceable>maxActiveClientTransfers</replaceable></arg>
         <arg><option>-queue=<replaceable>moverQueueName</replaceable></option></arg>
       </cmdsynopsis>
       <variablelist>
@@ -225,7 +225,7 @@ t      data amount in TBytes</screen>
     <refsynopsisdiv>
       <cmdsynopsis>
         <command>p2p set max active</command>
-        <arg choice="req"><replaceable>maxActiveP2PTransfers</replaceable></arg>
+        <arg choice="plain"><replaceable>maxActiveP2PTransfers</replaceable></arg>
       </cmdsynopsis>
       <variablelist>
         <varlistentry>
@@ -264,7 +264,7 @@ t      data amount in TBytes</screen>
     <refsynopsisdiv>
       <cmdsynopsis>
         <command>pp set max active</command>
-        <arg choice="req"><replaceable>maxActivePPTransfers</replaceable></arg>
+        <arg choice="plain"><replaceable>maxActivePPTransfers</replaceable></arg>
       </cmdsynopsis>
       <variablelist>
         <varlistentry>
@@ -303,7 +303,7 @@ t      data amount in TBytes</screen>
     <refsynopsisdiv>
       <cmdsynopsis>
         <command>flush set max active</command>
-        <arg choice="req"><replaceable>maxActiveNOCLUETransfers</replaceable></arg>
+        <arg choice="plain"><replaceable>maxActiveNOCLUETransfers</replaceable></arg>
       </cmdsynopsis>
       <variablelist>
         <varlistentry>
@@ -336,7 +336,7 @@ t      data amount in TBytes</screen>
     <refsynopsisdiv>
       <cmdsynopsis>
         <command>set gap</command>
-        <arg choice="req"><replaceable>gapPara</replaceable></arg>
+        <arg choice="plain"><replaceable>gapPara</replaceable></arg>
       </cmdsynopsis>
       <variablelist>
         <varlistentry>
@@ -377,7 +377,7 @@ t      data amount in TBytes</screen>
     <refsynopsisdiv>
       <cmdsynopsis>
         <command>set breakeven</command>
-        <arg choice="req"><replaceable>breakevenPara</replaceable></arg>
+        <arg choice="plain"><replaceable>breakevenPara</replaceable></arg>
       </cmdsynopsis>
       <variablelist>
         <varlistentry>
@@ -420,8 +420,8 @@ t      data amount in TBytes</screen>
       <cmdsynopsis>
         <command>mover ls</command>
         <group>
-          <arg choice="req">-queue</arg>
-          <arg choice="req">-queue=<replaceable>queueName</replaceable></arg>
+          <arg choice="plain">-queue</arg>
+          <arg choice="plain">-queue=<replaceable>queueName</replaceable></arg>
         </group>
       </cmdsynopsis>
       <variablelist>

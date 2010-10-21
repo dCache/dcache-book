@@ -18,8 +18,8 @@
       <title>Synopsis</title>
       <cmdsynopsis><command>&prog-dccp;</command>
       <arg rep="repeat"><option>option</option></arg>
-      <arg choice="req"><replaceable>sourceUrl</replaceable></arg>
-      <arg choice="req"><replaceable>destUrl</replaceable></arg>
+      <arg choice="plain"><replaceable>sourceUrl</replaceable></arg>
+      <arg choice="plain"><replaceable>destUrl</replaceable></arg>
       </cmdsynopsis>
     </refsynopsisdiv>
 

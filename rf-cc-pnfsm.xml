@@ -18,7 +18,7 @@
     <refsynopsisdiv>
       <cmdsynopsis>
         <command>pnfsidof</command>
-        <arg choice="req">
+        <arg choice="plain">
           <replaceable>globalPath</replaceable>
         </arg>
         <!-- <arg choice="opt" rep="repeat">file</arg> -->
@@ -47,10 +47,10 @@
     <refsynopsisdiv>
       <cmdsynopsis>
         <command>flags remove</command>
-        <arg choice="req">
+        <arg choice="plain">
           <replaceable>pnfsId</replaceable>
         </arg>
-        <arg choice="req" rep="repeat">
+        <arg choice="plain" rep="repeat">
           <replaceable>key</replaceable>
         </arg>
         <!-- <arg choice="opt" rep="repeat">file</arg> -->
@@ -97,7 +97,7 @@
     <refsynopsisdiv>
       <cmdsynopsis>
         <command>flags ls</command>
-        <arg choice="req">
+        <arg choice="plain">
           <replaceable>pnfsId</replaceable>
         </arg>
       </cmdsynopsis>
@@ -132,10 +132,10 @@
     <refsynopsisdiv>
       <cmdsynopsis>
         <command>flags set</command>
-        <arg choice="req">
+        <arg choice="plain">
           <replaceable>pnfsId</replaceable>
         </arg>
-        <arg choice="req" rep="repeat">
+        <arg choice="plain" rep="repeat">
           <replaceable>key</replaceable>=<replaceable>value</replaceable>
         </arg>
       </cmdsynopsis>
@@ -209,7 +209,7 @@
     <refsynopsisdiv>
       <cmdsynopsis>
         <command>metadataof</command>
-        <group choice="req">
+        <group choice="plain">
           <arg>
             <replaceable>pnfsId</replaceable>
           </arg>
@@ -267,7 +267,7 @@
     <refsynopsisdiv>
       <cmdsynopsis>
         <command>g2l</command>
-        <arg choice="req">
+        <arg choice="plain">
           <replaceable>globalPath</replaceable>
         </arg>
       </cmdsynopsis>
@@ -299,7 +299,7 @@
     <refsynopsisdiv>
       <cmdsynopsis>
         <command>pathfinder</command>
-        <arg choice="req">
+        <arg choice="plain">
           <replaceable>pnfsId</replaceable>
         </arg>
         <group>
@@ -343,14 +343,14 @@
     <refsynopsisdiv>
       <cmdsynopsis>
         <command>set meta</command>
-        <group choice="req">
+        <group choice="plain">
           <arg><replaceable>pnfsId</replaceable></arg>
           <arg><replaceable>globalPath</replaceable></arg>
         </group>
-        <arg choice="req"><replaceable>uid</replaceable></arg>
-        <arg choice="req"><replaceable>gid</replaceable></arg>
-        <arg choice="req"><replaceable>perm</replaceable></arg>
-        <arg choice="req" rep="repeat"><replaceable>levelInfo</replaceable></arg>
+        <arg choice="plain"><replaceable>uid</replaceable></arg>
+        <arg choice="plain"><replaceable>gid</replaceable></arg>
+        <arg choice="plain"><replaceable>perm</replaceable></arg>
+        <arg choice="plain" rep="repeat"><replaceable>levelInfo</replaceable></arg>
       </cmdsynopsis>
       <variablelist>
 	  <title>Arguments</title>
@@ -401,7 +401,7 @@
     <refsynopsisdiv>
       <cmdsynopsis>
         <command>storageinfoof</command>
-        <group choice="req">
+        <group choice="plain">
           <arg><replaceable>pnfsId</replaceable></arg>
           <arg><replaceable>globalPath</replaceable></arg>
         </group>
@@ -455,7 +455,7 @@
     <refsynopsisdiv>
       <cmdsynopsis>
         <command>cacheinfoof</command>
-        <group choice="req">
+        <group choice="plain">
           <arg><replaceable>pnfsId</replaceable></arg>
           <arg><replaceable>globalPath</replaceable></arg>
         </group>

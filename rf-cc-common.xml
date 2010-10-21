@@ -17,7 +17,7 @@
     <refsynopsisdiv>
       <cmdsynopsis>
         <command>pin</command>
-        <arg choice="req">
+        <arg choice="plain">
           <replaceable>comment</replaceable>
         </arg>
       </cmdsynopsis>
@@ -97,7 +97,7 @@
     <refsynopsisdiv>
       <cmdsynopsis>
         <command>exec context</command>
-        <arg choice="req">
+        <arg choice="plain">
           <replaceable>arg-0</replaceable>
         </arg>
       </cmdsynopsis>
@@ -129,7 +129,7 @@
     <refsynopsisdiv>
       <cmdsynopsis>
         <command>dump pinboard</command>
-        <arg choice="req">
+        <arg choice="plain">
           <replaceable>filename</replaceable>
         </arg>
       </cmdsynopsis>
@@ -195,7 +195,7 @@
     <refsynopsisdiv>
       <cmdsynopsis>
         <command>set printout</command>
-        <arg choice="req">
+        <arg choice="plain">
           <replaceable>arg-0</replaceable>
         </arg>
       </cmdsynopsis>
@@ -251,7 +251,7 @@
     <refsynopsisdiv>
       <cmdsynopsis>
         <command>say</command>
-        <arg choice="req">
+        <arg choice="plain">
           <replaceable>arg-0</replaceable>
         </arg>
       </cmdsynopsis>
