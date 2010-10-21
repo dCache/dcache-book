@@ -6,42 +6,39 @@
 %sharedents;
 ]>
 <chapter id="cb-clients">
-  <title>Protocols</title>
+  <title>&dcache; Clients.</title>
 
-  <section id="cb-clients-gen">
-    <title>&dcache; Clients.</title>
+  <chapterinfo>
+    <authorgroup>
+      <author>
+	<firstname>Owen</firstname>
+	<surname>Synge</surname>
+      </author>
+    </authorgroup>
+  </chapterinfo>
 
-    <sectioninfo>
-      <authorgroup>
-        <author>
-          <firstname>Owen</firstname>
-          <surname>Synge</surname>
-        </author>
-      </authorgroup>
-    </sectioninfo>
+  <para>
+    There are many client tools for &dcache;. These can most easily be
+    classified by communication protocol.
+  </para>
+
+  <section id="cb-clients-gridftp">
+    <title>&gsiftp;</title>
 
     <para>
-      There are many client tools for &dcache;. These can most easily
-      be classified by communication protocol.
+      &dcache; provides a &gsiftp; door, which is in effect a
+      &gsi; authenticated &ftp; access point to &dcache;
     </para>
 
-    <section id="cb-clients-gridftp">
-      <title>Using the &gsiftp; clients with &dcache;</title>
+    <section id="cb-clients-gridftp-ls">
+      <title>Listing a directory</title>
 
       <para>
-	&dcache; provides a &gsiftp; door, which is in effect a
-        &gsi; authenticated &ftp; access point to &dcache;
+	To list the content of a &dcache; directory, the &gsiftp; protocol can be used;
       </para>
 
-      <section id="cb-clients-gridftp-ls">
-        <title>Listing a directory</title>
-
-        <para>
-          To list the content of a &dcache; directory, the &gsiftp; protocol can be used;
-        </para>
-
-        <screen>&prompt-user; <userinput>edg-gridftp-ls gsiftp://gridftp-door.example.org/pnfs/example.org/data/dteam/</userinput></screen>
-      </section>
+      <screen>&prompt-user; <userinput>edg-gridftp-ls gsiftp://gridftp-door.example.org/pnfs/example.org/data/dteam/</userinput></screen>
+    </section>
 
       <section id="cb-clients-gridftp-exists">
         <title>Checking a file exists</title>
@@ -58,19 +55,23 @@ error the server sent an error response: 451 451 /pnfs/example.org/data/dteam/fi
 &prompt-user; <userinput>echo $?</userinput>
 1</screen>
 
-        <para>
-          Please note the <userinput>echo $?</userinput> show the
-          return code of the last run application. The error message
-          returned from the client this should not be scripted against
-          as its one of many possible errors.
-        </para>
+        <note>
+	  <title>Use the return code</title>
+
+	  <para>
+	    Please note the <userinput>echo $?</userinput> show the
+	    return code of the last run application. The error message
+	    returned from the client this should not be scripted
+	    against as it is one of many possible errors.
+	  </para>
+	</note>
       </section>
 
       <section id="cb-clients-gridftp-rm">
         <title>Deleting files</title>
 
         <para>
-          To delete files with &gsiftp; use the following command.
+          To delete files with &gsiftp; use the <command>edg-gridftp-rm</command> command.
         </para>
 
         <screen>&prompt-user; <userinput>edg-gridftp-rm gsiftp://gridftp-door.example.org/pnfs/example.org/data/dteam/filler_test20050811160948926780000</userinput></screen>
@@ -95,11 +96,17 @@ error the server sent an error response: 451 451 /pnfs/example.org/data/dteam/fi
         </cmdsynopsis>
 
         <para>
-          Copying file with <literal>globus-url-copy</literal> follows
+          Copying file with <command>globus-url-copy</command> follows
           the syntax source, destination.
         </para>
 
         <informalexample>
+	  <para>
+	    The following example copies the file
+	    <filename>/etc/group</filename> into &dcache; as the file
+	    <filename>/pnfs/example.org/data/dteam/test_GlobusUrlCopy.clinton.504.22080.20071102160121.2</filename>
+	  </para>
+
           <screen>&prompt-user; <userinput>globus-url-copy \
 file://///etc/group \
 gsiftp://gridftp-door.example.org/pnfs/example.org/data/dteam/test_GlobusUrlCopy.clinton.504.22080.20071102160121.2</userinput></screen>
@@ -121,26 +128,35 @@ gsiftp://gridftp-door.example.org/pnfs/example.org/data/dteam/test_GlobusUrlCopy
         <title>&prog-dccp;</title>
 
         <para>
-          Using &prog-dccp; as a &dcap; client
+          The following example shows &prog-dccp; being used to copy
+          the file <filename>/etc/group</filename> into &dcache; as
+          the the file
+          <filename>/pnfs/example.org/data/dteam/test6</filename>.
+          The &prog-dccp; program will connect to &dcache; without
+          authenticating.
         </para>
 
-        <screen>&prompt-user; <userinput>/opt/d-cache/dcap/bin/dccp    /etc/group dcap://dcap-door.example.org:22125//pnfs/example.org/data/dteam/test6</userinput>
+        <screen>&prompt-user; <userinput>/opt/d-cache/dcap/bin/dccp /etc/group dcap://dcap-door.example.org:22125/pnfs/example.org/data/dteam/test6</userinput>
 Command failed!
-Server error message for [1]: "path //pnfs/example.org/data/dteam/test6 not found" (errno 10001).
+Server error message for [1]: "path /pnfs/example.org/data/dteam/test6 not found" (errno 10001).
 597 bytes in 0 seconds</screen>
 
         <para>
-          Using &prog-dccp; as a &gsidcap; client
+          The following example shows &prog-dccp; being used to upload
+          the file <filename>/etc/group</filename>.  In this example,
+          &prog-dccp; will authenticate with &dcache; using the &gsi;
+          protocol.
         </para>
 
-        <screen>&prompt-user; <userinput>export DCACHE_IO_TUNNEL=libgsiTunnel.so</userinput>
-&prompt-user; <userinput>/opt/d-cache/dcap/bin/dccp    /etc/group gsidcap://gsidcap-door.example.org:22128/pnfs/example.org/data/dteam/test5</userinput>
+        <screen>&prompt-user; <userinput>/opt/d-cache/dcap/bin/dccp /etc/group gsidcap://gsidcap-door.example.org:22128/pnfs/example.org/data/dteam/test5</userinput>
 Command failed!
-Server error message for [1]: "path //pnfs/example.org/data/dteam/test5 not found" (errno 10001).
+Server error message for [1]: "path /pnfs/example.org/data/dteam/test5 not found" (errno 10001).
 597 bytes in 0 seconds</screen>
 
         <para>
-          Using debug flags with &prog-dccp;
+          The following example shows &prog-dccp; with the debugging
+          enabled.  The value <literal>63</literal> controls how much
+          information is displayed.
         </para>
 
         <screen>&prompt-user; <userinput>/opt/d-cache/dcap/bin/dccp -d 63   /etc/group dcap://dcap-door.example.org:22128/pnfs/example.org/data/dteam/test3</userinput>
@@ -211,23 +227,31 @@ Removing unneeded queue [2]
 [7] destroing node
 597 bytes in 0 seconds
 Debugging</screen>
-
-        <para>
-          The &dcap; libraries and &prog-dccp; client use a bit mask
-          variable.
-        </para>
-
-        <screen>&prompt-user; <userinput>export DCACHE_DEBUG=255</userinput></screen>
-
-        <para>
-	  255 is the highest level of debugging, but may crash or
-	  prove unstable, I would recommend lower levels with
-	  1,2,4,8.
-	</para>
       </section>
 
       <section id="cb-clients-dcap-interposition">
         <title>Using the &dcache; client interposition library.</title>
+
+        <tip>
+          <title>Finding the &gsi; tunnel.</title>
+
+          <para>
+            When the <envar>LD_PRELOAD</envar> library
+            <literal>libpdcap.so</literal> variable produces errors
+            finding the &gsi; tunnel it can be useful to specify the
+            location of the &gsi; tunnel library directly using the
+            following command:
+	  </para>
+
+	  <screen>&prompt-user; <userinput>export
+DCACHE_IO_TUNNEL=/opt/d-cache/dcap/lib/libgsiTunnel.so</userinput></screen>
+
+          <para>
+	    Please see <ulink
+	    url="http://www.dcache.org/manuals/experts_docs/tunnel-HOWTO.html"/>
+	    for further details on tunnel setup for the server.
+          </para>
+        </tip>
 
         <para>
           &dcap; is a <acronym>POSIX</acronym> like interface for
@@ -247,56 +271,43 @@ Debugging</screen>
 
         <para>
           To make non &dcache; aware applications access files within
-          &dcache; through &dcap; all that is needed is setting a
-          couple of environment variables listed below.
+          &dcache; through &dcap; all that is needed is set the
+          <envar>LD_PRELOAD</envar> environment variable to
+          <literal>/opt/d-cache/dcap/lib/libpdcap.so</literal>.
         </para>
 
-        <screen>&prompt-user; <userinput>export LD_PRELOAD=/opt/d-cache/dcap/lib/libpdcap.so </userinput></screen>
+        <screen>&prompt-user; <userinput>export LD_PRELOAD=/opt/d-cache/dcap/lib/libpdcap.so</userinput></screen>
 
         <para>
-          The <envar>LD_PRELOAD</envar> environment variable overrides the operating system calls.
+          Setting the <envar>LD_PRELOAD</envar> environment variable
+          results in the library <filename>libpdcap.so</filename>
+          overriding the operating system calls.  After setting this
+          environment variable, the standard shell command should work
+          with &dcap; and &gsidcap; &url;s.
         </para>
 
-        <para>
-          After the environment variable is set as above the following commands should work.
-        </para>
+	<informalexample>
+	  <para>
+	    The following session demonstrates copying a file into
+	    &dcache;, checking the file is present with the
+	    <command>ls</command> command, reading the first 3 lines
+	    from &dcache; and finally deleting the file.
+	  </para>
 
-        <itemizedlist>
-          <listitem>
-            <screen>&prompt-user; <userinput>cp /etc/group gsidcap://gsidcap-door.example.org:22128/pnfs/example.org/data/dteam/myFile</userinput></screen>
-          </listitem>
-          <listitem>
-            <screen>&prompt-user; <userinput>ls gsidcap://gsidcap-door.example.org:22128/pnfs/example.org/data/dteam/DirOrFile</userinput></screen>
-          </listitem>
-          <listitem>
-            <screen>&prompt-user; <userinput>head gsidcap://gsidcap-door.example.org:22128/pnfs/example.org/data/dteam/myFile</userinput></screen>
-          </listitem>
-          <listitem>
-            <screen>&prompt-user; <userinput>rm gsidcap://gsidcap-door.example.org:22128/pnfs/example.org/data/dteam/MyFile</userinput></screen>
-          </listitem>
-        </itemizedlist>
+	  <screen>&prompt-user; <userinput>cp /etc/group gsidcap://gsidcap-door.example.org:22128/pnfs/example.org/data/dteam/myFile</userinput>
+&prompt-user; <userinput>ls gsidcap://gsidcap-door.example.org:22128/pnfs/example.org/data/dteam/DirOrFile</userinput>
+&prompt-user; <userinput>head -3 gsidcap://gsidcap-door.example.org:22128/pnfs/example.org/data/dteam/myFile</userinput>
+root:x:0:
+daemon:x:1:
+bin:x:2:
+&prompt-user; <userinput>rm gsidcap://gsidcap-door.example.org:22128/pnfs/example.org/data/dteam/MyFile</userinput></screen>
+	</informalexample>
 
-        <tip>
-          <title>Finding the gsi tunnel.</title>
-
-          <para>
-            When the <envar>LD_PRELOAD</envar> library
-            <literal>libpdcap.so</literal> variable produces errors
-            finding the &gsi; tunnel it can be useful to specify the
-            location of the &gsi; tunnel library directly using the
-            following command.  <screen>&prompt-user;
-            <userinput>export
-            DCACHE_IO_TUNNEL=/opt/d-cache/dcap/lib/libgsiTunnel.so</userinput></screen>
-            Please see <ulink
-            url="http://www.dcache.org/manuals/experts_docs/tunnel-HOWTO.html">http://www.dcache.org/manuals/experts_docs/tunnel-HOWTO.html</ulink>
-            for further details on tunnel setup for the server.
-          </para>
-        </tip>
       </section>
     </section>
 
     <section id="cb-clients-srm">
-      <title>Using &dcache; &srm; client.</title>
+      <title>&srm;</title>
 
       <para>
         &dcache; provides a series of clients one of which is the
@@ -316,11 +327,17 @@ Debugging</screen>
         <para>Usage:</para>
 
         <cmdsynopsis>
-            srmmkdir <arg>[command line options]</arg><arg><replaceable>srmUrl</replaceable></arg>
+            srmmkdir <arg>[command line options]</arg> <arg><replaceable>srmUrl</replaceable></arg>
         </cmdsynopsis>
 
         <para>Example:</para>
+
         <informalexample>
+	  <para>
+	    The following example creates the directory <filename
+	    class="directory">/pnfs/example.org/data/dteam/myDir</filename>.
+	  </para>
+
           <screen>&prompt-user; <userinput>srmmkdir srm://srm-door.example.org:8443/pnfs/example.org/data/dteam/myDir</userinput></screen>
         </informalexample>
       </section>
@@ -332,6 +349,7 @@ Debugging</screen>
         <cmdsynopsis>
            srmrm  <arg>[command line options]</arg><arg><replaceable>srmUrl</replaceable> ...</arg>
         </cmdsynopsis>
+
         <informalexample>
           <screen>&prompt-user; <userinput>srmrm srm://srm-door.example.org:8443/pnfs/example.org/data/dteam/myDir/myFile</userinput></screen>
         </informalexample>
@@ -346,6 +364,7 @@ Debugging</screen>
 	</para>
 
         <para>Usage:</para>
+
         <cmdsynopsis>
            srmrmdir <arg>command line options</arg><arg><replaceable>srmUrl</replaceable></arg>
         </cmdsynopsis>
@@ -400,7 +419,7 @@ Debugging</screen>
 
           <para>
             The <command>srmping</command> command will tell you the
-            version of &dcache; This only works for authorized users
+            version of &dcache;.  This only works for authorized users
             and not just authenticated users.
           </para>
 
@@ -416,11 +435,11 @@ backend_version:production-1-9-1-11</screen>
           <title>Space Tokens</title>
 
           <para>
-            Space tokens are only supported in &dcache; 1.8.0 and
-            above. Space token support must be set up and reserving
-            space with the admin interface this is also documented
-            <link linkend="cf-srm-intro">in the &srm; section</link>
-            and in <ulink
+            Space token support must be set up and reserving space
+            with the admin interface this is also documented <link
+            linkend="cf-srm-intro">in the &srm; section</link> and in
+<!-- FIXME: reference to wiki from Book -->
+            <ulink
             url="http://trac.dcache.org/projects/dcache/wiki/manuals/SRM_2.2_Setup">the
             &dcache; wiki</ulink>.
           </para>
@@ -574,7 +593,8 @@ Space Reservation with token=120049
         <section id="cb-clients-srm-2-ls">
           <title>Listing a file in &srm;</title>
           <para>
-	    &srm; 2.2 has a much richer set of file listing commands.
+	    &srm; version 2.2 has a much richer set of file listing
+	    commands.
 	  </para>
           <para>
 	    Usage:
@@ -595,11 +615,17 @@ Space Reservation with token=120049
           </example>
 
           <note>
-            <userinput>srmls -l</userinput> is a long format mode and may result in dramatic increase in execution time.
+	    <para>
+	      The <option>-l</option> option results in
+	      <command>srmls</command> providing additional
+	      information.  Collecting this additional information may
+	      result in a dramatic increase in execution time.
+	    </para>
           </note>
 
           <example>
             <title>Using <userinput>srmls -l</userinput>:</title>
+
 	    <screen>&prompt-user; <userinput>srmls -l srm://srm-door.example.org:8443/pnfs/example.org/data/dteam/testdir -2</userinput>
   0 /pnfs/example.org/data/dteam/testdir/
   storage type:PERMANENT
@@ -634,21 +660,21 @@ Space Reservation with token=120049
       - Original SURL:  /pnfs/example.org/data/dteam/testdir/testFile1
  - Status:  null
  - Type:  FILE</screen>
-            <para>
-              If you have more than <literal>1000</literal> entries in
-              your directory, please use the following parameters:
-            </para>
           </example>
-          <note>
-	    The maximum number of elements listed with srmls is set to
-	    <literal>1000</literal>.
-          </note>
+
+	  <para>
+	    If you have more than 1000 entries in your directory then
+	    &dcache; will return only the first 1000.  To view
+	    directories with more than 1000 entries, please use the
+	    following parameters:
+	  </para>
+
 	  <variablelist>
 	    <title>srmls parameters</title>
 	    <varlistentry><term>-count=<replaceable>integer</replaceable></term>
             <listitem>
               <para>
-                Number of entries to report
+                The number of entries to report.
               </para>
             </listitem>
 	    </varlistentry>
@@ -659,25 +685,17 @@ Space Reservation with token=120049
             </para>
 	    </varlistentry>
 	  </variablelist>
-	  <para>
-	    For example, if you list a directory (containing more than
-	    1000 entries) without parameters above, you get the first
-	    999 entries listed.
-	  </para>
 
-	  <para>Example:</para>
-	  <screen>&prompt-user; <userinput>srmls -count=3 srm://srm-door.example.org:8443/pnfs/example.org/data/dteam/testdir  -srm_protocol_version=2</userinput>
-0 /pnfs/example.org/data/dteam/testdir/
-      31 /pnfs/example.org/data/dteam/testdir/testFile1
-      31 /pnfs/example.org/data/dteam/testdir/testFile2
-      31 /pnfs/example.org/data/dteam/testdir/testFile3</screen>
-         <para>Example:</para>
-         <screen>&prompt-user; <userinput>srmls -count=3 -offset=1 srm://srm-door.example.org:8443/pnfs/example.org/data/dteam/testdir  -srm_protocol_version=2</userinput>
-0 /pnfs/example.org/data/dteam/testdir/
-      31 /pnfs/example.org/data/dteam/testdir/testFile2
-      31 /pnfs/example.org/data/dteam/testdir/testFile3
-      31 /pnfs/example.org/data/dteam/testdir/testFile4</screen>
-         <para>Example:</para>
+	  <example>
+	    <title>Limited directory listing</title>
+
+            <para>
+	      The first command shows the output without specifying
+	      <option>-count</option> or <option>-offset</option>.
+	      Since the directory contains less than 1000 entries, all
+	      entries are listed.
+	    </para>
+
          <screen>&prompt-user; <userinput>srmls srm://srm-door.example.org:8443/pnfs/example.org/data/dteam/dir1 \
 srm://srm-door.example.org:8443/pnfs/example.org/data/dteam/dir2</userinput>
   0 /pnfs/example.org/data/dteam/dir1/
@@ -687,8 +705,31 @@ srm://srm-door.example.org:8443/pnfs/example.org/data/dteam/dir2</userinput>
   0 /pnfs/example.org/data/dteam/dir2/
       25 /pnfs/example.org/data/dteam/dir2/fileA
       59 /pnfs/example.org/data/dteam/dir2/fileB</screen>
-         <para>Using AdvidoryDelete Issues.</para>
-        </section>
+
+	    <para>
+	      The following examples shows the result when using the
+	      <option>-count</option> option to listing the first
+	      three entries.
+	    </para>
+
+	    <screen>&prompt-user; <userinput>srmls -count=3 srm://srm-door.example.org:8443/pnfs/example.org/data/dteam/testdir  -srm_protocol_version=2</userinput>
+0 /pnfs/example.org/data/dteam/testdir/
+      31 /pnfs/example.org/data/dteam/testdir/testFile1
+      31 /pnfs/example.org/data/dteam/testdir/testFile2
+      31 /pnfs/example.org/data/dteam/testdir/testFile3</screen>
+
+            <para>
+	      In the next command, the <option>-offset</option> option
+	      is used to view a different set of entries.
+	    </para>
+
+            <screen>&prompt-user; <userinput>srmls -count=3 -offset=1 srm://srm-door.example.org:8443/pnfs/example.org/data/dteam/testdir  -srm_protocol_version=2</userinput>
+0 /pnfs/example.org/data/dteam/testdir/
+      31 /pnfs/example.org/data/dteam/testdir/testFile2
+      31 /pnfs/example.org/data/dteam/testdir/testFile3
+      31 /pnfs/example.org/data/dteam/testdir/testFile4</screen>
+	  </example>
+	</section>
       </section>
     </section>
 
@@ -766,100 +807,98 @@ gsidcap://gsidcap-door.example.org:22128/pnfs/example.org/data/dteam/group
           information. These are explained below.
         </para>
 
-        <screen>gsidcap://gsidcap-door.example.org:22128/pnfs/example.org/data/dteam/group</screen>
+	<para>
+	  <literal>gsidcap://gsidcap-door.example.org:22128/pnfs/example.org/data/dteam/group</literal>
+	  is the transfer &url; (&turl;).
+	</para>
 
-        <para>
-          This line is a &turl;.
+	<para>
+	  <literal>-2147365977</literal> is the &srm; <literal>Request
+	  Id</literal>, Please note that it is a negative number in
+	  this example, which is allowed by the specification.
         </para>
 
-        <screen>-2147365977</screen>
-
-        <para>
-          This is the &srm; request Id, Please note that it is a
-          negative number in this example, which is allowed by the
-          specification.
+	<para>
+	  <literal>-2147365976</literal> is the Unique identifier for
+	  the file with respect to the <literal>Request
+	  Id</literal>. Please note that with this example this is a
+	  negative number.
         </para>
 
-        <screen>-2147365976</screen>
-        <para>
-          Unique identifier to the file with respect to the request
-          Id. Please note that with this example this is a negative
-          number.
-        </para>
+	<important>
+          <title>Remember to return your <literal>Request Id</literal></title>
 
-        <section id="cb-clients-lcg-gt-usagenotes">
-          <title>Usage Notes</title>
           <para>
-            Each user has a limited number of request Id's available
-            and all used request Id's should be returned to &dcache;
-            using the command <command>lcg-sd</command> <xref
-            linkend="cb-clients-lcg-sd-usagenotes"/>. If you use in
-            invalid protocol not supported by &dcache; this command
-            will block for some time as &dcache;'s &srm; interface
-            times out after approximately 10 minutes.
-          </para>
-        </section>
+            &dcache; limits the number of <literal>Request
+            Id</literal>s a user may have.  All <litearl>Request
+            Id</litearl>s should be returned to &dcache; using the
+            command <command>lcg-sd</command>.
+	  </para>
+	</important>
+
+	<para>
+	  If you use <command>lcg-gt</command> to request a file with
+	  a protocol that is not supported by &dcache; the command
+	  will block for some time as &dcache;'s &srm; interface times
+	  out after approximately 10 minutes.
+	</para>
       </section>
 
       <section id="cb-clients-lcg-sd">
         <title>The <command>lcg-sd</command> Application</title>
+
         <para>
           This command should be used to return any &turl;s given by
           &dcache;'s &srm; interface.  This is because &dcache;
           provides a limited number of &turl;s available concurrently.
         </para>
+
         <para>
-          <command>lcg-sd</command> takes 4 parameters, the &surl;,
-          the request Id, the file Id with respect to the request Id,
-          and the direction of data transfer. The following example is
-          to complete the get operation, the values are taken form the
-          above example of <command>lcg-gt</command>.
+          <command>lcg-sd</command> takes four parameters: the &surl;,
+          the <literal>Request Id</literal>, the <literal>File
+          Id</literal> with respect to the <literal>Request
+          Id</literal>, and the direction of data transfer.
+	</para>
+
+	<para>
+	  The following example is to complete the get operation, the
+	  values are taken form the above example of
+	  <command>lcg-gt</command>.
         </para>
 
         <screen>&prompt-user; <userinput>lcg-sd srm://srm-door.example.org:22128/pnfs/example.org/data/dteam/group " -2147365977" " -2147365976" 0</userinput></screen>
 
-        <note>
-          <itemizedlist>
-            <listitem>
-              <para>
-                The request Id comes from the
-                <command>lcg-gt</command> command.
-              </para>
-            </listitem>
-            <listitem>
-              <para>
-                The file Id comes from the <command>lcg-gt</command>
-                command.
-              </para>
-            </listitem>
-            <listitem>
-              <para>
-                The direction parameter of data transfer should be set
-                to <literal>0</literal> for reading data and
-                <literal>1</literal> for writing data.
-              </para>
-            </listitem>
-          </itemizedlist>
-        </note>
+	<note>
+	  <title>Negative numbers</title>
 
-        <section id="cb-clients-lcg-sd-usagenotes">
-          <title>Usage Notes</title>
+	  <para>
+	    &dcache; returns negative numbers for <literal>Request
+	    Id</literal> and <literal>File Id</literal>.  Please note
+	    that <command>lcg-sd</command> requires that these values
+	    are places in double-quotes with a single space before the
+	    <literal>-</literal> sign.
+	  </para>
+	</note>
 
-          <warning>
-            <title>Negative numbers</title>
-            <para>
-              &dcache; follows the &srm; specification but is the only
-              implementation that returns negative
-              numbers. Unfortunately this is not handled cleanly or in
-              a standard way with <literal>lcg_util</literal>
-              applications, <command>lcg-sd</command> is no exception.
-              Please note the above examples places the request Id and
-              the file Id in quotes with a single space before the -
-              sign.
-            </para>
-          </warning>
-        </section>
+	<para>
+	  The <literal>Request Id</literal> is one of the values
+	  returned by the <command>lcg-gt</command> command.  In this
+	  example, the value (<literal>-2147365977</literal>) comes
+	  from the above example <command>lcg-gt</command>.
+	</para>
+
+	<para>
+	  The <literal>File Id</literal> is also one of the values
+	  returned returned by the <command>lcg-gt</command> command.
+	  In this example, the value (<literal>-2147365976</literal>)
+	  comes from the above example <command>lcg-gt</command>.
+	</para>
+
+	<para>
+	  The direction parameter indicates in which direction data
+	  was transferred: <literal>0</literal> for reading data and
+	  <literal>1</literal> for writing data.
+	</para>
       </section>
     </section>
-  </section>
 </chapter>
