@@ -7,8 +7,10 @@
 ]>
 <chapter id="cb-clients">
   <title>Protocols</title>
+
   <section id="cb-clients-gen">
     <title>&dcache; Clients.</title>
+
     <sectioninfo>
       <authorgroup>
         <author>
@@ -17,27 +19,37 @@
         </author>
       </authorgroup>
     </sectioninfo>
+
     <para>
-      There are many client tools for &dcache;. These can most
-      easily be classified by communication protocol.
+      There are many client tools for &dcache;. These can most easily
+      be classified by communication protocol.
     </para>
+
     <section id="cb-clients-gridftp">
       <title>Using the &gsiftp; clients with &dcache;</title>
+
       <para>
-&dcache; provides a &gsiftp; door, which is in effect a &gsi; authenticated &ftp; access point to &dcache;
+	&dcache; provides a &gsiftp; door, which is in effect a
+        &gsi; authenticated &ftp; access point to &dcache;
       </para>
+
       <section id="cb-clients-gridftp-ls">
         <title>Listing a directory</title>
+
         <para>
           To list the content of a &dcache; directory, the &gsiftp; protocol can be used;
         </para>
+
         <screen>&prompt-user; <userinput>edg-gridftp-ls gsiftp://gridftp-door.example.org/pnfs/example.org/data/dteam/</userinput></screen>
       </section>
+
       <section id="cb-clients-gridftp-exists">
         <title>Checking a file exists</title>
+
         <para>
           To check the existence of a file with &gsiftp;.
         </para>
+
         <screen>&prompt-user; <userinput>edg-gridftp-exists gsiftp://gridftp-door.example.org/pnfs/example.org/data/dteam/filler_test20050819130209790873000</userinput>
 &prompt-user; <userinput>echo $?</userinput>
 0
@@ -45,62 +57,92 @@
 error the server sent an error response: 451 451 /pnfs/example.org/data/dteam/filler_test200508191302097908730002  not found
 &prompt-user; <userinput>echo $?</userinput>
 1</screen>
+
         <para>
-          Please note the <userinput>echo $?</userinput> show the return code of the last run application. The error message returned from the client this should not be scripted against as its one of many possible errors.
+          Please note the <userinput>echo $?</userinput> show the
+          return code of the last run application. The error message
+          returned from the client this should not be scripted against
+          as its one of many possible errors.
         </para>
       </section>
+
       <section id="cb-clients-gridftp-rm">
         <title>Deleting files</title>
+
         <para>
           To delete files with &gsiftp; use the following command.
         </para>
+
         <screen>&prompt-user; <userinput>edg-gridftp-rm gsiftp://gridftp-door.example.org/pnfs/example.org/data/dteam/filler_test20050811160948926780000</userinput></screen>
+
         <para>
-          This deletes the file <filename>filler_test20050811160948926780000</filename>
-          from the <filename class="directory">/pnfs/example.org/data/dteam</filename> using the door running on the host
-          <systemitem class="fqdomainname">gridftp-door.example.org</systemitem> within the &dcache; cluster
-          <systemitem class="domainname">example.org</systemitem>
+          This deletes the file
+          <filename>filler_test20050811160948926780000</filename> from
+          the <filename
+          class="directory">/pnfs/example.org/data/dteam</filename>
+          using the door running on the host <systemitem
+          class="fqdomainname">gridftp-door.example.org</systemitem>
+          within the &dcache; cluster <systemitem
+          class="domainname">example.org</systemitem>
         </para>
       </section>
+
       <section id="cb-clients-gridftp-cp">
         <title>Copying files</title>
+
         <cmdsynopsis>
           globus-url-copy <arg>[command line options]</arg><arg><replaceable>srcUrl</replaceable></arg> <arg><replaceable>destinationUrl</replaceable></arg> ...
         </cmdsynopsis>
+
         <para>
-          Copying file with <literal>globus-url-copy</literal> follows the syntax source, destination.
+          Copying file with <literal>globus-url-copy</literal> follows
+          the syntax source, destination.
         </para>
+
         <informalexample>
           <screen>&prompt-user; <userinput>globus-url-copy \
 file://///etc/group \
 gsiftp://gridftp-door.example.org/pnfs/example.org/data/dteam/test_GlobusUrlCopy.clinton.504.22080.20071102160121.2</userinput></screen>
-        <para>Please note that the five slashes are really needed.</para>
+          <para>Please note that the five slashes are really needed.</para>
         </informalexample>
       </section>
     </section>
+
     <section id="cb-clients-dcap">
       <title>&dcap;</title>
-      <para>When using &prog-dccp; client or using the interposition library the errors <computeroutput>Command failed!</computeroutput> can be safely ignored.</para>
+
+      <para>
+	When using &prog-dccp; client or using the interposition
+	library the errors <computeroutput>Command
+	failed!</computeroutput> can be safely ignored.
+      </para>
+
       <section id="cb-clients-dcap-dcc">
         <title>&prog-dccp;</title>
+
         <para>
           Using &prog-dccp; as a &dcap; client
         </para>
+
         <screen>&prompt-user; <userinput>/opt/d-cache/dcap/bin/dccp    /etc/group dcap://dcap-door.example.org:22125//pnfs/example.org/data/dteam/test6</userinput>
 Command failed!
 Server error message for [1]: "path //pnfs/example.org/data/dteam/test6 not found" (errno 10001).
 597 bytes in 0 seconds</screen>
+
         <para>
           Using &prog-dccp; as a &gsidcap; client
         </para>
+
         <screen>&prompt-user; <userinput>export DCACHE_IO_TUNNEL=libgsiTunnel.so</userinput>
 &prompt-user; <userinput>/opt/d-cache/dcap/bin/dccp    /etc/group gsidcap://gsidcap-door.example.org:22128/pnfs/example.org/data/dteam/test5</userinput>
 Command failed!
 Server error message for [1]: "path //pnfs/example.org/data/dteam/test5 not found" (errno 10001).
 597 bytes in 0 seconds</screen>
+
         <para>
           Using debug flags with &prog-dccp;
         </para>
+
         <screen>&prompt-user; <userinput>/opt/d-cache/dcap/bin/dccp -d 63   /etc/group dcap://dcap-door.example.org:22128/pnfs/example.org/data/dteam/test3</userinput>
 Dcap Version version-1-2-42 Jul 10 2007 19:56:02
 Using system native stat64 for /etc/group.
@@ -169,38 +211,56 @@ Removing unneeded queue [2]
 [7] destroing node
 597 bytes in 0 seconds
 Debugging</screen>
+
         <para>
-          The &dcap; libraries and &prog-dccp; client use a bit mask variable.
+          The &dcap; libraries and &prog-dccp; client use a bit mask
+          variable.
         </para>
+
         <screen>&prompt-user; <userinput>export DCACHE_DEBUG=255</userinput></screen>
-        <para>255 is the highest level of debugging, but may crash or prove unstable,
-        I would recommend lower levels with 1,2,4,8.</para>
+
+        <para>
+	  255 is the highest level of debugging, but may crash or
+	  prove unstable, I would recommend lower levels with
+	  1,2,4,8.
+	</para>
       </section>
+
       <section id="cb-clients-dcap-interposition">
         <title>Using the &dcache; client interposition library.</title>
+
         <para>
-          &dcap; is a <acronym>POSIX</acronym> like interface for accessing &dcache;,
-          allowing unmodified applications to access &dcache; transparently. This access
-          method uses a proprietary data transfer protocol, which can emulate
-          <acronym>POSIX</acronym> access across the <acronym>LAN</acronym> or
-          <acronym>WAN</acronym>.
+          &dcap; is a <acronym>POSIX</acronym> like interface for
+          accessing &dcache;, allowing unmodified applications to
+          access &dcache; transparently. This access method uses a
+          proprietary data transfer protocol, which can emulate
+          <acronym>POSIX</acronym> access across the
+          <acronym>LAN</acronym> or <acronym>WAN</acronym>.
         </para>
+
         <para>
-          Unfortunately the client requires inbound connectivity and so it is not practical
-          to use this protocol over the <acronym>WAN</acronym> as most sites will not allow
-          inbound connectivity to worker nodes.
+          Unfortunately the client requires inbound connectivity and
+          so it is not practical to use this protocol over the
+          <acronym>WAN</acronym> as most sites will not allow inbound
+          connectivity to worker nodes.
         </para>
+
         <para>
-          To make non &dcache; aware applications access files within &dcache; through &dcap;
-          all that is needed is setting a couple of environment variables listed below.
+          To make non &dcache; aware applications access files within
+          &dcache; through &dcap; all that is needed is setting a
+          couple of environment variables listed below.
         </para>
+
         <screen>&prompt-user; <userinput>export LD_PRELOAD=/opt/d-cache/dcap/lib/libpdcap.so </userinput></screen>
+
         <para>
           The <envar>LD_PRELOAD</envar> environment variable overrides the operating system calls.
         </para>
+
         <para>
           After the environment variable is set as above the following commands should work.
         </para>
+
         <itemizedlist>
           <listitem>
             <screen>&prompt-user; <userinput>cp /etc/group gsidcap://gsidcap-door.example.org:22128/pnfs/example.org/data/dteam/myFile</userinput></screen>
@@ -215,41 +275,59 @@ Debugging</screen>
             <screen>&prompt-user; <userinput>rm gsidcap://gsidcap-door.example.org:22128/pnfs/example.org/data/dteam/MyFile</userinput></screen>
           </listitem>
         </itemizedlist>
+
         <tip>
           <title>Finding the gsi tunnel.</title>
+
           <para>
-            When the <envar>LD_PRELOAD</envar> library <literal>libpdcap.so</literal> variable
-            produces errors finding the &gsi; tunnel it can be useful to specify the location
-            of the &gsi; tunnel library directly using the following command.
-            <screen>&prompt-user; <userinput>export DCACHE_IO_TUNNEL=/opt/d-cache/dcap/lib/libgsiTunnel.so</userinput></screen>
-            Please see <ulink url="http://www.dcache.org/manuals/experts_docs/tunnel-HOWTO.html">http://www.dcache.org/manuals/experts_docs/tunnel-HOWTO.html</ulink>
+            When the <envar>LD_PRELOAD</envar> library
+            <literal>libpdcap.so</literal> variable produces errors
+            finding the &gsi; tunnel it can be useful to specify the
+            location of the &gsi; tunnel library directly using the
+            following command.  <screen>&prompt-user;
+            <userinput>export
+            DCACHE_IO_TUNNEL=/opt/d-cache/dcap/lib/libgsiTunnel.so</userinput></screen>
+            Please see <ulink
+            url="http://www.dcache.org/manuals/experts_docs/tunnel-HOWTO.html">http://www.dcache.org/manuals/experts_docs/tunnel-HOWTO.html</ulink>
             for further details on tunnel setup for the server.
           </para>
         </tip>
       </section>
     </section>
+
     <section id="cb-clients-srm">
       <title>Using &dcache; &srm; client.</title>
+
       <para>
-        &dcache; provides a series of clients one of which is the &srm; client which supports a
-        large number operations, but is just one Java application, the script name is sent to
-        the Java applications command line to invoke each operation.
+        &dcache; provides a series of clients one of which is the
+        &srm; client which supports a large number operations, but is
+        just one Java application, the script name is sent to the Java
+        applications command line to invoke each operation.
       </para>
-      <para>This page just shows the scripts command line and not the invocation of the Java
-      application directly.</para>
+
+      <para>
+	This page just shows the scripts command line and not the
+	invocation of the Java application directly.
+      </para>
+
       <section id="cb-clients-srm-mkdir">
         <title>Creating a new directory.</title>
+
         <para>Usage:</para>
+
         <cmdsynopsis>
             srmmkdir <arg>[command line options]</arg><arg><replaceable>srmUrl</replaceable></arg>
         </cmdsynopsis>
+
         <para>Example:</para>
         <informalexample>
           <screen>&prompt-user; <userinput>srmmkdir srm://srm-door.example.org:8443/pnfs/example.org/data/dteam/myDir</userinput></screen>
         </informalexample>
       </section>
+
       <section id="cb-clients-srm-rm">
         <title>Removing files from &dcache;</title>
+
         <para>Usage:</para>
         <cmdsynopsis>
            srmrm  <arg>[command line options]</arg><arg><replaceable>srmUrl</replaceable> ...</arg>
@@ -258,14 +336,20 @@ Debugging</screen>
           <screen>&prompt-user; <userinput>srmrm srm://srm-door.example.org:8443/pnfs/example.org/data/dteam/myDir/myFile</userinput></screen>
         </informalexample>
       </section>
+
       <section id="cb-clients-srm-rmdir">
         <title>Removing empty directories from &dcache;</title>
-        <para>It is allowed to remove only empty directories as well as trees of empty
-        directories.</para>
+
+        <para>
+	  It is allowed to remove only empty directories as well as
+	  trees of empty directories.
+	</para>
+
         <para>Usage:</para>
         <cmdsynopsis>
            srmrmdir <arg>command line options</arg><arg><replaceable>srmUrl</replaceable></arg>
         </cmdsynopsis>
+
         <para>Examples:</para>
         <informalexample>
           <screen>&prompt-user; <userinput>srmrmdir srm://srm-door.example.org:8443/pnfs/example.org/data/dteam/myDir</userinput></screen>
@@ -274,24 +358,32 @@ Debugging</screen>
           <screen>&prompt-user; <userinput>srmrmdir -recursive=true srm://srm-door.example.org:8443/pnfs/example.org/data/dteam/myDir</userinput></screen>
         </informalexample>
       </section>
+
       <section id="cb-clients-srm-1-cp">
         <title>srmcp for &srm; v1</title>
+
         <para>Usage:</para>
+
         <cmdsynopsis>
           srmcp <arg>command line options</arg> <arg rep='repeat' choice='plain'><replaceable>source</replaceable></arg> <arg><replaceable>destination</replaceable></arg>
         </cmdsynopsis>
+
         <para>or</para>
+
         <cmdsynopsis>
           srmcp <arg>command line options</arg> <arg>-copyjobfile</arg> <arg choice='plain'><replaceable>file</replaceable></arg>
         </cmdsynopsis>
+
         <section id="cb-clients-srm-1-cp-to">
           <title>Copying files to &dcache;</title>
+
           <informalexample>
             <screen>&prompt-user; <userinput>srmcp -webservice_protocol=http \
    file://///etc/group \
    srm://srm-door.example.org:8443/pnfs/example.org/data/dteam/test_Srm.clinton.501.32050.20070907153055.0</userinput></screen>
           </informalexample>
         </section>
+
         <section id="cb-clients-srm-1-cp-from">
           <title>Copying files from &dcache;</title>
           <screen>&prompt-user; <userinput>srmcp -webservice_protocol=http \
@@ -299,14 +391,19 @@ Debugging</screen>
    file://///tmp/testfile1 -streams_num=1</userinput></screen>
         </section>
       </section>
+
       <section id="cb-clients-srm-2">
         <title>srmcp for &srm; v2.2</title>
-          <section id="cb-clients-srm-ping">
+
+	<section id="cb-clients-srm-ping">
           <title>Getting the &dcache; Version</title>
+
           <para>
-            The <command>srmping</command> command will tell you the version of &dcache; This only
-            works for authorized users and not just authenticated users.
+            The <command>srmping</command> command will tell you the
+            version of &dcache; This only works for authorized users
+            and not just authenticated users.
           </para>
+
           <screen>&prompt-user; <userinput>srmping -2 srm://srm-door.example.org:8443/pnfs</userinput>
 WARNING: SRM_PATH is defined, which might cause a wrong version of srm client to be executed
 WARNING: SRM_PATH=/opt/d-cache/srm
@@ -314,24 +411,33 @@ VersionInfo : v2.2
 backend_type:dCache
 backend_version:production-1-9-1-11</screen>
         </section>
+
         <section id="cb-clients-srm-st">
           <title>Space Tokens</title>
+
           <para>
-            Space tokens are only supported in &dcache; 1.8.0 and above. Space token support
-            must be set up and reserving space with the admin interface this is also documented
-            <link linkend="cf-srm-intro">in the &srm; section</link> and in
-            <ulink url="http://trac.dcache.org/projects/dcache/wiki/manuals/SRM_2.2_Setup">the
+            Space tokens are only supported in &dcache; 1.8.0 and
+            above. Space token support must be set up and reserving
+            space with the admin interface this is also documented
+            <link linkend="cf-srm-intro">in the &srm; section</link>
+            and in <ulink
+            url="http://trac.dcache.org/projects/dcache/wiki/manuals/SRM_2.2_Setup">the
             &dcache; wiki</ulink>.
           </para>
+
           <section id="cb-clients-srm-st-ls">
             <title>Space Token Listing</title>
-            <para>Usage:
+
+            <para>Usage:</para>
             <cmdsynopsis>get-space-tokens <arg>command line options</arg> <arg><replaceable>srmUrl</replaceable></arg></cmdsynopsis>
-            </para>
+
             <example>
-              <title>Example surveying's the space tokens available in a directory.</title>
+              <title>surveying the space tokens available in a directory.</title>
+
               <screen>&prompt-user; <userinput>srm-get-space-tokens srm://srm-door.example.org:8443/pnfs/example.org/data/dteam -srm_protocol_version=2</userinput></screen>
+
               <para>A successful result:</para>
+
               <screen>return status code : SRM_SUCCESS
 return status expl. : OK
 Space Reservation Tokens:
@@ -346,8 +452,10 @@ Space Reservation Tokens:
 148231
 148352</screen>
             </example>
+
             <example>
-              <title>Example of listing the space tokens for a &srm;:</title>
+              <title>Listing the space tokens for a &srm;:</title>
+
               <screen>&prompt-user; <userinput>srm-get-space-tokens srm://srm-door.example.org:8443</userinput>
 Space Reservation Tokens:
 145614
@@ -361,12 +469,15 @@ Space Reservation Tokens:
 145589</screen>
             </example>
           </section>
+
           <section id="cb-clients-srm-st-reserve">
             <title>Space Reservation</title>
+
             <para>Usage:</para>
             <cmdsynopsis>
               srm-reserve-space <arg>[command line options]</arg><arg><replaceable>srmUrl</replaceable></arg>
             </cmdsynopsis>
+
             <screen>&prompt-user; <userinput>srm-reserve-space  \
 -desired_size 2000 \
 -srm_protocol_version=2 \
@@ -375,9 +486,12 @@ Space Reservation Tokens:
 -guaranteed_size 1024 \
 -lifetime 36000 \
 srm://srm-door.example.org:8443/pnfs/example.org/data/dteam</userinput></screen>
+
             <para>A successful result:</para>
             <screen>Space token =144573</screen>
+
             <para>A typical failure</para>
+
             <screen>SRMClientV2 : srmStatusOfReserveSpaceRequest , contacting service httpg://srm-door.example.org:8443/srm/managerv2
 status: code=SRM_NO_FREE_SPACE explanantion= at Thu Nov 08 15:29:44 CET 2007 state Failed :  no space available
 lifetime = null
@@ -385,9 +499,16 @@ access latency = ONLINE
 retention policy = REPLICA
 guaranteed size = null
 total size = 34</screen>
-            <para>Also you can get info for this space token <literal>144573</literal>:</para>
+
+            <para>
+	      Also you can get info for this space token
+	      <literal>144573</literal>:
+	    </para>
+
             <screen>&prompt-user; <userinput>srm-get-space-metadata srm://srm-door.example.org:8443/pnfs/example.org/data/dteam -space_tokens=144573</userinput></screen>
+
             <para>Possible result:</para>
+
             <screen>Space Reservation with token=120047
                    owner:VoGroup=/dteam VoRole=NULL
                totalSize:1024
@@ -398,23 +519,33 @@ total size = 34</screen>
            accessLatency:ONLINE
          retentionPolicy:REPLICA</screen>
           </section>
+
           <section id="cb-clients-srm-st-write">
             <title>Writing to a Space Token</title>
+
             <para>Usage: srmcp [command line options] source(s) destination</para>
+
             <para>Examples:</para>
             <screen>&prompt-user; <userinput>srmcp -protocols=gsiftp -space_token=144573 \
 file://///home/user/path/to/myFile \
 srm://srm-door.example.org:8443/pnfs/example.org/data/dteam/myFile</userinput></screen>
+
             <screen>&prompt-user; <userinput>srmcp -protocols=gsiftp -space_token=144573 \
 file://///home/user/path/to/myFile1 \
 file://///home/user/path/to/myFile2 \
 srm://srm-door.example.org:8443/pnfs/example.org/data/dteam</userinput></screen>
           </section>
+
           <section id="cb-clients-srm-st-metadata">
             <title>Space Metadata</title>
+
             <para>
-              Users can get the metadata available for the space, but the ability to query the metadata of a space reservation may be restricted so that only certain users can obtain this information.
+              Users can get the metadata available for the space, but
+              the ability to query the metadata of a space reservation
+              may be restricted so that only certain users can obtain
+              this information.
             </para>
+
             <screen>&prompt-user; <userinput>srm-get-space-metadata srm://srm-door.example.org:8443/pnfs/example.org/data/dteam -space_tokens=120049
 WARNING: SRM_PATH is defined, which might cause a wrong version of srm client to be executed
 WARNING: SRM_PATH=/opt/d-cache/srm</userinput>
@@ -428,24 +559,33 @@ Space Reservation with token=120049
            accessLatency:ONLINE
          retentionPolicy:REPLICA</screen>
           </section>
+
           <section id="cb-clients-srm-st-strm">
             <title>Space Token Release</title>
-            <para>Removes a space token from the &srm;.</para>
+
+            <para>
+	      Removes a space token from the &srm;.
+	    </para>
+
             <screen>&prompt-user; <userinput>srm-release-space srm://srm-door.example.org:8443 -space_token=15</userinput></screen>
           </section>
         </section>
+
         <section id="cb-clients-srm-2-ls">
           <title>Listing a file in &srm;</title>
-          <para>&srm; 2.2 has a much richer set of file listing commands.</para>
           <para>
-          Usage:
+	    &srm; 2.2 has a much richer set of file listing commands.
+	  </para>
+          <para>
+	    Usage:
           </para>
           <cmdsynopsis>
             srmls <arg>command line options</arg> <arg choice='plain' rep='repeat'><replaceable>srmUrl</replaceable></arg>
           </cmdsynopsis>
+
           <example>
-          <title>Example of using <userinput>srmls -l</userinput>:</title>
-          <screen>&prompt-user; <userinput>srmls srm://srm-door.example.org:8443/pnfs/example.org/data/dteam/testdir  -2</userinput>
+	    <title>Using <userinput>srmls -l</userinput>:</title>
+	    <screen>&prompt-user; <userinput>srmls srm://srm-door.example.org:8443/pnfs/example.org/data/dteam/testdir  -2</userinput>
   0 /pnfs/example.org/data/dteam/testdir/
       31 /pnfs/example.org/data/dteam/testdir/testFile1
       31 /pnfs/example.org/data/dteam/testdir/testFile2
@@ -453,12 +593,14 @@ Space Reservation with token=120049
       31 /pnfs/example.org/data/dteam/testdir/testFile4
       31 /pnfs/example.org/data/dteam/testdir/testFile5</screen>
           </example>
-          <example>
-            <title>Example of using <userinput>srmls -l</userinput>:</title>
+
           <note>
             <userinput>srmls -l</userinput> is a long format mode and may result in dramatic increase in execution time.
           </note>
-          <screen>&prompt-user; <userinput>srmls -l srm://srm-door.example.org:8443/pnfs/example.org/data/dteam/testdir  -2</userinput>
+
+          <example>
+            <title>Using <userinput>srmls -l</userinput>:</title>
+	    <screen>&prompt-user; <userinput>srmls -l srm://srm-door.example.org:8443/pnfs/example.org/data/dteam/testdir -2</userinput>
   0 /pnfs/example.org/data/dteam/testdir/
   storage type:PERMANENT
   retention policy:CUSTODIAL
@@ -491,35 +633,40 @@ Space Reservation with token=120049
       - Lifetime left (in seconds):  -1
       - Original SURL:  /pnfs/example.org/data/dteam/testdir/testFile1
  - Status:  null
- - Type:  FILE
-          </screen>
-          <note>The maximum number of elements listed with srmls is set to <literal>1000</literal>.
-          </note>
-          <para>
-            If you have more than <literal>1000</literal> entries in your directory, please use the following
-            parameters:
-          </para>
+ - Type:  FILE</screen>
+            <para>
+              If you have more than <literal>1000</literal> entries in
+              your directory, please use the following parameters:
+            </para>
           </example>
-         <variablelist><title>srmls parameters</title>
-          <varlistentry><term>-count=<replaceable>integer</replaceable></term>
+          <note>
+	    The maximum number of elements listed with srmls is set to
+	    <literal>1000</literal>.
+          </note>
+	  <variablelist>
+	    <title>srmls parameters</title>
+	    <varlistentry><term>-count=<replaceable>integer</replaceable></term>
             <listitem>
               <para>
                 Number of entries to report
               </para>
             </listitem>
-          </varlistentry>
-          <varlistentry><term>-offset=<replaceable>integer</replaceable></term>
+	    </varlistentry>
+	    <varlistentry><term>-offset=<replaceable>integer</replaceable></term>
             <para>
-              Offset to start number of entries to report. The default value is <literal>0</literal>.
+              Offset to start number of entries to report. The default
+              value is <literal>0</literal>.
             </para>
-          </varlistentry>
-         </variablelist>
-         <para>
-           For example, if you list a directory (containing more than 1000 entries) without
-           parameters above, you get the first 999 entries listed.
-         </para>
-         <para>Example:</para>
-         <screen>&prompt-user; <userinput>srmls -count=3 srm://srm-door.example.org:8443/pnfs/example.org/data/dteam/testdir  -srm_protocol_version=2</userinput>
+	    </varlistentry>
+	  </variablelist>
+	  <para>
+	    For example, if you list a directory (containing more than
+	    1000 entries) without parameters above, you get the first
+	    999 entries listed.
+	  </para>
+
+	  <para>Example:</para>
+	  <screen>&prompt-user; <userinput>srmls -count=3 srm://srm-door.example.org:8443/pnfs/example.org/data/dteam/testdir  -srm_protocol_version=2</userinput>
 0 /pnfs/example.org/data/dteam/testdir/
       31 /pnfs/example.org/data/dteam/testdir/testFile1
       31 /pnfs/example.org/data/dteam/testdir/testFile2
@@ -544,126 +691,171 @@ srm://srm-door.example.org:8443/pnfs/example.org/data/dteam/dir2</userinput>
         </section>
       </section>
     </section>
+
     <section id="cb-clients-ldap">
       <title>ldap</title>
+
       <para>&dcache; is commonly deployed with the BDII. The information provider within &dcache;
         publishes information to BDII. To querying the &dcache; BDII is a matter of using the
         standard command ldapsearch. For grid the standard ldap port is set to 2170 from the
         previous value of 2135.
       </para>
+
       <screen>&prompt-user; <userinput>ldapsearch -x -H ldap://localhost:2170 -b mds-vo-name=resource,o=grid > /tmp/ldap.output.ldif</userinput>
 &prompt-user; <userinput>wc -l  /tmp/ldap.output.ldif</userinput>
 205 /tmp/ldap.output.ldif</screen>
+
     </section>
+
     <para>
-      As can be seen from above even a single node standard install of &dcache; returns a
-      considerable number of lines and for this reason we have not included the output, in this
-      case 205 lines where written.
+      As can be seen from above even a single node standard install of
+      &dcache; returns a considerable number of lines and for this
+      reason we have not included the output, in this case 205 lines
+      where written.
     </para>
+
     <section id="cb-clients-lcg">
       <title>Using the <acronym>LCG</acronym> commands with &dcache;</title>
+
       <para>
-        The <literal>lcg_util</literal> <acronym>RPM</acronym> contains many small command line applications which interact with
-        &srm; implementations, these where developed independently from &dcache; and provided
-        by the <acronym>LCG</acronym> grid computing effort.
+        The <literal>lcg_util</literal> <acronym>RPM</acronym>
+        contains many small command line applications which interact
+        with &srm; implementations, these where developed
+        independently from &dcache; and provided by the
+        <acronym>LCG</acronym> grid computing effort.
       </para>
+
       <para>
-        Each command line application operates on a different method of the &srm; interface.
-        These applications where not designed for normal use but to provide components upon
-        which operations can be built.
+        Each command line application operates on a different method
+        of the &srm; interface.  These applications where not designed
+        for normal use but to provide components upon which operations
+        can be built.
       </para>
+
       <para>
-        <command>lcg-gt</command> queries the <acronym>BDII</acronym> information
-        server. This adds an additional requirement that the <acronym>BDII</acronym>
-        information server can be found by <command>lcg-gt</command>,
-        please only attempt to contact servers found on your user interface using.
+        <command>lcg-gt</command> queries the <acronym>BDII</acronym>
+        information server. This adds an additional requirement that
+        the <acronym>BDII</acronym> information server can be found by
+        <command>lcg-gt</command>, please only attempt to contact
+        servers found on your user interface using.
       </para>
+
       <screen>&prompt-user; <userinput>lcg-infosites --vo dteam se</userinput></screen>
       <section id="cb-clients-lcg-gt">
         <title>The <command>lcg-gt</command> Application</title>
         <para>
-          &srm; provides a protocol negotiating interface, and returns a &turl; (transfer &url;).
-          The protocol specified by the client will be returned by the server if the server supports the requested protocol.
+          &srm; provides a protocol negotiating interface, and returns
+          a &turl; (transfer &url;).  The protocol specified by the
+          client will be returned by the server if the server supports
+          the requested protocol.
         </para>
         <para>
-          To read a file from &dcache; using <command>lcg-gt</command> you must specify two parameters the &surl; (storage &url;), and the protcol (&gsidcap; or &gsiftp;) you wish to use to access the
-          file.
+          To read a file from &dcache; using <command>lcg-gt</command>
+          you must specify two parameters the &surl; (storage &url;),
+          and the protcol (&gsidcap; or &gsiftp;) you wish to use to
+          access the file.
         </para>
+
         <screen>&prompt-user; <userinput>lcg-gt srm://srm-door.example.org/pnfs/example.org/data/dteam/group gsidcap</userinput>
 gsidcap://gsidcap-door.example.org:22128/pnfs/example.org/data/dteam/group
 -2147365977
 -2147365976</screen>
+
         <para>
-          Each of the above three lines contains different information. These are explained below.
+          Each of the above three lines contains different
+          information. These are explained below.
         </para>
+
         <screen>gsidcap://gsidcap-door.example.org:22128/pnfs/example.org/data/dteam/group</screen>
+
         <para>
           This line is a &turl;.
         </para>
+
         <screen>-2147365977</screen>
+
         <para>
-          This is the &srm; request Id, Please note that it is a negative number in this
-          example, which is allowed by the specification.
+          This is the &srm; request Id, Please note that it is a
+          negative number in this example, which is allowed by the
+          specification.
         </para>
+
         <screen>-2147365976</screen>
         <para>
-          Unique identifier to the file with respect to the request Id. Please note that with
-          this example this is a negative number.
+          Unique identifier to the file with respect to the request
+          Id. Please note that with this example this is a negative
+          number.
         </para>
+
         <section id="cb-clients-lcg-gt-usagenotes">
           <title>Usage Notes</title>
           <para>
-            Each user has a limited number of request Id's available and all used request Id's
-            should be returned to &dcache; using the command <command>lcg-sd</command>
-            <xref linkend="cb-clients-lcg-sd-usagenotes"/>. If you use in invalid protocol
-            not supported by &dcache; this command will block for some time as &dcache;'s &srm;
-            interface times out after approximately 10 minutes.
+            Each user has a limited number of request Id's available
+            and all used request Id's should be returned to &dcache;
+            using the command <command>lcg-sd</command> <xref
+            linkend="cb-clients-lcg-sd-usagenotes"/>. If you use in
+            invalid protocol not supported by &dcache; this command
+            will block for some time as &dcache;'s &srm; interface
+            times out after approximately 10 minutes.
           </para>
         </section>
       </section>
+
       <section id="cb-clients-lcg-sd">
         <title>The <command>lcg-sd</command> Application</title>
         <para>
-          This command should be used to return any &turl;s given by &dcache;'s &srm; interface.
-          This is because &dcache; provides a limited number of &turl;s available concurrently.
+          This command should be used to return any &turl;s given by
+          &dcache;'s &srm; interface.  This is because &dcache;
+          provides a limited number of &turl;s available concurrently.
         </para>
         <para>
-          <command>lcg-sd</command> takes 4 parameters, the &surl;, the request Id, the file Id
-          with respect to the request Id, and the direction of data transfer. The following
-          example is to complete the get operation, the values are taken form the above example
-          of <command>lcg-gt</command>.
+          <command>lcg-sd</command> takes 4 parameters, the &surl;,
+          the request Id, the file Id with respect to the request Id,
+          and the direction of data transfer. The following example is
+          to complete the get operation, the values are taken form the
+          above example of <command>lcg-gt</command>.
         </para>
+
         <screen>&prompt-user; <userinput>lcg-sd srm://srm-door.example.org:22128/pnfs/example.org/data/dteam/group " -2147365977" " -2147365976" 0</userinput></screen>
+
         <note>
           <itemizedlist>
             <listitem>
               <para>
-                The request Id comes from the <command>lcg-gt</command> command.
+                The request Id comes from the
+                <command>lcg-gt</command> command.
               </para>
             </listitem>
             <listitem>
               <para>
-                The file Id comes from the <command>lcg-gt</command> command.
+                The file Id comes from the <command>lcg-gt</command>
+                command.
               </para>
             </listitem>
             <listitem>
               <para>
-                The direction parameter of data transfer should be set to <literal>0</literal> for
-                reading data and <literal>1</literal> for writing data.
+                The direction parameter of data transfer should be set
+                to <literal>0</literal> for reading data and
+                <literal>1</literal> for writing data.
               </para>
             </listitem>
           </itemizedlist>
         </note>
+
         <section id="cb-clients-lcg-sd-usagenotes">
           <title>Usage Notes</title>
+
           <warning>
             <title>Negative numbers</title>
             <para>
-              &dcache; follows the &srm; specification but is the only implementation that
-              returns negative numbers. Unfortunately this is not handled cleanly or in a
-              standard way with <literal>lcg_util</literal> applications, <command>lcg-sd</command> is no exception.
-              Please note the above examples places the request Id and the file Id in quotes with
-              a single space before the - sign.
+              &dcache; follows the &srm; specification but is the only
+              implementation that returns negative
+              numbers. Unfortunately this is not handled cleanly or in
+              a standard way with <literal>lcg_util</literal>
+              applications, <command>lcg-sd</command> is no exception.
+              Please note the above examples places the request Id and
+              the file Id in quotes with a single space before the -
+              sign.
             </para>
           </warning>
         </section>
