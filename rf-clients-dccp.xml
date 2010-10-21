@@ -7,6 +7,7 @@
 
 <section id="rf-clients-dccp">
   <title>&prog-dccp;</title>
+
   <refentry id="cmd-dccp">
     <refmeta><refentrytitle><command>&prog-dccp;</command></refentrytitle></refmeta>
     <refnamediv><refname><command>&prog-dccp;</command></refname>
@@ -51,9 +52,9 @@
 
       <para>
 	The &prog-dccp; utility provides a <command>cp</command>(1)
-	like functionality on the pnfs file system.  The source must
-	be a single file while the destination could be a directory
-	name as well as a file name. If the directory is a
+	like functionality on the &dcache; file system.  The source
+	must be a single file while the destination could be a
+	directory name or a file name. If the directory is a
 	destination, a new file with the same name as the source name
 	will be created there and the contents of the source will be
 	copied. If the final destination file exists in &dcache;, it
@@ -75,7 +76,7 @@
 
       <variablelist>
 	<varlistentry>
-	  <term><arg>-a</arg></term>
+	  <term><option>-a</option></term>
 	  <listitem>
 	    <para>
 	      Enable read-ahead functionality.
@@ -84,7 +85,7 @@
 	</varlistentry>
 
 	<varlistentry>
-	  <term><arg>-b</arg> <replaceable>bufferSize</replaceable></term>
+	  <term><option>-b</option> <replaceable>bufferSize</replaceable></term>
 	  <listitem>
 	    <para>
 	      Set read-ahead buffer size. The default value is
@@ -97,7 +98,7 @@
 	</varlistentry>
 
 	<varlistentry>
-	  <term><arg>-B</arg> <replaceable>bufferSize</replaceable></term>
+	  <term><option>-B</option> <replaceable>bufferSize</replaceable></term>
 	  <listitem>
 	    <para>
 	      Set buffer size. The size of the buffer is requested in
@@ -111,52 +112,67 @@
 	</varlistentry>
 
 	<varlistentry>
-	  <term><arg>-d</arg> <replaceable>debug level</replaceable></term>
+	  <term><option>-d</option> <replaceable>debug level</replaceable></term>
 	  <listitem>
 	    <para>
-	      Set the debug level. This is a integer binary byte mask
-	      between <literal>0</literal> and <literal>127</literal>
-	      the values are shown below.
-	    </para>
+	      Set the debug level. <replaceable>debug
+	      level</replaceable> is a integer between
+	      <literal>0</literal> and <literal>127</literal>.  If the
+	      value is <literal>0</literal> then no output is
+	      generated, otherwise the value is formed by adding
+	      together one or more of the following values:
 
-	    <orderedlist numeration="lowerroman">
-	      <listitem>
-		<para>0</para>
-		<para>no_output</para>
-	      </listitem>
-	      <listitem>
-		<para>1</para>
-		<para>error messages only</para>
-	      </listitem>
-	      <listitem>
-		<para>2</para>
-		<para>info messages</para>
-	      </listitem>
-	      <listitem>
-		<para>4</para>
-		<para>speed information</para>
-	      </listitem>
-	      <listitem>
-		<para>8</para>
-		<para>trace information for developers</para>
-	      </listitem>
-	      <listitem>
-		<para>16</para>
-		<para>function call sequence information</para>
-	      </listitem>
-	      <listitem>
-		<para>32</para>
-		<para>io information</para>
-	      </listitem>
-	      <listitem>
-		<para>64</para>
-		<para>thread information</para>
-	      </listitem>
-	    </orderedlist>
+	      <segmentedlist>
+		<?dbhtml list-presentation="table"?>
+		<?dbfo   list-presentation="table"?>
+		<segtitle>Value</segtitle>
+		<segtitle>Enabled output</segtitle>
+
+		<seglistitem>
+		  <seg>1</seg>
+		  <seg>Error messages</seg>
+		</seglistitem>
+
+		<seglistitem>
+		  <seg>2</seg>
+		  <seg>Info messages</seg>
+		</seglistitem>
+
+		<seglistitem>
+		  <seg>4</seg>
+		  <seg>Timing information</seg>
+		</seglistitem>
+
+		<seglistitem>
+		  <seg>8</seg>
+		  <seg>Trace information</seg>
+		</seglistitem>
+
+		<seglistitem>
+		  <seg>16</seg>
+		  <seg>Show stack-trace</seg>
+		</seglistitem>
+
+		<seglistitem>
+		  <seg>32</seg>
+		  <seg>IO operations</seg>
+		</seglistitem>
+
+		<seglistitem>
+		  <seg>32</seg>
+		  <seg>IO operations</seg>
+		</seglistitem>
+
+		<seglistitem>
+		  <seg>64</seg>
+		  <seg>Thread information</seg>
+		</seglistitem>
+	      </segmentedlist>
+	    </para>
 	  </listitem>
 	</varlistentry>
 	<varlistentry>
-	  <term><arg>-h</arg> <replaceable>replyHostName</replaceable></term>
+	  <term><option>-h</option> <replaceable>replyHostName</replaceable></term>
 	  <listitem>
 	    <para>
 	      Bind the callback connection to the specific hostname interface.
@@ -164,7 +180,7 @@
 	  </listitem>
 	</varlistentry>
 	<varlistentry>
-	  <term><arg>-i</arg></term>
+	  <term><option>-i</option></term>
 	  <listitem>
 	    <para>
 	      Secure mode. Do not overwrite the existing files.
@@ -172,7 +188,7 @@
 	  </listitem>
 	</varlistentry>
 	<varlistentry>
-	  <term><arg>-l</arg> <replaceable>location</replaceable></term>
+	  <term><option>-l</option> <replaceable>location</replaceable></term>
 	  <listitem>
 	    <para>
 	      Set location for pre-stage. if the location is not
@@ -182,10 +198,10 @@
 	  </listitem>
 	</varlistentry>
 	<varlistentry>
-	  <term><arg>-p</arg> <replaceable>first_port</replaceable>:<replaceable>last_port</replaceable></term>
+	  <term><option>-p</option> <replaceable>first_port</replaceable>:<replaceable>last_port</replaceable></term>
 	  <listitem>
 	    <para>
-	      Bind the callback data connection to the specified TCP
+	      Bind the callback data connection to the specified &tcp;
 	      port/rangeSet port range.  Delimited by the ':'
 	      character, the <replaceable>first_port</replaceable> is
 	      required but the <replaceable>last_port</replaceable> is
@@ -194,7 +210,7 @@
 	  </listitem>
 	</varlistentry>
 	<varlistentry>
-	  <term><arg>-P</arg></term>
+	  <term><option>-P</option></term>
 	  <listitem>
 	    <para>
 	      Pre-stage. Do not copy the file to a local host but make
@@ -203,32 +219,32 @@
 	  </listitem>
 	</varlistentry>
 	<varlistentry>
-	  <term><arg>-r</arg> <replaceable>bufferSize</replaceable></term>
+	  <term><option>-r</option> <replaceable>bufferSize</replaceable></term>
 	  <listitem>
 	    <para>
-	      TCP receive buffer size. The default is
-	      <literal>256K</literal>. Setting to 0 uses the system
-	      default value. Memorry useage will increase with higher
-	      values, but performance better
+	      &tcp; receive buffer size. The default is
+	      <literal>256K</literal>. Setting to <literal>0</literal>
+	      uses the system default value. Memory useage will
+	      increase with higher values, but performance better.
 	    </para>
 	  </listitem>
 	</varlistentry>
 	<varlistentry>
-	  <term><arg>-s</arg> <replaceable>bufferSize</replaceable></term>
+	  <term><option>-s</option> <replaceable>bufferSize</replaceable></term>
 	  <listitem>
 	    <para>
-	      TCP send buffer size. The default is
-	      <literal>256K</literal>. Setting to 0 uses the system
-	      default value.
+	      &tcp; send buffer size. The default is
+	      <literal>256K</literal>. Setting to <literal>0</literal>
+	      uses the system default value.
 	    </para>
 	  </listitem>
 	</varlistentry>
 	<varlistentry>
-	  <term><arg>-t</arg> <replaceable>time</replaceable></term>
+	  <term><option>-t</option> <replaceable>time</replaceable></term>
 	  <listitem>
 	    <para>
 	      Stage timeout in seconds. This option must be used with
-	      the -P option.
+	      the <option>-P</option> option.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -236,28 +252,28 @@
     </refsect1>
 
     <refsect1 id="rf-clients-dccp-example">
-      <title>Example:</title>
+      <title>Examples:</title>
 
       <para>
 	To copy a file to &dcache;:
       </para>
 
-      <screen>&prog-dccp; /etc/group dcap://example.org/pnfs/desy.de/gading/</screen>
+      <screen>&prompt-user; dccp /etc/group dcap://example.org/pnfs/desy.de/gading/</screen>
 
       <para>
 	To copy a file from &dcache;:
       </para>
 
-      <screen>&prog-dccp; dcap://example.org/pnfs/desy.de/gading/group /tmp/</screen>
+      <screen>&prompt-user; dccp dcap://example.org/pnfs/desy.de/gading/group /tmp/</screen>
 
       <para>Pre-Stage request:</para>
-      <screen>dccp -P -t 3600 -l example.org /acs/user_space/data_file</screen>
+      <screen>&prompt-user; dccp -P -t 3600 -l example.org /acs/user_space/data_file</screen>
 
       <para>stdin:</para>
-      <screen>tar cf - data_dir | dccp - /acs/user_space/data_arch.tar</screen>
+      <screen>&prompt-user; tar cf - data_dir | dccp - /acs/user_space/data_arch.tar</screen>
 
       <para>stdout:</para>
-      <screen>dccp /acs/user_space/data_arch.tar - | tar xf - </screen>
+      <screen>&prompt-user; dccp /acs/user_space/data_arch.tar - | tar xf - </screen>
     </refsect1>
 
     <refsect1 id="rf-clients-dccp-seealso">
