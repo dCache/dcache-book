@@ -15,13 +15,13 @@
       <uri>srm://dmx.lbl.gov:6253//srm/DRM/srmv1?SFN=/tmp/try1</uri>
       and the file URL looks like <uri>file:////tmp/aaa</uri>.
     </para>
-  
+
     <refentry id="cmd-srmcp">
       <refmeta><refentrytitle><command>srmcp</command></refentrytitle></refmeta>
       <refnamediv><refname><command>srmcp</command></refname>
       <refpurpose>Copy a file from or to an &srm; or between two &srm;s.</refpurpose>
       </refnamediv>
-    
+
       <refsynopsisdiv>
 	<cmdsynopsis>
 	  <command>srmcp</command>
@@ -51,7 +51,7 @@
 	<variablelist>
 	  <title>Options</title>
 	  <varlistentry>
-	    <term><option>gss_expected_name</option></term>	
+	    <term><option>gss_expected_name</option></term>
 	    <listitem>
 	      <para>
 		To enable the user to specify the gss expected name in
@@ -65,14 +65,14 @@
 		  <literal>CN=srm/tam01.fnal.gov</literal>, then
 		  <option>gss_expected_name</option> should be
 		  <literal>srm</literal>.
-	
+
 		  <screen>&prompt-user; <userinput>srmcp --gss_expected_name=srm <replaceable>sourceUrl</replaceable> <replaceable>destinationUrl</replaceable></userinput></screen>
 
 	      </para>
 	    </informalexample>
 	  </listitem>
 	</varlistentry>
-	
+
 	<varlistentry>
 	  <term><option>globus_tcp_port_range</option></term>
 	  <listitem>
@@ -82,16 +82,16 @@
 	      by <quote><literal>:</literal></quote>, not set by
 	      default.
 	    </para>
-	    
+
 	    <para>
 	      This takes care of compute nodes that are behind
 	      firewall.
 	    </para>
-	    
+
 	    <informalexample>
 	      <para>
 		<literal>globus_tcp_port_range=40000:50000</literal>
-	
+
 		<screen>&prompt-user; <userinput>srmcp --globus_tcp_port_range=<replaceable>minVal</replaceable>:<replaceable>maxVal</replaceable> <replaceable>sourceUrl</replaceable> <replaceable>destinationUrl</replaceable></userinput></screen>
 
 	      </para>
@@ -123,7 +123,7 @@
 	      <literal>passive</literal>, <literal>passive</literal>
 	      by default.
 	    </para>
-	    
+
 	    <para>
 	      This option will have effect only if transfer is
 	      performed in a stream mode (see
@@ -138,23 +138,23 @@
 	</varlistentry>
       </variablelist>
     </refsynopsisdiv>
-    
+
     <refsection>
-      <title>Description</title>      
+      <title>Description</title>
       <para>
       </para>
     </refsection>
   </refentry>
 
-  <refentry id="cmd-srmstage">        
+  <refentry id="cmd-srmstage">
     <refmeta><refentrytitle><command>srmstage</command></refentrytitle></refmeta>
     <refnamediv><refname><command>srmstage</command></refname>
       <refpurpose>Request staging of a file.</refpurpose>
     </refnamediv>
-    
+
     <refsynopsisdiv>
       <cmdsynopsis>
-	<command>srmstage</command> 
+	<command>srmstage</command>
 	<arg rep="repeat"><replaceable>srmUrl</replaceable></arg>
       </cmdsynopsis>
       <variablelist>
@@ -169,18 +169,18 @@
         </varlistentry>
       </variablelist>
     </refsynopsisdiv>
-    
+
     <refsection>
       <title>Description</title>
-      
+
       <para>
 	Provides an option to the user to stage files from &hsm; to
 	&dcache; and not transfer them to the user right away. This
 	case will be useful if files are not needed right away at user
 	end, but its good to stage them to dcache for faster access
-	later. 
+	later.
       </para>
-      
+
     </refsection>
   </refentry>
 </section>
