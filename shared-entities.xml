@@ -16,6 +16,9 @@ Rules / Guidelines / Suggestions for adding new entities:
   4.  Go through whole document and switch existing usage to new entity.
 -->
 
+<!-- dCache-version -->
+<!ENTITY dcache-version          "1.9.10">
+
 <!-- "Products" or high-level services -->
 <!ENTITY dcache       "<productname>dCache</productname>">
 <!ENTITY chimera      "<productname>Chimera</productname>">
