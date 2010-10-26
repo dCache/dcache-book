@@ -108,8 +108,8 @@
 &prompt-root; <userinput>rpm -ivh dcache-client-<replaceable>version</replaceable>-<replaceable>release</replaceable>.i386.rpm</userinput></screen>
        <para>
        The actual sources lie at <ulink url="http://www.dcache.org/downloads.shtml"/>.
-       To install for example Version 1.9.8-1 of the server you would use this:
-        <screen>&prompt-root; <userinput>rpm -ivh http://www.dcache.org/downloads/1.9/dcache-server-1.9.8-1.noarch.rpm</userinput></screen>
+       To install for example Version &dcache-version;-1 of the server you would use this:
+        <screen>&prompt-root; <userinput>rpm -ivh http://www.dcache.org/downloads/1.9/dcache-server-&dcache-version;-1.noarch.rpm</userinput></screen>
         The client can be found in the download-section of the above url, too.
         </para>
 
