@@ -830,8 +830,8 @@ gsidcap://gsidcap-door.example.org:22128/pnfs/example.org/data/dteam/group
 
           <para>
             &dcache; limits the number of <literal>Request
-            Id</literal>s a user may have.  All <litearl>Request
-            Id</litearl>s should be returned to &dcache; using the
+            Id</literal>s a user may have.  All <literal>Request
+            Id</literal>s should be returned to &dcache; using the
             command <command>lcg-sd</command>.
 	  </para>
 	</important>
