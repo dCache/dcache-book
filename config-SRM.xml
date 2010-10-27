@@ -56,15 +56,15 @@
     </para>
 
     <section>
-      <title>General SRM Concepts </title>
+      <title>General &srm; Concepts </title>
 
       <para>
-	&srm; interface consists of the five categories of functions:
+	The &srm; interface consists of the five categories of functions:
 	Space Management, Data Transfer, Request Status, Directory and
 	Permission Functions. &srm; interface utilizes Grid Security
 	Infrastructure (&gsi;) for authentications. &srm; service is a
 	Web Service implementation of a published WSDL
-	document. Please visit <ulink
+	document. Please visit the <ulink
 	url="http://sdm.lbl.gov/srm-wg/"> SRM Working Group
 	Page</ulink> to see the &srm; Version 1.1 and &srm; Version
 	2.2 protocol specification documents.
@@ -281,16 +281,18 @@ srm://srm.cern.ch:8443/castor/cern.ch/cms/store/cmsfile23</programlisting>
     </section>
 
     <section>
-      <title>&srm; Service</title>
+      <title>The &cell-srm; service</title>
 
       <para>
-	&dcache; &srm; is implemented as Web Service Interface running
-	under Apache Tomcat application server and Axis Web Services
-	engine. This service starts a &dcache; &srm; domain with a main
-	&srm; cell and a number of other cells &srm; service relies
-	on. These are SrmSpaceManager, PinManager,
-	RemoteGsiftpCopyManager, etc. Of these services only &srm; and
-	SrmSpaceManager require special configuration.
+	&dcache; &cell-srm; is implemented as a Web Service Interface running
+	on a &jetty; application server and an
+	<productname>Axis</productname> Web Services
+	engine. The &jetty; server is executed as a cell,
+	embedded in &dcache; and started automatically by the &cell-srm; service.
+	Other cells started automatically by &cell-srm; are for instance
+	&cell-spacemngr;, &cell-pinmngr; and &cell-remotegsitransfermngr;.
+	Of these services only &cell-srm; and &cell-spacemngr; require special
+	configuration.
       </para>
     </section>
 
@@ -302,9 +304,9 @@ srm://srm.cern.ch:8443/castor/cern.ch/cms/store/cmsfile23</programlisting>
 
 	<para>
 	  &dcache; 1.8 &cell-poolmngr; supports new type of objects
-	  called LinkGroups. Each link group corresponds to a number
-	  of &dcache; pools in the following way: LinkGroup is a
-	  collection of the Links, each of which is a collection of
+	  called <firstterm>LinkGroups</firstterm>. Each link group corresponds to
+	  a number of &dcache; pools in the following way: A LinkGroup is a
+	  collection of Links, each of which is a collection of
 	  the PoolGroups associated (Linked, hence a name <quote>Link</quote>) with
 	  a set of the Pool Selection Units or PSUs. Each link group
 	  knows about its available size, which is a sum of all
@@ -385,18 +387,18 @@ srm://srm.cern.ch:8443/castor/cern.ch/cms/store/cmsfile23</programlisting>
       </section>
 
       <section>
-	<title>Space Manager access control</title>
+	<title>&cell-spacemngr; access control</title>
 
 	<para>
 	  When &srm; Space Reservation request is executed, its
 	  parameters, such as reservation size, lifetime, access
 	  latency and retention policy as well as user's Virtual
 	  Organization (VO) membership information is forwarded to the
-	  &srm; SpaceManager.
+	  &srm; &cell-spacemngr;.
 	</para>
 
 	<para>
-	  Space Manager uses a special file for listing all the
+	  &cell-spacemngr; uses a special file for listing all the
 	  Virtual Organizations (VOs) and all the VO Roles that are
 	  permitted to make reservations in the given link group. List
 	  of the allowed VOs and VO Roles, together with the total
@@ -481,7 +483,7 @@ kernel.shmall=1073741824</programlisting>
    -->
 
   <section id="cf-srm-psql">
-    <title>Configuring Postgres Database</title>
+    <title>Configuring the Postgres Database</title>
 
     <para>
       Install the latest &psql; database from <ulink
@@ -580,92 +582,41 @@ effective_cache_size = 16384            # typically 8KB each</programlisting>
    -->
 
   <section id="cf-srm-srm">
-    <title>Configuring &srm; Domain</title>
+    <title>Configuring the &cell-srm; service</title>
 
     <para>
-      Once database and and &jvm; are installed and database is running,
-      you may install &dcache; &srm;.
+    Like other services, he &cell-srm; service can be enabled in the layout-file of
+    your &dcache; installation. For an overview of the layout file
+    format, please see <xref linkend="in-install-layout" />.
     </para>
 
-    <section>
-      <title>Install &dcache; server.rpm</title>
+    <informalexample>
 
-      <para>
-	<screen>&prompt-root; <userinput>rpm -Uvh <replaceable>dcache.server.rpm</replaceable></userinput></screen>
-      </para>
+    <para>
+    For instance, to enable a &srm; door in a separate
+    <replaceable>srm-${host.name}Domain</replaceable> in &dcache;,
+    add the following lines to your layout file:
+    </para>
 
-    </section>
-
-    <section>
-      <title><filename>node_config</filename></title>
-
-      <para>
-	Copy <filename>/pt/d-cache/etc/node_config.template</filename>
-	into <filename>/opt/d-cache/etc/node_config</filename>
-      </para>
-
-      <para>
-	 Edit <filename>/opt/d-cache/etc/node_config</filename>
-      </para>
-
-      <programlisting>NODE_TYPE=custom
-...
-SRM=yes
-...
-# all other parameters should be turned off on "srm only" node</programlisting>
-    </section>
+    <programlisting>[<replaceable>srm-${host.name}Domain</replaceable>]
+[<replaceable>srm-${host.name}Domain</replaceable>/srm]</programlisting>
+    </informalexample>
 
     <section>
-      <title>srm_setup.env</title>
+    <title>Important &cell-srm; configuration options</title>
 
       <para>
-	Edit <filename>/opt/d-cache/etc/srm_setup.env</filename>
+      The defaults for the configuration parameters for the &cell-srm; service can be found in
+      <filename>/opt/d-cache/share/defauls/dcache.properties</filename>.
+
+      If you want to modify parameters, copy them to
+      <filename>/opt/d-cache/etc/dcache.conf</filename>
+      and update their value.
       </para>
 
-      <itemizedlist>
-	<listitem>
-	  <para>
-	    Make sure that <envar>JAVA_HOME</envar> is set to correct
-	    value, for example
-	    <programlisting>JAVA_HOME=/usr/java/jdk1.5.0_07</programlisting>
-	  </para>
-	</listitem>
-
-	<listitem>
-	  <para>
-	    Tomcat port does not interfere with with services that are
-	    already using network
-	  </para>
-	  <programlisting>TOMCAT_PORT=8080</programlisting>
-	</listitem>
-
-	<listitem>
-	  <para>
-	    If you are going to run the monitoring on the same node:
-	  </para>
-
-	  <programlisting>TOMCAT_HTTP_ENABLED=true
-JAVA_OPTS="-Xmx512m -Djava.awt.headless=true"</programlisting>
-	</listitem>
-      </itemizedlist>
-    </section>
-
-    <section>
-      <title>install <filename>dCacheSetup</filename></title>
-
       <para>
-	Copy
-	<filename>/opt/d-cache/etc/dCacheSetup.template</filename>
-	into <filename>/opt/d-cache/config/dCacheSetup</filename> and
-	edit it so that, serviceLocatorHost and serviceLocatorPort
-	point to central dcache node:
-      </para>
-
-      <programlisting>serviceLocatorHost=<replaceable>host of central node</replaceable>
-serviceLocatorPort=<replaceable>11111</replaceable></programlisting>
-
-      <para>
-	following &srm; parameters should be configured as following:
+        This section explains the most important &cell-srm; configuration parameters
+        in detail.
       </para>
 
       <programlisting>srmVacuum=false
@@ -691,57 +642,19 @@ remoteGsiftpMaxTransfers=90</programlisting>
       <programlisting>srmCopyReqThreadPoolSize=2000
 remoteGsiftpMaxTransfers=2000</programlisting>
 
-    </section>
-
-
-    <section>
-      <title>Tomcat/axis deployment</title>
-
-      <para>
-	Run
-      </para>
-
-      <screen>&prompt-root; <userinput>/opt/d-cache/install/install.sh</userinput></screen>
-    </section>
-
-    <section>
-      <title>Starting and stopping &srm; domain</title>
-
-      <para>
-	 Run
-      </para>
-
-      <screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache-core start</userinput></screen>
-
-      <para>
-	to start &srm; domain.
-      </para>
-
-      <para>
-	 Run
-      </para>
-
-      <screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache-core stop</userinput></screen>
-
-      <para>
-	to stop &srm; domain.
-      </para>
+     <note>
+        <para>
+        &cell-srm; might produce a lot of log entries, especially if it run in
+        debug mode. The need to run &cell-srm; in debug mode is greatly
+        reduced if &srm; monitoring is installed. It is recommended to
+        make sure that logs are redirected into a file on large
+        disk.
+        </para>
+    </note>
 
     </section>
 
-    <section>
-      <title>&srm; Logs</title>
-
-      <para>
-	&srm; might produce a lot of logs, especially if it run in
-	debug mode.  Need to run &srm; in debug mode is greatly
-	reduced if &srm; monitoring is installed. It is recommended to
-	make sure that logs are redirected into a file on large
-	disk. &dcache; &srm; 1.7 logs into
-	<filename>/opt/d-cache/libexec/apache-tomcat-5.5.20/logs/catalina.out</filename>.
-      </para>
     </section>
-  </section>
 
   <!--
      ##############################################################
@@ -750,11 +663,11 @@ remoteGsiftpMaxTransfers=2000</programlisting>
    -->
 
   <section id="cf-srm-expert-config">
-    <title>&srm; configuration for experts</title>
+    <title>&cell-srm; configuration for experts</title>
 
     <para>
-      There are a few parameters in <filename>dCacheSetup</filename>
-      that you might find useful for nontrivial &srm; deployment.
+      There are a few parameters in <filename>dcache.properties</filename>
+      that you might find useful for nontrivial &cell-srm; deployment.
     </para>
 
     <section>
@@ -762,7 +675,7 @@ remoteGsiftpMaxTransfers=2000</programlisting>
 
       <para>
 	<varname>srmSpaceManagerEnabled</varname> tells if the space
-	management is activated in &srm;.
+	management is activated in &cell-srm;.
       </para>
 
       <para>
@@ -804,9 +717,9 @@ remoteGsiftpMaxTransfers=2000</programlisting>
       <title>overwriteEnabled</title>
 
       <para>
-	<varname>overwriteEnabled</varname> tells to &srm; and
+	<varname>overwriteEnabled</varname> tells &srm; and
 	&gridftp; servers if the overwrite is allowed. If enabled on
-	&srm; node, should be enabled on all &gridftp; nodes.
+	the &srm; node, should be enabled on all &gridftp; nodes.
       </para>
 
       <para>
@@ -850,7 +763,7 @@ remoteGsiftpMaxTransfers=2000</programlisting>
       <title>srmDatabaseHost</title>
 
       <para>
-	<varname>srmDatabaseHost</varname> tells to &srm; which
+	<varname>srmDatabaseHost</varname> tells &cell-srm; which
 	database host to connect to. Do not change unless you know
 	what you are doing.
       </para>
@@ -870,8 +783,8 @@ remoteGsiftpMaxTransfers=2000</programlisting>
       <title>spaceManagerDatabaseHost</title>
 
       <para>
-	<varname>spaceManagerDatabaseHost</varname> tells to &srm;
-	Space Manager which database host to connect to. Do not change
+	<varname>spaceManagerDatabaseHost</varname> tells &cell-spacemngr;
+	which database host to connect to. Do not change
 	unless you know what you are doing.
       </para>
 
@@ -889,8 +802,8 @@ remoteGsiftpMaxTransfers=2000</programlisting>
     <section>
       <title>pinManagerDatabaseHost</title>
       <para>
-	<varname>pinManagerDatabaseHost</varname> tells to &srm; Pin
-	Manager which database host to connect to. Do not change
+	<varname>pinManagerDatabaseHost</varname> tells &cell-pinmngr;
+    which database host to connect to. Do not change
 	unless you know what you are doing.
       </para>
 
@@ -909,7 +822,7 @@ remoteGsiftpMaxTransfers=2000</programlisting>
       <title>srmDbName</title>
 
       <para>
-	<emphasis>srmDbName </emphasis> tells to &srm; which database
+	<varname>srmDbName</varname> tells &cell-srm; which database
 	to connect to. Do not change unless you know what you are
 	doing.
       </para>
@@ -929,7 +842,7 @@ remoteGsiftpMaxTransfers=2000</programlisting>
       <title>srmDbUser</title>
 
       <para>
-	<varname>srmDbUser</varname> tells to &srm; which database
+	<varname>srmDbUser</varname> tells &cell-srm; which database
 	user name to use when connecting to database. Do not change
 	unless you know what you are doing.
       </para>
@@ -949,7 +862,7 @@ remoteGsiftpMaxTransfers=2000</programlisting>
       <title>srmDbPassword</title>
 
       <para>
-	<varname>srmDbPassword</varname> tells to &srm; which database
+	<varname>srmDbPassword</varname> tells &cell-srm; which database
 	password to use when connecting to database. Do not change
 	unless you know what you are doing.
       </para>
@@ -965,7 +878,7 @@ remoteGsiftpMaxTransfers=2000</programlisting>
       <title>srmPasswordFile</title>
 
       <para>
-	<varname>srmPasswordFile</varname> tells to &srm; which
+	<varname>srmPasswordFile</varname> tells &cell-srm; which
 	database password file to use when connecting to database.  Do
 	not change unless you know what you are doing. It is
 	recommended that MD5 authentication method is used. To learn
@@ -989,15 +902,15 @@ remoteGsiftpMaxTransfers=2000</programlisting>
     </section>
 
     <section>
-      <title>srmJdbsMonitoringLogEnabled</title>
+      <title>srmJdbcMonitoringLogEnabled</title>
 
       <para>
-	<varname>srmJdbsMonitoringLogEnabled</varname> tells the &srm;
+	<varname>srmJdbsMonitoringLogEnabled</varname> tells &cell-srm;
 	to store the history of the &srm; request executions in the
 	database. This option is useful if you are using SRMWatch web
 	monitoring tool. Activation of this option might lead to the
 	increase of the database activity, so if the &psql; load
-	generated by &srm; is excessive, disable it.
+	generated by &cell-srm; is excessive, disable it.
       </para>
 
       <para>
@@ -1016,12 +929,12 @@ remoteGsiftpMaxTransfers=2000</programlisting>
       <title>srmDbLogEnabled</title>
 
       <para>
-	<varname>srmDbLogEnabled</varname> tells to &srm; to store the
+	<varname>srmDbLogEnabled</varname> tells &cell-srm; to store the
 	information about the remote (copy, srmCopy) transfer details
 	in the database. This option is useful if you are using
 	SRMWatch web monitoring tool. Activation of this option might
 	lead to the increase of the database activity, so if the
-	&psql; load generated by &srm; is excessive, diable it.
+	&psql; load generated by &cell-srm; is excessive, disable it.
       </para>
 
       <para>
@@ -1040,8 +953,8 @@ remoteGsiftpMaxTransfers=2000</programlisting>
       <title>srmVersion</title>
 
       <para>
-	<varname>srmVersion</varname> not used by &srm;, it was
-	mentioned that this value us used by some publishing scritps.
+	<varname>srmVersion</varname> is not used by &cell-srm;; it was
+	mentioned that this value is used by some publishing scripts.
       </para>
 
       <para>
@@ -1053,8 +966,8 @@ remoteGsiftpMaxTransfers=2000</programlisting>
       <title>pnfsSrmPath</title>
 
       <para>
-	<varname>pnfsSrmPath</varname> tells to &srm; what is the root
-	of all &srm; paths is in pnfs. &srm; will prepend path to all
+	<varname>pnfsSrmPath</varname> tells &cell-srm; what the root
+	of all &srm; paths is in pnfs. &cell-srm; will prepend path to all
 	the local &surl; paths passed to it by &srm; client. So if the
 	<varname>pnfsSrmPath</varname> is set to
 	<literal>/pnfs/fnal.gov/THISISTHEPNFSSRMPATH</literal> and
@@ -1083,7 +996,7 @@ remoteGsiftpMaxTransfers=2000</programlisting>
 
       <para>
 	<varname>parallelStreams</varname> specifies the number of the
-	parallel streams that &srm; will use when performing third
+	parallel streams that &cell-srm; will use when performing third
 	party transfers between this system and remote &gsiftp;
 	servers, in response to &srm; v1.1 copy or &srm; V2.2 srmCopy
 	function. This will have no effect on srmPrepareToPut and
@@ -1206,7 +1119,7 @@ srmCopyLifeTime=14400000</programlisting>
 	<varname>srmGetReqMaxReadyRequests</varname> and
 	<varname>srmPutReqMaxReadyRequests</varname> specify the
 	maximum number of the files for which the transfer &url;s will
-	be be computed and given to the users in responce to &srm; get
+	be computed and given to the users in response to &srm; get
 	(srmPrepareToGet) and put (srmPrepareToPut) requests. The rest
 	of the files that are ready to be transfered are put on the
 	<literal>Ready</literal> queues, the maximum length of these
@@ -1236,16 +1149,16 @@ srmPutReqMaxReadyRequests=1000</programlisting>
 	<varname>srmCopyReqThreadPoolSize</varname> and
 	<varname>remoteGsiftpMaxTransfers</varname>.
 	srmCopyReqThreadPoolSize is used to specify how many parallel
-	srmCopy file copies to execute simultaneously. Once the this
-	&srm; contacted remote &srm; system, and obtained a Transfer
-	&url; (usually &gsiftp; &url;), it contact a Copy Manager
-	module (usually RemoteGsiftpTransferManager), and asks it to
-	perform a &gridftp; transfer between remote &gridftp; server
-	and a &dcache; pool. The maximum number of the simultaneous
-	transfers that RemoteGsiftpTransferManager will support is
-	remoteGsiftpMaxTransfers, therefore it is important that
-	remoteGsiftpMaxTransfers is greater than or equal to
-	srmCopyReqThreadPoolSize.
+	srmCopy file copies to execute simultaneously. Once the
+	&cell-srm; contacted the remote &srm; system, and obtained a Transfer
+	&url; (usually &gsiftp; &url;), it contacts a Copy Manager
+	module (usually &cell-remotegsitransfermngr;), and asks it to
+	perform a &gridftp; transfer between the remote &gridftp; server
+	and a &dcache; pool. The maximum number of simultaneous
+	transfers that &cell-remotegsitransfermngr; will support is
+	<varname>remoteGsiftpMaxTransfers</varname>, therefore it is important that
+	<varname>remoteGsiftpMaxTransfers</varname> is greater than or equal to
+	<varname>srmCopyReqThreadPoolSize</varname>.
       </para>
 
       <para>
@@ -1302,14 +1215,14 @@ remoteGsiftpMaxTransfers=260</programlisting>
    -->
 
   <section id="cf-srm-space">
-    <title>&srm; Space Manager configuration</title>
+    <title>&cell-spacemngr; configuration</title>
 
     <section>
-      <title>&srm; Space Manager and LinkGroups</title>
+      <title>&srm; &cell-spacemngr; and LinkGroups</title>
 
       <para>
-	Space Manager is making reservations agains space in
-	LinkGroups, LinkGroup is an object created by the
+	&cell-spacemngr; is making reservations agains space in
+	<firstterm>LinkGroups</firstterm>, LinkGroup is an object created by the
 	&cell-poolmngr;, that consists of several Links. The total
 	space available in the given LinkGroup is a sum of available
 	spaces in all links. The available space in each link is a sum
@@ -1337,11 +1250,12 @@ remoteGsiftpMaxTransfers=260</programlisting>
 &dc-prompt-pm; <userinput>psu addto linkGroup  write-link-group write-link</userinput></screen>
 
       <para>
-	To tell Space Manager if the LinkGroup will be able to store
-	files with given AccessLatency and RetentionPolicy, LinkGroups
-	have 5 attributes: custodialAllowed, outputAllowed,
-	replicaAllowed, onlineAllowed and nearlineAllowed. These
-	attributes can be specified with the following commands:
+	To tell &cell-spacemngr; if the LinkGroup will be able to store
+	files with given AccessLatency and RetentionPolicy,
+  LinkGroups have 5 attributes: <varname>custodialAllowed</varname>,
+  <varname>outputAllowed</varname>, <varname>replicaAllowed</varname>,
+  <varname>onlineAllowed</varname> and <varname>nearlineAllowed</varname>.
+  These attributes can be specified with the following commands:
       </para>
 
       <screen>&dc-prompt-pm; <userinput>psu set linkGroup custodialAllowed &lt;group name&gt; &lt;true|false&gt;</userinput>
@@ -1353,31 +1267,31 @@ remoteGsiftpMaxTransfers=260</programlisting>
        <para>
 	 Please note that that it is up to administrators that the
 	 link groups attributes are specified correctly. For example
-	 dcache will not complain if the linkGroup that does not
+	 dcache will not complain if the LinkGroup that does not
 	 support tape backend will be declared as one that supports
 	 custodial.
       </para>
     </section>
 
     <section>
-      <title>Activating &srm; Space Manager</title>
+      <title>Activating &srm; &cell-spacemngr;</title>
 
       <para>
 	In order to enable the new space reservation: add (uncomment)
-	the following definition in <filename>dCacheSetup</filename>
+	the following definition in <filename>dcache.conf</filename>
       </para>
 
       <programlisting>srmSpaceManagerEnabled=yes</programlisting>
     </section>
 
-    <section>
-      <title>&srm; Space Manager Parameters in dCacheSetup</title>
+    <section id="cf-srm-spaceman-params">
+      <title>&srm; &cell-spacemngr; parameters in <filename>dcache.conf</filename></title>
 
       <section>
 	<title>SpaceManagerDefaultRetentionPolicy</title>
 
 	<para>
-	  If space reservation request does not specify retention
+	  If space reservation request does not specify a retention
 	  policy we will assign
 	  <varname>SpaceManagerDefaultRetentionPolicy</varname>
 	  retention policy by default.
@@ -1399,7 +1313,7 @@ remoteGsiftpMaxTransfers=260</programlisting>
 	<title>SpaceManagerDefaultAccessLatency</title>
 
 	<para>
-	  If space reservation request does not specify access latency
+	  If a space reservation request does not specify an access latency
 	  we will assign
 	  <varname>SpaceManagerDefaultAccessLatency</varname> this
 	  access latency by default.
@@ -1422,8 +1336,8 @@ remoteGsiftpMaxTransfers=260</programlisting>
 	  If
 	  <varname>SpaceManagerReserveSpaceForNonSRMTransfers</varname>
 	  is set to <literal>true</literal>, and if the transfer
-	  request come from the door, and there was not prior space
-	  reservation made for this file, Space Manager will try to
+	  request comes from the door, and there was no prior space
+	  reservation made for this file, &cell-spacemngr; will try to
 	  reserve space before satisfying the request.
 	</para>
 
@@ -1485,16 +1399,14 @@ remoteGsiftpMaxTransfers=260</programlisting>
 	basis of the system wide defaults, which are controlled by
 	<varname>SpaceManagerDefaultRetentionPolicy</varname> and
 	<varname>SpaceManagerDefaultAccessLatency</varname> variables
-	in dCacheSetup; these variable are described in details in the
-	previous section "SRM Space Manager Parameters in
-	dCacheSetup".
-	<!-- TODO better link here -->
+	in <filename>dcache.conf</filename>; these variable are described in details in
+    <xref linkend="cf-srm-spaceman-params" />.
       </para>
 
       <para>
 	If you have a direct access to the namespace, you can check if
-	the AccessLatency and RetentionPolicy tags are present by
-	using the following commands:
+	the <varname>AccessLatency</varname> and <varname>RetentionPolicy</varname>
+	tags are present by using the following commands:
       </para>
 
       <screen>&prompt-root; <userinput>cd <replaceable>pnfsDir</replaceable></userinput>
@@ -1550,7 +1462,7 @@ remoteGsiftpMaxTransfers=260</programlisting>
    -->
 
     <section id="cf-srm-space-ac">
-    <title>&srm; Space Manager Virtual Organization based access control configuration</title>
+    <title>&srm; &cell-spacemngr; Virtual Organization based access control configuration</title>
 
     <section>
       <title>VO based Authorization Prerequisites</title>
@@ -1590,7 +1502,7 @@ remoteGsiftpMaxTransfers=260</programlisting>
 
       <para>
 	Only if these 3 conditions are satisfied the VO based
-	authorization of the Space Manager can work.
+	authorization of the &cell-spacemngr; can work.
       </para>
 
       <para>
@@ -1602,8 +1514,8 @@ remoteGsiftpMaxTransfers=260</programlisting>
 	be extracted its
 	credential. <command>voms-proxy-init</command> adds a Fully
 	Qualified Attribute Name (FQAN) section(s) to the grid proxy,
-	which contain informaton about user's VO membership, in
-	particular it contain VO Group name and VO Role that the
+	which contains information about the user's VO membership, in
+	particular it contains the VO Group name and the VO Role that the
 	client intends to play at this time. In this case the name of
 	the user is extracted on basis of the direct Distinguished
 	Name (DN) to use name mapping. For the purposes of the space
@@ -1617,7 +1529,7 @@ remoteGsiftpMaxTransfers=260</programlisting>
 
       <para>
 	&dcache; Space Reservation Functionality Access Control is
-	currently performed at the level of the LinkGroups. The access
+	currently performed at the level of the LinkGroups. Access
 	to making reservations in each LinkGroup is controlled by the
 	<varname>SpaceManagerLinkGroupAuthorizationFile</varname>
 	property.
@@ -1645,13 +1557,13 @@ remoteGsiftpMaxTransfers=260</programlisting>
 	</para>
 
 	<para>
-	  File location is specified by defining
+	  The file location is specified by defining
 	</para>
 
 	<programlisting>SpaceManagerLinkGroupAuthorizationFileName=<replaceable>FILENAME</replaceable></programlisting>
 
 	<para>
-	  in the dCacheSetup
+	  in <filename>dcache.conf</filename>.
 	</para>
 
       </section>
@@ -1675,7 +1587,7 @@ LinkGroup default-LinkGroup
 
         <para>
 	  Successful VO and Experiment specific examples of &dcache;
-	  &srm; Space Manager configurations are or will be published
+	  &srm; &cell-spacemngr; configurations are or will be published
 	  at <ulink
 	  url="http://trac.dcache.org/trac.cgi/wiki/manuals/index">
 	  &dcache; WIKI documentation pages </ulink>.
