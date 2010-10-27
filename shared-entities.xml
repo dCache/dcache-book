@@ -31,6 +31,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY psql         "<productname>PostgreSQL</productname>">
 <!ENTITY java         "<productname>Java</productname>">
 <!ENTITY tomcat       "<productname>Tomcat</productname>">
+<!ENTITY jetty        "<productname>Jetty</productname>">
 
 <!-- Various domains -->
 <!ENTITY domain-http      "<literal>httpDomain</literal>">
@@ -66,6 +67,8 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY cell-info-provider "<literal>infoProvider</literal>">
 <!ENTITY cell-topo          "<literal>topo</literal>">
 <!ENTITY cell-nfsv3         "<literal>nfsv3</literal>">
+<!ENTITY cell-srm             "<literal>SRM</literal>">
+<!ENTITY cell-remotegsitransfermngr   "<literal>RemoteGSIFTPTransferManager</literal>">
 
 <!-- Various protocols: TODO: should these names be prefixed by "protocol-" ? -->
 <!ENTITY dcap     "<systemitem class='protocol'>dCap</systemitem>">
