@@ -39,10 +39,9 @@
   <para>The behaviour of the pool manager is highly configurable. In order to
   exploit the full potential of the software it is essential to understand the
   mechanisms used and how they are configured. The pool manager is a unique
-  cell in the domain <quote><literal>dCacheDomain</literal></quote> and
-  consists of several sub-modules: The important ones are the <firstterm>pool
-  selection unit</firstterm> (<abbrev>PSU</abbrev>) and the <firstterm>cost
-  manager</firstterm> (<abbrev>CM</abbrev>).</para>
+  cell in &dcache; and consists of several sub-modules: The important ones
+  are the <firstterm>pool selection unit</firstterm> (<abbrev>PSU</abbrev>)
+  and the <firstterm>cost manager</firstterm> (<abbrev>CM</abbrev>).</para>
 
   <para>The PSU is responsible for finding the pools which the pool manager is
   allowed to use for a specific transfer-request. From those the CM selects
@@ -94,9 +93,7 @@
             <term>Location of the File</term>
 
             <listitem>
-              <para>The directory of the file in the file system
-              (<firstterm>perfectly normal file system</firstterm> -
-              <abbrev>pnfs</abbrev>).</para>
+              <para>The directory of the file in the file system.</para>
             </listitem>
           </varlistentry>
 
@@ -133,7 +130,7 @@
               set of tapes) and dCache can use the storage class for a similar
               purpose (i.e. on which pools the file can be stored.). A
               detailed description of the syntax and how to set the storage
-              class of a directory in the PNFS is given in <xref
+              class of a directory in the namespace is given in <xref
               linkend="secStorageClass" />.</para>
             </listitem>
           </varlistentry>
@@ -362,7 +359,7 @@
         cache class conditions can be used for the same purpose.</para>
 
         <para>Assume, data of experiment A obtained in 2004 is written into
-        subdirectories in the PNFS tree which are tagged with the storage
+        subdirectories in the namespace tree which are tagged with the storage
         class <quote><literal>exp-a:run2004@osm</literal></quote>, and
         similarly for the other years. (How this is done is described in <xref
         linkend="secStorageClass" />.) Experiment B uses the storage class
@@ -442,7 +439,7 @@
       this is tested best. Then the
       <replaceable>StoreDescriptor</replaceable> has the syntax
       <literal><replaceable>Store</replaceable>:<replaceable>StorageGroup</replaceable></literal>.
-      These can be set within PNFS per directory. Consider for example the
+      These can be set within the namespace per directory. Consider for example the
       following setup:
       <screen>&prompt-root; <userinput>cd <filename>/pnfs/<replaceable>domain</replaceable>/<replaceable>experiment-a</replaceable>/</filename></userinput>
 &prompt-root; <userinput>cat "<filename>.(tag)(OSMTemplate)</filename>"</userinput>
@@ -490,7 +487,7 @@ STRING</screen>This is the setup after a fresh installation and it will lead
       <para>Tags are inherited by sub-directories: Changing a tag of a
       directory will change the tag of each sub-directory, if the tag has
       never been changed for this sub-directory directly. Changing tags breaks
-      these inheritance links. Directories in PNFS should never be moved,
+      these inheritance links. Directories in namespace should never be moved,
       since this will mess up the inheritance structure and eventually break
       the whole system.</para>
     </section>
