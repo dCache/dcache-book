@@ -3,6 +3,7 @@
                          "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
 <!ENTITY % sharedents SYSTEM "shared-entities.xml" >
 %sharedents;
+<!ENTITY chimera-cli  "/opt/d-cache/libexec/chimera/chimera-cli.sh">
 ]>
 
 <chapter id="in">
@@ -107,35 +108,25 @@
 &prompt-root; <userinput>rpm -ivh dcache-client-<replaceable>version</replaceable>-<replaceable>release</replaceable>.i386.rpm</userinput></screen>
        <para>
        The actual sources lie at <ulink url="http://www.dcache.org/downloads.shtml"/>.
-       To install for example Version 1.9.8-1 of the server you would use this:
-        <screen>&prompt-root; <userinput>rpm -ivh http://www.dcache.org/downloads/1.9/dcache-server-1.9.8-1.noarch.rpm</userinput></screen>
+       To install for example Version &dcache-version;-1 of the server you would use this:
+        <screen>&prompt-root; <userinput>rpm -ivh http://www.dcache.org/downloads/1.9/dcache-server-&dcache-version;-1.noarch.rpm</userinput></screen>
         The client can be found in the download-section of the above url, too.
         </para>
 
     </section>
 
-
     <section>
-      <title>Readying the &psql; server</title>
+      <title>Readying the &psql; server for the use with &dcache;</title>
 
       <para>
+	Using a &psql; server with &dcache; places a number of requirements on the database.
         You must configure &psql; for use by &dcache; and create the
         necessary &psql; user accounts and database structure.  This
         section describes how to do this.
       </para>
 
       <section>
-        <title>Configuring the &psql; server</title>
-
-        <para>
-          Using a &psql; server with &dcache; places a number of
-          requirements on the database.  This section describes what
-          configuration is necessary to ensure &psql; operates so
-          &dcache; can use it.
-        </para>
-
-        <section>
-          <title>Enabling local trust</title>
+        <title>Enabling local trust</title>
 
           <para>
             Perhaps the simplest configuration is to allow
@@ -164,30 +155,21 @@
 host    all         all         127.0.0.1/32   trust
 host    all         all         ::1/128        trust</programlisting>
 
+          <important>
+	    <title>Restarting &psql;</title>
 
-        </section>
-
-      </section>
-
-      <important>
-          <title>Restarting &psql;</title>
-
-          <para>
+	    <para>
             If you have edited &psql; configuration files, you
             <emphasis>must</emphasis> restart &psql; for those changes
             to take effect.  On many systems, this can be done with
             the following command:
-          </para>
+	    </para>
 
-          <screen>&prompt-root; <userinput>/etc/init.d/postgresql restart</userinput>
+	    <screen>&prompt-root; <userinput>/etc/init.d/postgresql restart</userinput>
 Stopping postgresql service:                               [  OK  ]
 Starting postgresql service:                               [  OK  ]</screen>
-        </important>
-
-	<para>
-	  Make sure that &psql; will be started automatically after booting.
-	  <screen>&prompt-root; <userinput>chkconfig postgresql on</userinput></screen>
-	</para>
+          </important>
+        </section>
 
       <section>
         <title>Configuring &chimera;</title>
@@ -197,7 +179,8 @@ Starting postgresql service:                               [  OK  ]</screen>
           with associated meta data. Where pools in &dcache; store the
           content of files, &chimera; stores the names and meta data
           of those files. &chimera; itself stores the data in a
-          relational database. We will use &psql; in this tutorial.
+          relational database. We will use &psql; in this tutorial. Database connection settings can be customized in
+            <filename>/opt/d-cache/config/chimera-config.xml</filename>
         </para>
 
         <note>
@@ -224,38 +207,29 @@ Enter it again:
 CREATE ROLE
 
 &prompt-root; <userinput>psql -U chimera chimera -f /opt/d-cache/libexec/chimera/sql/create.sql</userinput>
-psql:/opt/d-cache/libexec/chimera/sql/create.sql:23: NOTICE:  CREATE TABLE / PRIMARY KEY will create
-implicit index "t_inodes_pkey" for table "t_inodes"
+psql:/opt/d-cache/libexec/chimera/sql/create.sql:23: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_inodes_pkey" for table "t_inodes"
 CREATE TABLE
-psql:/opt/d-cache/libexec/chimera/sql/create.sql:35: NOTICE:  CREATE TABLE / PRIMARY KEY will create
-implicit index "t_dirs_pkey" for table "t_dirs"
+psql:/opt/d-cache/libexec/chimera/sql/create.sql:35: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_dirs_pkey" for table "t_dirs"
 CREATE TABLE
-psql:/opt/d-cache/libexec/chimera/sql/create.sql:45: NOTICE:  CREATE TABLE / PRIMARY KEY will create
-implicit index "t_inodes_data_pkey" for table "t_inodes_data"
+psql:/opt/d-cache/libexec/chimera/sql/create.sql:45: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_inodes_data_pkey" for table "t_inodes_data"
 <lineannotation>many more like this...</lineannotation>
 INSERT 0 1
 <lineannotation>many more like this...</lineannotation>
 INSERT 0 1
 CREATE INDEX
 CREATE INDEX
-psql:/opt/d-cache/libexec/chimera/sql/create.sql:256: NOTICE:  CREATE TABLE / PRIMARY KEY will create
-implicit index "t_storageinfo_pkey" for table "t_storageinfo"
+psql:/opt/d-cache/libexec/chimera/sql/create.sql:256: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_storageinfo_pkey" for table "t_storageinfo"
 CREATE TABLE
-psql:/opt/d-cache/libexec/chimera/sql/create.sql:263: NOTICE:  CREATE TABLE / PRIMARY KEY will create
-implicit index "t_access_latency_pkey" for table "t_access_latency"
+psql:/opt/d-cache/libexec/chimera/sql/create.sql:263: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_access_latency_pkey" for table "t_access_latency"
 CREATE TABLE
-psql:/opt/d-cache/libexec/chimera/sql/create.sql:270: NOTICE:  CREATE TABLE / PRIMARY KEY will create
-implicit index "t_retention_policy_pkey" for table "t_retention_policy"
+psql:/opt/d-cache/libexec/chimera/sql/create.sql:270: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_retention_policy_pkey" for table "t_retention_policy"
 CREATE TABLE
-psql:/opt/d-cache/libexec/chimera/sql/create.sql:295: NOTICE:  CREATE TABLE / PRIMARY KEY will create
-implicit index "t_locationinfo_pkey" for table "t_locationinfo"
+psql:/opt/d-cache/libexec/chimera/sql/create.sql:295: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_locationinfo_pkey" for table "t_locationinfo"
 CREATE TABLE
-psql:/opt/d-cache/libexec/chimera/sql/create.sql:311: NOTICE:  CREATE TABLE / PRIMARY KEY will create
-implicit index "t_locationinfo_trash_pkey" for table "t_locationinfo_trash"
+psql:/opt/d-cache/libexec/chimera/sql/create.sql:311: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_locationinfo_trash_pkey" for table "t_locationinfo_trash"
 CREATE TABLE
 CREATE INDEX
-psql:/opt/d-cache/libexec/chimera/sql/create.sql:332: NOTICE:  CREATE TABLE / PRIMARY KEY will create
-implicit index "t_acl_pkey" for table "t_acl"
+psql:/opt/d-cache/libexec/chimera/sql/create.sql:332: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_acl_pkey" for table "t_acl"
 CREATE TABLE
 CREATE INDEX
 
@@ -273,58 +247,11 @@ CREATE TRIGGER
 </screen>
 
           <para>
-            Database connection settings can be customized in
-            <filename>/opt/d-cache/config/chimera-config.xml</filename>
-            Specifically you should change the user to
-            <quote>chimera</quote>.
-          </para>
-
-<screen>&lt;?xml version="1.0"?&gt;
-&lt;config&gt;
-        &lt;db fsid="0" url="jdbc:postgresql://localhost/chimera?prepareThreshold=3" drv="org.postgresql
-.Driver" user="chimera" pass="" dialect="PgSQL" /&gt;
-        &lt;nfs&gt;
-                &lt;port&gt;2049&lt;/port&gt;
-                &lt;logLevel&gt;0&lt;/logLevel&gt;
-                &lt;logFile&gt;/tmp/himera.log&lt;/logFile&gt;
-        &lt;/nfs&gt;
-&lt;/config&gt;</screen>
-        </section>
-
-        <section>
-          <title>Mounting &chimera; through &nfs;</title>
-
-          <para>
-            Since release 1.9.7, &dcache; does not need the &chimera;
-            filesystem to be mounted any longer. But a mounted file
-            system can be nice for administrative access.
-            This offers the opportunity to use
-            OS-level tools like ls and mkdir for Chimera. However,
-            direct I/O-operations like <command>cp</command> are not possible,
-            since the &nfs3; interface provides the namespace part only. This
-            section describes how to start the &chimera; &nfs3; server
-            and mount the name space.
-          </para>
-
-          <note>
-          <para>
             Since &dcache; version 1.9.7, &chimera; does not need to be started
-            with an init script any more; instead &chimera; is available as the
-            &cell-nfsv3; service and can be added to and edited in the &dcache;
-            <firstterm>layout</firstterm> file
-            (see <xref linkend="in-install-layout" />).
+            with an init script any more. &chimera; is now available as the
+            &cell-nfsv3; service, which can be added by editing the &dcache;
+            <firstterm>layout</firstterm> file    (see <xref linkend="in-install-layout" />) and will be started automatically as &dcache; is started.
           </para>
-          </note>
-
-          <para>The &chimera; &nfs; server uses the
-          <filename>/etc/exports</filename> file to manage
-          exports. So it has to exist or be created.
-          The typical <filename>exports</filename> file looks like this:</para>
-
-<programlisting>/ localhost(rw)
-/pnfs
-# or
-# /pnfs *.my.domain(rw)</programlisting>
 
           <note>
             <para>
@@ -336,24 +263,9 @@ CREATE TRIGGER
 Stopping portmap: portmap</screen>
           </note>
 
-	  <para>
-	    First you create the root of the Chimera namespace, called
-	    <filename class="directory">pnfs</filename> for legacy reasons.
-	    <screen>&prompt-root; <userinput>/opt/d-cache/libexec/chimera/chimera-cli.sh Mkdir /pnfs</userinput></screen>
-	  </para>
-          <para>
-            Now you need to add directory tags.
-            For more information on tags see <xref linkend="cf-pnfs-tags"/>.
-          </para>
+        </section>
+      </section>
 
-<screen>&prompt-root; <userinput>/opt/d-cache/libexec/chimera/chimera-cli.sh Mkdir /pnfs/<replaceable>your domain</replaceable></userinput>
-&prompt-root; <userinput>/opt/d-cache/libexec/chimera/chimera-cli.sh Mkdir /pnfs/<replaceable>your domain</replaceable>/data</userinput>
-&prompt-root; <userinput>echo "chimera" | /opt/d-cache/libexec/chimera/chimera-cli.sh Writetag /pnfs/<replaceable>your domain</replaceable>
-/data sGroup</userinput>
-&prompt-root; <userinput>echo "StoreName sql" | /opt/d-cache/libexec/chimera/chimera-cli.sh Writetag /pnfs/<replaceable>your do
-main</replaceable>/data OSMTemplate</userinput>
-</screen>
-	</section>
         <section>
          <title>Creating users and databases for &dcache;</title>
 
@@ -380,10 +292,109 @@ main</replaceable>/data OSMTemplate</userinput>
           host.
         </para>
 
+
         <para>
+	Now the configuration of &psql; is done and you can start &dcache;.
+	</para>
+	</section>
+
+<screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache start</userinput>
+Starting dCacheDomain done</screen>
+        </section>
+
+      <section>
+	<title>Mounting &chimera;</title>
+      <!-- TODO: move this section to appendix. -->
+        <section>
+          <title>Mounting &chimera; through &nfs;</title>
+
+          <para>
+            Since release 1.9.7, &dcache; does not need the &chimera;
+            filesystem to be mounted any longer. But a mounted file
+            system can be nice for administrative access.
+            This offers the opportunity to use
+            OS-level tools like <command>ls</command> and <command>mkdir</command> for &chimera;. However,
+            direct I/O-operations like <command>cp</command> are not possible,
+            since the &nfs3; interface provides the namespace part only. This
+            section describes how to mount &chimera; through &nfs; and how to create directory tags.
+          </para>
+
+          <para>The &chimera; &nfs; server uses the
+          <filename>/etc/exports</filename> file to manage
+          exports. If this file doesn't exist it must be created.
+          The typical <filename>exports</filename> file looks like this:</para>
+
+<programlisting>/ localhost(rw)
+/pnfs
+# or
+# /pnfs *.my.domain(rw)</programlisting>
+
+	  <para>
+	    First you create the root of the &chimera; namespace, called
+	    <filename class="directory">pnfs</filename> for legacy reasons and the directories where your data will be accessible.
+	    <screen>&prompt-root; <userinput>&chimera-cli; Mkdir /pnfs</userinput>
+&prompt-root; <userinput>&chimera-cli; Mkdir /pnfs/<replaceable>your domain</replaceable></userinput>
+&prompt-root; <userinput>&chimera-cli; Mkdir /pnfs/<replaceable>your domain</replaceable>/data</userinput>
+</screen>
+	  </para>
+          <para>
+            Now you need to add directory tags.
+            For more information on tags see <xref linkend="cf-pnfs-tags"/>.
+          </para>
+
+<screen>
+&prompt-root; <userinput>echo "chimera" | &chimera-cli; Writetag /pnfs/<replaceable>your domain</replaceable>/data sGroup</userinput>
+&prompt-root; <userinput>echo "StoreName sql" | &chimera-cli; Writetag /pnfs/<replaceable>your domain</replaceable>/data OSMTemplate</userinput>
+</screen>
+	</section>
+
+	<section>
+	  <title>Using &dcap; with a mounted file system</title>
+
+          <para>
+	    If you plan to use &dcap; with mounted file system
+	    instead of the URL-syntax (e.g. &prog-dccp;
+	    <filename>/pnfs/example.org/data/file1</filename>
+	    <filename>/tmp/file1</filename>), you need to mount the
+            root of &chimera; locally
+            (remote mounts are not allowed yet). This will allow us to
+            establish wormhole files so &dcap; clients can discover the &dcap; doors.
+          </para>
+
+<screen>&prompt-root; <userinput>mount localhost:/ /mnt</userinput>
+&prompt-root; <userinput>mkdir /mnt/admin/etc/config/dCache</userinput>
+&prompt-root; <userinput>touch /mnt/admin/etc/config/dCache/dcache.conf</userinput>
+&prompt-root; <userinput>touch /mnt/admin/etc/config/dCache/'.(fset)(dcache.conf)(io)(on)'</userinput>
+&prompt-root; <userinput>echo "<replaceable>door host</replaceable>:<replaceable>port</replaceable>" > /mnt/admin/etc/config/dCache/dcache.conf</userinput></screen>
+          <para>
+            The default values for ports can be found in <xref linkend="rf-ports"/> (for &dcap; the default port is <literal>22125</literal>)  and in the
+            file
+            <filename>/opt/d-cache/share/defaults/dcache.properties</filename>. They can be altered in
+            <filename>/opt/d-cache/etc/dcache.conf</filename>
+          </para>
+
+          <para>
+            When the configuration is complete you can unmount &chimera;:
+          </para>
+
+<screen>&prompt-root; <userinput>umount /mnt</userinput></screen>
+
+          <note>
+	    <para>
+            Please note that whenever you need to change the
+            configuration, you have to remount the root
+            <literal>localhost:/</literal> to a temporary location like <filename class="directory">/mnt</filename>.
+	    </para>
+          </note>
+      </section>
+      </section>
+      <section>
+	<title>Replica manager and billing</title>
+      <!-- TODO:  move this section to the appropriate chapters, which need to be rewritten. -->
+              <para>
           If the resilience feature provided by the <glossterm
           linkend="gl-replicamanager">replica manager</glossterm> is
-          used, the database <quote>replicas</quote> has to be prepared
+          used, the database <database>replicas</database> has to be prepared
           on the head node with the command:
         </para>
 
@@ -411,49 +422,7 @@ main</replaceable>/data OSMTemplate</userinput>
           to configure the &cell-billing; to write into this database,
           see below.
         </para>
-
-        <para>
-	Start &dcache;.
-        </para>
-
-<screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache start</userinput></screen>
-        </section>
-
-          <para>
-	    If you plan to use &dcap; with mounted file system
-	    instead of the URL-syntax (e.g. &prog-dccp;
-	    <filename>/pnfs/example.org/data/file1</filename>
-	    <filename>/tmp/file1</filename>), we need to mount the
-            root of &chimera; locally
-            (remote mounts are not allowed yet). This will allow us to
-            establish wormhole files so &dcap; clients can discover the &dcap; doors.
-          </para>
-
-<screen>&prompt-root; <userinput>mount localhost:/ /mnt</userinput>
-&prompt-root; <userinput>mkdir /mnt/admin/etc/config/dCache</userinput>
-&prompt-root; <userinput>touch /mnt/admin/etc/config/dCache/dcache.conf</userinput>
-&prompt-root; <userinput>touch /mnt/admin/etc/config/dCache/'.(fset)(dcache.conf)(io)(on)'</userinput>
-&prompt-root; <userinput>echo "<replaceable>door host</replaceable>:<replaceable>port</replaceable>" > /mnt/admin/etc/config/dCache/dcache.conf</userinput></screen>
-          <para>
-            The default values for ports can be found in <xref linkend="rf-ports"/> (for &dcap; the default port is <literal>22125</literal>)  and in the
-            file
-            <filename>/opt/d-cache/share/defaults/dcache.properties</filename>. They can be altered in
-            <filename>/opt/d-cache/etc/dcache.conf</filename>
-          </para>
-
-          <para>
-            When the configuration is complete you can unmount &chimera;:
-          </para>
-
-<screen>&prompt-root; <userinput>umount /mnt</userinput></screen>
-
-          <note>
-            Please note that whenever you need to change the
-            configuration, you have to remount the root
-            <literal>localhost:/</literal> to a temporary location like <filename class="directory">/mnt</filename>.
-          </note>
       </section>
-    </section>
 
     <section>
       <title>Configuring &dcache;</title>
@@ -462,16 +431,10 @@ main</replaceable>/data OSMTemplate</userinput>
         In the setup of &dcache; 1.9.7 and newer, there is one main
         configuration file:
         <filename>/opt/d-cache/etc/dcache.conf</filename>. Initially, it
-        contains only a reference to the <firstterm>layout</firstterm> of the
-        instance, but is otherwise empty. That is because &dcache;
+         is empty. That is because &dcache;
         stores default settings separately. These default configuration values
         can be viewed in the files in
-        <filename class="directory">/opt/d-cache/share/default/</filename>.
-      </para>
-      <para>
-        If any of the default configurations values needs to be changed, copy it
-        to <filename>/opt/d-cache/etc/dcache.conf</filename> and update the
-        value.
+        <filename class="directory">/opt/d-cache/share/defaults/</filename>.
       </para>
 
       <important>
@@ -481,43 +444,11 @@ main</replaceable>/data OSMTemplate</userinput>
       </para>
       </important>
 
-      <note>
-        <para>
-            As &dcache; no longer parses any of the configuration files from
-            the shell scripts, the location of the &java; binary cannot be
-            defined in the configuration files. &dcache; will search for &java;
-            on the system path first; if it is found there, no further action
-            is needed. If &java; is not on the system path, the environment
-            variable <envar>JAVA_HOME</envar> to define the location of the
-            &java; installation directory. Alternatively, the environment
-            variable <envar>JAVA</envar> can be used to point to the &java;
-            executable directly.
-        </para>
-
-        <para>
-            If <envar>JAVA_HOME</envar> or <envar>JAVA</envar> cannot be
-            defined as global environment variables
-            in the operating system, then they can be defined in either
-            <filename>/etc/default/dcache</filename> or <filename>/etc/dcache.env</filename>.
-            These two files are sourced by the init script and allow
-            <envar>JAVA_HOME</envar>, <envar>JAVA</envar> and
-            <envar>DCACHE_HOME</envar> to be defined.
-        </para>
-      </note>
-   </section>
-
-    <section>
-        <title>Grid user authorization</title>
-
-        <para>
-        For authorization of grid users the file
-        <filename>/opt/d-cache/etc/dcache.kpwd</filename> is
-        needed. You can simply copy the template that is in the same directory. Note that it may be generated from the standard
-        <filename>/etc/grid-security/grid-mapfile</filename> with the
-        tool <filename>grid-mapfile2dcache-kpwd</filename> which is
-        distributed with the WLCG software.
+      <para>
+        If any of the default configurations values needs to be changed, copy it
+        to <filename>/opt/d-cache/etc/dcache.conf</filename> and update the
+        value.
       </para>
-    </section>
 
     <section id="in-install-layout">
       <title>Defining services and domains</title>
@@ -533,28 +464,28 @@ main</replaceable>/data OSMTemplate</userinput>
 
       <para>
         There are several layout files in the layout directory, but only one
-        of them is read by &dcache; when starting up. This layout file is
-        configured in <filename>/opt/d-cache/etc/dcache.conf</filename> using
-        the <varname>dcache.layout</varname> property. Keep in mind that the
-        property value has to point to a file with the same name, suffixed by
+	of them is read by &dcache; when starting up. In <filename class="directory">/opt/d-cache/share/defaults/ </filename> it is set to be the <varname>single.conf</varname>. 
+	If the &dcache; should be started with another layout file you will have to add a new entry to <filename>/opt/d-cache/etc/dcache.conf</filename>.
+
+      <informalexample>
+      <para>
+        For a pool node &dcache;
+        setup, specify <varname>dcache.layout=pool</varname> in
+        <filename>/opt/d-cache/etc/dcache.conf</filename>. This
+        will instruct dCache to read the layout file
+        <filename>/opt/d-cache/etc/layouts/pool.conf</filename> when starting
+        up.
+      </para>
+      </informalexample> 
+
+      Keep in mind that the property value has to point to a file with the same name, suffixed by
         <literal>.conf</literal>. That means, if you set the
         <varname>dcache.layout</varname> property to <literal>mylayout</literal>,
         make sure that the file
         <filename>/opt/d-cache/etc/layouts/mylayout.conf</filename> exists.
       </para>
 
-      <informalexample>
-      <para>
-        For a single node &dcache;
-        setup, specify <varname>dcache.layout=single</varname> in
-        <filename>/opt/d-cache/etc/dcache.conf</filename>. This
-        will instruct dCache to read the layout file
-        <filename>/opt/d-cache/etc/layouts/single.conf</filename> when starting
-        up.
-      </para>
-      </informalexample>
-
-      <para>
+     <para>
         Besides defining domains and the services to run in a domain,
         a layout can define domain- and service- specific configuration
         parameters.
@@ -686,6 +617,43 @@ Starting gsidcap-dcache-vmDomain  Done (pid=8296)
 Starting dcache-vmDomain  Done (pid=8369)</screen>
 
       </section>
+      <note>
+        <para>
+            As &dcache; no longer parses any of the configuration files from
+            the shell scripts, the location of the &java; binary cannot be
+            defined in the configuration files. &dcache; will search for &java;
+            on the system path first; if it is found there, no further action
+            is needed. If &java; is not on the system path, the environment
+            variable <envar>JAVA_HOME</envar> to define the location of the
+            &java; installation directory. Alternatively, the environment
+            variable <envar>JAVA</envar> can be used to point to the &java;
+            executable directly.
+        </para>
+
+        <para>
+            If <envar>JAVA_HOME</envar> or <envar>JAVA</envar> cannot be
+            defined as global environment variables
+            in the operating system, then they can be defined in either
+            <filename>/etc/default/dcache</filename> or <filename>/etc/dcache.env</filename>.
+            These two files are sourced by the init script and allow
+            <envar>JAVA_HOME</envar>, <envar>JAVA</envar> and
+            <envar>DCACHE_HOME</envar> to be defined.
+        </para>
+      </note>
+    <section>
+        <title>Grid user authorization</title>
+
+        <para>
+        For authorization of grid users the file
+        <filename>/opt/d-cache/etc/dcache.kpwd</filename> is
+        needed. You can simply copy the template that is in the same directory. Note that it may be generated from the standard
+        <filename>/etc/grid-security/grid-mapfile</filename> with the
+        tool <filename>grid-mapfile2dcache-kpwd</filename> which is
+        distributed with the WLCG software.
+      </para>
+    </section>
+
+   </section>
 
       <section>
     <title>Installing &dcache; on several nodes</title>
@@ -729,6 +697,7 @@ Starting dcache-vmDomain  Done (pid=8369)</screen>
     </para>
 
   </section>
+
   </section>
 
   <section id="in-upgrade">
@@ -736,7 +705,7 @@ Starting dcache-vmDomain  Done (pid=8369)</screen>
 
     <para>
       Upgrading to bugfix releases within one version (e.g. from
-      1.9.3-1 to 1.9.3-2) may be done by shutting down the server and
+       &dcache-version;-1 to  &dcache-version;-2) may be done by shutting down the server and
       upgrading the packages with
 
 <screen>&prompt-root; <userinput>rpm -Uvh <replaceable>packageName</replaceable></userinput></screen>
