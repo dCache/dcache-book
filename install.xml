@@ -115,28 +115,18 @@
 
     </section>
 
-
     <section>
-      <title>Readying the &psql; server</title>
+      <title>Readying the &psql; server for the use with &dcache;</title>
 
       <para>
+	Using a &psql; server with &dcache; places a number of requirements on the database.
         You must configure &psql; for use by &dcache; and create the
         necessary &psql; user accounts and database structure.  This
         section describes how to do this.
       </para>
 
       <section>
-        <title>Configuring the &psql; server</title>
-
-        <para>
-          Using a &psql; server with &dcache; places a number of
-          requirements on the database.  This section describes what
-          configuration is necessary to ensure &psql; operates so
-          &dcache; can use it.
-        </para>
-
-        <section>
-          <title>Enabling local trust</title>
+        <title>Enabling local trust</title>
 
           <para>
             Perhaps the simplest configuration is to allow
@@ -165,30 +155,21 @@
 host    all         all         127.0.0.1/32   trust
 host    all         all         ::1/128        trust</programlisting>
 
+          <important>
+	    <title>Restarting &psql;</title>
 
-        </section>
-
-      </section>
-
-      <important>
-          <title>Restarting &psql;</title>
-
-          <para>
+	    <para>
             If you have edited &psql; configuration files, you
             <emphasis>must</emphasis> restart &psql; for those changes
             to take effect.  On many systems, this can be done with
             the following command:
-          </para>
+	    </para>
 
-          <screen>&prompt-root; <userinput>/etc/init.d/postgresql restart</userinput>
+	    <screen>&prompt-root; <userinput>/etc/init.d/postgresql restart</userinput>
 Stopping postgresql service:                               [  OK  ]
 Starting postgresql service:                               [  OK  ]</screen>
-        </important>
-
-	<para>
-	  Make sure that &psql; will be started automatically after booting.
-	  <screen>&prompt-root; <userinput>chkconfig postgresql on</userinput></screen>
-	</para>
+          </important>
+        </section>
 
       <section>
         <title>Configuring &chimera;</title>
@@ -198,7 +179,8 @@ Starting postgresql service:                               [  OK  ]</screen>
           with associated meta data. Where pools in &dcache; store the
           content of files, &chimera; stores the names and meta data
           of those files. &chimera; itself stores the data in a
-          relational database. We will use &psql; in this tutorial.
+          relational database. We will use &psql; in this tutorial. Database connection settings can be customized in
+            <filename>/opt/d-cache/config/chimera-config.xml</filename>
         </para>
 
         <note>
@@ -264,49 +246,12 @@ CREATE FUNCTION
 CREATE TRIGGER
 </screen>
 
-          <note>
-	    <para>
-            Database connection settings can be customized in
-            <filename>/opt/d-cache/config/chimera-config.xml</filename>
-	    </para>
-          </note>
-
-        </section>
-
-        <section>
-          <title>Mounting &chimera; through &nfs;</title>
-
-          <para>
-            Since release 1.9.7, &dcache; does not need the &chimera;
-            filesystem to be mounted any longer. But a mounted file
-            system can be nice for administrative access.
-            This offers the opportunity to use
-            OS-level tools like ls and mkdir for Chimera. However,
-            direct I/O-operations like <command>cp</command> are not possible,
-            since the &nfs3; interface provides the namespace part only. This
-            section describes how to start the &chimera; &nfs3; server
-            and mount the name space.
-          </para>
-
-          <note>
           <para>
             Since &dcache; version 1.9.7, &chimera; does not need to be started
-            with an init script any more; instead &chimera; is available as the
-            &cell-nfsv3; service and can be added to and edited in the &dcache;
-            <firstterm>layout</firstterm> file
-            (see <xref linkend="in-install-layout" />).
+            with an init script any more. &chimera; is now available as the
+            &cell-nfsv3; service, which can be added by editing the &dcache;
+            <firstterm>layout</firstterm> file    (see <xref linkend="in-install-layout" />) and will be started automatically as &dcache; is started.
           </para>
-          </note>
-
-          <para>The &chimera; &nfs; server uses the
-          <filename>/etc/exports</filename> file to manage
-          exports. So it has to exist or be created.
-          The typical <filename>exports</filename> file looks like this:</para>
-
-<programlisting>/ localhost(rw)
-/pnfs
-# or
-# /pnfs *.my.domain(rw)</programlisting>
 
           <note>
             <para>
@@ -318,22 +263,9 @@ CREATE TRIGGER
 Stopping portmap: portmap</screen>
           </note>
 
-	  <para>
-	    First you create the root of the Chimera namespace, called
-	    <filename class="directory">pnfs</filename> for legacy reasons.
-	    <screen>&prompt-root; <userinput>&chimera-cli; Mkdir /pnfs</userinput></screen>
-	  </para>
-          <para>
-            Now you need to add directory tags.
-            For more information on tags see <xref linkend="cf-pnfs-tags"/>.
-          </para>
+        </section>
+      </section>
 
-<screen>&prompt-root; <userinput>&chimera-cli; Mkdir /pnfs/<replaceable>your domain</replaceable></userinput>
-&prompt-root; <userinput>&chimera-cli; Mkdir /pnfs/<replaceable>your domain</replaceable>/data</userinput>
-&prompt-root; <userinput>echo "chimera" | &chimera-cli; Writetag /pnfs/<replaceable>your domain</replaceable>/data sGroup</userinput>
-&prompt-root; <userinput>echo "StoreName sql" | &chimera-cli; Writetag /pnfs/<replaceable>your domain</replaceable>/data OSMTemplate</userinput>
-</screen>
-	</section>
         <section>
          <title>Creating users and databases for &dcache;</title>
 
@@ -360,10 +292,109 @@ Stopping portmap: portmap</screen>
           host.
         </para>
 
+
         <para>
+	Now the configuration of &psql; is done and you can start &dcache;.
+	</para>
+	</section>
+
+<screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache start</userinput>
+Starting dCacheDomain done</screen>
+        </section>
+
+      <section>
+	<title>Mounting &chimera;</title>
+      <!-- TODO: move this section to appendix. -->
+        <section>
+          <title>Mounting &chimera; through &nfs;</title>
+
+          <para>
+            Since release 1.9.7, &dcache; does not need the &chimera;
+            filesystem to be mounted any longer. But a mounted file
+            system can be nice for administrative access.
+            This offers the opportunity to use
+            OS-level tools like <command>ls</command> and <command>mkdir</command> for &chimera;. However,
+            direct I/O-operations like <command>cp</command> are not possible,
+            since the &nfs3; interface provides the namespace part only. This
+            section describes how to mount &chimera; through &nfs; and how to create directory tags.
+          </para>
+
+          <para>The &chimera; &nfs; server uses the
+          <filename>/etc/exports</filename> file to manage
+          exports. If this file doesn't exist it must be created.
+          The typical <filename>exports</filename> file looks like this:</para>
+
+<programlisting>/ localhost(rw)
+/pnfs
+# or
+# /pnfs *.my.domain(rw)</programlisting>
+
+	  <para>
+	    First you create the root of the &chimera; namespace, called
+	    <filename class="directory">pnfs</filename> for legacy reasons and the directories where your data will be accessible.
+	    <screen>&prompt-root; <userinput>&chimera-cli; Mkdir /pnfs</userinput>
+&prompt-root; <userinput>&chimera-cli; Mkdir /pnfs/<replaceable>your domain</replaceable></userinput>
+&prompt-root; <userinput>&chimera-cli; Mkdir /pnfs/<replaceable>your domain</replaceable>/data</userinput>
+</screen>
+	  </para>
+          <para>
+            Now you need to add directory tags.
+            For more information on tags see <xref linkend="cf-pnfs-tags"/>.
+          </para>
+
+<screen>
+&prompt-root; <userinput>echo "chimera" | &chimera-cli; Writetag /pnfs/<replaceable>your domain</replaceable>/data sGroup</userinput>
+&prompt-root; <userinput>echo "StoreName sql" | &chimera-cli; Writetag /pnfs/<replaceable>your domain</replaceable>/data OSMTemplate</userinput>
+</screen>
+	</section>
+
+	<section>
+	  <title>Using &dcap; with a mounted file system</title>
+
+          <para>
+	    If you plan to use &dcap; with mounted file system
+	    instead of the URL-syntax (e.g. &prog-dccp;
+	    <filename>/pnfs/example.org/data/file1</filename>
+	    <filename>/tmp/file1</filename>), you need to mount the
+            root of &chimera; locally
+            (remote mounts are not allowed yet). This will allow us to
+            establish wormhole files so &dcap; clients can discover the &dcap; doors.
+          </para>
+
+<screen>&prompt-root; <userinput>mount localhost:/ /mnt</userinput>
+&prompt-root; <userinput>mkdir /mnt/admin/etc/config/dCache</userinput>
+&prompt-root; <userinput>touch /mnt/admin/etc/config/dCache/dcache.conf</userinput>
+&prompt-root; <userinput>touch /mnt/admin/etc/config/dCache/'.(fset)(dcache.conf)(io)(on)'</userinput>
+&prompt-root; <userinput>echo "<replaceable>door host</replaceable>:<replaceable>port</replaceable>" > /mnt/admin/etc/config/dCache/dcache.conf</userinput></screen>
+          <para>
+            The default values for ports can be found in <xref linkend="rf-ports"/> (for &dcap; the default port is <literal>22125</literal>)  and in the
+            file
+            <filename>/opt/d-cache/share/defaults/dcache.properties</filename>. They can be altered in
+            <filename>/opt/d-cache/etc/dcache.conf</filename>
+          </para>
+
+          <para>
+            When the configuration is complete you can unmount &chimera;:
+          </para>
+
+<screen>&prompt-root; <userinput>umount /mnt</userinput></screen>
+
+          <note>
+	    <para>
+            Please note that whenever you need to change the
+            configuration, you have to remount the root
+            <literal>localhost:/</literal> to a temporary location like <filename class="directory">/mnt</filename>.
+	    </para>
+          </note>
+      </section>
+      </section>
+      <section>
+	<title>Replica manager and billing</title>
+      <!-- TODO:  move this section to the appropriate chapters, which need to be rewritten. -->
+              <para>
           If the resilience feature provided by the <glossterm
           linkend="gl-replicamanager">replica manager</glossterm> is
-          used, the database <quote>replicas</quote> has to be prepared
+          used, the database <database>replicas</database> has to be prepared
           on the head node with the command:
         </para>
 
@@ -391,49 +422,7 @@ Stopping portmap: portmap</screen>
           to configure the &cell-billing; to write into this database,
           see below.
         </para>
-
-        <para>
-	Start &dcache;.
-        </para>
-
-<screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache start</userinput></screen>
-        </section>
-
-          <para>
-	    If you plan to use &dcap; with mounted file system
-	    instead of the URL-syntax (e.g. &prog-dccp;
-	    <filename>/pnfs/example.org/data/file1</filename>
-	    <filename>/tmp/file1</filename>), we need to mount the
-            root of &chimera; locally
-            (remote mounts are not allowed yet). This will allow us to
-            establish wormhole files so &dcap; clients can discover the &dcap; doors.
-          </para>
-
-<screen>&prompt-root; <userinput>mount localhost:/ /mnt</userinput>
-&prompt-root; <userinput>mkdir /mnt/admin/etc/config/dCache</userinput>
-&prompt-root; <userinput>touch /mnt/admin/etc/config/dCache/dcache.conf</userinput>
-&prompt-root; <userinput>touch /mnt/admin/etc/config/dCache/'.(fset)(dcache.conf)(io)(on)'</userinput>
-&prompt-root; <userinput>echo "<replaceable>door host</replaceable>:<replaceable>port</replaceable>" > /mnt/admin/etc/config/dCache/dcache.conf</userinput></screen>
-          <para>
-            The default values for ports can be found in <xref linkend="rf-ports"/> (for &dcap; the default port is <literal>22125</literal>)  and in the
-            file
-            <filename>/opt/d-cache/share/defaults/dcache.properties</filename>. They can be altered in
-            <filename>/opt/d-cache/etc/dcache.conf</filename>
-          </para>
-
-          <para>
-            When the configuration is complete you can unmount &chimera;:
-          </para>
-
-<screen>&prompt-root; <userinput>umount /mnt</userinput></screen>
-
-          <note>
-            Please note that whenever you need to change the
-            configuration, you have to remount the root
-            <literal>localhost:/</literal> to a temporary location like <filename class="directory">/mnt</filename>.
-          </note>
       </section>
-    </section>
 
     <section>
       <title>Configuring &dcache;</title>
