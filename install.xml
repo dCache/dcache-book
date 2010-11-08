@@ -180,8 +180,20 @@ Starting postgresql service:                               [  OK  ]</screen>
           content of files, &chimera; stores the names and meta data
           of those files. &chimera; itself stores the data in a
           relational database. We will use &psql; in this tutorial. Database connection settings can be customized in
-            <filename>/opt/d-cache/config/chimera-config.xml</filename>
+            <filename>/opt/d-cache/config/chimera-config.xml</filename>.
+	     Specifically you should change the user to
+            <quote>chimera</quote>.
         </para>
+
+<screen>&lt;?xml version="1.0"?&gt;
+&lt;config&gt;
+        &lt;db fsid="0" url="jdbc:postgresql://localhost/chimera?prepareThreshold=3" drv="org.postgresql.Driver" user="chimera" pass="" dialect="PgSQL" /&gt;
+        &lt;nfs&gt;
+                &lt;port&gt;2049&lt;/port&gt;
+                &lt;logLevel&gt;0&lt;/logLevel&gt;
+                &lt;logFile&gt;/tmp/himera.log&lt;/logFile&gt;
+        &lt;/nfs&gt;
+&lt;/config&gt;</screen>
 
         <note>
           <para> &dcache; used to use another name space
