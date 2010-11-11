@@ -316,8 +316,8 @@ Starting dCacheDomain done</screen>
         </section>
 
       <section>
+<!-- TODO: move this section to appendix. -->
 	<title>Mounting &chimera;</title>
-      <!-- TODO: move this section to appendix. -->
         <section>
           <title>Mounting &chimera; through &nfs;</title>
 
@@ -329,36 +329,47 @@ Starting dCacheDomain done</screen>
             OS-level tools like <command>ls</command> and <command>mkdir</command> for &chimera;. However,
             direct I/O-operations like <command>cp</command> are not possible,
             since the &nfs3; interface provides the namespace part only. This
-            section describes how to mount &chimera; through &nfs; and how to create directory tags.
+            section describes how to mount &chimera; through &nfs;.
           </para>
 
-          <para>The &chimera; &nfs; server uses the
-          <filename>/etc/exports</filename> file to manage
-          exports. If this file doesn't exist it must be created.
-          The typical <filename>exports</filename> file looks like this:</para>
+          <para>
+	    If you want to mount &chimera; for easier administrative access, you need to edit the <filename>/etc/exports</filename> file as the &chimera; &nfs; server uses it to manage exports. If this file doesn't exist it must be created.
+          The typical <filename>exports</filename> file looks like this:
+	  </para>
 
 <programlisting>/ localhost(rw)
 /pnfs
 # or
 # /pnfs *.my.domain(rw)</programlisting>
 
+<para>
+  Now you can mount &chimera; by
+<screen>&prompt-root; <userinput>mount localhost:/ /mnt</userinput>
+&prompt-root; <userinput>mkdir -p /mnt/pnfs/<replaceable>your domain</replaceable>/data</userinput></screen>
+</para>
+
 	  <para>
-	    First you create the root of the &chimera; namespace, called
-	    <filename class="directory">pnfs</filename> for legacy reasons and the directories where your data will be accessible.
+	    If you don't want to mount chimera you can create the root of the &chimera; namespace, called
+	    <filename class="directory">pnfs</filename> for legacy reasons and the directories where your data will be accessible by
 	    <screen>&prompt-root; <userinput>&chimera-cli; Mkdir /pnfs</userinput>
 &prompt-root; <userinput>&chimera-cli; Mkdir /pnfs/<replaceable>your domain</replaceable></userinput>
 &prompt-root; <userinput>&chimera-cli; Mkdir /pnfs/<replaceable>your domain</replaceable>/data</userinput>
 </screen>
 	  </para>
+
+	  <section>
+	    <title>Directory tags</title>
           <para>
-            Now you need to add directory tags.
+            You can now add directory tags.
             For more information on tags see <xref linkend="cf-pnfs-tags"/>.
           </para>
-
 <screen>
 &prompt-root; <userinput>echo "chimera" | &chimera-cli; Writetag /pnfs/<replaceable>your domain</replaceable>/data sGroup</userinput>
 &prompt-root; <userinput>echo "StoreName sql" | &chimera-cli; Writetag /pnfs/<replaceable>your domain</replaceable>/data OSMTemplate</userinput>
 </screen>
+	  </section>
+
+
 	</section>
 
 	<section>
