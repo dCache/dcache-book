@@ -16,6 +16,9 @@ Rules / Guidelines / Suggestions for adding new entities:
   4.  Go through whole document and switch existing usage to new entity.
 -->
 
+<!-- dCache-version -->
+<!ENTITY dcache-version          "1.9.8">
+
 <!-- "Products" or high-level services -->
 <!ENTITY dcache       "<productname>dCache</productname>">
 <!ENTITY chimera      "<productname>Chimera</productname>">
@@ -51,7 +54,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY cell-spacemngr "<literal>SpaceManager</literal>">
 <!ENTITY cell-cleaner   "<literal>Cleaner</literal>">
 <!ENTITY cell-cpymngr   "<literal>CopyManager</literal>">
-<!ENTITY cell-gplazma   "<literal>gPlazma</literal>">
+<!ENTITY cell-admin   "<literal>admin</literal>">
 <!ENTITY cell-hopmngr   "<literal>HoppingManager</literal>">
 <!ENTITY cell-hsmflushctl "<literal>HsmFlushControl</literal>">
 <!ENTITY cell-gplazma   "<literal>gPlazma</literal>">
