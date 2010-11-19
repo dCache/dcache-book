@@ -1206,6 +1206,78 @@ remoteGsiftpMaxTransfers=260</programlisting>
       <programlisting>RecursiveDirectoryCreation=true</programlisting>
     </section>
 
+       <section>
+    <title>hostCertificateRefreshPeriod</title>
+
+    <para>
+    This option allows you to control how often the &srm; door will reload the
+    server's host certificate from the filesystem. For the specified period,
+    the host certificate will be kept in memory. This speeds up the rate at
+    which the door can handle requests, but also causes it to be unaware of
+    changes to the host certificate (for instance in the case of renewal).
+    </para>
+
+    <para>
+    By changing this parameter you can control how long the host certificate
+    is cached by the door and consequently how fast the door will be able to
+    detect and reload a renewed host certificate.
+    </para>
+
+    <para>
+    Please note that the value of this parameter has to be specified in
+    seconds.
+    </para>
+
+    <para>
+    Usage example:
+    </para>
+
+      <programlisting>hostCertificateRefreshPeriod=86400</programlisting>
+    </section>
+
+    <section>
+    <title>trustAnchorRefreshPeriod</title>
+
+    <para>
+    The <varname>trustAnchorRefreshPeriod</varname> option is similar to
+    <varname>hostCertificateRefreshPeriod</varname>. It applies to the set
+    of CA certificates trusted by the &srm; door for signing end-entity
+    certificates (along with some metadata, these form so called
+    <firstterm>trust anchors</firstterm>).
+    The trust anchors are needed to make a decision about
+    the trustworthiness of a certificate in <abbrev>X.509</abbrev> client
+    authentication. The &gsi; security protocol used by &srm; builds upon
+    <abbrev>X.509</abbrev> client authentication.
+    </para>
+
+    <para>
+    By changing this parameter you can control how long the set of trust
+    anchors remains cached by the door. Conversely, it also influences how
+    often the door reloads the set of trusted certificates.
+    </para>
+
+    <para>
+    Please note that the value of this parameter has to be specified in
+    seconds.
+    </para>
+
+    <tip>
+    <para>
+      Trust-anchors usually change more often than the host
+      certificate. Thus, it might be sensible to set the refresh period of the
+      trust anchors lower than the refresh period of the host certificate.
+    </para>
+    </tip>
+
+    <para>
+    Usage example:
+    </para>
+
+      <programlisting>trustAnchorRefreshPeriod=3600</programlisting>
+
+    </section>
+
+
   </section>
 
   <!--
