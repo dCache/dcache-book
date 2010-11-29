@@ -87,7 +87,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY xrootd   "<systemitem class='protocol'>xrootd</systemitem>">
 <!ENTITY nfs3     "<systemitem class='protocol'>NFS-3</systemitem>">
 <!ENTITY nfs      "<systemitem class='protocol'>NFS</systemitem>">
-
+<!ENTITY webdav   "<systemitem class='protocol'>WebDAV</systemitem>">
 
 
 <!-- Various formats -->
