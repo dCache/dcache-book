@@ -326,18 +326,14 @@ Starting dCacheDomain done</screen>
 	  </para>
 
 <programlisting>/ localhost(rw)
-/pnfs
+/data
 # or
-# /pnfs *.my.domain(rw)</programlisting>
+# /data *.my.domain(rw)</programlisting>
 
 	  <para>
 	    First you create the root of the &chimera; namespace, called
-	    <filename class="directory">pnfs</filename> for legacy reasons and
-	    the directories where your data will be accessible.
-	    <screen>&prompt-root; <userinput>&chimera-cli; Mkdir /pnfs</userinput>
-&prompt-root; <userinput>&chimera-cli; Mkdir /pnfs/<replaceable>your domain</replaceable></userinput>
-&prompt-root; <userinput>&chimera-cli; Mkdir /pnfs/<replaceable>your domain</replaceable>/data</userinput>
-</screen>
+	    <filename class="directory">data</filename>.
+	    <screen>&prompt-root; <userinput>&chimera-cli; Mkdir /data</userinput></screen>
 	  </para>
           <para>
             Now you need to add directory tags.
@@ -345,8 +341,8 @@ Starting dCacheDomain done</screen>
           </para>
 
 <screen>
-&prompt-root; <userinput>echo "chimera" | &chimera-cli; Writetag /pnfs/<replaceable>your domain</replaceable>/data sGroup</userinput>
-&prompt-root; <userinput>echo "StoreName sql" | &chimera-cli; Writetag /pnfs/<replaceable>your domain</replaceable>/data OSMTemplate</userinput>
+&prompt-root; <userinput>echo "chimera" | &chimera-cli; Writetag /data sGroup</userinput>
+&prompt-root; <userinput>echo "StoreName sql" | &chimera-cli; Writetag /data OSMTemplate</userinput>
 </screen>
 	</section>
 
@@ -356,7 +352,7 @@ Starting dCacheDomain done</screen>
           <para>
 	    If you plan to use &dcap; with mounted file system
 	    instead of the URL-syntax (e.g. &prog-dccp;
-	    <filename>/pnfs/example.org/data/file1</filename>
+	    <filename>/data/file1</filename>
 	    <filename>/tmp/file1</filename>), you need to mount the
             root of &chimera; locally
             (remote mounts are not allowed yet). This will allow us to
