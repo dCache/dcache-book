@@ -61,7 +61,7 @@
       process root access is required.
     </para>
 
-    <section>
+    <section id="in-install-prerequisites">
       <title>Prerequisites</title>
 
       <para>
@@ -80,9 +80,8 @@
 
         <listitem>
           <para>
-           &dcache; requires Java 1.6 JRE. It is recommended to use
-	   the newest Java release
-           available within the release series used.
+           &dcache; requires Java 1.6 JRE. It is recommended to use &sunjvm; at the
+	   latest patch-level (at least 1.6.0_18).
           </para>
         </listitem>
 
@@ -96,7 +95,7 @@
       </itemizedlist>
     </section>
 
-    <section>
+    <section id="in-install-installation">
       <title>Installation of the &dcache; Software</title>
 
       <para>
@@ -115,7 +114,7 @@
 
     </section>
 
-    <section>
+    <section id="in-install-postgres">
       <title>Readying the &psql; server for the use with &dcache;</title>
 
       <para>
@@ -125,8 +124,8 @@
         section describes how to do this.
       </para>
 
-      <section>
-        <title>Enabling local trust</title>
+      <section id="in-install-postgres-trust">
+	<title>Enabling local trust</title>
 
           <para>
             Perhaps the simplest configuration is to allow
@@ -171,8 +170,8 @@ Starting postgresql service:                               [  OK  ]</screen>
           </important>
         </section>
 
-      <section>
-        <title>Configuring &chimera;</title>
+      <section id="in-install-postgres-chimera">
+	<title>Configuring &chimera;</title>
 
         <para>
           &chimera; is a library providing a hierarchical name space
@@ -190,8 +189,8 @@ Starting postgresql service:                               [  OK  ]</screen>
           </para>
         </note>
 
-        <section>
-          <title>Initialize the database</title>
+        <section id="in-install-postgres-chimera-initDB">
+	  <title>Initialize the database</title>
 
           <para>
             Create the <database>Chimera</database> user and database and add the
@@ -266,8 +265,8 @@ Stopping portmap: portmap</screen>
         </section>
       </section>
 
-        <section>
-         <title>Creating users and databases for &dcache;</title>
+        <section id="in-install-postgres-users">
+	  <title>Creating users and databases for &dcache;</title>
 
          <para>
           The &dcache; components will access the database server with
@@ -423,9 +422,9 @@ Starting dCacheDomain done</screen>
         </para>
       </section>
 
-    <section>
+    <section id="in-install-configure">
       <title>Configuring &dcache;</title>
-      <section>
+      <section id="in-install-configure-terminology">
 	<title>Terminology</title>
 	  <para>
 	    &dcache; consists of one or more <firstterm>domains</firstterm>.
@@ -446,7 +445,7 @@ Starting dCacheDomain done</screen>
 	  </para>
 	</section>
 
-	<section>
+	<section id="in-install-configure-files">
 	  <title>Configuration files</title>
 
 	  <para>
@@ -603,7 +602,7 @@ Starting dCacheDomain done</screen>
 	</important>
     </section>
 
-    <section>
+    <section id="in-install-configure-pools">
       <title>Creating and configuring pools</title>
 
       <para>
@@ -679,8 +678,9 @@ maxDiskSpace=2T</programlisting>
        </note>
       </section>
 
-      <section><title>Defining two doors</title>
-      <para>
+      <section id="in-install-configure-doors">
+	<title>Defining two doors</title>
+	<para>
 	  To define two &gridftp; doors on the same host, you can define two &gridftp;
 	  domains in your
 	  <filename>mylayout.conf</filename>.
@@ -701,36 +701,38 @@ cell.name=GFTP-${host.name}-2</programlisting>
 	      the &dcache; does not enforce any fixed scheme for domain naming. Neither
 	      does &dcache; enforce any fixed scheme for naming door cells.
 	    </informalexample>
-      </para>
+	</para>
 	  </section>
-	  <section><title>&java; heap size</title>
-	  <para>
-	  By default the &java; heap size and the maximum direct buffer size are defined as
-	  <programlisting>dcache.java.memory.heap=512m
+	  <section id="in-install-configure-java">
+	    <title>&java; heap size</title>
+	    <para>
+	      By default the &java; heap size and the maximum direct buffer size are defined as
+	      <programlisting>dcache.java.memory.heap=512m
 dcache.java.memory.direct=512m</programlisting>
-	  Again, these values can be changed in
-	  <filename>/opt/dcache/etc/dcache.conf</filename>.
-	  </para>
-	  <para>
-	    For optimization of your &dcache; you can define the &java; heap size in the
-	    layout file separately for every domain.
-	  <informalexample>
-	    <programlisting>[dCacheDomain]
+	      Again, these values can be changed in
+	      <filename>/opt/dcache/etc/dcache.conf</filename>.
+	    </para>
+	    <para>
+	      For optimization of your &dcache; you can define the &java; heap size in the
+	      layout file separately for every domain.
+	      <informalexample>
+		<programlisting>[dCacheDomain]
 dcache.java.memory.heap=2048m
 dcache.java.memory.direct=0m
 ...
 [utilityDomain]
 dcache.java.memory.heap=384m
 dcache.java.memory.direct=16m</programlisting>
-	  </informalexample>
-	  </para>
+	      </informalexample>
+	    </para>
 	  </section>
 
-	  <section><title>Starting &dcache;</title>
-	  <para>
-	    All configured components can now be started with
-	    <userinput>/opt/d-cache/bin/dcache start</userinput>, for example:
-	  </para>
+	  <section id="in-install-configure-starting">
+	    <title>Starting &dcache;</title>
+	    <para>
+	      All configured components can now be started with
+	      <userinput>/opt/d-cache/bin/dcache start</userinput>, for example:
+	    </para>
 
         <screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache start</userinput>
 Starting dCacheDomain  Done (pid=7574)
@@ -774,7 +776,7 @@ Starting srmDomain  Done (pid=8081)</screen>
 
   </section>
 
-  <section>
+  <section id="in-install-multinode">
     <title>Installing &dcache; on several nodes</title>
 
     <para>
