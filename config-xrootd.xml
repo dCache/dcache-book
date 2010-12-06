@@ -55,16 +55,16 @@
     <informalexample>
     <para>
         For example, if your &dcache;-instance is configured to be a head-node
-        and you want to run the &door-xrootd; within the 
+        and you want to run the &door-xrootd; within the
         <literal>xrootd-${host.name}Domain</literal>, add/uncomment the
         following lines in <filename>${dCacheHome}/etc/layouts/head.conf</filename>:
     </para>
-    
+
         <programlisting>..
 [xrootd-${host.name}Domain]
 [xrootd-${host.name}Domain/xrootd]
 ..</programlisting>
-    
+
     </informalexample>
 
     <para>
@@ -81,7 +81,7 @@ Starting xrootd-babelfishDomain done</screen>
       should appear at the web monitoring interface under "Cell
       Services" (see <xref linkend="intouch-web" />).
     </para>
-		
+
     <warning>
       <para>
 	Starting from version 1.7.0 (patchlevel 20), the &door-xrootd;
@@ -91,10 +91,10 @@ Starting xrootd-babelfishDomain done</screen>
 	on how to setup security.
       </para>
     </warning>
-		
+
     <section id="cf-xrootd-setup-params">
       <title>Parameters</title>
-      
+
       <para>
 	The default port the &door-xrootd; is listening on is
 	1094. This can be changed two ways:
@@ -127,28 +127,31 @@ xrootd/port=1095
     </listitem>
     </orderedlist>
 
-      <para>
-    The number of parallel &xrootd; file transfers per pool node
-    is limited by the defined portrange. This is due to each transfer occupying
-    one (not firewalled) port for its own. The portrange can be set by adding
-    the properties <literal>net.lan.port.min</literal> and
-    <literal>net.lan.port.max</literal> to 
-    <filename>${dCacheHome}/etc/dcache.conf</filename>. The default values
-    can be viewed in <filename>${dCacheHome}/share/defaults/dcache.properties</filename>.
+    <para>
+      For controlling the &tcp;-portrange within which new &xrootd;-movers
+      will start listening in the &domain-pool;, you can add the properties
+      <literal>net.lan.port.min</literal> and
+      <literal>net.lan.port.max</literal> to
+      <filename>${dCacheHome}/etc/dcache.conf</filename> and adapt them
+      according to your preferences. The default values can be viewed in
+      <filename>${dCacheHome}/share/defaults/dcache.properties</filename>.
     </para>
-                
-      <programlisting>..
-        net.lan.port.min=30100
-        net.lan.port.max=30200
+
+    <programlisting>..
+net.lan.port.min=30100
+net.lan.port.max=30200
 ..</programlisting>
 
+    <note>
       <para>
-    In the above example, the maximum would be 100 simultaneous
-    &xrootd; transfers per pool. Any change to the door port or
-    the portrange requires a restart of the dcache domain running the
-    &door-xrootd; or the pool respectively.
+        Since &dcache; version 1.9.10, the number of simultaneously active
+        &xrootd;-movers of one &dcache;-instance is not limited by the
+        configured portrange anymore.
+        The reason for this is that &dcache; now uses
+        <firstterm>UUIDs</firstterm> included in the &xrootd;-redirect to match
+        the requests on the pool-side to the requests issued to the door.
       </para>
-
+    </note>
     </section>
   </section>
 
@@ -170,7 +173,7 @@ xrootd/port=1095
 	is the command xrdcp. It is included in every xrootd and ROOT
 	distribution.
       </para>
-			
+
       <para>
 	To transfer a single file in and out of &dcache;, just issue
       </para>
@@ -179,10 +182,10 @@ xrootd/port=1095
 &prompt-user; <userinput>xrdcp root://<replaceable>xrootd-door.example.org</replaceable>/pnfs/<replaceable>example.org</replaceable>/data/xrd_test /dev/null</userinput></screen>
 
     </section>
-    
+
     <section id="cf-xrootd-tests-ROOT">
       <title>Accessing files from within ROOT</title>
-			
+
       <para>
 	This simple ROOT example shows how to write a randomly filled
 	histogram to a file in &dcache;:
@@ -218,13 +221,13 @@ TXNetFile**             //pnfs/<replaceable>example.org</replaceable>/data/test.
 
     </section>
   </section>
-	
+
   <section id="cf-xrootd-sec">
     <title>&xrootd; security</title>
-		
+
     <section id="cf-xrootd-sec-ro">
       <title>Read-Write access</title>
-			
+
       <para>
 	Per default &dcache; &xrootd; is restricted to read-only,
 	because plain &xrootd; is completely unauthenticated. A
@@ -245,7 +248,7 @@ Setting debug level 1
 061024 18:43:06 5819 Xrd: SendGenCommand: Server declared: <command>Permission denied. Access is read only.(error code: 3003)</command>
 061024 18:43:06 001 Xrd: Close: File not opened.
 Error accessing path/file for root://ford//pnfs/desy.de/data/asdfas</screen>
-			
+
       <para>
 	To enable read-write access, add the following line to
 	<filename>${dCacheHome}/etc/dcache.conf</filename>
@@ -268,9 +271,9 @@ xrootdIsReadOnly=false
 	generated through &xrootd; will inherit UID/GID from its
 	parent directory.
       </para>
-			
+
     </section>
-		
+
     <section id="cf-xrootd-sec-selected">
       <title>Permitting read/write access on selected &pnfs; directories</title>
 
@@ -299,7 +302,7 @@ xrootdAllowedPaths=/pnfs/<replaceable>example.org</replaceable>/path1:/pnfs/<rep
         If you want to split permissions depending on whether the operation is
         reading or writing, add the following lines instead:
        </para>
-       
+
        <programlisting>..
 xrootdAllowedReadPaths=/pnfs/<replaceable>example.org</replaceable>/rpath1:/pnfs/<replaceable>example.org</replaceable>/rpath2
 xrootdAllowedWritePaths=/pnfs/<replaceable>example.org</replaceable>/wpath1:/pnfs/<replaceable>example.org</replaceable>/wpath2
@@ -317,15 +320,15 @@ xrootdAllowedWritePaths=/pnfs/<replaceable>example.org</replaceable>/wpath1:/pnf
 
     <section id="cf-xrootd-sec-authz">
       <title>Token-based authorization</title>
-			
+
       <para>
 	The &xrootd; &dcache; implementation includes a generic
-	mechanism to plug in different authorization handler. The only
+	mechanism to plug in different authorization handlers. The only
 	plugin available so far implements token-based authorization
 	as suggested in <ulink
 	url="http://people.web.psi.ch/feichtinger/doc/authz.pdf"/>.
       </para>
-			
+
       <para>
 	The first thing to do is to setup the keystore. The keystore
 	file basically specifies all RSA-keypairs used within the
@@ -343,7 +346,7 @@ xrootdAllowedWritePaths=/pnfs/<replaceable>example.org</replaceable>/wpath1:/pnf
 	found in
 	<filename>${dCacheHome}/etc/keystore.template</filename>.
       </para>
-			
+
       <para>
 	The keys itself have to be converted into a certain format in
 	order to be loaded into the authorization plugin. &dcache;
@@ -352,7 +355,7 @@ xrootdAllowedWritePaths=/pnfs/<replaceable>example.org</replaceable>/wpath1:/pnf
 	PKCS #8-compliant and the public key must follow the
 	X.509-standard.
       </para>
-			
+
       <para>
 	The following example demonstrates how to create and convert a
 	keypair using OpenSSL:
@@ -371,14 +374,14 @@ xrootdAllowedWritePaths=/pnfs/<replaceable>example.org</replaceable>/wpath1:/pnf
 &prompt-root; <userinput>openssl x509 -pubkey -in cert.pem -out pkey.pem</userinput>
 &prompt-root; <userinput>openssl pkcs8 -in key.pem -topk8 -nocrypt -outform DER -out <replaceable>new_private_key</replaceable></userinput>
 &prompt-root; <userinput>openssl enc -base64 -d -in pkey.pem -out <replaceable>new_public_key</replaceable></userinput></screen>
-			
+
       <para>
 	Only the last two lines are performing the actual conversion,
 	therefore you can skip the previous lines in case you already
 	have a keypair. Make sure that you keystore file correctly
 	points to the converted keys.
       </para>
-			
+
       <para>
 	To enable the plugin, it is necessary to add the following two lines to
 	the file
@@ -390,7 +393,7 @@ xrootdAllowedWritePaths=/pnfs/<replaceable>example.org</replaceable>/wpath1:/pnf
 	xrootdAuthzPlugin=org.dcache.xrootd.security.plugins.tokenauthz.TokenAuthorizationFactory
 	xrootdAuthzKeystore=<replaceable>Path_to_your_Keystore</replaceable>
 	..</programlisting>
-			
+
       <para>
 	After doing a restart of &dcache;, any requests without
 	an appropriate token should result in an error saying
@@ -398,7 +401,7 @@ xrootdAllowedWritePaths=/pnfs/<replaceable>example.org</replaceable>/wpath1:/pnf
 	found in open request, access denied.(error code:
 	3010)</literal>".
       </para>
-			
+
       <para>
 	If both tokenbased authorization and read-only access are
 	activated, the read-only restriction will dominate (local
