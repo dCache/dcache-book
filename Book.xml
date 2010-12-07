@@ -250,9 +250,19 @@
         <listitem>
           <para>For acquiring resources:
             <itemizedlist>
-              <listitem><link href="http://www.dcache.org/downloads" >http://www.dcache.org/downloads</link></listitem>
-              <listitem><para>YUM repositories: <link href="http://trac.dcache.org/projects/dcache/wiki/manuals/Yum" >
-                http://trac.dcache.org/projects/dcache/wiki/manuals/Yum</link> </para>
+	      <listitem>
+		<para>
+		  The <ulink
+		  url="http://www.dcache.org/downloads">download
+		  page</ulink>.
+		</para>
+	      </listitem>
+              <listitem>
+		<para>
+		  The <ulink
+		  url="http://trac.dcache.org/projects/dcache/wiki/manuals/Yum">YUM
+		  repositories</ulink>.
+		</para>
               </listitem>
             </itemizedlist>
           </para>
@@ -288,13 +298,15 @@
         </listitem-->
         <listitem>
           <para>
-            If you like to stay up-to-date about new releases you can use the RSS feeds available from our downloads
-            page <link href="http://www.dcache.org/downloads" >http://www.dcache.org/downloads</link>.
+            If you like to stay up-to-date about new releases you can use the RSS feeds available from
+	    <ulink url="http://www.dcache.org/downloads">our downloads page</ulink>.
           </para>
         </listitem>
         <listitem>
           <para>
-            For EMI releases of &dcache; please visit <link href="http://emisoft.web.cern.ch/emisoft/dist/dCache/" >http://emisoft.web.cern.ch/emisoft/dist/dCache/</link>.
+            For EMI releases of &dcache; please visit the <ulink
+            url="http://emisoft.web.cern.ch/emisoft/dist/dCache/">EMI
+            &dcache; download page</ulink>.
           </para>
         </listitem>
       </itemizedlist>
@@ -311,6 +323,7 @@
   <xi:include href="config.xml"/>
   <xi:include href="cookbook.xml"/>
   <xi:include href="reference.xml"/>
+  <xi:include href="appendix.xml"/>
 
 </book>
 
