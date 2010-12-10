@@ -3,7 +3,6 @@
                          "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
 <!ENTITY % sharedents SYSTEM "shared-entities.xml" >
 %sharedents;
-<!ENTITY chimera-cli  "/opt/d-cache/bin/chimera-cli.sh">
 ]>
 
 <chapter id="in">
@@ -178,8 +177,9 @@ Starting postgresql service:                               [  OK  ]</screen>
           with associated meta data. Where pools in &dcache; store the
           content of files, &chimera; stores the names and meta data
           of those files. &chimera; itself stores the data in a
-          relational database. We will use &psql; in this tutorial. Database connection settings can be customized in
-            <filename>/opt/d-cache/config/chimera-config.xml</filename>
+          relational database. We will use &psql; in this tutorial.
+          Database connection settings can be customized in
+          <filename>/opt/d-cache/config/chimera-config.xml</filename>
         </para>
 
         <note>
@@ -291,7 +291,6 @@ Stopping portmap: portmap</screen>
           host.
         </para>
 
-
         <para>
 	Now the configuration of &psql; is done and you can start &dcache;.
 	</para>
@@ -300,127 +299,6 @@ Stopping portmap: portmap</screen>
 <screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache start</userinput>
 Starting dCacheDomain done</screen>
         </section>
-
-      <section>
-	<title>Mounting &chimera;</title>
-      <!-- TODO: move this section to appendix. -->
-        <section>
-          <title>Mounting &chimera; through &nfs;</title>
-
-          <para>
-            Since release 1.9.7, &dcache; does not need the &chimera;
-            filesystem to be mounted any longer. But a mounted file
-            system can be nice for administrative access.
-            This offers the opportunity to use
-            OS-level tools like <command>ls</command> and <command>mkdir</command> for &chimera;. However,
-            direct I/O-operations like <command>cp</command> are not possible,
-            since the &nfs3; interface provides the namespace part only. This
-            section describes how to mount &chimera; through &nfs; and how to create directory tags.
-          </para>
-
-          <para>The &chimera; &nfs; server uses the
-          <filename>/etc/exports</filename> file to record which clients are
-	  authorised to mount the namespace. If this file doesn't exist it must be
-	  created. The typical <filename>exports</filename> file looks like this:
-	  </para>
-
-<programlisting>/ localhost(rw)
-/data
-# or
-# /data *.my.domain(rw)</programlisting>
-
-	  <para>
-	    First you create the root of the &chimera; namespace, called
-	    <filename class="directory">data</filename>.
-	    <screen>&prompt-root; <userinput>&chimera-cli; Mkdir /data</userinput></screen>
-	  </para>
-          <para>
-            Now you need to add directory tags.
-            For more information on tags see <xref linkend="cf-pnfs-tags"/>.
-          </para>
-
-<screen>
-&prompt-root; <userinput>echo "chimera" | &chimera-cli; Writetag /data sGroup</userinput>
-&prompt-root; <userinput>echo "StoreName sql" | &chimera-cli; Writetag /data OSMTemplate</userinput>
-</screen>
-	</section>
-
-	<section>
-	  <title>Using &dcap; with a mounted file system</title>
-
-          <para>
-	    If you plan to use &dcap; with mounted file system
-	    instead of the URL-syntax (e.g. &prog-dccp;
-	    <filename>/data/file1</filename>
-	    <filename>/tmp/file1</filename>), you need to mount the
-            root of &chimera; locally
-            (remote mounts are not allowed yet). This will allow us to
-            establish wormhole files so &dcap; clients can discover the &dcap; doors.
-          </para>
-
-<screen>&prompt-root; <userinput>mount localhost:/ /mnt</userinput>
-&prompt-root; <userinput>mkdir /mnt/admin/etc/config/dCache</userinput>
-&prompt-root; <userinput>touch /mnt/admin/etc/config/dCache/dcache.conf</userinput>
-&prompt-root; <userinput>touch /mnt/admin/etc/config/dCache/'.(fset)(dcache.conf)(io)(on)'</userinput>
-&prompt-root; <userinput>echo "<replaceable>door host</replaceable>:<replaceable>port</replaceable>" > /mnt/admin/etc/config/dCache/dcache.conf</userinput></screen>
-          <para>
-            The default values for ports can be found in <xref linkend="rf-ports"/>
-	    (for &dcap; the default port is <literal>22125</literal>)  and in the
-            file <filename>/opt/d-cache/share/defaults/dcache.properties</filename>.
-	    They can be altered in <filename>/opt/d-cache/etc/dcache.conf</filename>
-          </para>
-
-          <para>
-            When the configuration is complete you can unmount &chimera;:
-          </para>
-
-<screen>&prompt-root; <userinput>umount /mnt</userinput></screen>
-
-          <note>
-	    <para>
-            Please note that whenever you need to change the
-            configuration, you have to remount the root
-            <literal>localhost:/</literal> to a temporary location like
-	    <filename class="directory">/mnt</filename>.
-	    </para>
-          </note>
-      </section>
-      </section>
-      <section>
-	<title>Replica manager and billing</title>
-      <!-- TODO:  move this section to the appropriate chapters, which need to be rewritten. -->
-              <para>
-		If the resilience feature provided by the <glossterm
-		linkend="gl-replicamanager">replica manager</glossterm> is
-		used, the database <database>replicas</database> has to be prepared
-		on the head node with the command:
-	      </para>
-
-        <screen>&prompt-root; <userinput>createdb -U srmdcache replicas</userinput>
-&prompt-root; <userinput>psql -U srmdcache replicas -f /opt/d-cache/etc/psql_install_replicas.sql</userinput></screen>
-
-        <note>
-          <para>
-            Note that the disk space will at least be cut in half if the
-            replica manager is used.
-          </para>
-        </note>
-
-        <para>
-          If the billing information should also be stored in a
-          database (in addition to files) the database
-          <database>billing</database> has to be created:
-        </para>
-
-        <screen>&prompt-root; <userinput>createdb -U srmdcache billing</userinput></screen>
-
-        <para>
-          However, we strongly advise against using the same database
-          server for &chimera; and the billing information.  For how
-          to configure the &cell-billing; to write into this database,
-          see below.
-        </para>
-      </section>
 
     <section id="in-install-configure">
       <title>Configuring &dcache;</title>
