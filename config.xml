@@ -22,6 +22,7 @@
     </para>
   </partintro>
 
+  <xi:include href="config-chimera.xml"/>
   <xi:include href="config-pnfs.xml"/>
   <xi:include href="config-cellpackage.xml"/>
   <xi:include href="config-ReplicaManager.xml"/>

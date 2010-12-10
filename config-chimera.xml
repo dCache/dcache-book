@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+%sharedents;
+<!ENTITY chimera-cli  "/opt/d-cache/bin/chimera-cli.sh">
+]>
+<chapter id="cf-chimera">
+  <title>&chimera;</title>
+
+    <para>
+      Since &dcache; is a distributed storage system, it provides a
+      single-rooted file system view. &dcache; supports multiple
+      namespace providers, while &chimera; is the one being used in
+      the current version.
+    </para>
+
+    <para>
+      The &chimera; filesystem may also be mounted by
+      clients. Mounting can be achieved through following the steps
+      described in the following section (assuming the system is
+      configured as described in the installation instructions).
+      Users may then access the meta data with regular filesystem
+      operations, like <command>ls -l</command>, and by the
+      &chimera;-specific operations described in the following
+      sections. The files themselves may then be accessed with the
+      &dcap; protocol.
+    </para>
+
+<section id="chimera-mount">
+  <title>Mounting &chimera; through &nfs;</title>
+
+  <para>
+    &dcache; does not need the &chimera; filesystem to be mounted but
+    a mounted file system is convenient for administrative access.
+    This offers the opportunity to use OS-level tools like
+    <command>ls</command> and <command>mkdir</command> for
+    &chimera;. However, direct I/O-operations like
+    <command>cp</command> are not possible, since the &nfs3; interface
+    provides the namespace part only. This section describes how to
+    start the &chimera; &nfs3; server and mount the name space.
+  </para>
+
+  <note>
+    <para>
+      &chimera; is available as the &cell-nfsv3; service and can be
+      added to and edited in the &dcache;
+      <firstterm>layout</firstterm> file (see <xref
+      linkend="in-install-layout" />).
+    </para>
+  </note>
+
+  <para>
+     If you want to mount &chimera; for easier administrative access,
+     you need to edit the <filename>/etc/exports</filename> file as
+     the &chimera; &nfs; server uses it to manage exports. If this
+     file doesn't exist it must be created.  The typical
+     <filename>exports</filename> file looks like this:
+  </para>
+
+  <programlisting>/ localhost(rw)
+/data
+# or
+# /data *.my.domain(rw)</programlisting>
+
+  <para>
+    Now you can mount &chimera; by
+  </para>
+
+  <screen>&prompt-root; <userinput>mount localhost:/ /mnt</userinput></screen>
+
+  <para>
+    and create the root of the &chimera; namespace which you can call
+    <filename class="directory">data</filename>:
+  </para>
+
+  <screen>&prompt-root; <userinput>mkdir -p /mnt/data</userinput></screen>
+
+  <para>
+    If you don't want to mount chimera you can create the root of the &chimera; namespace by
+  </para>
+
+  <screen>&prompt-root; <userinput>&chimera-cli; Mkdir /data</userinput></screen>
+
+  <para>
+    You can now add directory tags.  For more information on tags see
+    <xref linkend="chimera-tags"/>.
+  </para>
+
+  <screen>&prompt-root; <userinput>echo "chimera" | &chimera-cli; Writetag /data sGroup</userinput>
+&prompt-root; <userinput>echo "StoreName sql" | &chimera-cli; Writetag /data OSMTemplate</userinput></screen>
+
+  <section id="chimera-useDcap">
+    <title>Using &dcap; with a mounted file system</title>
+
+    <para>
+      If you plan to use &dcap; with a mounted file system instead of
+      the &url;-syntax (e.g. &prog-dccp;
+      <filename>/data/file1</filename>
+      <filename>/tmp/file1</filename>), you need to mount the root of
+      &chimera; locally (remote mounts are not allowed yet). This will
+      allow us to establish wormhole files so &dcap; clients can
+      discover the &dcap; doors.
+    </para>
+
+    <screen>&prompt-root; <userinput>mount localhost:/ /mnt</userinput>
+&prompt-root; <userinput>mkdir /mnt/admin/etc/config/dCache</userinput>
+&prompt-root; <userinput>touch /mnt/admin/etc/config/dCache/dcache.conf</userinput>
+&prompt-root; <userinput>touch /mnt/admin/etc/config/dCache/'.(fset)(dcache.conf)(io)(on)'</userinput>
+&prompt-root; <userinput>echo "<replaceable>door host</replaceable>:<replaceable>port</replaceable>" > /mnt/admin/etc/config/dCache/dcache.conf</userinput></screen>
+
+    <para>
+      The default values for ports can be found in <xref
+      linkend="rf-ports"/> (for &dcap; the default port is
+      <literal>22125</literal>) and in the file
+      <filename>/opt/d-cache/share/defaults/dcache.properties</filename>. They
+      can be altered in
+      <filename>/opt/d-cache/etc/dcache.conf</filename>
+    </para>
+
+    <para>
+      When the configuration is complete you can unmount &chimera;:
+    </para>
+
+    <screen>&prompt-root; <userinput>umount /mnt</userinput></screen>
+  </section>
+
+  <note>
+    <para>
+      Please note that whenever you need to change the configuration,
+      you have to remount the root <literal>localhost:/</literal> to a
+      temporary location like <filename
+      class="directory">/mnt</filename>.
+    </para>
+  </note>
+
+</section>
+
+<section id="chimera-commands">
+  <title>Communicating with &chimera; </title>
+
+  <para>
+    Many configuration parameters of &chimera; and the
+    application specific meta data is accessed by reading, writing, or
+    creating files of the form
+    <filename>.(<replaceable>command</replaceable>)(<replaceable>para</replaceable>)</filename>.
+    For example, the following prints the &chimera;ID of the file
+    <filename>/data/some/dir/file.dat</filename>:
+  </para>
+
+  <screen>&prompt-user; <userinput>cat /data/any/sub/directory/'.(id)(file.dat)'</userinput>
+0004000000000000002320B8 &prompt-user; </screen>
+  <para>
+
+    From the point of view of the &nfs; protocol, the file
+    <filename>.(id)(file.dat)</filename> in the directory <filename
+    class="directory">/data/some/dir/</filename> is read. However,
+    &chimera; interprets it as the command <literal>id</literal> with
+    the parameter <literal>file.dat</literal> executed in the
+    directory <filename
+    class="directory">/data/some/dir/</filename>. The quotes are
+    important, because the shell would otherwise try to interpret the
+    parentheses.
+  </para>
+
+  <para>
+    Some of these command files have a second parameter in a third
+    pair of parentheses. Note, that files of the form
+    <filename>.(<replaceable>command</replaceable>)(<replaceable>para</replaceable>)</filename>
+    are not really files. They are not shown when listing directories
+    with <command>ls</command>. However, the command files are listed
+    when they appear in the argument list of <command>ls</command> as
+    in
+  </para>
+
+  <screen>&prompt-user; <userinput>ls -l '<filename>.(tag)(sGroup)</filename>'</userinput>
+-rw-r--r-- 11 root root 7 Aug 6 2010 .(tag)(sGroup)</screen>
+
+  <para>
+    Only a subset of file operations are allowed on these special
+    command files. Any other operation will result in an appropriate
+    error. Beware, that files with names of this form might
+    accidentally be created by typos.  They will then be shown when
+    listing the directory.
+  </para>
+
+</section>
+
+<section id="chimera-tags">
+  <title>Directory Tags</title>
+
+  <para>
+    In the mounted &chimera; namespace, each directory can have a
+    number of tags. The existing tags may be listed with
+  </para>
+
+  <screen>&prompt-user; <userinput>cat '<filename>.(tags)()</filename>'</userinput>
+.(tag)(OSMTemplate)
+.(tag)(sGroup)</screen>
+
+  <para>
+    and the content of a tag can be read with
+  </para>
+
+  <screen>&prompt-user; <userinput>cat '<filename>.(tag)(OSMTemplate)</filename>'</userinput>
+StoreName myStore</screen>
+
+  <para>
+    A nice trick to list all tags with their contents is
+  </para>
+
+  <screen>&prompt-user; <userinput>grep "" $(cat  ".(tags)()")</userinput>
+.(tag)(OSMTemplate):StoreName myStore
+.(tag)(sGroup):STRING</screen>
+
+  <para>
+    Directory tags may be used within &dcache; to control which pools
+    are used for storing the files in the directory (see <xref
+    linkend="cf-pm-psu"/>). They might also be used by a
+    <firstterm>tertiary storage system</firstterm> for similar
+    purposes (e.g. controlling the set of tapes used for the files in
+    the directory).
+  </para>
+
+  <para>
+    Even if the directory tags are not used to control the behaviour
+    of &dcache;, some tags have to be set for the directories where
+    &dcache; files are stored. The installation procedure takes care
+    of this: In the directory <filename
+    class="directory">/data/</filename> two tags are set to default
+    values:
+  </para>
+
+  <screen>&prompt-user; <userinput>cd /data/</userinput>
+&prompt-user; <userinput>grep "" $(cat ".(tags)()")</userinput>
+.(tag)(OSMTemplate):StoreName myStore
+.(tag)(sGroup):STRING</screen>
+
+  <para>
+    The following directory tags appear in the &dcache; context:
+  </para>
+
+  <variablelist>
+    <title>Directory Tags for &dcache;</title>
+
+    <varlistentry>
+      <term>OSMTemplate</term>
+
+      <listitem>
+	<para>
+	  Contains one line of the form
+	  <quote><literal>StoreName</literal>
+	  <replaceable>storeName</replaceable></quote> and specifies
+	  the name of the store that is used by &dcache; to construct
+	  the <glossterm linkend="gl-storage_class">storage
+	  class</glossterm> if the <glossterm
+	  linkend="gl-hsm_type">&hsm; type</glossterm> is
+	  <literal>osm</literal>.
+	</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>&hsm;Type</term>
+
+      <listitem>
+	<para>
+	  The <glossterm linkend="gl-hsm_type">&hsm; type</glossterm> is
+	  normally determined from the other existing tags. E.g., if
+	  the tag <literal>OSMTemplate</literal> exists, &hsm; type
+	  <literal>osm</literal> is assumed. With this tag it can be
+	  set explicitly. A class implementing that &hsm; type has to
+	  exist. Currently the only implementations are
+	  <literal>osm</literal> and <literal>enstore</literal>.
+          </para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>sGroup</term>
+
+	<listitem>
+          <para>
+	    The storage group is also used to construct the <glossterm
+	    linkend="gl-storage_class">storage Class</glossterm> if
+	    the <glossterm linkend="gl-hsm_type">&hsm; type</glossterm>
+	    is <literal>osm</literal>.
+          </para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>cacheClass</term>
+
+	<listitem>
+	  <para>
+	    The cache class is only used to control on which pools the
+            files in a directory may be stored, while the storage
+            class (constructed from the two above tags) might also be
+            used by the &hsm;. The cache class is only needed if the
+            above two tags are already fixed by &hsm; usage and more
+            flexibility is needed.
+          </para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>&hsm;Instance</term>
+
+	<listitem>
+	  <para>
+	    If not set, the &hsm; instance will be the same as the
+	    &hsm; type. Setting this tag will only change the name as
+	    used in the <glossterm linkend="gl-storage_class">storage
+	    class</glossterm> and in the pool commands.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+
+    <para>
+      There are more tags used by &dcache; if the &hsm; type
+      <literal>enstore</literal> is used.
+    </para>
+
+    <para>
+      When creating or changing directory tags by writing to the
+      command file as in
+    </para>
+
+    <screen>&prompt-user; <userinput>echo '<replaceable>content</replaceable>' > '<filename>.(tag)(<replaceable>tagName</replaceable>)</filename>'</userinput></screen>
+
+    <para>
+      one has to take care not to treat the command files in the
+      same way as regular files, because tags are different from files
+      in the following aspects:
+    </para>
+
+    <orderedlist>
+      <listitem>
+        <para>
+          The <replaceable>tagName</replaceable> is limited to 62
+          characters and the <replaceable>content</replaceable> to 512
+          bytes. Writing more to the command file, will be silently
+          ignored.
+        </para>
+      </listitem>
+      <listitem>
+	<para>
+	  If a tag which does not exist in a directory is created by
+          writing to it, it is called a <emphasis>primary</emphasis>
+          tag.
+        </para>
+      </listitem>
+
+      <listitem>
+        <para>
+	  Tags are <emphasis>inherited</emphasis> from the parent
+          directory by a newly created directory. Changing a primary
+          tag in one directory will change the tags inherited from it
+	  in the same way. Creating a new primary tag in a directory will
+          not create an inherited tag in its subdirectories.
+        </para>
+        <para>
+	  Moving a directory within the &chimera; namespace will not
+          change the inheritance. Therefore, a directory does not
+          necessarily inherit tags from its parent directory. Removing
+          an inherited tag does not have any effect.
+        </para>
+      </listitem>
+    </orderedlist>
+
+    <para>
+      If directory tags are used to control the behaviour of &dcache;
+      and/or a tertiary storage system, it is a good idea to plan the
+      directory structure in advance, thereby considering the
+      necessary tags and how they should be set up. Moving directories
+      should be done with great care or even not at all. Inherited
+      tags can only be created by creating a new directory.
+    </para>
+
+  </section>
+
+ <!--  <section id="chimera-deleteFiles">
+    <title>Deleting Files in &chimera;</title>
+
+    <para>
+       TODO: write section
+    </para>
+  </section> -->
+
+</chapter>
