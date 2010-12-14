@@ -46,7 +46,8 @@
       &chimera; is available as the &cell-nfsv3; service and can be
       added to and edited in the &dcache;
       <firstterm>layout</firstterm> file (see <xref
-      linkend="in-install-layout" />).
+      linkend="in-install-layout" />). &chimera; will be started
+      automatically as &dcache; is started.
     </para>
   </note>
 

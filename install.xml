@@ -245,13 +245,6 @@ CREATE FUNCTION
 CREATE TRIGGER
 </screen>
 
-          <para>
-            Since &dcache; version 1.9.7, &chimera; does not need to be started
-            with an init script any more. &chimera; is now available as the
-            &cell-nfsv3; service, which can be added by editing the &dcache;
-            <firstterm>layout</firstterm> file    (see <xref linkend="in-install-layout" />) and will be started automatically as &dcache; is started.
-          </para>
-
           <note>
             <para>
               In general you should switch the
@@ -556,79 +549,53 @@ maxDiskSpace=2T</programlisting>
        </note>
       </section>
 
-      <section id="in-install-configure-doors">
-	<title>Defining two doors</title>
+      <section id="in-install-configure-java">
+	<title>&java; heap size</title>
 	<para>
-	  To define two &gridftp; doors on the same host, you can define two &gridftp;
-	  domains in your
-	  <filename>mylayout.conf</filename>.
-	    <informalexample>
-	      <programlisting>[gridftp-${host.name}-1Domain]
-gridftp-${host.name}-1Domain/gridftp]
-port=2811
-cell.name=GFTP-${host.name}-1
-
-[gridftp-${host.name}-2Domain]
-[gridftp-${host.name}-2Domain/gridftp]
-port=2812
-cell.name=GFTP-${host.name}-2</programlisting>
-
-	      This defines two domains, each containing a &gridftp; door. Each door
-	      listens on its own &tcp; port and each door has a unique cell name. Both
-	      domain and cell names are parameterised using the host name. Notice
-	      the &dcache; does not enforce any fixed scheme for domain naming. Neither
-	      does &dcache; enforce any fixed scheme for naming door cells.
-	    </informalexample>
-	</para>
-	  </section>
-	  <section id="in-install-configure-java">
-	    <title>&java; heap size</title>
-	    <para>
-	      By default the &java; heap size and the maximum direct buffer size are defined as
-	      <programlisting>dcache.java.memory.heap=512m
+	  By default the &java; heap size and the maximum direct buffer size are defined as
+	  <programlisting>dcache.java.memory.heap=512m
 dcache.java.memory.direct=512m</programlisting>
-	      Again, these values can be changed in
-	      <filename>/opt/dcache/etc/dcache.conf</filename>.
-	    </para>
-	    <para>
-	      For optimization of your &dcache; you can define the &java; heap size in the
-	      layout file separately for every domain.
-	      <informalexample>
-		<programlisting>[dCacheDomain]
+          Again, these values can be changed in
+	  <filename>/opt/dcache/etc/dcache.conf</filename>.
+	</para>
+	<para>
+	  For optimization of your &dcache; you can define the &java; heap size in the
+	  layout file separately for every domain.
+	  <informalexample>
+	    <programlisting>[dCacheDomain]
 dcache.java.memory.heap=2048m
 dcache.java.memory.direct=0m
 ...
 [utilityDomain]
 dcache.java.memory.heap=384m
 dcache.java.memory.direct=16m</programlisting>
-	      </informalexample>
-	    </para>
-	  </section>
+	  </informalexample>
+	</para>
+      </section>
 
-	  <section id="in-install-configure-starting">
-	    <title>Starting &dcache;</title>
-	    <para>
-	      All configured components can now be started with
-	      <userinput>/opt/d-cache/bin/dcache start</userinput>, for example:
-	    </para>
-
-        <screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache start</userinput>
+      <section id="in-install-configure-starting">
+	<title>Starting &dcache;</title>
+	<para>
+	  All configured components can now be started with
+	  <userinput>/opt/d-cache/bin/dcache start</userinput>.
+	</para>
+	<informalexample>
+	  <screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache start</userinput>
 Starting dCacheDomain  Done (pid=7574)
 Starting namespaceDomain  Done (pid=7647)
 Starting gPlazmaDomain  Done (pid=8002)
 Starting srmDomain  Done (pid=8081)</screen>
-	  </section>
+	</informalexample>
+      </section>
 
-	  <para> Now you can have a look at your &dcache; via The Web Interface, see
-	  <xref
-	      linkend="intouch-web">intouch-web</xref>:
-
-	  <uri>http://<replaceable>httpd.example.org</replaceable>:2288/</uri>,
-
-	  where <replaceable>httpd.example.org</replaceable> is the node on which your
-	  &cell-httpd; service is running.
-	  For a single node &dcache; this is the machine on which your &dcache; is running.
-	  </para>
+      <para> 
+	Now you can have a look at your &dcache; via The Web
+	Interface, see <xref linkend="intouch-web">intouch-web</xref>:
+	<uri>http://<replaceable>httpd.example.org</replaceable>:2288/</uri>,
+	where <replaceable>httpd.example.org</replaceable> is the node on which your
+	&cell-httpd; service is running.
+	For a single node &dcache; this is the machine on which your &dcache; is running.
+      </para>
 
       <note>
         <para>
