@@ -16,16 +16,46 @@
     </para>
 
     <para>
-      The &chimera; filesystem may also be mounted by
-      clients. Mounting can be achieved through following the steps
-      described in the following section (assuming the system is
-      configured as described in the installation instructions).
-      Users may then access the meta data with regular filesystem
-      operations, like <command>ls -l</command>, and by the
-      &chimera;-specific operations described in the following
-      sections. The files themselves may then be accessed with the
-      &dcap; protocol.
+      &chimera; is available as the &cell-nfsv3; service and can be
+      added to and edited in the &dcache;
+      <firstterm>layout</firstterm> file (see <xref
+      linkend="in-install-layout" />). &chimera; will be started
+      automatically as &dcache; is started.
     </para>
+
+    <informalexample>
+      <programlisting>[dCacheDomain/nfsv3]</programlisting>
+    </informalexample>
+
+    <para>
+      The properties of &chimera; are defined in
+      <filename>/opt/d-cache/share/defaults/chimera.properties</filename>. For
+      customisation the files
+      <filename>/opt/d-cache/etc/layouts/mylayout.conf</filename> or
+      <filename>/opt/d-cache/etc/dcache.conf</filename> should be
+      modified.
+    </para>
+
+    <informalexample>
+
+      <para>
+	Example for a change in
+	<filename>/opt/d-cache/etc/layouts/mylayout.conf</filename>.
+      </para>
+
+      <programlisting>[dCacheDomain/pnfsmanager]
+ chimera.db.user=myuser
+ chimera.db.password=secret</programlisting>
+
+    </informalexample>
+
+    <important>
+      <para>
+	Do not update configuration values in
+	<filename>/opt/d-cache/share/defaults/chimera.properties</filename>,
+	since changes to this file will be overwritten by updates.
+      </para>
+    </important>
 
 <section id="chimera-mount">
   <title>Mounting &chimera; through &nfs;</title>
@@ -40,16 +70,6 @@
     provides the namespace part only. This section describes how to
     start the &chimera; &nfs3; server and mount the name space.
   </para>
-
-  <note>
-    <para>
-      &chimera; is available as the &cell-nfsv3; service and can be
-      added to and edited in the &dcache;
-      <firstterm>layout</firstterm> file (see <xref
-      linkend="in-install-layout" />). &chimera; will be started
-      automatically as &dcache; is started.
-    </para>
-  </note>
 
   <para>
      If you want to mount &chimera; for easier administrative access,
