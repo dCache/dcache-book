@@ -24,16 +24,16 @@
 
     <para>
       First, we will get used to the client tools. On the &dcache;
-      head node, change into the &pnfs; directory, where the users
+      head node, change into the <filename class="directory">data</filename> directory, where the users
       are going to store their data:
     </para>
 
-    <screen>&prompt-user; <userinput>cd /pnfs/<replaceable>site.de</replaceable>/data/</userinput>
+    <screen>&prompt-user; <userinput>cd /data/</userinput>
 &prompt-user;</screen>
 
     <para>
       The mounted &chimera; filesystem is not intended for reading or
-      writing actual data with regular file operations via the NFS
+      writing actual data with regular file operations via the &nfs;
       protocol.
     </para>
 
@@ -46,12 +46,12 @@
     </para>
 
     <para>
-      We will first try &dcap; with the <command>dccp</command>
+      We will first try &dcap; with the &prog-dccp;
       command:
     </para>
 
     <screen>&prompt-user; <userinput>export PATH=/opt/d-cache/dcap/bin/:$PATH</userinput>
-&prompt-user; <userinput>cd /pnfs/<replaceable>site.de</replaceable>/data/</userinput>
+&prompt-user; <userinput>cd /data/</userinput>
 &prompt-user; <userinput>dccp /bin/sh my-test-file</userinput>
 541096 bytes in 0 seconds</screen>
 
@@ -59,22 +59,22 @@
       This command succeeds if the user <systemitem
       class="username">user</systemitem> has the Unix rights to write
       to the current directory <filename
-      class="directory">/pnfs/<replaceable>site.de</replaceable>/data/</filename>.
+      class="directory">/data/</filename>.
     </para>
 
     <para>
-      The dccp command also accepts URLs.  We can copy the data back
-      using the dccp command and the &dcap; protocol but this time
+      The &prog-dccp; command also accepts URLs.  We can copy the data back
+      using the &prog-dccp; command and the &dcap; protocol but this time
       describing the location of the file using a URL.
     </para>
 
-    <screen>&prompt-user; <userinput>dccp dcap://<replaceable>adminNode</replaceable>/pnfs/<replaceable>site.de</replaceable>/data/my-test-file /tmp/test.tmp</userinput>
+    <screen>&prompt-user; <userinput>dccp dcap://<replaceable>adminNode</replaceable>/data/my-test-file /tmp/test.tmp</userinput>
 541096 bytes in 0 seconds</screen>
 
     <para>
       However, this command only succeeds if the file is world
       readable.  The following shows how to ensure the file is
-      <emphasis>not</emphasis> world readable and illustrates dccp
+      <emphasis>not</emphasis> world readable and illustrates &prog-dccp;
       consequently failing to copy the file.
     </para>
 
@@ -90,7 +90,7 @@ System error: Input/output error</screen>
       This command did not succeed, because &dcap; access is
       unauthenticated and the user is mapped to a non-existent user in
       order to determine the access rights. However, you should be
-      able to access the file with the NFS mount:
+      able to access the file with the &nfs; mount:
     </para>
 
     <screen>&prompt-user; <userinput>dccp my-test-file /tmp/test2.tmp</userinput>
@@ -100,13 +100,13 @@ System error: Input/output error</screen>
       If you have a valid grid proxy with a certificate subject which
       is properly mapped in the configuration file
       <filename>/opt/d-cache/etc/dcache.kpwd</filename> you can also
-      try grid-authenticated access via the GSI-authenticated version
+      try grid-authenticated access via the &gsi;-authenticated version
       of &dcap;:
     </para>
 
     <screen>&prompt-user; <userinput>chgrp <replaceable>yourVO</replaceable> my-test-file</userinput>
 &prompt-user; <userinput>export LD_LIBRARY_PATH=/opt/d-cache/dcap/lib/:$LD_LIBRARY_PATH</userinput>
-&prompt-user; <userinput>dccp gsidcap://<replaceable>adminNode</replaceable>:22128/pnfs/<replaceable>site.de</replaceable>/data/my-test-file /tmp/test3.tmp</userinput>
+&prompt-user; <userinput>dccp gsidcap://<replaceable>adminNode</replaceable>:22128/data/my-test-file /tmp/test3.tmp</userinput>
 541096 bytes in 0 seconds</screen>
 
     <para>
@@ -114,7 +114,7 @@ System error: Input/output error</screen>
     </para>
 
     <screen>&prompt-user; <userinput>export PATH=/opt/d-cache/srm/bin/:$PATH</userinput>
-&prompt-user; <userinput>srmcp srm://<replaceable>adminNode</replaceable>:8443/pnfs/desy.de/data/my-test-file file:////tmp/test4.tmp</userinput>
+&prompt-user; <userinput>srmcp srm://<replaceable>adminNode</replaceable>:8443/data/my-test-file file:////tmp/test4.tmp</userinput>
 configuration file not found, configuring srmcp
 created configuration file in ~/.srmconfig/config.xml</screen>
 
@@ -125,11 +125,11 @@ created configuration file in ~/.srmconfig/config.xml</screen>
     </para>
 
     <screen>&prompt-user; <userinput>lcg-cp -v --vo <replaceable>yourVO</replaceable> \
-srm://<replaceable>dCacheAdminFQN</replaceable>/pnfs/<replaceable>site.de</replaceable>/data/my-test-file \
+srm://<replaceable>dCacheAdminFQN</replaceable>/data/my-test-file \
 file:///tmp/test5.tmp</userinput>
-Source URL: srm://<replaceable>dCacheAdminFQN</replaceable>/pnfs/<replaceable>site.de</replaceable>/data/my-test-file
+Source URL: srm://<replaceable>dCacheAdminFQN</replaceable>/data/my-test-file
 File size: 541096
-Source URL for copy: gsiftp://<replaceable>dCacheAdminFQN</replaceable>:2811//pnfs/site.de/data/my-test-file
+Source URL for copy: gsiftp://<replaceable>dCacheAdminFQN</replaceable>:2811//data/my-test-file
 Destination URL: file:///tmp/test5.tmp
 # streams: 1
 Transfer took 770 ms</screen>
@@ -138,8 +138,8 @@ Transfer took 770 ms</screen>
       and it can be deleted with the help of the &srm; interface:
     </para>
 
-    <screen>&prompt-user; <userinput>srm-advisory-delete srm://<replaceable>dCacheAdminFQN</replaceable>:8443/pnfs/<replaceable>site.de</replaceable>/data/my-test-file</userinput>
- srmcp error :  advisoryDelete(User [name=...],pnfs/<replaceable>site.de</replaceable>/data/my-test-file)
+    <screen>&prompt-user; <userinput>srm-advisory-delete srm://<replaceable>dCacheAdminFQN</replaceable>:8443/data/my-test-file</userinput>
+ srmcp error :  advisoryDelete(User [name=...],/data/my-test-file)
 Error user User [name=...] has no permission to delete 000100000000000000BAF0C0</screen>
 
     <para>
@@ -148,11 +148,11 @@ Error user User [name=...] has no permission to delete 000100000000000000BAF0C0<
     </para>
 
     <screen>&prompt-user; <userinput>chown <replaceable>yourVO</replaceable>001 my-test-file</userinput>
-&prompt-user; <userinput>srm-advisory-delete srm://<replaceable>dCacheAdminFQN</replaceable>:8443/pnfs/<replaceable>site.de</replaceable>/data/my-test-file</userinput></screen>
+&prompt-user; <userinput>srm-advisory-delete srm://<replaceable>dCacheAdminFQN</replaceable>:8443/data/my-test-file</userinput></screen>
 
     <para>
       If the grid functionality is not required the file can be
-      deleted with the NFS mount of the &pnfs; filesystem:
+      deleted with the &nfs; mount of the &pnfs; filesystem:
     </para>
 
     <screen>&prompt-user; <userinput>rm <filename>my-test-file</filename></userinput></screen>
@@ -278,6 +278,7 @@ create diskCacheV111.cells.WebCollectorV3 collector \
     copytruncate
 }</programlisting>
 
+<!-- TODO new config -->
     <para>
       The files
       <filename>config/<replaceable>domainName</replaceable>Setup</filename>
@@ -343,7 +344,7 @@ create diskCacheV111.cells.WebCollectorV3 collector \
     </para>
 
     <!--
-        TODO:
+        TODO: ???
         <para>
         <filename>certificate</filename>
         <filename>CAs</filename>
@@ -444,10 +445,10 @@ pam
 lm</screen>
 
     <para>
-    The cells in the domain can be accessed using <command>cd</command>
-    together with the cell-name scoped by the domain-name. So first, one has to
-    get back to the local prompt, as the <command>cd</command> command will not
-    work otherwise.
+      The cells in the domain can be accessed using
+      <command>cd</command> together with the cell-name scoped by the
+      domain-name. So first, one has to get back to the local prompt,
+      as the <command>cd</command> command will not work otherwise.
     </para>
 
     <screen>&dc-prompt-admindoor; <userinput>..</userinput>
@@ -455,19 +456,19 @@ lm</screen>
 &dc-prompt-skmadmin;</screen>
 
     <note>
-    <para>
-    If the cells are <firstterm>well-known</firstterm>, they can be accessed
-    without adding the domain-scope. See <xref linkend="cf-cellpackage" /> for
-    more information.
-    </para>
+      <para>
+	If the cells are <firstterm>well-known</firstterm>, they can
+	be accessed without adding the domain-scope. See <xref
+	linkend="cf-cellpackage" /> for more information.
+      </para>
     </note>
 
     <para>
-        The domains that are running on the &dcache;-instance, can be viewed
-        in the layout-configuration (see <xref linkend="in" />). Additionally,
-        there is the &cell-topo; cell, which keeps track of the instance's
-        domain topology. If it is running, it can be used to obtain the list of
-        domains the following way:
+      The domains that are running on the &dcache;-instance, can be
+      viewed in the layout-configuration (see <xref linkend="in"
+      />). Additionally, there is the &cell-topo; cell, which keeps
+      track of the instance's domain topology. If it is running, it
+      can be used to obtain the list of domains the following way:
     </para>
 
     <screen>&dc-prompt-local; <userinput>cd topo</userinput>
@@ -485,11 +486,11 @@ statisticsDomain
 namespaceDomain</screen>
 
     <note>
-    <para>
+      <para>
         The &cell-topo; cell rescans periodically which domains are running, so
         it can take some time until <command>ls</command> displays the full
         domain list.
-    </para>
+      </para>
     </note>
 
     <para>
@@ -621,7 +622,7 @@ Identity added: /home/<replaceable>user</replaceable>/.ssh/identity (SSH1 key of
     </para>
 
     <para>
-      Now, the ssh program should not ask for a password anymore. This
+      Now, the &ssh; program should not ask for a password anymore. This
       is still quite secure, since the unencrypted private key is only
       held in the memory of the <command>ssh-agent</command>. It can
       be removed from it with
@@ -651,7 +652,7 @@ logoff
 EOF</programlisting>
 
     <para>
-      or, the equivalient as stdin.
+      or, the equivalent as stdin.
     </para>
 
     <programlisting>#!/bin/bash
@@ -668,10 +669,10 @@ echo -e 'cd <replaceable>pool_1</replaceable>\nrep ls\n<lineannotation>(more com
   <title>The Graphical User Interface</title>
 
     <para>
-      Instead of using <command>ssh</command> to access the admin
-      interface, the &dcache; graphical user interface can be used. If
-      it is not included in the &dcache; distribution, it can be
-      downloaded from the <ulink url="http://www.dcache.org/">&dcache;
+      Instead of using &ssh; to access the admin interface, the
+      &dcache; graphical user interface can be used. If it is not
+      included in the &dcache; distribution, it can be downloaded from
+      the <ulink url="http://www.dcache.org/">&dcache;
       homepage</ulink>. It is started by
     </para>
 
@@ -693,7 +694,7 @@ echo -e 'cd <replaceable>pool_1</replaceable>\nrep ls\n<lineannotation>(more com
       are ready to log in. Pressing the right mouse button clicking
       <guibutton>Login</guibutton> will scan the &dcache; instance for
       domains. Cells can be reached by clicking on their name and the
-      same commands can be entered as in the SSH login.
+      same commands can be entered as in the &ssh; login.
     </para>
 
     <para>
