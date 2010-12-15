@@ -79,7 +79,7 @@
     </para>
 
     <screen>&prompt-user; <userinput>chmod o-r my-test-file</userinput>
-&prompt-user; <userinput>dccp dcap://<replaceable>adminNode</replaceable>/pnfs/<replaceable>site.de</replaceable>/data/my-test-file /tmp/test2.tmp</userinput>
+&prompt-user; <userinput>dccp dcap://<replaceable>adminNode</replaceable>/data/my-test-file /tmp/test2.tmp</userinput>
 Command failed!
 Server error message for [1]: "Permission denied" (errno 2).
 Failed open file in the dCache.
