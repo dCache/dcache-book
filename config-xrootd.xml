@@ -14,6 +14,10 @@
       <firstname>Martin</firstname>
       <surname>Radicke</surname>
     </author>
+    <author>
+      <firstname>Thomas</firstname>
+      <surname>Zangerl</surname>
+    </author>
   </chapterinfo>
 
   <para>
@@ -410,29 +414,89 @@ xrootdAllowedWritePaths=/pnfs/<replaceable>example.org</replaceable>/wpath1:/pnf
       </para>
     </section>
 
+    <section id="cf-xrootd-sec-authn">
+      <title>Strong authentication</title>
+
+      <para>
+        The &xrootd;-implementation in &dcache; includes a pluggable
+        authentication framework. To control which authentication mechanism
+        is used by &xrootd;, add the <varname>xrootdAuthNPlugin</varname>
+        option to your &dcache; configuration and set it to the desired value.
+      </para>
+
+      <informalexample>
+        <para>
+          For instance, to enable &gsi; authentication in &xrootd;, add the
+          following line to <filename>{$dCacheHome}/etc/dcache.conf</filename>:
+
+          <programlisting>..
+xrootdAuthNPlugin=gsi
+..</programlisting>
+        </para>
+
+        <para>
+          When using &gsi; authentication, depending on your setup,
+          you may or may not want &dcache; to fail if the host
+          certificate chain can not be verified against trusted certificate
+          authorities. Whether &dcache; performs this check can be controlled
+          by setting the option <varname>verifyHostCertificateChain</varname>:
+
+          <programlisting>..
+verifyHostCertificateChain=true
+..
+</programlisting>
+
+        </para>
+      </informalexample>
+
+      <para>
+        <emphasis>Authorization</emphasis> of the user information obtained
+        by strong authentication is performed by contacting the &cell-gplazma;
+        service. Please refer to <xref linkend="cf-gplazma" /> for instructions
+        about how to configure &cell-gplazma;.
+      </para>
+    </section>
+
     <section id="cf-xrootd-sec-precedence">
       <title>Precedence of security mechanisms</title>
 
       <para>
-	The previously explained methods to restrict access via
-	&xrootd; can also be used in conjunction. The precedence
-	applied in that case is as following:
+        The previously explained methods to restrict access via
+        &xrootd; can also be used together. The precedence
+        applied in that case is as following:
+      </para>
+
+      <note>
+      <para>
+        The &xrootd;-door can be configured to use either token authorization
+        or strong authentication with &cell-gplazma; authorization.
+        A combination of both is currently not possible.
+      </para>
+      </note>
+
+      <para>
+        The permission check executed by the authorization plugin (if
+        one is installed) is given the lowest priority, because it can
+        controlled by a remote party. E.g. in the case of token based
+        authorization, access control is determined by the file
+        catalogue (global namespace).
       </para>
 
       <para>
-	The permission check executed by the authorization plugin (if
-	one is installed) is given the lowest priority, because it can
-	controlled by a remote party. E.g. in the case of tokenbased
-	authorization, access control is determined by the file
-	catalogue (global namespace).
+        The same argument holds for many strong authentication mechanisms - for
+        example, both the &gsi; protocol as well as the &kerberos; protocols require
+        trust in remote authorities. However, this only affects user
+        <emphasis>authentication</emphasis>, while authorization decisions can
+        be adjusted by local site administrators by adapting the &cell-gplazma;
+        configuration.
       </para>
 
       <para>
-	To allow local site's administrators to override remote
-	security settings, write access can be further restricted to
-	few directories (based on the local namespace, the
-	&pnfs;). Setting &xrootd; access to read-only has the highest
-	priority, overriding all other settings.
+        To allow local site's administrators to override remote
+        security settings, write access can be further restricted to
+        few directories (based on the local namespace, the
+        &pnfs;). Setting &xrootd; access to read-only has the highest
+        priority, overriding all other settings.
       </para>
     </section>
 
