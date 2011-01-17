@@ -2,6 +2,8 @@
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
                          "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
 <!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+<!ENTITY user-dcache "<systemitem class='username'>dcache</systemitem>">
+<!ENTITY user-root "<systemitem class='username'>root</systemitem>">
 %sharedents;
 ]>
 
@@ -388,8 +390,9 @@ Starting dCacheDomain done</screen>
       </para>
 
       <para>
-	In the layouts files it is defined which domains to start and which services to put in which domain.
-	Configuration can be done per domain and per service.
+	In the layouts files it is defined which domains to start and
+	which services to put in which domain.  Configuration can be
+	done per domain and per service.
       </para>
 
       <para>
@@ -512,9 +515,9 @@ waitForFiles=${path}/data
 maxDiskSpace=2T</programlisting>
 
         <para>
-	  You can name the domain the pool is running on after the host on which the pool
-	  is located.
-	  The only required properties are <varname>name</varname> and
+	  You can name the domain the pool is running on after the
+	  host on which the pool is located.  The only required
+	  properties are <varname>name</varname> and
 	  <varname>path</varname>.  The <varname>path</varname>
 	  property defines in which directory files are to be stored.
 	  The <varname>name</varname> defines the name of the
@@ -524,11 +527,11 @@ maxDiskSpace=2T</programlisting>
 	  />).
 	</para>
 	<para>
-	  The property <varname>waitForFiles</varname> instructs
-	  the pool not to start up until the specified file or
-	  directory is available.  This is recommended as it prevents
-	  problems should the underlying storage be unavailable (e.g.,
-	  if a RAID device is offline).  The property
+	  The property <varname>waitForFiles</varname> instructs the
+	  pool not to start up until the specified file or directory
+	  is available.  This is recommended as it prevents problems
+	  should the underlying storage be unavailable (e.g., if a
+	  RAID device is offline).  The property
 	  <varname>maxDiskSpace</varname> defines the maximum disk
 	  usage for the pool.
 	</para>
@@ -552,18 +555,110 @@ maxDiskSpace=2T</programlisting>
 
       </section>
 
+      <section id="in-install-non-root">
+	<title>Running &dcache; as a non-&user-root; user</title>
+	<para>
+	  For security reasons you might want to run &dcache; as a
+	  non-&user-root; user. This needs to be configured in
+	  <filename>/opt/d-cache/etc/dcache.conf</filename> and the
+	  ownership of the pools and the billing directories need to
+	  be changed.
+	</para>
+	<informalexample>
+	  <para>
+	    In this example we explain how to configure &dcache; to
+	    run as user &user-dcache;.
+	  </para>
+	  <para>
+	    First of all create the user &user-dcache; and a new
+	    directory <filename
+	    class="directory">/var/log/dcache</filename>, owned by
+	    &user-dcache;
+	  </para>
+
+	    <screen>&prompt-root;<userinput>useradd dcache</userinput>
+&prompt-root;<userinput>mkdir /var/log/dcache</userinput>
+&prompt-root;<userinput>chown dcache /var/log/dcache</userinput></screen>
+	    <para>
+	      and add two lines to
+	      <filename>/opt/d-cache/etc/dcache.conf</filename>.
+	  </para>
+	  <programlisting>dcache.user=dcache
+dcache.paths.billing=/var/log/dcache</programlisting>
+	  <para>
+	    In the layout file
+	    <filename>/opt/d-cache/etc/layouts/mylayout.conf</filename>
+	    a pool was defined.
+	  </para>
+	  <programlisting>[${host.name}Domain/pool]
+name=pool1
+path=/path/to/pool1
+waitForFiles=${path}/data
+maxDiskSpace=2T</programlisting>
+          <para>
+	    Change the ownership of the directory of the pool.
+	  </para>
+	  <screen>&prompt-root;<userinput>chown -R dcache /path/to/pool1</userinput></screen>
+	  <para>
+	    Moreover, if &dcache; has been running as &user-root; the
+	    files <filename>/tmp/createDDL.jdbc</filename> and
+	    <filename>/tmp/dropDDL.jdbc</filename> need to be removed
+	    as they are owned by the user &user-root;.
+	  </para>
+	  <screen>&prompt-root;<userinput>rm -f /tmp/createDDL.jdbc /tmp/dropDDL.jdbc</userinput></screen>
+
+	<important>
+	  <para>
+	    If you switched the portmap daemon off the domain in which
+	    the &nfs; server is running needs to be running as
+	    &user-root;. This needs to be set in the layout file.
+	  </para>
+	<programlisting>[namespaceDomain]
+dcache.user=root
+[namespaceDomain/pnfsmanager]
+[namespaceDomain/cleaner]
+[namespaceDomain/acl]
+[namespaceDomain/nfsv3]</programlisting>
+	</important>
+
+          <para>
+	    Now you can start &dcache; as user &user-dcache;
+	  </para>
+	  <screen>&prompt-root;<userinput>/opt/d-cache/bin/dcache  start</userinput>
+Starting dCacheDomain done
+Starting namespaceDomain done
+Starting gPlazmaDomain done
+Starting srmDomain done</screen>
+          <para>
+            and verifiy that &dcache; is running as &user-dcache; and
+            the &nfs; server is running as &user-root;.
+	  </para>
+	  <screen>&prompt-root;<userinput>/opt/d-cache/bin/dcache status</userinput>
+Domain          Status       PID
+dCacheDomain    running    11469
+namespaceDomain running    11518
+gPlazmaDomain   running    11602
+srmDomain       running    11619
+&prompt-root;<userinput>ps h -o user -p 11469</userinput>
+dcache
+&prompt-root;<userinput>ps h -o user -p 11518</userinput>
+root</screen>
+	</informalexample>
+      </section>
+
       <section id="in-install-configure-java">
 	<title>&java; heap size</title>
 
       <note>
         <para>
-	  &dcache; uses &java; to parse the configuration files and will search for &java;
-	  on the system path first; if it is found there, no further action
-	  is needed. If &java; is not on the system path, the environment
-	  variable <envar>JAVA_HOME</envar> defines the location of the
-	  &java; installation directory. Alternatively, the environment
-	  variable <envar>JAVA</envar> can be used to point to the &java;
-	  executable directly.
+	  &dcache; uses &java; to parse the configuration files and
+	  will search for &java; on the system path first; if it is
+	  found there, no further action is needed. If &java; is not
+	  on the system path, the environment variable
+	  <envar>JAVA_HOME</envar> defines the location of the &java;
+	  installation directory. Alternatively, the environment
+	  variable <envar>JAVA</envar> can be used to point to the
+	  &java; executable directly.
         </para>
 
 	<para>
@@ -578,7 +673,8 @@ maxDiskSpace=2T</programlisting>
       </note>
 
       <para>
-	By default the &java; heap size and the maximum direct buffer size are defined as
+	By default the &java; heap size and the maximum direct buffer
+	size are defined as
 	<programlisting>dcache.java.memory.heap=512m
 dcache.java.memory.direct=512m</programlisting>
         Again, these values can be changed in
