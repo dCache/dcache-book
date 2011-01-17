@@ -235,7 +235,7 @@ distclean: clean
 .%-letter.fo.d .%-a4.fo.d: %.xml
 	$(XSLTPROC) --nonet -stringparam output-file $(@:.%.d=%) --stringparam initial-file $< --stringparam graphics SVG  --stringparam dep-file $@ dependency.xsl $< > $@
 
-.%.html.d: %.xml
+.%.$(HTML_EXT).d: %.xml
 	$(XSLTPROC) --nonet -stringparam output-file $(@:.%.d=%) --stringparam initial-file $< --stringparam graphics none --stringparam dep-file $@ dependency.xsl $< > $@
 
 .%-chunk.d: %.xml
