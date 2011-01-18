@@ -634,15 +634,11 @@ Starting srmDomain done</screen>
             the &nfs; server is running as &user-root;.
 	  </para>
 	  <screen>&prompt-root;<userinput>/opt/d-cache/bin/dcache status</userinput>
-Domain          Status       PID
-dCacheDomain    running    11469
-namespaceDomain running    11518
-gPlazmaDomain   running    11602
-srmDomain       running    11619
-&prompt-root;<userinput>ps h -o user -p 11469</userinput>
-dcache
-&prompt-root;<userinput>ps h -o user -p 11518</userinput>
-root</screen>
+DOMAIN          STATUS  PID   USER
+dCacheDomain    running 11040 dcache
+namespaceDomain running 11117 root
+gPlazmaDomain   running 11125 dcache
+srmDomain       running 11182 dcache</screen>
 	</informalexample>
       </section>
 
