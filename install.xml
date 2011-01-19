@@ -203,7 +203,7 @@ Starting postgresql service:                               [  OK  ]</screen>
           <screen>&prompt-root; <userinput>createdb -U postgres chimera</userinput>
 CREATE DATABASE
 
-&prompt-root; <userinput>createuser -U postgres --createdb --pwprompt chimera</userinput>
+&prompt-root; <userinput>createuser -U postgres --no-superuser --no-createrole --createdb --pwprompt chimera</userinput>
 Enter password for new role:
 Enter it again:
 CREATE ROLE
@@ -271,7 +271,7 @@ Stopping portmap: portmap</screen>
           example:
          </para>
 
-        <screen>&prompt-root; <userinput>createuser -U postgres --createdb --pwprompt srmdcache</userinput></screen>
+        <screen>&prompt-root; <userinput>createuser -U postgres --no-superuser --no-createrole --createdb --pwprompt srmdcache</userinput></screen>
 
         <para>
           Several management components running on the head node as well
