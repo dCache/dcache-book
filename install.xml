@@ -34,6 +34,15 @@
         <shortaffil>DESY</shortaffil>
       </affiliation>
     </author>
+
+    <author>
+      <firstname>Antje</firstname>
+      <surname>Petersen </surname>
+      <affiliation>
+        <shortaffil>DESY</shortaffil>
+      </affiliation>
+    </author>
+
   </chapterinfo>
 
   <para>
@@ -307,13 +316,45 @@ Stopping portmap: portmap</screen>
 
 
         <para>
-	Now the configuration of &psql; is done and you can start &dcache;.
+	Now the configuration of &psql; is done.
 	</para>
 	</section>
 
+    <section id="in-install-ssh-keys">
+      <title>Generating &ssh;-keys</title>
+
+      <para>
+	In order to use the Admin Interface of &dcache; (see <xref
+	linkend="intouch-admin"/>) you will need to generate &ssh;-keys.
+      </para>
+
+      <screen>&prompt-root; <userinput>ssh-keygen -b 768 -t rsa1 -f /opt/d-cache/config/server_key -N ""</userinput>
+Generating public/private rsa1 key pair.
+Your identification has been saved in /opt/d-cache/config/server_key.
+Your public key has been saved in /opt/d-cache/config/server_key.pub.
+The key fingerprint is:
+33:ac:91:4c:21:4e:63:aa:2d:90:58:4d:72:e6:b5:88 root@example.org
+&prompt-root; <userinput>ssh-keygen -b 1024 -t rsa1 -f /opt/d-cache/config/host_key -N ""</userinput>
+Generating public/private rsa1 key pair.
+Your identification has been saved in /opt/d-cache/config/host_key.
+Your public key has been saved in /opt/d-cache/config/host_key.pub.
+The key fingerprint is:
+75:a4:2b:24:cc:75:ad:b7:bd:8b:dd:1a:3e:96:3f:9d root@example.org</screen>
+      <para>
+	Now you can start &dcache;.
+      </para>
+
 <screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache start</userinput>
 Starting dCacheDomain done</screen>
-        </section>
+
+     <para>
+       So far, no configuration is done, so only one predefined domain is started.
+     </para>
+
+    </section>
+
+
+    </section>
 
       <section>
 	<title>Mounting &chimera;</title>
