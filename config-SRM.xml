@@ -1374,11 +1374,9 @@ remoteGsiftpMaxTransfers=260</programlisting>
 	  <literal>OUTPUT</literal> and <literal>CUSTODIAL</literal>.
 	</para>
 
-	<para>
-	  Usage example:
-	</para>
-
-	<programlisting>SpaceManagerDefaultRetentionPolicy=CUSTODIAL</programlisting>
+	<informalexample>
+	  <programlisting>SpaceManagerDefaultRetentionPolicy=CUSTODIAL</programlisting>
+	</informalexample>
       </section>
 
       <section>
@@ -1396,11 +1394,17 @@ remoteGsiftpMaxTransfers=260</programlisting>
 	  <literal>NEARLINE</literal>.
 	</para>
 
-	<para>
-	  Usage example:
-	</para>
-	<programlisting>SpaceManagerDefaultAccessLatency=NEARLINE</programlisting>
+	<informalexample>
+	  <programlisting>SpaceManagerDefaultAccessLatency=NEARLINE</programlisting>
+	</informalexample>
       </section>
+
+	<important>
+	  Please make sure to use capital letters for
+	  <literal>REPLICA</literal>, <literal>OUTPUT</literal>,
+	  <literal>CUSTODIAL</literal>, <literal>ONLINE</literal> and
+	  <literal>NEARLINE</literal> otherwise you will receive an error message.
+	</important>
 
       <section>
 	<title>SpaceManagerReserveSpaceForNonSRMTransfers</title>
@@ -1417,12 +1421,9 @@ remoteGsiftpMaxTransfers=260</programlisting>
 	  Possible values are <literal>true</literal> and
 	  <literal>false</literal>.
 	</para>
-
-	<para>
-	  Usage example:
-	</para>
-
-	<programlisting>SpaceManagerReserveSpaceForNonSRMTransfers=false</programlisting>
+	<informalexample>
+	  <programlisting>SpaceManagerReserveSpaceForNonSRMTransfers=false</programlisting>
+	</informalexample>
       </section>
 
       <section>
@@ -1439,12 +1440,9 @@ remoteGsiftpMaxTransfers=260</programlisting>
 	  This parameter is not set by default.
 	</para>
 
-	<para>
-	  Usage example:
-	</para>
-
-	<programlisting>SpaceManagerLinkGroupAuthorizationFileName=/opt/d-cache/etc/LinkGroupAuthorization.conf</programlisting>
-
+	<informalexample>
+	  <programlisting>SpaceManagerLinkGroupAuthorizationFileName=/opt/d-cache/etc/LinkGroupAuthorization.conf</programlisting>
+	</informalexample>
       </section>
 
     </section>
