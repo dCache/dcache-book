@@ -17,7 +17,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 -->
 
 <!-- dCache-version -->
-<!ENTITY dcache-version          "1.9.11">
+<!ENTITY dcache-version          "1.9.12">
 
 <!-- "Products" or high-level services -->
 <!ENTITY dcache       "<productname>dCache</productname>">
@@ -68,6 +68,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY cell-info-provider "<literal>infoProvider</literal>">
 <!ENTITY cell-topo          "<literal>topo</literal>">
 <!ENTITY cell-nfsv3         "<literal>nfsv3</literal>">
+<!ENTITY cell-nfsv4         "<literal>nfsv4</literal>">
 <!ENTITY cell-webDAV         "<literal>WebDAV</literal>">
 <!ENTITY cell-webadmin         "<literal>Webadmin</literal>">
 <!ENTITY cell-srm             "<literal>SRM</literal>">
@@ -86,7 +87,8 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY ip       "<systemitem class='protocol'>IP</systemitem>">
 <!ENTITY http     "<systemitem class='protocol'>HTTP</systemitem>">
 <!ENTITY xrootd   "<systemitem class='protocol'>xrootd</systemitem>">
-<!ENTITY nfs3     "<systemitem class='protocol'>NFS-3</systemitem>">
+<!ENTITY nfs3     "<systemitem class='protocol'>NFSv3</systemitem>">
+<!ENTITY nfs4     "<systemitem class='protocol'>NFSv4.1</systemitem>">
 <!ENTITY nfs      "<systemitem class='protocol'>NFS</systemitem>">
 <!ENTITY webdav   "<systemitem class='protocol'>WebDAV</systemitem>">
 <!ENTITY kerberos "<systemitem class='protocol'>Kerberos</systemitem>">
@@ -96,7 +98,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY ascii    "<acronym>ASCII</acronym>">
 <!ENTITY html     "<acronym>HTML</acronym>">
 <!ENTITY ldif     "<acronym>LDIF</acronym>">
-<!ENTITY rpm     "<acronym>RPM</acronym>">
+<!ENTITY rpm      "<acronym>RPM</acronym>">
 
 <!-- Other network concepts -->
 <!ENTITY url      "<acronym>URL</acronym>">
@@ -115,7 +117,11 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY prog-dccp            "<command>dccp</command>">
 <!ENTITY prog-srmcp           "<command>srmcp</command>">
 <!ENTITY prog-globus-url-copy "<command>globus-url-copy</command>">
-
+<!ENTITY prog-cp              "<command>cp</command>">
+<!ENTITY prog-ls              "<command>ls</command>">
+<!ENTITY prog-mkdir           "<command>mkdir</command>">
+<!ENTITY prog-mv              "<command>mv</command>">
+<!ENTITY prog-cat             "<command>cat</command>">
 
 <!-- Various movers -->
 <!ENTITY mover-dcap  "<literal>&dcap; mover</literal>">
@@ -136,11 +142,11 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY dc-prompt-cpymngr "<prompt>(<replaceable>copyManagerCell</replaceable>) admin &gt;</prompt>">
 <!ENTITY dc-prompt-acladmin "<prompt>(acladmin) admin &gt;</prompt>">
 <!ENTITY dc-prompt-skmadmin "<prompt>(skm) admin &gt;</prompt>">
-<!ENTITY dc-prompt-topo "<prompt>(topo) admin &gt;</prompt>">
+<!ENTITY dc-prompt-topo     "<prompt>(topo) admin &gt;</prompt>">
 
 
-<!ENTITY dc-prompt-pnfsmngr "<prompt>(PnfsManager) admin &gt;</prompt>">
-<!ENTITY dc-prompt-acm   "<prompt>(acm) admin &gt;</prompt>">
+<!ENTITY dc-prompt-pnfsmngr  "<prompt>(PnfsManager) admin &gt;</prompt>">
+<!ENTITY dc-prompt-acm       "<prompt>(acm) admin &gt;</prompt>">
 <!ENTITY dc-prompt-admindoor "<prompt>(System@adminDoorDomain) admin &gt;</prompt>">
 
 <!-- Shell prompts -->
@@ -148,10 +154,12 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY prompt-root   "<prompt>[root] #</prompt>">
 
 <!-- Colo(u)r definitions -->
-<!ENTITY pi-fo-bgcolour-item "<?dbfo bgcolor='#FCFFFC'?>">
+<!ENTITY pi-fo-bgcolour-item  "<?dbfo bgcolor='#FCFFFC'?>">
 <!-- !ENTITY pi-fo-bgcolour-bg   "<?dbfo bgcolor='#FDFDFD'?>" -->
-<!ENTITY pi-fo-bgcolour-bg   "<?dbfo bgcolor='#FFFFFF'?>">
+<!ENTITY pi-fo-bgcolour-bg    "<?dbfo bgcolor='#FFFFFF'?>">
 
 
 <!-- Misc -->
+<!ENTITY ns-base "<filename class='directory'>/data</filename>">
 <!-- <!ENTITY ndash "&#x2013;"> -->
+

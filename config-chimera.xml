@@ -9,23 +9,23 @@
   <title>&chimera;</title>
 
     <para>
-      Since &dcache; is a distributed storage system, it provides a
-      single-rooted file system view. &dcache; supports multiple
-      namespace providers, while &chimera; is the one being used in
-      the current version.
+      &dcache; is a distributed storage system, nevertheless it
+      provides a single-rooted file system view. While &dcache;
+      supports multiple namespace providers, &chimera; is the
+      recommended provider and is used by default.
     </para>
 
     <para>
-      &chimera; is available as the &cell-nfsv3; service and can be
-      added to and edited in the &dcache;
-      <firstterm>layout</firstterm> file (see <xref
-      linkend="in-install-layout" />). &chimera; will be started
-      automatically as &dcache; is started.
+      The inner &dcache; components talk to the namespace via a module
+      called &cell-pnfsmngr;, which in turn communicates with the
+      &chimera; database using a thin &java; layer, which in turn
+      communicates directly with the &chimera; database. &chimera;
+      allows direct access to the namespace by providing an &nfs3; and
+      &nfs4; server. Clients can &nfs;-mount the namespace locally.
+      This offers the opportunity to use OS-level tools like
+      &prog-ls;, &prog-mkdir;, &prog-mv; for &chimera;. Direct
+      I/O-operations like &prog-cp; and &prog-cat; are possible with &nfs4;.
     </para>
-
-    <informalexample>
-      <programlisting>[dCacheDomain/nfsv3]</programlisting>
-    </informalexample>
 
     <para>
       The properties of &chimera; are defined in
@@ -33,21 +33,46 @@
       customisation the files
       <filename>/opt/d-cache/etc/layouts/mylayout.conf</filename> or
       <filename>/opt/d-cache/etc/dcache.conf</filename> should be
-      modified.
+      modified (see <xref linkend="in-install-layout" />).
     </para>
 
     <informalexample>
-
       <para>
-	Example for a change in
-	<filename>/opt/d-cache/etc/layouts/mylayout.conf</filename>.
+	This example shows an extract of the
+	<filename>/opt/d-cache/etc/layouts/mylayout.conf</filename>
+	file in order to run &dcache; with &nfs3;.
       </para>
 
-      <programlisting>[dCacheDomain/pnfsmanager]
- chimera.db.user=myuser
- chimera.db.password=secret</programlisting>
-
+      <programlisting>[namespaceDomain]
+[namespaceDomain/pnfsmanager]
+[namespaceDomain/nfsv3]</programlisting>
     </informalexample>
+
+    <note>
+      <para>
+	You cannot run the &nfs3; and &nfs4; server concurrently on the same machine.
+      </para>
+    </note>
+
+    <informalexample>
+      <para>
+	If you want to run the &nfs4; server you need to add the
+	corresponding &cell-nfsv4; service to a domain in the
+	<filename>/opt/d-cache/etc/layouts/mylayout.conf</filename>
+	file and start this domain.
+      </para>
+      <programlisting>[namespaceDomain]
+[namespaceDomain/pnfsmanager]
+[namespaceDomain/nfsv4]</programlisting>
+    </informalexample>
+
+      <para>
+	If you wish &dcache; to access your &chimera; with a &psql; user
+	other than <database class="user">chimera</database> then you must specify the username and
+	password in <filename>/opt/d-cache/etc/dcache.conf</filename>.
+     </para>
+      <programlisting>chimera.db.user=myuser
+chimera.db.password=secret</programlisting>
 
     <important>
       <para>
