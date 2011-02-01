@@ -90,6 +90,15 @@
   </xsl:template>
 
   <xsl:template name="user.footer.navigation">
+    <xsl:if test="$comments.enabled = 'true'">
+      <script>
+var idcomments_acct = '34b62bdb3ebc077ad6c4f77998f1db2b';
+var idcomments_post_id;
+var idcomments_post_url;
+      </script>
+      <span id="IDCommentsPostTitle" style="display:none"/>
+      <script type='text/javascript' src='http://www.intensedebate.com/js/genericCommentWrapperV2.js'/>
+    </xsl:if>
     <xsl:comment>#include virtual="&location-frag-footer;"</xsl:comment>
   </xsl:template>
 
