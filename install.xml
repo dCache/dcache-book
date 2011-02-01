@@ -540,9 +540,16 @@ Starting dCacheDomain done</screen>
       <para>
 	Consider the following example for adding a pool to a &dcache; layout file.
       </para>
+      <para>
+	Create the directory in which the pool will be stored.
+      </para>
+      <screen>&prompt-root; <userinput>mkdir -p /srv/dcache/pool1</userinput></screen>
+      <para>
+	and define the pool in the layout file.
+      </para>
 	<programlisting>[${host.name}Domain/pool]
 name=pool1
-path=/path/to/pool1
+path=/srv/dcache/pool1
 waitForFiles=${path}/data
 maxDiskSpace=2T</programlisting>
 
