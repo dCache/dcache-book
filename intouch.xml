@@ -166,11 +166,12 @@ Error user User [name=...] has no permission to delete 000100000000000000BAF0C0<
 
     <para>
       In the standard configuration the &dcache; web interface is
-      started on the head node and can be reached via port
-      <systemitem class="resource">2288</systemitem>. Point a web
-      browser to <ulink
-      url="http://headNode:2288/">http://<replaceable>adminNode</replaceable>:2288/</ulink>
-      to get to the main menue of the dCache web interface.  The
+      started on the head node (meaning that the domain hosting the
+      &cell-httpd; service is running on the head node) and can be
+      reached via port <systemitem
+      class="resource">2288</systemitem>. Point a web browser to
+      <uri>http://<replaceable>head-node.example.org</replaceable>:2288/</uri>
+      to get to the main menu of the &dcache; web interface.  The
       contents of the web interface are self-explanatory and are the
       primary source for most monitoring and trouble-shooting tasks.
     </para>
@@ -178,33 +179,7 @@ Error user User [name=...] has no permission to delete 000100000000000000BAF0C0<
     <para>
       The <quote>Cell Services</quote> page displays the status of
       some important <glossterm linkend="gl-cell">cells</glossterm> of
-      the &dcache; instance. You might observe that some cells are
-      marked <quote>OFFLINE</quote>. In general &dcache; has no
-      knowledge about which cells are supposed to be online, but for
-      purposes of monitoring, some cells may be hard coded in the file
-      <filename>/opt/d-cache/config/httpd.batch</filename>:
-    </para>
-
-    <programlisting>#
-create diskCacheV111.cells.WebCollectorV3 collector \
-    "PnfsManager \
-     PoolManager \
-     -loginBroker=LoginBroker,srm-LoginBroker \
-     -replyObject"
-#</programlisting>
-
-    <para>
-      Additional cells may be added. To take effect, the &domain-http;
-      <glossterm linkend="gl-domain">domain</glossterm> must be
-      restarted by executing
-    </para>
-
-    <screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache restart httpd</userinput></screen>
-
-    <para>
-      More information about the
-      <filename><replaceable>domainName</replaceable>.batch</filename>
-      will follow in the next section.
+      the &dcache; instance.
     </para>
 
     <para>
@@ -214,13 +189,14 @@ create diskCacheV111.cells.WebCollectorV3 collector \
       <glossterm linkend="gl-cached">cached files</glossterm> (which
       may be deleted when space is needed) is marked green, and space
       occupied by <glossterm linkend="gl-precious">precious
-      files</glossterm>, which cannot be deleted. Other states
-      (e.g., files which are currently written) are marked purple.
+      files</glossterm>, which cannot be deleted is marked red. Other
+      states (e.g., files which are currently written) are marked
+      purple.
     </para>
 
     <para>
       The page <quote>Pool Request Queues</quote> (or <quote>Pool
-      Transfer Queues</quote>) gives information about the number
+      Transfer Queues</quote>) gives information about the number of
       current requests handled by each pool. <quote>Actions
       Log</quote> keeps track of all the transfers performed by the
       pools up to now.
