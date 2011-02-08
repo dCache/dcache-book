@@ -33,11 +33,12 @@
 
   <note>
     <para>
-      Most &dcache; distributions do not expect to run together with
-      an &hsm; backend system. To make this work, make sure that
-      neither in the pool.batch file, nor in the
-      <filename>config/<replaceable>pool</replaceable>.poollist</filename>
-      files the option <literal>lfs=precious</literal> is specified.
+      Most &dcache; installations do not use an &hsm; backend
+      system. However, if you have an &hsm; backend system please
+      check in your layout file in <filename
+      class='directory'>/opt/d-cache/etc/layouts</filename> and in the
+      <filename>/opt/d-cache/etc/dcache.conf</filename> file that the
+      option <literal>lfs=precious</literal> is not specified.
     </para>
   </note>
 
