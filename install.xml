@@ -48,7 +48,7 @@
   <para>
     The first section describes the installation of a fresh &dcache;
     instance using RPM files downloaded from <ulink
-    url="http://www.dcache.org">the &dcache; home-page</ulink>.  It is
+    url="http://www.dcache.org">the &dcache; home-page</ulink>. It is
     followed by a guide to upgrading an existing installation. In both
     cases we assume standard requirements of a small to medium sized
     &dcache; instance without an attached <glossterm
@@ -89,8 +89,12 @@
 
         <listitem>
           <para>
-           &dcache; requires Java 1.6 JRE. It is recommended to use &sunjvm; at the
-	   latest patch-level (at least 1.6.0_18).
+           &dcache; requires Java 1.6 JRE. Please use
+           &sunjvm; at the latest patch-level (at least
+           1.6.0_18). It is recommendet to use JDK as &dcache;
+           scripts can make use of some extra features that JDK
+           provides to gather more diagnostic information (heap-dump,
+           etc). This helps when tracking down bugs.
           </para>
         </listitem>
 
@@ -111,9 +115,8 @@
         The RPM packages may be installed right away, for example
         using the command:
       </para>
+      <screen>&prompt-root; <userinput>rpm -ivh dcache-server-<replaceable>version</replaceable>noarch.rpm</userinput></screen>
 
-      <screen>&prompt-root; <userinput>rpm -ivh dcache-server-<replaceable>version</replaceable>-<replaceable>release</replaceable>.i386.rpm</userinput>
-&prompt-root; <userinput>rpm -ivh dcache-client-<replaceable>version</replaceable>-<replaceable>release</replaceable>.i386.rpm</userinput></screen>
        <para>
        The actual sources lie at <ulink url="http://www.dcache.org/downloads.shtml"/>.
        To install for example Version &dcache-version;-1 of the server you would use this:
@@ -571,17 +574,18 @@ Starting dCacheDomain done</screen>
       </para>
 
       <para>
-	In the layouts files it is defined which domains to start and which services to put in which domain.
-	Configuration can be done per domain and per service.
+	The layout files define which domains to start and which
+	services to put in which domain. Configuration can be done per
+ 	domain and per service.
       </para>
 
       <para>
-	  A name in square brackets, without a forward-slash
-	  (<literal>/</literal>) defines a domain.
-	  A name in square brackets with a forward slash defines a service that is
-	  to run in a domain.
-	  Lines starting with a hash-symbol (<literal>#</literal>) are comments and will be
-	  ignored by &dcache;.
+	A name in square brackets, <emphasis>without</emphasis> a
+	forward-slash (<literal>/</literal>) defines a domain.  A name
+	in square brackets <emphasis>with</emphasis> a forward slash
+	defines a service that is to run in a domain.  Lines starting
+	with a hash-symbol (<literal>#</literal>) are comments and
+	will be ignored by &dcache;.
       </para>
 
       <para>
@@ -641,7 +645,7 @@ Starting dCacheDomain done</screen>
 [namespaceDomain/nfsv3]
 
 [gPlazmaDomain]
-[gPlazma/gplazma]
+[gPlazmaDomain/gplazma]
 
 [srmDomain]
 [srmDomain/srm]
