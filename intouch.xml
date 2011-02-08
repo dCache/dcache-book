@@ -23,26 +23,136 @@
     <title>Checking the Functionality</title>
 
     <para>
-      First, we will get used to the client tools. On the &dcache;
-      head node, change into the <filename class="directory">data</filename> directory, where the users
-      are going to store their data:
-    </para>
-
-    <screen>&prompt-user; <userinput>cd /data/</userinput>
-&prompt-user;</screen>
-
-    <para>
-      The mounted &chimera; filesystem is not intended for reading or
-      writing actual data with regular file operations via the &nfs;
-      protocol.
-    </para>
-
-    <para>
       Reading and writing data to and from a &dcache; instance can be
       done with a number of protocols. After a standard installation,
       these protocols are &dcap;, &gsidcap;, and &gridftp;. In
       addition &dcache; comes with an implementation of the &srm;
       protocol which negotiates the actual data transfer protocol.
+    </para>
+
+    <section id="intouch-client-dcap">
+      <title>&dcap;</title>
+      <para>
+	To be able to use &dcap; you need to have the &dcap; door
+	running in a domain.
+	</para>
+	<informalexample>
+	  <programlisting>[dCacheDomain]
+[dCacheDomain/dcap]</programlisting>
+        </informalexample>
+
+        <para>
+	  Install the &dcap; library and the &dcap; client from <ulink
+	  url="http://www.dcache.org/downloads/dcap/">the &dcap;
+	  downloads page</ulink>.  For this tutorial install them on the
+	  machine where your &dcache; is running.
+	</para>
+	<informalexample>
+	  <screen>&prompt-root; <userinput>rpm -i http://www.dcache.org/repository/yum/sl5/i386/RPMS.stable/libdcap-2.47.5-0.i386.rpm</userinput>
+&prompt-root; <userinput>rpm -i http://www.dcache.org/repository/yum/sl5/i386/RPMS.stable/dcap-2.47.5-0.i386.rpm</userinput></screen>
+	</informalexample>
+
+	<para>
+	  Now set the <envar>PATH</envar> environment variable.
+	</para>
+	<screen>&prompt-root; <userinput>export PATH=/opt/d-cache/dcap/bin/:$PATH</userinput></screen>
+	<section id="dcap-unmounted">
+	  <title>&dcap; without mounted namespace</title>
+	  <para>
+	    Create the root of the &chimera; namespace and a
+	    world-writable directory for &dcap; to write into by
+	  </para>
+	  <screen>&prompt-root; <userinput>/opt/d-cache/bin/chimera-cli.sh mkdir /data</userinput>
+&prompt-root; <userinput>/opt/d-cache/bin/chimera-cli.sh mkdir /data/world-writable</userinput>
+&prompt-root; <userinput>/opt/d-cache/bin/chimera-cli.sh chmod /data/world-writable 777</userinput></screen>
+
+          <para>
+	    Copy the data (here <filename>/bin/sh</filename> is used
+	    as example data) using the &prog-dccp; command and the
+	    &dcap; protocol describing the location of the file using
+	    a URL
+	  </para>
+	  <screen>&prompt-root; <userinput>dccp -H /bin/sh dcap://<replaceable>adminNode</replaceable>/data/world-writable/my-test-file-1</userinput>
+[##########################################################################################] 100% 718 kiB
+735004 bytes (718 kiB) in 0 seconds</screen>
+
+         <para>
+	   and copy the file back.
+	 </para>
+	 <screen>&prompt-root; <userinput>dccp -H dcap://<replaceable>adminNode</replaceable>/data/world-writable/my-test-file-1 /tmp/mytestfile1</userinput>
+[##########################################################################################] 100% 718 kiB
+735004 bytes (718 kiB) in 0 seconds</screen>
+
+	</section>
+
+	<section id="dcap-mounted">
+	  <title>Using &dcap; with a mounted filesystem</title>
+	  <para>
+	    &dcap; can also be used with a mounted file system.
+	    Before mounting the name space you need to edit the
+	    <filename>/etc/exports</filename> file. Add the lines
+	  </para>
+	  <programlisting>/ localhost(rw)
+/data</programlisting>
+
+          <para>
+	    and restart &dcache;.
+	  </para>
+	  <screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache restart</userinput></screen>
+
+	  <para>
+	    Now you can mount &chimera;.
+	  </para>
+	  <screen>&prompt-root; <userinput>mount localhost:/ /mnt</userinput></screen>
+
+	  <para>
+	    With the root of the namespace mounted you can establish
+	    wormhole files so &dcap; clients can discover the &dcap;
+	    doors.
+<!-- TODO: Add link to section with wormholes as soon as available for chimera -->
+	  </para>
+
+	  <screen>&prompt-root; <userinput>mkdir /mnt/admin/etc/config/dCache</userinput>
+&prompt-root; <userinput>touch /mnt/admin/etc/config/dCache/dcache.conf</userinput>
+&prompt-root; <userinput>touch /mnt/admin/etc/config/dCache/'.(fset)(dcache.conf)(io)(on)'</userinput>
+&prompt-root; <userinput>echo "<replaceable>door host</replaceable>:22125" > /mnt/admin/etc/config/dCache/dcache.conf</userinput></screen>
+          <para>
+	    where <replaceable>door host</replaceable> is the host on
+	    which the domain hosting the &dcap; door is running.
+	  </para>
+          <para>
+	    Create the directory in which the users are going to
+	    store their data and change to this directory.
+	  </para>
+	  <screen>&prompt-root; <userinput>mkdir -p /mnt/data</userinput>
+&prompt-root; <userinput>cd /mnt/data</userinput></screen>
+
+          <para>
+	    Now you can copy a file into your &dcache;
+	  </para>
+	  <screen>&prompt-root; <userinput>dccp /bin/sh my-test-file-2</userinput>
+735004 bytes (718 kiB) in 0 seconds</screen>
+
+	  <para>
+	    and copy the data back using the &prog-dccp; command.
+	  </para>
+
+	 <screen>&prompt-root; <userinput>dccp my-test-file-2 /tmp/mytestfile2</userinput>
+735004 bytes (718 kiB) in 0 seconds</screen>
+
+         <para>
+	   The file has been transferred succesfully.
+	 </para>
+
+	</section>
+
+
+<!-- TODO: Move this to the dCap-section and rewrite
+
+    <para>
+      The mounted &chimera; filesystem is not intended for reading or
+      writing actual data with regular file operations via the &nfs;
+      protocol.
     </para>
 
     <para>
@@ -96,18 +206,34 @@ System error: Input/output error</screen>
     <screen>&prompt-user; <userinput>dccp my-test-file /tmp/test2.tmp</userinput>
 541096 bytes in 0 seconds</screen>
 
-    <para>
-      If you have a valid grid proxy with a certificate subject which
-      is properly mapped in the configuration file
-      <filename>/opt/d-cache/etc/dcache.kpwd</filename> you can also
-      try grid-authenticated access via the &gsi;-authenticated version
-      of &dcap;:
-    </para>
+-->
+
+      </section>
+
+<!-- TODO:  rewrite -->
+      <section id="intouch-client-gsidcap">
+	<title>&gsidcap;</title>
+
+	<para>
+	  If you have a valid grid proxy with a certificate subject
+	  which is properly mapped in the configuration file
+	  <filename>/opt/d-cache/etc/dcache.kpwd</filename> you can
+	  also try grid-authenticated access via the
+	  &gsi;-authenticated version of &dcap;:
+	</para>
 
     <screen>&prompt-user; <userinput>chgrp <replaceable>yourVO</replaceable> my-test-file</userinput>
 &prompt-user; <userinput>export LD_LIBRARY_PATH=/opt/d-cache/dcap/lib/:$LD_LIBRARY_PATH</userinput>
 &prompt-user; <userinput>dccp gsidcap://<replaceable>adminNode</replaceable>:22128/data/my-test-file /tmp/test3.tmp</userinput>
 541096 bytes in 0 seconds</screen>
+
+      </section>
+
+
+
+<!-- TODO: rewrite -->
+     <section id="intouch-client-srm">
+	<title>&srm;</title>
 
     <para>
       Or we let the &srm; negotiate the protocol:
@@ -134,6 +260,7 @@ Destination URL: file:///tmp/test5.tmp
 # streams: 1
 Transfer took 770 ms</screen>
 
+
     <para>
       and it can be deleted with the help of the &srm; interface:
     </para>
@@ -150,16 +277,16 @@ Error user User [name=...] has no permission to delete 000100000000000000BAF0C0<
     <screen>&prompt-user; <userinput>chown <replaceable>yourVO</replaceable>001 my-test-file</userinput>
 &prompt-user; <userinput>srm-advisory-delete srm://<replaceable>dCacheAdminFQN</replaceable>:8443/data/my-test-file</userinput></screen>
 
-    <para>
-      If the grid functionality is not required the file can be
-      deleted with the &nfs; mount of the &pnfs; filesystem:
-    </para>
+      <para>
+	If the grid functionality is not required the file can be
+	deleted with the &nfs; mount of the &chimera; namespace:
+      </para>
 
     <screen>&prompt-user; <userinput>rm <filename>my-test-file</filename></userinput></screen>
 
+      </section>
+
   </section>
-
-
 
   <section id="intouch-web">
     <title>The Web Interface for Monitoring &dcache;</title>
