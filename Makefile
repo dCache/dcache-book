@@ -41,6 +41,7 @@ TXT_FILES = $(SOURCES:%.xml=%.txt)
 FO_DEPS = $(FO_FILES:%=.%.d)
 HTML_SINGLE_DEPS = $(HTML_SINGLE_FILES:%=.%.d)
 HTML_CHUNK_DEPS = $(SOURCES:%.xml=.%-chunk.d)
+HTML_COMMENTS_DEPS = $(SOURCES:%.xml=.%-comments.d)
 
 EPUB_FILES = $(SOURCES:%.xml=%.epub)
 
@@ -48,7 +49,7 @@ GFX_FILES = images/important.png images/warning.png images/caution.png images/no
 
 # Used by deploy target
 ALL = $(HTML_SINGLE_FILES) $(PDF_FILES) $(HTML_ALL_CHUNK_FILES) $(EPUB_FILES) book.css $(GFX_FILES)
-ALL_COMMENTS = $(HTML_ALL_COMMENT_FILES) book.css $(GFX_FILES)
+ALL_COMMENTS = $(HTML_ALL_COMMENTS_FILES) book.css $(GFX_FILES)
 ALL_INSTALLED = $(ALL:%=%__INSTALL__)
 ALL_TEST_INSTALLED = $(ALL:%=%__TEST_INSTALL__)
 COMMENTS_INSTALLED = $(ALL_COMMENTS:%=%__COMMENTS_INSTALL__)
@@ -63,7 +64,7 @@ WWW_COMMENTS_LOCATION = /manuals/Book-1.9.12-comments/
 # NB we don't do deps on txt as it depends on html-single output.  This
 #    is cheating, but hey, it works.
 
-DEP_FILES = $(FO_DEPS) $(HTML_SINGLE_DEPS) $(HTML_CHUNK_DEPS)
+DEP_FILES = $(FO_DEPS) $(HTML_SINGLE_DEPS) $(HTML_CHUNK_DEPS) $(HTML_COMMENTS_DEPS)
 
 
 ######### Common options
@@ -272,6 +273,9 @@ distclean: clean
 
 .%-chunk.d: %.xml
 	$(XSLTPROC) --nonet -stringparam output-file $(@:.%-chunk.d=%/index.$(HTML_EXT)) --stringparam initial-file $< --stringparam graphics none --stringparam dep-file $@ dependency.xsl $< > $@
+
+.%-comments.d: %.xml
+	$(XSLTPROC) --nonet -stringparam output-file $(@:.%-comments.d=%-comments/index.$(HTML_EXT)) --stringparam initial-file $< --stringparam graphics none --stringparam dep-file $@ dependency.xsl $< > $@
 
 .PHONY:	all pdf html html-single html-chunked
 .PHONY: clean distclean
