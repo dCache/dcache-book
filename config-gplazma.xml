@@ -230,7 +230,7 @@ storageAuthzPath="/etc/grid-security/storage-authzdb"</programlisting>
 
       <para>
 	When using the grid-mapfile plugin, the
-	<filename>torage-authzdb</filename> file must also be
+	<filename>storage-authzdb</filename> file must also be
 	configured. See <xref linkend="cf-gplazma-authzdb"/> for
 	details.
       </para>
@@ -239,14 +239,15 @@ storageAuthzPath="/etc/grid-security/storage-authzdb"</programlisting>
 
 
   <section id="cf-gplazma-authzdb">
-    <title>Configuring storage-authzdb</title>
+    <title><filename>storage-authzdb</filename></title>
 
     <para>
       In &cell-gplazma;, except for the dcache.kpwd plugin,
       authorization mapping is a two-step process. First, a username
       is obtained from a mapping of the user's DN or DN and role, then
       a mapping of username to uid, gid, rootpath is performed. The
-      storage-authzdb file is used for the second mapping.
+      <filename> storage-authzdb</filename> file is used for the
+      second mapping.
     </para>
 
     <section>
