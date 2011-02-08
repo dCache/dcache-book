@@ -12,52 +12,50 @@
   <para>
     &dcache; is a distributed storage solution.  It organises storage
     across computers so the combined storage can be used without the
-    end-users being aware of on precisely which computer their data is
-    stored; end-users see simply a large amount of storage.
+    end-users being aware of where their data is stored. They simply
+    see a large amount of storage.
   </para>
 
   <para>
-    Because end-users need not know on which computer their data is
-    stored, their data can be migrated from one computer to another
-    without any interruption of service.  This allows &dcache; storage
-    computers to be taken out of service or additional machines (with
-    additional storage) to be added without interrupting the service
-    the end-users enjoy.
+    Because end-users do not need to know on which computer their data
+    is stored, it can be migrated from one computer to another without
+    any interruption of service. As a consequence, (new) servers may
+    be added to or taken away from the &dcache; storage cluster at any
+    time.
+   </para>
+
+  <para>
+    &dcache; supports requesting data from a tertiary storage
+    system. Such systems typically store data on magnetic tapes
+    instead of disks, which must be loaded and unloaded using a tape
+    robot. The main reason for using tertiary storage is the better
+    cost-efficiency, archiving a very large amount of data on rather
+    inexpensive hardware. In turn the access latency for archived data
+    is significantly higher.
   </para>
 
   <para>
-    &dcache; supports requesting data from a tertiary storage system.
-    A tertiary storage system typically uses a robotic tape system,
-    where data is stored on a tape from a library of available tapes,
-    which must be loaded and unloaded using a tape robot.  Tertiary
-    storage systems typically have a higher initial cost, but can be
-    extended cheaply by added additional tapes.  This results in
-    tertiary storage systems being popular where large amounts of data
-    must be read.
-  </para>
-
-  <para>
-    &dcache; also provides many transfer protocols (allowing users to
-    read and write to data).  These have a modular deployment,
-    allowing &dcache; to support expanded capacity by providing
-    additional front-end machines.
+    &dcache; also supports many transfer protocols (allowing users to
+    read and write to data). These have a modular deployment, allowing
+    &dcache; to support expanded capacity by providing additional
+    front-end machines.
   </para>
 
   <para>
     Another performance feature of &dcache; is hot-spot data
-    migration.  In this process, &dcache; will detect when files
-    are requested very often. If this happens, &dcache; can
-    make duplicate copies of the popular files on other computers.
-    This allows the load to be spread across multiple machines, so
-    increasing throughput.
+    migration. In this process, &dcache; will detect when files are
+    requested very often. If this happens, &dcache; can generate
+    duplicates of the popular files on other computers.  This allows
+    the load to be spread across multiple machines, so increasing
+    throughput.
   </para>
 
   <para>
     The flow of data within &dcache; can also be carefully controlled.
     This is especially important for large sites as chaotic movement
-    of data may lead to suboptimal usage; instead, incoming and
-    outgoing data can be marshaled so they use designated resources;
-    allowing better throughput and guaranteeing end-user experience.
+    of data may lead to suboptimal usage. Instead, incoming and
+    outgoing data can be marshaled so they use designated resources
+    guaranteeing better throughput and improving end-user experience.
   </para>
 
   <para>
@@ -96,27 +94,27 @@
 
     <para>
       There are only a few cells where (at most) only a single
-      instance is required.  The majority of cells within a &dcache;
+      instance is required. The majority of cells within a &dcache;
       instance can have multiple instances and &dcache; is designed to
       allow load-balancing over these cells.
     </para>
 
     <para>
       A <firstterm>domain</firstterm> is a container for running
-      cells.  Each domain runs in its own Java Virtual Machine (JVM)
-      instance, which it cannot share with any other domain.  In
+      cells. Each domain runs in its own Java Virtual Machine (JVM)
+      instance, which it cannot share with any other domain. In
       essence, a domain <emphasis>is</emphasis> a JVM with the
       additional functionality necessary to run cells (such as system
-      administration and inter-cell communication).  Since domains
-      running on the same node and each have an independent JVM, they
-      share the node's resources such as memory, available CPU and
-      network bandwidth.
+      administration and inter-cell communication). This also implies,
+      that a node's resources, such as memory, available CPU and network
+      bandwidth, are shared among several domains running on the same
+      node.
     </para>
 
     <para>
       &dcache; comes with a set of domain definitions, each specifying
       a useful set of cells to run within that domain to achieve a
-      certain goal.  These goals include storing data, providing a
+      certain goal. These goals include storing data, providing a
       front-end to the storage, recording file names, and so on. The
       list of cells to run within these domains are recommended
       deployments: the vast majority of &dcache; deployments do not
@@ -126,10 +124,10 @@
     <para>
       A node is free to run multiple domains, provided there's no
       conflicting requirement from the domains for exclusive access to
-      hardware.  A node may run a single domain; but, typically a node
-      will run multiple domains.  The choice of which domains to run
+      hardware. A node may run a single domain; but, typically a node
+      will run multiple domains. The choice of which domains to run
       on which nodes will depend on expected load of the &dcache;
-      instance and on the available hardware.  If this sounds
+      instance and on the available hardware. If this sounds
       daunting, don't worry: starting and stopping a domain is easy
       and migrating a domain from one node to another is often as easy
       as stopping the domain on one node and starting it on another.
@@ -137,9 +135,9 @@
 
 
     <para>
-      &dcache; is scalable storage software.  This means that (in most
+      &dcache; is scalable storage software. This means that (in most
       cases) the performance of &dcache; can be improved by
-      introducing new hardware.  Depending on the performance issue,
+      introducing new hardware. Depending on the performance issue,
       the new hardware may be used by hosting a domain migrated from a
       overloaded node, or by running an additional instance of a
       domain to allow load-balancing.
@@ -147,7 +145,7 @@
 
     <para>
       Most cells communicate in such a way that they don't rely on in
-      which domain they are running.  This allows a site to move cells
+      which domain they are running. This allows a site to move cells
       from one domain to another or to create new domain definitions
       with some subset of available cells.  Although this is possible,
       it is rare that redefining domains or defining new domains is
