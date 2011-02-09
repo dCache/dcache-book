@@ -102,6 +102,11 @@
       <firstname>Owen</firstname>
       <surname>Synge</surname>
     </author>
+    <author>
+      <firstname>Antje</firstname>
+      <surname>Petersen</surname>
+    </author>
+
     <mediaobject>
       <imageobject role="fo">
 	<imagedata fileref="images/dCache-book-logo.svg"
@@ -278,6 +283,7 @@
                 <itemizedlist>
                   <listitem><para>German support:<email>german-support@dcache.org</email></para></listitem>
                   <listitem><para>UK support:<email>GRIDPP-STORAGE@JISCMAIL.AC.UK</email></para></listitem>
+		  <listitem><para>USA support:<email>osg-storage@opensciencegrid.org</email></para></listitem>
                   <listitem><para>User Forum: <email>user-forum@dcache.org</email></para></listitem>
                 </itemizedlist>
               </para>
