@@ -253,16 +253,6 @@ CREATE FUNCTION
 CREATE TRIGGER
 </screen>
 
-          <note>
-            <para>
-              In general you should switch the
-              <systemitem class='service'>portmap</systemitem> daemon off
-              before starting &chimera;:
-            </para>
-            <screen>&prompt-root; <userinput>/etc/init.d/portmap stop</userinput>
-Stopping portmap: portmap</screen>
-          </note>
-
         </section>
       </section>
 
