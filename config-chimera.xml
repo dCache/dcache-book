@@ -110,6 +110,19 @@ chimera.db.password=secret</programlisting>
 # /data *.my.domain(rw)</programlisting>
 
   <para>
+    Before mounting &chimera; you will need to turn off the
+    <systemitem class='service'>portmap</systemitem> daemon.
+  </para>
+   <screen>&prompt-root; <userinput>/etc/init.d/portmap stop</userinput>
+Stopping portmap: portmap</screen>
+  <para>
+    and restart the domain in which the &nfs; server is running.
+  </para>
+  <informalexample>
+    <screen>&prompt-root;<userinput>/opt/d-cache/bin/dcache restart namespaceDomain</userinput></screen>
+  </informalexample>
+
+  <para>
     Now you can mount &chimera; by
   </para>
 
