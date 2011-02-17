@@ -333,13 +333,26 @@ Error user User [name=...] has no permission to delete 000100000000000000BAF0C0<
   <section id="intouch-admin">
     <title>The Admin Interface</title>
 
+    <note>
+      <para>
+	If you attempt to log into the admin interface without
+	generating the &ssh;-keys you will get an error message.
+      </para>
+      <screen>&prompt-user; <userinput>ssh -c blowfish -p 22223 -l admin headnode.example.org</userinput>
+Connection closed by 192.0.2.11</screen>
+      <para>
+	See <xref linkend="in-install-ssh-keys" />.
+      </para>
+    </note>
+
+
     <para>
       &dcache; has a powerful administration interface. It is accessed
       with the &ssh; protocol. The server is part of the
       &domain-adminDoor; domain. Connect to it with
     </para>
 
-    <screen>&prompt-user; <userinput>ssh -c blowfish -p 22223 -l admin <replaceable>headNode</replaceable></userinput></screen>
+    <screen>&prompt-user; <userinput>ssh -c blowfish -p 22223 -l admin headnode.example.org</userinput></screen>
 
     <para>
       The initial password is
