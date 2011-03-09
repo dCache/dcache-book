@@ -673,11 +673,26 @@ Starting dCacheDomain done</screen>
 	created automatically when &dcache; is started.
       </para>
 
+       <note>
+        <title>Mind the Gap!</title>
+	<para>
+	  The default gap for poolsizes is 4GiB. This means you should
+	  make a bigger pool than 4GiB otherwise you would have to
+	  change this gap in the &dcache; admin tool. See the example
+	  below.  See also <xref linkend="intouch-admin"/>.
+	</para>
+
+	<screen>&dc-prompt-local; <userinput>cd <replaceable>poolName</replaceable></userinput>
+&dc-prompt-pool; <userinput>set gap 2G</userinput>
+&dc-prompt-pool; <userinput>save</userinput></screen>
+       </note>
+
       <informalexample>
       <para>
 	Consider the following example for adding a pool to a &dcache; layout file.
       </para>
-	<programlisting>[${host.name}Domain/pool]
+	<programlisting>[${host.name}Domain]
+[${host.name}Domain/pool]
 name=pool1
 path=/path/to/pool1
 waitForFiles=${path}/data
@@ -722,19 +737,23 @@ maxDiskSpace=2T</programlisting>
 	the data in it and can thus safely be undone or repeated.
       </para>
 
-       <note>
-        <title>Mind the Gap!</title>
+      <informalexample>
 	<para>
-	  The default gap for poolsizes is 4GiB. This means you should
-	  make a bigger pool than 4GiB otherwise you would have to
-	  change this gap in the &dcache; admin tool. See the example
-	  below.  See also <xref linkend="intouch-admin"/>.
+	  This is an example of a layout file which defines two pools.
 	</para>
+	<programlisting>[${host.name}Domain]
+[${host.name}Domain/pool]
+name=pool1
+path=/srv/dcache/pool1
+waitForFiles=${path}/data
+maxDiskSpace=2T
+[${host.name}Domain/pool]
+name=pool2
+path=/srv/dcache/pool2
+waitForFiles=${path}/data
+maxDiskSpace=2T</programlisting>
+      </informalexample>
 
-	<screen>&dc-prompt-local; <userinput>cd <replaceable>poolName</replaceable></userinput>
-&dc-prompt-pool; <userinput>set gap 2G</userinput>
-&dc-prompt-pool; <userinput>save</userinput></screen>
-       </note>
       </section>
 
       <section id="in-install-configure-doors">
