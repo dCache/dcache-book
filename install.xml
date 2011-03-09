@@ -583,7 +583,7 @@ maxDiskSpace=2T</programlisting>
 	<para>
 	  This is an example of a layout file which defines two pools.
 	</para>
-	<programlisting>>[${host.name}Domain]
+	<programlisting>[${host.name}Domain]
 [${host.name}Domain/pool]
 name=pool1
 path=/srv/dcache/pool1
