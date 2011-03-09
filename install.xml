@@ -540,7 +540,8 @@ Starting dCacheDomain done</screen>
       <para>
 	and define the pool in the layout file.
       </para>
-	<programlisting>[${host.name}Domain/pool]
+	<programlisting>[${host.name}Domain]
+[${host.name}Domain/pool]
 name=pool1
 path=/srv/dcache/pool1
 waitForFiles=${path}/data
@@ -584,6 +585,23 @@ maxDiskSpace=2T</programlisting>
 	Adding a pool to a configuration does not modify the pool or
 	the data in it and can thus safely be undone or repeated.
       </para>
+
+      <informalexample>
+	<para>
+	  This is an example of a layout file which defines two pools.
+	</para>
+	<programlisting>>[${host.name}Domain]
+[${host.name}Domain/pool]
+name=pool1
+path=/srv/dcache/pool1
+waitForFiles=${path}/data
+maxDiskSpace=2T
+[${host.name}Domain/pool]
+name=pool2
+path=/srv/dcache/pool2
+waitForFiles=${path}/data
+maxDiskSpace=2T</programlisting>
+      </informalexample>
 
       </section>
 
