@@ -212,6 +212,7 @@ CREATE DATABASE
 Enter password for new role:
 Enter it again:
 CREATE ROLE
+<lineannotation>You do not need to enter a password.</lineannotation>
 
 &prompt-root; <userinput>psql -U chimera chimera -f /opt/d-cache/libexec/chimera/sql/create.sql</userinput>
 psql:/opt/d-cache/libexec/chimera/sql/create.sql:23: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_inodes_pkey" for table "t_inodes"
@@ -266,7 +267,8 @@ CREATE TRIGGER
           example:
          </para>
 
-         <screen>&prompt-root; <userinput>createuser -U postgres --no-superuser --no-createrole --createdb --pwprompt srmdcache</userinput></screen>
+         <screen>&prompt-root; <userinput>createuser -U postgres --no-superuser --no-createrole --createdb --pwprompt srmdcache</userinput>
+<lineannotation>You do not need to enter a password</lineannotation></screen>
 
          <para>
           Several management components running on the head node as
