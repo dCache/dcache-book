@@ -40,6 +40,9 @@
 	  <programlisting>[dCacheDomain]
 [dCacheDomain/dcap]</programlisting>
         </informalexample>
+	<note>
+	  If &glite; is installed you do not need to install the &dcap; library.
+	</note>
 
         <para>
 	  Install the &dcap; library and the &dcap; client from <ulink
@@ -94,6 +97,12 @@
 	  </para>
 	  <programlisting>/ localhost(rw)
 /data</programlisting>
+
+          <para>
+	    stop the portmapper
+	  </para>
+	  <screen>&prompt-root; <userinput>/etc/init.d/portmap stop</userinput>
+Stopping portmap: portmap</screen>
 
           <para>
 	    and restart &dcache;.
