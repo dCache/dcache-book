@@ -33,6 +33,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY tomcat       "<productname>Tomcat</productname>">
 <!ENTITY jetty        "<productname>Jetty</productname>">
 <!ENTITY sunjvm        "<productname>Sun JVM</productname>">
+<!ENTITY glite        "<productname>gLite</productname>">
 
 <!-- Various domains -->
 <!ENTITY domain-http      "<literal>httpDomain</literal>">
