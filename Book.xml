@@ -9,7 +9,7 @@
       xmlns:xi="http://www.w3.org/2001/XInclude">
 
   <title>The dCache Book</title>
-  <subtitle>for 1.9.10-series</subtitle>
+  <subtitle>for &dcache-version;-series</subtitle>
   <titleabbrev>dCache Book</titleabbrev>
 
   <bookinfo>
