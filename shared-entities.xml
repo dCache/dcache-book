@@ -69,7 +69,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY cell-info-provider "<literal>infoProvider</literal>">
 <!ENTITY cell-topo          "<literal>topo</literal>">
 <!ENTITY cell-nfsv3         "<literal>nfsv3</literal>">
-<!ENTITY cell-nfsv4         "<literal>nfsv4</literal>">
+<!ENTITY cell-nfsv41         "<literal>nfsv41</literal>">
 <!ENTITY cell-webDAV         "<literal>WebDAV</literal>">
 <!ENTITY cell-webadmin         "<literal>Webadmin</literal>">
 <!ENTITY cell-srm             "<literal>SRM</literal>">
