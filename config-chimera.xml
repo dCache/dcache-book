@@ -58,9 +58,6 @@
       <programlisting>[namespaceDomain]
 [namespaceDomain/pnfsmanager]
 [namespaceDomain/nfsv41]</programlisting>
-      <para>
-	The &cell-nfsv41; service provides both an &nfs3; and &nfs4; server.
-      </para>
     </informalexample>
 
       <para>
