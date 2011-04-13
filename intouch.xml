@@ -23,21 +23,6 @@
     <title>Checking the Functionality</title>
 
     <para>
-      First, we will get used to the client tools. On the &dcache;
-      head node, change into the &pnfs; directory, where the users
-      are going to store their data:
-    </para>
-
-    <screen>&prompt-user; <userinput>cd /pnfs/<replaceable>site.de</replaceable>/data/</userinput>
-&prompt-user;</screen>
-
-    <para>
-      The mounted &chimera; filesystem is not intended for reading or
-      writing actual data with regular file operations via the NFS
-      protocol.
-    </para>
-
-    <para>
       Reading and writing data to and from a &dcache; instance can be
       done with a number of protocols. After a standard installation,
       these protocols are &dcap;, &gsidcap;, and &gridftp;. In
@@ -45,121 +30,411 @@
       protocol which negotiates the actual data transfer protocol.
     </para>
 
+    <section id="intouch-client-dcap">
+      <title>&dcap;</title>
+      <para>
+	To be able to use &dcap; you need to have the &dcap; door
+	running in a domain.
+	</para>
+	<informalexample>
+	  <programlisting>[dCacheDomain]
+[dCacheDomain/dcap]</programlisting>
+        </informalexample>
+
+	<para>
+	  For this tutorial install &dcap; on your worker node. This
+	  can be the machine where your &dcache; is running.
+	</para>
+
+        <para>
+	  Get the &glite; repository (which contains &dcap;) and
+	  install &dcap; using <command>yum</command>.
+	</para>
+	<screen>&prompt-root;<userinput> cd /etc/yum.repos.d/</userinput>
+&prompt-root;<userinput> wget http://grid-deployment.web.cern.ch/grid-deployment/glite/repos/3.2/glite-UI.repo</userinput>
+&prompt-root; <userinput>yum install dcap</userinput></screen>
+
+
+	<para>
+	  Now set the <envar>PATH</envar> environment variable.
+	</para>
+	<screen>&prompt-root; <userinput>export PATH=/opt/d-cache/dcap/bin/:$PATH</userinput></screen>
+	<section id="dcap-unmounted">
+	  <title>&dcap; without mounted namespace</title>
+	  <para>
+	    Create the root of the &chimera; namespace and a
+	    world-writable directory for &dcap; to write into by
+	  </para>
+	  <screen>&prompt-root; <userinput>/opt/d-cache/bin/chimera-cli.sh mkdir /data</userinput>
+&prompt-root; <userinput>/opt/d-cache/bin/chimera-cli.sh mkdir /data/world-writable</userinput>
+&prompt-root; <userinput>/opt/d-cache/bin/chimera-cli.sh chmod /data/world-writable 777</userinput></screen>
+
+          <para>
+	   Copy the data (here <filename>/bin/sh</filename> is used as
+	   example data) using the &prog-dccp; command and the &dcap;
+	   protocol describing the location of the file using a URL,
+	   where <replaceable>dcap-door.example.org</replaceable> is
+	   the host on which the domain hosting the &dcap; door is
+	   running
+	  </para>
+	  <screen>&prompt-root; <userinput>dccp -H /bin/sh dcap://<replaceable>dcap-door.example.org</replaceable>/data/world-writable/my-test-file-1</userinput>
+[##########################################################################################] 100% 718 kiB
+735004 bytes (718 kiB) in 0 seconds</screen>
+
+         <para>
+	  and copy the file back.
+	 </para>
+	 <screen>&prompt-root; <userinput>dccp -H dcap://<replaceable>dcap-door.example.org</replaceable>/data/world-writable/my-test-file-1 /tmp/mytestfile1</userinput>
+[##########################################################################################] 100% 718 kiB
+735004 bytes (718 kiB) in 0 seconds</screen>
+
+        <para>
+	  To remove the file you will need to mount the namespace.
+	</para>
+	</section>
+
+	<section id="dcap-mounted">
+	  <title>Using &dcap; with a mounted filesystem</title>
+	  <para>
+	    &dcap; can also be used with a mounted file system.
+	    Before mounting the name space you need to edit the
+	    <filename>/etc/exports</filename> file. Add the lines
+	  </para>
+	  <programlisting>/ localhost(rw)
+/data</programlisting>
+
+          <para>
+	    stop the portmapper
+	  </para>
+	  <screen>&prompt-root; <userinput>/etc/init.d/portmap stop</userinput>
+Stopping portmap: portmap</screen>
+
+          <para>
+	    and restart &dcache;.
+	  </para>
+	  <screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache restart</userinput></screen>
+
+	  <para>
+	    Now you can mount &chimera;.
+	  </para>
+	  <screen>&prompt-root; <userinput>mount localhost:/ /mnt</userinput></screen>
+
+	  <para>
+	    With the root of the namespace mounted you can establish
+	    wormhole files so &dcap; clients can discover the &dcap;
+	    doors.
+<!-- TODO: Add link to section with wormholes as soon as available for chimera -->
+	  </para>
+
+	  <screen>&prompt-root; <userinput>mkdir /mnt/admin/etc/config/dCache</userinput>
+&prompt-root; <userinput>touch /mnt/admin/etc/config/dCache/dcache.conf</userinput>
+&prompt-root; <userinput>touch /mnt/admin/etc/config/dCache/'.(fset)(dcache.conf)(io)(on)'</userinput>
+&prompt-root; <userinput>echo "<replaceable>dcap-door.example.org</replaceable>:22125" > /mnt/admin/etc/config/dCache/dcache.conf</userinput></screen>
+
+          <para>
+	    Create the directory in which the users are going to
+	    store their data and change to this directory.
+	  </para>
+	  <screen>&prompt-root; <userinput>mkdir -p /mnt/data</userinput>
+&prompt-root; <userinput>cd /mnt/data</userinput></screen>
+
+          <para>
+	    Now you can copy a file into your &dcache;
+	  </para>
+	  <screen>&prompt-root; <userinput>dccp /bin/sh my-test-file-2</userinput>
+735004 bytes (718 kiB) in 0 seconds</screen>
+
+	  <para>
+	    and copy the data back using the &prog-dccp; command.
+	  </para>
+
+	 <screen>&prompt-root; <userinput>dccp my-test-file-2 /tmp/mytestfile2</userinput>
+735004 bytes (718 kiB) in 0 seconds</screen>
+
+         <para>
+	   The file has been transferred succesfully.
+	 </para>
+	 <para>
+	   Now remove the file from the &dcache;.
+	 </para>
+	 <screen>&prompt-root; <userinput>rm  my-test-file-2</userinput></screen>
+
+	</section>
+
+      </section>
+  </section>
+
+  <section id="intouch-certificates">
+    <title>Authentication and Authorization in &dcache;</title>
     <para>
-      We will first try &dcap; with the <command>dccp</command>
-      command:
+      In &dcache; digital certificates are used for authentication and
+      authorisation. To be able to verify the chain of trust when
+      using the non-commercial grid-certificates you should install
+      the list of certificates of grid Certification Authorities
+      (CAs). In case you are using commercial certificates you will
+      find the list of CAs in your browser.
+    </para>
+    <screen>&prompt-root; <userinput>wget http://grid-deployment.web.cern.ch/grid-deployment/glite/repos/3.2/lcg-CA.repo</userinput>
+--2011-02-10 10:26:10--  http://grid-deployment.web.cern.ch/grid-deployment/glite/repos/3.2/lcg-CA.repo
+Resolving grid-deployment.web.cern.ch... 137.138.142.33, 137.138.139.19
+Connecting to grid-deployment.web.cern.ch|137.138.142.33|:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 449 [text/plain]
+Saving to: `lcg-CA.repo'
+
+100%[====================================================================>] 449         --.-K/s   in 0s
+
+2011-02-10 10:26:10 (61.2 MB/s) - `lcg-CA.repo' saved [449/449]
+&prompt-root; <userinput>mv lcg-CA.repo /etc/yum.repos.d/</userinput>
+&prompt-root; <userinput>yum install lcg-CA</userinput>
+Loaded plugins: allowdowngrade, changelog, kernel-module
+CA                                                                                     |  951 B     00:00
+CA/primary                                                                             |  15 kB     00:00
+CA
+...</screen>
+
+    <para>
+      You will need a server certificate for the host on which your
+      &dcache; is running and a user certificate. The host certificate
+      needs to be copied to the directory <filename
+      class='directory'>/etc/grid-security/</filename> on your server
+      and converted to <filename>hostcert.pem</filename> and
+      <filename>hostkey.pem</filename><!-- as described in <link
+      linkend='cf-gplazma-certificates'>Using X.509
+      Certificates</link>-->. Your user certificate is usually located in
+      <filename class='directory'>.globus</filename>. If it is not
+      there you should copy it from your browser to <filename
+      class='directory'>.globus</filename> and convert the
+      <filename>*.p12</filename> file to
+      <filename>usercert.pem</filename> and
+      <filename>userkey.pem</filename>.
     </para>
 
-    <screen>&prompt-user; <userinput>export PATH=/opt/d-cache/dcap/bin/:$PATH</userinput>
-&prompt-user; <userinput>cd /pnfs/<replaceable>site.de</replaceable>/data/</userinput>
-&prompt-user; <userinput>dccp /bin/sh my-test-file</userinput>
-541096 bytes in 0 seconds</screen>
+
+    <informalexample>
+    <para>
+      If you have the clients installed on the machine on which your
+      &dcache; is running you will need to add a user to that machine
+      in order to be able to execute the
+      <command>voms-proxy-init</command> command and execute
+      <command>voms-proxy-init</command> as this user.
+
+    </para>
+    <screen>&prompt-root;<userinput> useradd johndoe</userinput></screen>
 
     <para>
-      This command succeeds if the user <systemitem
-      class="username">user</systemitem> has the Unix rights to write
-      to the current directory <filename
-      class="directory">/pnfs/<replaceable>site.de</replaceable>/data/</filename>.
+      Change the password of the new user in order to be able to copy files to this account.
     </para>
+    <screen>&prompt-root; <userinput>passwd johndoe</userinput>
+Changing password for user johndoe.
+New UNIX password:
+Retype new UNIX password:
+passwd: all authentication tokens updated successfully.
+&prompt-root; <userinput>su johndoe</userinput>
+&prompt-user; <userinput>cd</userinput>
+&prompt-user; <userinput>mkdir .globus</userinput></screen>
 
     <para>
-      The dccp command also accepts URLs.  We can copy the data back
-      using the dccp command and the &dcap; protocol but this time
-      describing the location of the file using a URL.
+      Copy your key files from your local machine to the new user on
+      the machine where the &dcache; is running.
     </para>
-
-    <screen>&prompt-user; <userinput>dccp dcap://<replaceable>adminNode</replaceable>/pnfs/<replaceable>site.de</replaceable>/data/my-test-file /tmp/test.tmp</userinput>
-541096 bytes in 0 seconds</screen>
+    <screen>&prompt-user; <userinput>scp .globus/user*.pem johndoe@<replaceable>example.org</replaceable>:.globus</userinput></screen>
+    </informalexample>
 
     <para>
-      However, this command only succeeds if the file is world
-      readable.  The following shows how to ensure the file is
-      <emphasis>not</emphasis> world readable and illustrates dccp
-      consequently failing to copy the file.
+      Install glite-security-voms-clients (contained in the &glite;-UI).
     </para>
-
-    <screen>&prompt-user; <userinput>chmod o-r my-test-file</userinput>
-&prompt-user; <userinput>dccp dcap://<replaceable>adminNode</replaceable>/pnfs/<replaceable>site.de</replaceable>/data/my-test-file /tmp/test2.tmp</userinput>
-Command failed!
-Server error message for [1]: "Permission denied" (errno 2).
-Failed open file in the dCache.
-Can't open source file : "Permission denied"
-System error: Input/output error</screen>
+    <screen>&prompt-root; <userinput>yum install glite-security-voms-clients</userinput></screen>
 
     <para>
-      This command did not succeed, because &dcap; access is
-      unauthenticated and the user is mapped to a non-existent user in
-      order to determine the access rights. However, you should be
-      able to access the file with the NFS mount:
+      Set the <envar>PATH</envar> and <envar>LD_LIBRARY_PATH</envar>
+      environment variables and generate a proxy certificate using the
+      command <command>voms-proxy-init</command><!--(see <xref
+      linkend="cb-voms-proxy"/>)-->.
     </para>
+    <informalexample>
+    <screen>&prompt-user; <userinput>export PATH=$PATH:/opt/glite/bin/</userinput>
+&prompt-user; <userinput>export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/d-cache/dcap/lib64</userinput>
+&prompt-user; <userinput>voms-proxy-init</userinput>
+Enter GRID pass phrase:
+Your identity: /C=DE/O=GermanGrid/OU=DESY/CN=John Doe
 
-    <screen>&prompt-user; <userinput>dccp my-test-file /tmp/test2.tmp</userinput>
-541096 bytes in 0 seconds</screen>
+Creating proxy .............................................. Done
+Your proxy is valid until Mon Mar  7 22:06:15 2011</screen>
+    </informalexample>
 
     <para>
-      If you have a valid grid proxy with a certificate subject which
-      is properly mapped in the configuration file
-      <filename>/opt/d-cache/etc/dcache.kpwd</filename> you can also
-      try grid-authenticated access via the GSI-authenticated version
-      of &dcap;:
+     With <command>voms-proxy-init -voms
+     <replaceable>yourVO</replaceable></command> you can add VOMS
+     attributes to the proxy. A user's roles (Fully Qualified
+     Attribute Names) are read from the certificate chain found within
+     the proxy. These attributes are signed by the user's VOMS server
+     when the proxy is created. For the <command>voms-proxy-init -voms
+     </command> command you need to have the file
+     <filename>/opt/glite/etc/vomses</filename> which contains entries
+     about the VOMS servers like
     </para>
 
-    <screen>&prompt-user; <userinput>chgrp <replaceable>yourVO</replaceable> my-test-file</userinput>
-&prompt-user; <userinput>export LD_LIBRARY_PATH=/opt/d-cache/dcap/lib/:$LD_LIBRARY_PATH</userinput>
-&prompt-user; <userinput>dccp gsidcap://<replaceable>adminNode</replaceable>:22128/pnfs/<replaceable>site.de</replaceable>/data/my-test-file /tmp/test3.tmp</userinput>
-541096 bytes in 0 seconds</screen>
+    <informalexample>
+      <programlisting>"desy" "grid-voms.desy.de" "15104" "/C=DE/O=GermanGrid/OU=DESY/CN=host/grid-voms.desy.de" "desy" "24"
+"atlas" "voms.cern.ch" "15001" "/DC=ch/DC=cern/OU=computers/CN=voms.cern.ch" "atlas" "24"
+"dteam" "lcg-voms.cern.ch" "15004" "/DC=ch/DC=cern/OU=computers/CN=lcg-voms.cern.ch" "dteam" "24"
+"dteam" "voms.cern.ch" "15004" "/DC=ch/DC=cern/OU=computers/CN=voms.cern.ch" "dteam" "24"
+      </programlisting>
+    </informalexample>
 
     <para>
-      Or we let the &srm; negotiate the protocol:
+      Now you can generate your voms proxy containing your VO.
     </para>
 
-    <screen>&prompt-user; <userinput>export PATH=/opt/d-cache/srm/bin/:$PATH</userinput>
-&prompt-user; <userinput>srmcp srm://<replaceable>adminNode</replaceable>:8443/pnfs/desy.de/data/my-test-file file:////tmp/test4.tmp</userinput>
-configuration file not found, configuring srmcp
-created configuration file in ~/.srmconfig/config.xml</screen>
+    <informalexample>
+      <screen>&prompt-user; <userinput>voms-proxy-init -voms desy</userinput>
+Enter GRID pass phrase:
+Your identity: /C=DE/O=GermanGrid/OU=DESY/CN=John Doe
+Creating temporary proxy ................................... Done
+Contacting  grid-voms.desy.de:15104 [/C=DE/O=GermanGrid/OU=DESY/CN=host/grid-voms.desy.de] "desy" Done
+Creating proxy .................... Done
+Your proxy is valid until Thu Mar 31 21:49:06 2011</screen>
+    </informalexample>
 
     <para>
-      If the &dcache; instance is registered as a storage element in
-      the LCG/EGEE grid and the LCG user interface software is
-      available the file can be accessed via &srm;:
+      In this tutorial we will use the <link
+      linkend='cf-gplazma-vorole'>gplazmalite-vorole-mapping
+      plugin</link>. To this end you need to edit the
+      <filename>/etc/grid-security/grid-vorolemap</filename> and the
+      <filename>/etc/grid-security/storage-authzdb</filename> as well
+      as the
+      <filename>/opt/d-cache/etc/dcachesrm-gplazma.policy</filename>.
     </para>
+    <informalexample>
+      <para>
+	The <filename>/etc/grid-security/grid-vorolemap</filename>:
+      </para>
+      <programlisting>"/C=DE/O=GermanGrid/OU=DESY/CN=John Doe" "/desy" doegroup</programlisting>
 
-    <screen>&prompt-user; <userinput>lcg-cp -v --vo <replaceable>yourVO</replaceable> \
-srm://<replaceable>dCacheAdminFQN</replaceable>/pnfs/<replaceable>site.de</replaceable>/data/my-test-file \
-file:///tmp/test5.tmp</userinput>
-Source URL: srm://<replaceable>dCacheAdminFQN</replaceable>/pnfs/<replaceable>site.de</replaceable>/data/my-test-file
-File size: 541096
-Source URL for copy: gsiftp://<replaceable>dCacheAdminFQN</replaceable>:2811//pnfs/site.de/data/my-test-file
-Destination URL: file:///tmp/test5.tmp
-# streams: 1
-Transfer took 770 ms</screen>
+      <para>
+	The <filename>/etc/grid-security/storage-authzdb</filename>:
+      </para>
+      <programlisting>version 2.1
 
-    <para>
-      and it can be deleted with the help of the &srm; interface:
-    </para>
+authorize  doegroup read-write 12345 1234 / / /</programlisting>
 
-    <screen>&prompt-user; <userinput>srm-advisory-delete srm://<replaceable>dCacheAdminFQN</replaceable>:8443/pnfs/<replaceable>site.de</replaceable>/data/my-test-file</userinput>
- srmcp error :  advisoryDelete(User [name=...],pnfs/<replaceable>site.de</replaceable>/data/my-test-file)
-Error user User [name=...] has no permission to delete 000100000000000000BAF0C0</screen>
+      <para>
+	The <filename>/opt/d-cache/etc/dcachesrm-gplazma.policy</filename>:
+      </para>
+      <programlisting># Switches
+xacml-vo-mapping="OFF"
+saml-vo-mapping="OFF"
+kpwd="OFF"
+grid-mapfile="OFF"
+gplazmalite-vorole-mapping="ON"
 
-    <para>
-      This works only if the grid certificate subject is mapped to a
-      user which has permissions to delete the file:
-    </para>
+# Priorities
+xacml-vo-mapping-priority="5"
+saml-vo-mapping-priority="2"
+kpwd-priority="3"
+grid-mapfile-priority="4"
+gplazmalite-vorole-mapping-priority="1"
+      </programlisting>
 
-    <screen>&prompt-user; <userinput>chown <replaceable>yourVO</replaceable>001 my-test-file</userinput>
-&prompt-user; <userinput>srm-advisory-delete srm://<replaceable>dCacheAdminFQN</replaceable>:8443/pnfs/<replaceable>site.de</replaceable>/data/my-test-file</userinput></screen>
-
-    <para>
-      If the grid functionality is not required the file can be
-      deleted with the NFS mount of the &pnfs; filesystem:
-    </para>
-
-    <screen>&prompt-user; <userinput>rm <filename>my-test-file</filename></userinput></screen>
+    </informalexample>
 
   </section>
 
+  <section id="intouch-sec-dcache">
+    <title>How to work with secured &dcache;</title>
 
+    <section id="intouch-client-gsidcap">
+      <title>&gsidcap;</title>
+
+      <para>
+	To be able to use &gsidcap; you need to have
+	<systemitem>libdcap-tunnel-gsi</systemitem> installed, which
+	is contained in the &glite;-UI.
+      </para>
+
+      <note>
+	<para>
+	  As ScientificLinux 5  32bit is not supported by &glite; there is no
+	  <systemitem>libdcap-tunnel-gsi</systemitem> for SL5 32bit.
+	</para>
+      </note>
+
+      <screen>&prompt-root; <userinput>yum install libdcap-tunnel-gsi</userinput></screen>
+
+      <para>
+	It is also available on the <ulink
+	url="http://www.dcache.org/downloads/dcap/">&dcap; downloads
+	page</ulink>.
+      </para>
+      <informalexample>
+	<screen>&prompt-root; <userinput>rpm -i http://www.dcache.org/repository/yum/sl5/x86_64/RPMS.stable//libdcap-tunnel-gsi-2.47.5-0.x86_64.rpm</userinput></screen>
+      </informalexample>
+
+      <para>
+	In order to use the shared libraries, you need to set the
+	<envar>LD_LIBRARY_PATH</envar> environment variable.
+      </para>
+
+      <screen>&prompt-user; <userinput>export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/globus/lib</userinput></screen>
+
+      <para>
+	The machine running the &gsidcap; door needs to have a host
+	certificate and you need to have a valid user certificate. In
+	addition, you should have created a voms proxy as mentioned
+	<link linkend='intouch-certificates'>above</link>.
+      </para>
+
+      <para>
+	Now you can copy a file into your &dcache; using &gsidcap;
+      </para>
+      <screen>&prompt-user; <userinput>dccp /bin/sh gsidcap://<replaceable>dcap-door.example.org</replaceable>:22128/data/world-writable/my-test-file3</userinput>
+801512 bytes in 0 seconds</screen>
+      <para>
+	and copy it back
+      </para>
+      <screen>&prompt-user; <userinput>dccp gsidcap://<replaceable>dcap-door.example.org</replaceable>:22128/data/world-writable/my-test-file3 /tmp/mytestfile3.tmp</userinput>
+801512 bytes in 0 seconds</screen>
+
+    </section>
+
+     <section id="intouch-client-srm">
+	<title>&srm;</title>
+
+    <para>
+      Or we let the &srm; negotiate the protocol.  To this end install
+      the <systemitem>dcache-srmclient</systemitem> which is contained
+      in the &glite;-UI and set the <envar>PATH</envar> environment
+      variable.
+    </para>
+    <screen>&prompt-root; <userinput>yum install dcache-srmclient</userinput>
+&prompt-root; <userinput>export PATH=/opt/d-cache/srm/bin/:$PATH</userinput></screen>
+
+    <para>
+      You can now copy a file into your &dcache; using the &srm;,
+    </para>
+    <screen>&prompt-user; <userinput>srmcp -2 file:////bin/sh srm://<replaceable>example.org</replaceable>:8443/data/world-writable/my-test-file4</userinput></screen>
+    <para>
+      copy it back
+    </para>
+<screen>&prompt-user; <userinput>srmcp -2 srm://<replaceable>example.org</replaceable>:8443/data/world-writable/my-test-file4 file:////tmp/mytestfile4.tmp</userinput></screen>
+
+    <para>
+      and delete it
+    </para>
+
+    <screen>&prompt-user; <userinput>srmrm -2 srm://<replaceable>example.org</replaceable>:8443/data/world-writable/my-test-file4</userinput></screen>
+
+     <para>
+       If the grid functionality is not required the file can be
+       deleted with the &nfs; mount of the &chimera; namespace:
+     </para>
+
+    <screen>&prompt-user; <userinput>rm <filename>/data/world-writable/my-test-file4</filename></userinput></screen>
+
+      </section>
+
+  </section>
 
   <section id="intouch-web">
     <title>The Web Interface for Monitoring &dcache;</title>
@@ -254,6 +529,7 @@ Error user User [name=...] has no permission to delete 000100000000000000BAF0C0<
     copytruncate
 }</programlisting>
 
+<!-- TODO new config -->
     <para>
       The files
       <filename>config/<replaceable>domainName</replaceable>Setup</filename>
@@ -319,7 +595,7 @@ Error user User [name=...] has no permission to delete 000100000000000000BAF0C0<
     </para>
 
     <!--
-        TODO:
+        TODO: ???
         <para>
         <filename>certificate</filename>
         <filename>CAs</filename>
@@ -433,10 +709,10 @@ pam
 lm</screen>
 
     <para>
-    The cells in the domain can be accessed using <command>cd</command>
-    together with the cell-name scoped by the domain-name. So first, one has to
-    get back to the local prompt, as the <command>cd</command> command will not
-    work otherwise.
+      The cells in the domain can be accessed using
+      <command>cd</command> together with the cell-name scoped by the
+      domain-name. So first, one has to get back to the local prompt,
+      as the <command>cd</command> command will not work otherwise.
     </para>
 
     <screen>&dc-prompt-admindoor; <userinput>..</userinput>
@@ -444,19 +720,19 @@ lm</screen>
 &dc-prompt-skmadmin;</screen>
 
     <note>
-    <para>
-    If the cells are <firstterm>well-known</firstterm>, they can be accessed
-    without adding the domain-scope. See <xref linkend="cf-cellpackage" /> for
-    more information.
-    </para>
+      <para>
+	If the cells are <firstterm>well-known</firstterm>, they can
+	be accessed without adding the domain-scope. See <xref
+	linkend="cf-cellpackage" /> for more information.
+      </para>
     </note>
 
     <para>
-        The domains that are running on the &dcache;-instance, can be viewed
-        in the layout-configuration (see <xref linkend="in" />). Additionally,
-        there is the &cell-topo; cell, which keeps track of the instance's
-        domain topology. If it is running, it can be used to obtain the list of
-        domains the following way:
+      The domains that are running on the &dcache;-instance, can be
+      viewed in the layout-configuration (see <xref linkend="in"
+      />). Additionally, there is the &cell-topo; cell, which keeps
+      track of the instance's domain topology. If it is running, it
+      can be used to obtain the list of domains the following way:
     </para>
 
     <screen>&dc-prompt-local; <userinput>cd topo</userinput>
@@ -474,11 +750,11 @@ statisticsDomain
 namespaceDomain</screen>
 
     <note>
-    <para>
+      <para>
         The &cell-topo; cell rescans periodically which domains are running, so
         it can take some time until <command>ls</command> displays the full
         domain list.
-    </para>
+      </para>
     </note>
 
     <para>
@@ -610,7 +886,7 @@ Identity added: /home/<replaceable>user</replaceable>/.ssh/identity (SSH1 key of
     </para>
 
     <para>
-      Now, the ssh program should not ask for a password anymore. This
+      Now, the &ssh; program should not ask for a password anymore. This
       is still quite secure, since the unencrypted private key is only
       held in the memory of the <command>ssh-agent</command>. It can
       be removed from it with
@@ -640,7 +916,7 @@ logoff
 EOF</programlisting>
 
     <para>
-      or, the equivalient as stdin.
+      or, the equivalent as stdin.
     </para>
 
     <programlisting>#!/bin/bash
@@ -657,10 +933,10 @@ echo -e 'cd <replaceable>pool_1</replaceable>\nrep ls\n<lineannotation>(more com
   <title>The Graphical User Interface</title>
 
     <para>
-      Instead of using <command>ssh</command> to access the admin
-      interface, the &dcache; graphical user interface can be used. If
-      it is not included in the &dcache; distribution, it can be
-      downloaded from the <ulink url="http://www.dcache.org/">&dcache;
+      Instead of using &ssh; to access the admin interface, the
+      &dcache; graphical user interface can be used. If it is not
+      included in the &dcache; distribution, it can be downloaded from
+      the <ulink url="http://www.dcache.org/">&dcache;
       homepage</ulink>. It is started by
     </para>
 
@@ -682,7 +958,7 @@ echo -e 'cd <replaceable>pool_1</replaceable>\nrep ls\n<lineannotation>(more com
       are ready to log in. Pressing the right mouse button clicking
       <guibutton>Login</guibutton> will scan the &dcache; instance for
       domains. Cells can be reached by clicking on their name and the
-      same commands can be entered as in the SSH login.
+      same commands can be entered as in the &ssh; login.
     </para>
 
     <para>
