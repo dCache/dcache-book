@@ -199,9 +199,9 @@ CA
       needs to be copied to the directory <filename
       class='directory'>/etc/grid-security/</filename> on your server
       and converted to <filename>hostcert.pem</filename> and
-      <filename>hostkey.pem</filename> as described in <link
+      <filename>hostkey.pem</filename><!-- as described in <link
       linkend='cf-gplazma-certificates'>Using X.509
-      Certificates</link>. Your user certificate is usually located in
+      Certificates</link>-->. Your user certificate is usually located in
       <filename class='directory'>.globus</filename>. If it is not
       there you should copy it from your browser to <filename
       class='directory'>.globus</filename> and convert the
@@ -380,9 +380,8 @@ gplazmalite-vorole-mapping-priority="1"
 
       <para>
 	The machine running the &gsidcap; door needs to have a host
-	certificate and you need to have a valid user
-	certificate. In addition, you should have created a <link
-	linkend='cb-voms-proxy-glite'>voms proxy</link> as mentioned
+	certificate and you need to have a valid user certificate. In
+	addition, you should have created a voms proxy as mentioned
 	<link linkend='intouch-certificates'>above</link>.
       </para>
 
