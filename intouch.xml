@@ -54,7 +54,6 @@
 &prompt-root;<userinput> wget http://grid-deployment.web.cern.ch/grid-deployment/glite/repos/3.2/glite-UI.repo</userinput>
 &prompt-root; <userinput>yum install dcap</userinput></screen>
 
-
 	<para>
 	  Now set the <envar>PATH</envar> environment variable.
 	</para>
@@ -73,18 +72,18 @@
 	   Copy the data (here <filename>/bin/sh</filename> is used as
 	   example data) using the &prog-dccp; command and the &dcap;
 	   protocol describing the location of the file using a URL,
-	   where <replaceable>dcap-door.example.org</replaceable> is
-	   the host on which the domain hosting the &dcap; door is
+	   where <replaceable>dcache.example.org</replaceable> is
+	   the host on which the &dcache; is
 	   running
 	  </para>
-	  <screen>&prompt-root; <userinput>dccp -H /bin/sh dcap://<replaceable>dcap-door.example.org</replaceable>/data/world-writable/my-test-file-1</userinput>
+	  <screen>&prompt-root; <userinput>dccp -H /bin/sh dcap://<replaceable>dcache.example.org</replaceable>/data/world-writable/my-test-file-1</userinput>
 [##########################################################################################] 100% 718 kiB
 735004 bytes (718 kiB) in 0 seconds</screen>
 
          <para>
 	  and copy the file back.
 	 </para>
-	 <screen>&prompt-root; <userinput>dccp -H dcap://<replaceable>dcap-door.example.org</replaceable>/data/world-writable/my-test-file-1 /tmp/mytestfile1</userinput>
+	 <screen>&prompt-root; <userinput>dccp -H dcap://<replaceable>dcache.example.org</replaceable>/data/world-writable/my-test-file-1 /tmp/mytestfile1</userinput>
 [##########################################################################################] 100% 718 kiB
 735004 bytes (718 kiB) in 0 seconds</screen>
 
@@ -129,7 +128,7 @@ Stopping portmap: portmap</screen>
 	  <screen>&prompt-root; <userinput>mkdir /mnt/admin/etc/config/dCache</userinput>
 &prompt-root; <userinput>touch /mnt/admin/etc/config/dCache/dcache.conf</userinput>
 &prompt-root; <userinput>touch /mnt/admin/etc/config/dCache/'.(fset)(dcache.conf)(io)(on)'</userinput>
-&prompt-root; <userinput>echo "<replaceable>dcap-door.example.org</replaceable>:22125" > /mnt/admin/etc/config/dCache/dcache.conf</userinput></screen>
+&prompt-root; <userinput>echo "<replaceable>dcache.example.org</replaceable>:22125" > /mnt/admin/etc/config/dCache/dcache.conf</userinput></screen>
 
           <para>
 	    Create the directory in which the users are going to
@@ -162,6 +161,41 @@ Stopping portmap: portmap</screen>
 	</section>
 
       </section>
+
+      <section id="intouch-client-webdav">
+	<title>&webdav;</title>
+	<para>
+	  To use &webdav; you need to define a &cell-webDAV; service
+	  in your layout file. You can define this service in an extra
+	  domain, e.g. <literal>[webdavDomain]</literal> or add it to another
+	  domain.
+	</para>
+	<programlisting>[webdavDomain]
+[webdavDomain/webdav]
+webdavAnonymousAccess=FULL
+webdavRootPath=/data/world-writable</programlisting>
+	<para>
+	  to the file <filename>/opt/d-cache/etc/layouts/mylayout.conf</filename>.
+	</para>
+
+        <para>
+	  You can also specifiy the last two lines in
+	  <filename>/opt/d-cache/etc/dcache.conf</filename>.
+	</para>
+
+        <para>
+	  Now you can start the &webdav; domain
+	</para>
+	<screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache start webdavDomain</userinput></screen>
+
+        <para>
+	  and access your files via
+	  <uri>http://<replaceable>dcache.example.org</replaceable>:2880</uri>
+	  with your browser.
+	</para>
+
+      </section>
+
   </section>
 
   <section id="intouch-certificates">
@@ -238,7 +272,7 @@ passwd: all authentication tokens updated successfully.
       Copy your key files from your local machine to the new user on
       the machine where the &dcache; is running.
     </para>
-    <screen>&prompt-user; <userinput>scp .globus/user*.pem johndoe@<replaceable>example.org</replaceable>:.globus</userinput></screen>
+    <screen>&prompt-user; <userinput>scp .globus/user*.pem johndoe@<replaceable>dcache.example.org</replaceable>:.globus</userinput></screen>
     </informalexample>
 
     <para>
@@ -389,12 +423,12 @@ gplazmalite-vorole-mapping-priority="1"
       <para>
 	Now you can copy a file into your &dcache; using &gsidcap;
       </para>
-      <screen>&prompt-user; <userinput>dccp /bin/sh gsidcap://<replaceable>dcap-door.example.org</replaceable>:22128/data/world-writable/my-test-file3</userinput>
+      <screen>&prompt-user; <userinput>dccp /bin/sh gsidcap://<replaceable>dcache.example.org</replaceable>:22128/data/world-writable/my-test-file3</userinput>
 801512 bytes in 0 seconds</screen>
       <para>
 	and copy it back
       </para>
-      <screen>&prompt-user; <userinput>dccp gsidcap://<replaceable>dcap-door.example.org</replaceable>:22128/data/world-writable/my-test-file3 /tmp/mytestfile3.tmp</userinput>
+      <screen>&prompt-user; <userinput>dccp gsidcap://<replaceable>dcache.example.org</replaceable>:22128/data/world-writable/my-test-file3 /tmp/mytestfile3.tmp</userinput>
 801512 bytes in 0 seconds</screen>
 
     </section>
@@ -402,41 +436,104 @@ gplazmalite-vorole-mapping-priority="1"
      <section id="intouch-client-srm">
 	<title>&srm;</title>
 
-    <para>
-      Or we let the &srm; negotiate the protocol.  To this end install
-      the <systemitem>dcache-srmclient</systemitem> which is contained
-      in the &glite;-UI and set the <envar>PATH</envar> environment
-      variable.
-    </para>
-    <screen>&prompt-root; <userinput>yum install dcache-srmclient</userinput>
+	<para>
+	  Or we let the &srm; negotiate the protocol.  To this end
+	  install the <systemitem>dcache-srmclient</systemitem> which
+	  is contained in the &glite;-UI and set the
+	  <envar>PATH</envar> environment variable.
+	</para>
+	<screen>&prompt-root; <userinput>yum install dcache-srmclient</userinput>
 &prompt-root; <userinput>export PATH=/opt/d-cache/srm/bin/:$PATH</userinput></screen>
 
-    <para>
-      You can now copy a file into your &dcache; using the &srm;,
-    </para>
-    <screen>&prompt-user; <userinput>srmcp -2 file:////bin/sh srm://<replaceable>example.org</replaceable>:8443/data/world-writable/my-test-file4</userinput></screen>
-    <para>
-      copy it back
-    </para>
-<screen>&prompt-user; <userinput>srmcp -2 srm://<replaceable>example.org</replaceable>:8443/data/world-writable/my-test-file4 file:////tmp/mytestfile4.tmp</userinput></screen>
+        <para>
+	  You can now copy a file into your &dcache; using the &srm;,
+	</para>
+	<screen>&prompt-user; <userinput>srmcp -2 file:////bin/sh srm://<replaceable>dcache.example.org</replaceable>:8443/data/world-writable/my-test-file4</userinput></screen>
+	<para>
+	  copy it back
+	</para>
+	<screen>&prompt-user; <userinput>srmcp -2 srm://<replaceable>dcache.example.org</replaceable>:8443/data/world-writable/my-test-file4 file:////tmp/mytestfile4.tmp</userinput></screen>
 
-    <para>
-      and delete it
-    </para>
+	<para>
+	  and delete it
+	</para>
 
-    <screen>&prompt-user; <userinput>srmrm -2 srm://<replaceable>example.org</replaceable>:8443/data/world-writable/my-test-file4</userinput></screen>
+	<screen>&prompt-user; <userinput>srmrm -2 srm://<replaceable>dcache.example.org</replaceable>:8443/data/world-writable/my-test-file4</userinput></screen>
 
-     <para>
-       If the grid functionality is not required the file can be
-       deleted with the &nfs; mount of the &chimera; namespace:
-     </para>
+	<para>
+	  If the grid functionality is not required the file can be
+	  deleted with the &nfs; mount of the &chimera; namespace:
+	</para>
 
-    <screen>&prompt-user; <userinput>rm <filename>/data/world-writable/my-test-file4</filename></userinput></screen>
+	<screen>&prompt-user; <userinput>rm <filename>/data/world-writable/my-test-file4</filename></userinput></screen>
 
-      </section>
+     </section>
 
-  </section>
+     <section id="intouch-client-https">
+       <title>&webdav; with certificates</title>
+       <para>
+	 To use &webdav; with certificates you change the entry in
+	 <filename>/opt/d-cache/etc/layouts/mylayout.conf</filename> from
+       </para>
 
+       <programlisting>[webdavDomain]
+[webdavDomain/webdav]
+webdavAnonymousAccess=FULL
+webdavRootPath=/data/world-writable</programlisting>
+       <para>
+	 to
+       </para>
+       <programlisting>[webdavDomain]
+[webdavDomain/webdav]
+webdavAnonymousAccess=NONE
+webdavRootPath=/data/world-writable
+webdavProtocol=https</programlisting>
+
+       <para>
+	 Then you will need to import the host certificate into the
+	 &dcache; keystore using the command
+       </para>
+       <screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache import hostcert</userinput></screen>
+       <para>
+	 and initialise your truststore by
+       </para>
+<screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache import cacerts</userinput></screen>
+
+       <para>
+	 Now you need to restart the &webdav; domain
+       </para>
+       <screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache restart webdavDomain</userinput></screen>
+       <para>
+	 and access your files via
+	 <uri>https://<replaceable>dcache.example.org</replaceable>:2880</uri>
+	 with your browser.
+       </para>
+
+       <section>
+	 <title>Allowing authenticated and non-authenticated access with &webdav;</title>
+	 <para>
+	   You can also choose to have secure and insecure access to
+	   your files at the same time. You might for example allow
+	   access without authentication for reading and access with
+	   authentication for reading and writing.
+	 </para>
+	 <programlisting>[webdavDomain]
+[webdavDomain/webdav]
+webdavRootPath=/data/world-writable
+webdavAnonymousAccess=READONLY
+port=2880
+webdavProtocol=https</programlisting>
+
+       <para>
+	You can access your files via
+	<uri>https://<replaceable>dcache.example.org</replaceable>:2880</uri>
+	with your browser.
+       </para>
+
+       </section>
+
+     </section>
+   </section>
   <section id="intouch-web">
     <title>The Web Interface for Monitoring &dcache;</title>
 
