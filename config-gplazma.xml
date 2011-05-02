@@ -6,32 +6,47 @@
 ]>
 <chapter id="cf-gplazma">
 
-<title>gPlazma authorization in &dcache;</title>
+<title>Authorization in &dcache;</title>
 
   <chapterinfo>
     <author>
       <firstname>Ted</firstname>
       <surname>Hesselroth</surname>
     </author>
+    <author>
+      <firstname>Antje</firstname>
+      <surname>Petersen</surname>
+    </author>
+
   </chapterinfo>
 
   <para>
-    &cell-gplazma; is a cell in &dcache; that authorizes users. Cells
-    make requests to &cell-gplazma; by submitting user credential
-    information to it, receiving the authorization decision and
-    site-specific user information such as uid, gid, and rootpath in
-    return.
+    Authorization in &dcache; is done via &cell-gplazma; using
+    grid-certificates. Cells make requests to &cell-gplazma; by
+    submitting user credential information to it, receiving the
+    authorization decision and site-specific user information such as
+    uid, gid, and rootpath in return.
   </para>
-
 
   <para>
     The acronym stands for Grid-aware PLuggable AuthoriZation
     Management, and supports the use of plugins which implement
-    various selectable authorization methods. The four
+    various selectable authorization methods. The five
     currently-available methods are:
   </para>
 
   <itemizedlist spacing="compact">
+
+    <listitem>
+      <para>
+	gplazmalite-vorole-mapping : In this method the mapping to the
+	username is done from the concatenation of the user's DN with
+	the user's Fully Qualified Attribute Name (FQAN). A second
+	file, <filename>storage-authzdb</filename>, is used for the
+	mapping of the username to the uid, gid, and rootpath.
+      </para>
+    </listitem>
+
     <listitem>
       <para>
 	kpwd : This is the <quote>legacy</quote> method. The
@@ -39,7 +54,7 @@
 	DN to a local username, and the same file is used in a second
 	mapping of the username to the uid, gid, and rootpath. As in
 	all methods, if the mappings succeed, file system access is
-	done using the obtained uid and gid, and a check is done that
+	done using the obtained uid and gid, and it is checked that
 	the local path of the transfer starts with the designated
 	rootpath.
       </para>
@@ -48,19 +63,9 @@
     <listitem>
       <para>
 	grid-mapfile : This method employs a grid mapfile. From the
-	mapfile, the user's DN is mapped to a username. A second file,
-	storage-authzdb, is used for the mapping of the username to
-	the uid, gid, and rootpath.
-      </para>
-    </listitem>
-
-    <listitem>
-      <para>
-	gplazmalite-vorole-mapping : In this method the mapping to the
-	username is done from the concatenation of the user's DN with
-	the user's Role (or, more precisely, with the user's Fully
-	Qualified Attribute Name). The mapping of username to uid,
-	gid, and rootpath is through the storage-authzdb file.
+	mapfile, the user's DN is mapped to a username. Again the mapping of
+	username to uid, gid, and rootpath is through the
+	<filename>storage-authzdb</filename> file.
       </para>
     </listitem>
 
@@ -68,174 +73,236 @@
       <para>
 	saml-vo-mapping : The DN and Role are mapped to a username via
 	a callout to a <ulink
-	url="http://grid.racf.bnl.gov/GUMS/">GUMS</ulink> server. The
-	GUMS service may run an extension which returns the uid, gid,
-	and rootpath as well. Otherwise, the mapping of username to
-	uid, gid, and rootpath is through the storage-authzdb file.
+	url="http://grid.racf.bnl.gov/GUMS/">GUMS</ulink> server (Grid
+	User Management System). The GUMS service may run an extension
+	which returns the uid, gid, and rootpath as well. Otherwise,
+	the mapping of username to uid, gid, and rootpath is through
+	the <filename>storage-authzdb</filename> file.
       </para>
     </listitem>
+
+    <listitem>
+      <para>
+	xacml-vo-mapping :
+<!-- TODO short explanation -->
+
+      </para>
+    </listitem>
+
   </itemizedlist>
 
   <para>
-    The following describes how to use gPlazma in dCache.
+    There are two versions of &cell-gplazma; available,
+    &cell-gplazma1; and &cell-gplazma2;. &cell-gplazma1; is enabled by
+    default. If you want to use &cell-gplazma2; you will have to
+    specify
+  </para>
+  <programlisting>gplazma.version = 2</programlisting>
+  <para>
+    in <filename>/opt/d-cache/etc/dcache.conf</filename> or in the layout file.
+    <informalexample>
+      <programlisting>[gPlazmaDomain]
+[gPlazmaDomain/gplazma]
+gplazma.version = 2</programlisting>
+    </informalexample>
+
   </para>
 
-  <section id="cf-gplazma-install">
-    <title>Installation</title>
+  <section id="cf-gplazma-certificates">
+    <title>Using x509 Certificates</title>
+    <para>
+      In &dcache; x509 Certificates are used for authentication and
+      authorisation. An x509 certificate identifies someone as an
+      individual, much like a passport or an identity card. To be able
+      to verify the chain of trust when using the non-commercial
+      grid-certificates you should install the list of certificates of
+      grid Certification Authorities (CAs). In case you are using
+      commercial certificates you will find the list of CAs in your
+      browser. Moreover, you will need a server certificate for the
+      &dcache; host and a user certificate.
+    </para>
+
+    <section>
+      <title>CA Certificates</title>
+      <para>
+	CERN packages a number of CA certificates. These are deployed
+	by most grid sites. By deploying these certificates, you
+	state that you trust the CA's procedure for identify
+	individuals and to act promptly if there are any security
+	issues.
+      </para>
+
+      <para>
+	Install the CA certificates.
+      </para>
+      <screen>&prompt-root; <userinput>cd /etc/yum.repos.d/</userinput>
+&prompt-root; <userinput>wget http://grid-deployment.web.cern.ch/grid-deployment/glite/repos/3.2/lcg-CA.repo</userinput>
+&prompt-root; <userinput>yum install lcg-CA</userinput></screen>
 
     <para>
-      &cell-gplazma; is included in &dcache; version 1.7 or higher. As
-      of that version, the &cell-gplazma; cell can be called from
-      &gridftp; and &gsidcap; doors and the &srm; server.
+      The directory <filename
+      class='directory'>/etc/grid-security/certificates</filename>
+      will be created and CA certificates will be copied to this directory.
     </para>
 
     <para>
-      For the &dcache; 1.7 version, there must be host certificates on
-      the node running the &cell-gplazma; cell. For version 1.8, host
-      certificates are needed if the option to delegate (see <xref
-      linkend='cf-gplazma-ops-del'/>) to &cell-gplazma; is used.
+      Certificates which have been revoked are collected in
+      certificate revocation lists (CRLs). To get the CRLs install the
+      <command>fetch-crl</command> command.
+    </para>
+    <screen>&prompt-root; <userinput>yum install fetch-crl</userinput>
+&prompt-root; <userinput>/usr/sbin/fetch-crl</userinput></screen>
+      <para>
+	<command>fetch-crl</command> adds x509 CRLs to <filename
+	class='directory'>/etc/grid-security/certificates</filename>.
+	You will usually set up a cron job to get the CRLs.
+      </para>
+    </section>
+
+    <section>
+      <title>Host Certificate</title>
+      <para>
+	If you do not have a host certificate you will need to request
+	it from your chosen CA. Once you have the certificate in your
+	browser, make a backup and name it
+	<filename>hostCertificate.p12</filename>. Copy the host
+	certificate to the directory <filename
+	class='directory'>/etc/grid-security/</filename> on your
+	server and convert it to <filename>*.pem</filename>.
+      </para>
+
+      <screen>&prompt-root; <userinput>openssl pkcs12 -clcerts -nokeys -in <replaceable>hostCertificate</replaceable>.p12 -out hostcert.pem</userinput>
+Enter Import Password:
+MAC verified OK</screen>
+      <para>
+	Here you will need to enter the password you used when you did the backup in your browser.
+      </para>
+
+      <screen>&prompt-root; <userinput>openssl pkcs12 -nocerts -in <replaceable>hostCertificate</replaceable>.p12 -out hostkey.pem</userinput>
+Enter Import Password:
+MAC verified OK
+Enter PEM pass phrase:</screen>
+
+      <para>
+	Again you will need to enter the above mentioned import
+	password. Then you will need to choose a PEM pass phrase, and
+	remove it from the key.
+      </para>
+      <screen>&prompt-root; <userinput>openssl rsa -in hostkey.pem -out hostkey.pem</userinput>
+Enter pass phrase for hostkey.pem:
+writing RSA key</screen>
+
+      <para>
+	Now change the file permissions.
+      </para>
+      <screen>&prompt-root; <userinput>chmod 400 hostkey.pem</userinput>
+&prompt-root; <userinput>chmod 644 hostcert.pem</userinput></screen>
+    </section>
+
+    <section>
+      <title>User Certificate</title>
+      <para>
+	Copy your user certificate to the directory <filename
+	class='directory'>.globus</filename> on your worker node and
+	convert it from <filename>*.p12</filename> to
+	<filename>usercert.pem</filename> and
+	<filename>userkey.pem</filename> as described above.
+      </para>
+    </section>
+
+    <section>
+      <title>VOMS Proxy Certificate</title>
+
+      <para>
+	For very large groups of people, it is often more
+	convenient to authorise people based on their membership of
+	some group. To identify that they are a member of some group,
+	the certificate owner can create a new short-lived x509
+	certificate that includes their membership of various
+	groups. This short-lived certificate is a proxy-certificate
+	and, when their membership information comes from a VOMS
+	server, it is often referred to as a voms proxy
+	certificate.
+      </para>
+
+      <!-- TODO Put chapter Proxy Certificates here, when it passed the review -->
+
+    </section>
+
+  </section>
+
+  <section id="cf-gplazma-install">
+    <title>Configuring how &cell-gplazma; works</title>
+
+    <para>
+      The &cell-gplazma; cell can be called from &gridftp; and
+      &gsidcap; doors and the &srm; server.
     </para>
 
     <para>
       Depending on which authorization methods are to be used, some
       configuration files must be modified. The configuration files
-      described here must exist on the node on which you wish to run
+      described here must exist on the node that should run
       the &cell-gplazma; cell and must contain the correct
       site-specific information for the &dcache; on which it is
       deployed.
     </para>
 
-  </section>
+    <section id="cf-gplazma-policy">
+      <title>The &cell-gplazma; policy file</title>
 
+      <para>
+	The &cell-gplazma; policy, located in the
+	<filename>/opt/d-cache/etc/dcachesrm-gplazma.policy</filename>
+	file, controls the authorization plugins to be used ("ON" or
+	"OFF" for each plugin) and the order of their execution.
+      </para>
 
-
-  <section id="cf-gplazma-policy">
-    <title>Configuring the gPlazma Policy File</title>
-
-    <para>
-      The &cell-gplazma; policy file, located in
-      <filename>${ourHomeDir}/etc/dcachesrm-gplazma.policy</filename>,
-      controls which authorization plugins will be tried and the order
-      in which they will be tried. The first of these is specified
-      lines containing "ON" or "OFF" for each plugin, for example
-    </para>
-
-    <blockquote>
+      <informalexample>
       <programlisting width="80"># Switches
 xacml-vo-mapping="OFF"
 saml-vo-mapping="ON"
 kpwd="ON"
 grid-mapfile="OFF"
 gplazmalite-vorole-mapping="OFF"</programlisting>
-    </blockquote>
 
-    <para>
-      The order is specified by assigning a different number to each
-      plugin, such as
-    </para>
+      <para>
+	The order of execution is specified by assigning a different
+	number to each plugin, such as
+      </para>
 
-    <blockquote>
-      <programlisting width="80"># Priorities
+	<programlisting width="80"># Priorities
 xacml-vo-mapping-priority="5"
 saml-vo-mapping-priority="1"
 kpwd-priority="3"
 grid-mapfile-priority="4"
 gplazmalite-vorole-mapping-priority="2"</programlisting>
-    </blockquote>
-
-    <para>
-      In the above example, the saml-vo-mapping plugin would be tried
-      first. If authorization was denied for that method, or if the
-      authentication method itself failed, then the kpwd plugin would
-      be tried. The "Priorities" numbering shows that if
-      gplazmalite-vorole-mapping were to also be turned on, it would
-      be tried after the saml-vo-mapping plugin and before the kpwd
-      method.
-    </para>
-
-    <para>
-      Having more than one plugin turned on allows a plugin to be used
-      as fallback for another plugin that may fail. It also allows for
-      the authorization of special users who may be denied by the
-      other methods.
-    </para>
-
-    <para>
-      The policy file also contains a section for each of the plugins,
-      for configuration specific to that plugin. These sections are
-      described in the documentation for each plugin, as follows.
-    </para>
-  </section>
-
-
-  <section id="cf-gplazma-kpwd">
-    <title>Configuring the kpwd Plugin</title>
-
-    <para>
-      The section in the gPlazma policy file for the kpwd plugin
-      specifies the location of the <filename>dcache.kpwd</filename>
-      file, for example
-    </para>
-
-    <blockquote>
-      <programlisting width="80"># dcache.kpwd
-kpwdPath="/opt/d-cache/etc/dcache.kpwd"</programlisting>
-    </blockquote>
-
-    <para>
-      To maintain only one such file, make sure that this is the same
-      location as defined in dCacheSetup.
-    </para>
-
-    <para>
-      Please see &dcache; documentation for <ulink
-      url="http://www.dcache.org/downloads/Release.notes1.6.5-2">dcache.kpwd</ulink>
-      for how to create this file.
-    </para>
-  </section>
-
-
-  <section id="cf-gplazma-gridmap">
-    <title>Configuring the grid-mapfile Plugin</title>
-
-    <para>
-      Two file locations are defined in the policy file for this
-      plugin:
-    </para>
-
-    <blockquote>
-      <programlisting width="80"># grid-mapfile
-gridMapFilePath="/etc/grid-security/grid-mapfile"
-storageAuthzPath="/etc/grid-security/storage-authzdb"</programlisting>
-    </blockquote>
-
-
-    <section>
-      <title>Preparing the grid mapfile</title>
+      </informalexample>
 
       <para>
-	The grid mapfile is the same as that used in other
-	applications. It can be created in various ways, either by
-	connecting directly to VOMS or GUMS servers, or by hand.
+	In the above example, the saml-vo-mapping plugin would be
+	tried first. If authorization was denied for that method, or
+	if the authentication method itself failed, then the kpwd
+	plugin would be tried. The "Priorities" numbering shows that
+	if gplazmalite-vorole-mapping were to also be turned on, it
+	would be tried after the saml-vo-mapping plugin and before the
+	kpwd method.
       </para>
 
       <para>
-	Each line contains two fields: a DN (Certificate Subject) in
-	quotes, and the username it is to be mapped to.
+	Having more than one plugin turned on allows a plugin to be
+	used as fallback for another plugin that may fail. It also
+	allows for the authorization of special users who may be
+	denied by the other methods.
       </para>
 
-      <blockquote>
-	<programlisting width="80">"/DC=org/DC=doegrids/OU=People/CN=Gina Carlson 584065" uscms01</programlisting>
-      </blockquote>
-
       <para>
-	When using the grid-mapfile plugin, the
-	<filename>storage-authzdb</filename> file must also be
-	configured. See <xref linkend="cf-gplazma-authzdb"/> for
-	details.
+	The policy file also contains a section for each of the
+	plugins, for configuration specific to that plugin. These
+	sections are described in the documentation for each plugin,
+	as follows.
       </para>
     </section>
-  </section>
 
 
   <section id="cf-gplazma-authzdb">
@@ -246,49 +313,49 @@ storageAuthzPath="/etc/grid-security/storage-authzdb"</programlisting>
       authorization mapping is a two-step process. First, a username
       is obtained from a mapping of the user's DN or DN and role, then
       a mapping of username to uid, gid, rootpath is performed. The
-      <filename> storage-authzdb</filename> file is used for the
+      <filename>storage-authzdb</filename> file is used for the
       second mapping.
     </para>
 
     <section>
-      <title>Preparing storage-authzdb</title>
+      <title>Preparing <filename>storage-authzdb</filename></title>
 
       <para>
-	The location of storage-authzdb is
-	<filename>/etc/grid-security/storage-authzdb</filename>. The
-	file must contain a line specifying the version of the
-	storage-authdb format.
+	The directory <filename class='directory'>/etc/grid-security</filename> is
+	the location of <filename>storage-authzdb</filename>. The file
+	must contain a line specifying the version of the
+	<filename>storage-authzdb</filename> format.
       </para>
 
       <blockquote><programlisting width="80">version 2.1</programlisting></blockquote>
 
       <para>
 	The other lines in the file each contain eight fields: the
-	string "authorize", followed by the username, read-write
+	string <literal>authorize</literal>, followed by the username, read-write
 	permission, uid, gid, and three paths.
       </para>
 
-
       <blockquote>
-	<programlisting width="80">authorize uscms01 read-write 60076 5063 / /pnfs/fnal.gov/resilient/uscms01 /</programlisting>
+	<programlisting width="80">authorize doegroup read-write 12345 1234 / /data/<replaceable>yourDirectory</replaceable> /</programlisting>
       </blockquote>
 
       <para>
-	In the storage-authzdb file, there must be a line for each
-	username to be authorized. The existence of three paths is for
-	legacy puposes. The second path is of most importance; it is
-	the path under which the user is allowed to access files. It
-	is permissible to simply use a <quote><filename
-	class="directory">/</filename></quote> for the second path.
+	In the <filename>storage-authzdb</filename> file, there must
+	be a line for each username to be authorized. The existence of
+	three paths is for legacy purposes. The second path is of most
+	importance; it is the path under which the user is allowed to
+	access files. It is permissible to simply use a
+	<quote><filename class="directory">/</filename></quote> for
+	the second path.
       </para>
 
       <blockquote>
-	<programlisting width="80">authorize uscms01 read-write 60076 5063 / / /</programlisting>
+	<programlisting width="80">authorize doegroup read-write 12345 1234 / / /</programlisting>
       </blockquote>
 
       <para>
 	in which case the user will be authorized for any path (the
-	filesystem permissions in pnfs must also allow the transfer).
+	filesystem permissions in &chimera; must also allow the transfer).
       </para>
 
       <para>
@@ -302,40 +369,42 @@ storageAuthzPath="/etc/grid-security/storage-authzdb"</programlisting>
       </para>
 
       <para>
-        Starting with &dcache; 1.9, multiple gids can be assigned by using comma-separated values for the GID file, as in
+        Multiple gids can be assigned by using comma-separated values for the GID file, as in
       </para>
 
       <blockquote>
-	<programlisting width="80">authorize uscms01 read-write 60076 5063,5071,6843 / / /</programlisting>
+	<programlisting width="80">authorize doegroup read-write 12345 5063,5071,6843 / / /</programlisting>
       </blockquote>
 
       <para>
-	The lines of the storage-authzdb file are similar to the
-	<quote>login</quote> lines of the
+	The lines of the <filename>storage-authzdb</filename> file are
+	similar to the <quote>login</quote> lines of the
 	<filename>dcache.kpwd</filename> file. If you alreay have a
-	<filename>dcache.kwpd</filename> file, create storage-authzdb
-	by taking the lines from your <filename>dcache.kpwd</filename>
-	file that start with the word "login", for example,
+	<filename>dcache.kwpd</filename> file, create
+	<filename>storage-authzdb</filename> by taking the lines from
+	your <filename>dcache.kpwd</filename> file that start with the
+	word <literal>login</literal>, for example,
       </para>
 
       <blockquote>
-	<programlisting width="80">login uscms01 read-write 60076 5063 / /pnfs/fnal.gov/resilient/uscms01 /</programlisting>
+	<programlisting width="80">login doegroup read-write 12345 50631234 / /data/<replaceable>yourDirectory</replaceable> /</programlisting>
       </blockquote>
 
       <para>
-	and replacing the word <quote>login</quote> with
-	<quote>authorize</quote>.
+	and replacing the word <literal>login</literal> with
+	<literal>authorize</literal>.
       </para>
-    </section>
+
 
     <section>
-      <title>Support for the Priority Field in storage-authzdb</title>
+      <title>Support for the Priority Field in <filename>storage-authzdb</filename></title>
 
       <para>
 	In the future, &dcache; services may support the use of
-	priorites, to be assigned in storage-authzdb. To assign
-	priorities in storage-authzdb, replace the stated version
-	number with "2.2"
+	priorites, to be assigned in
+	<filename>storage-authzdb</filename>. To assign priorities in
+	<filename>storage-authzdb</filename>, replace the stated
+	version number with <literal>2.2</literal>
       </para>
 
       <blockquote>
@@ -349,8 +418,8 @@ storageAuthzPath="/etc/grid-security/storage-authzdb"</programlisting>
       </para>
 
       <blockquote>
-	<programlisting width="80">authorize uscms01     read-write    2       60076 5063   / /pnfs/fnal.gov/resilient/uscms01 /
-authorize cmssoft     read-write    0       60501 5502   / /pnfs/fnal.gov/reduction/cmssoft /</programlisting>
+	<programlisting width="80">authorize doegroup1     read-write    2       12345 1234   / /data/<replaceable>yourDirectory</replaceable>/doe1 /
+authorize doegroup2     read-write    0       23456 2345   / /data/<replaceable>yourDirectory</replaceable>/doe2 /</programlisting>
       </blockquote>
 
       <para>
@@ -369,15 +438,16 @@ authorize cmssoft     read-write    0       60501 5502   / /pnfs/fnal.gov/reduct
       </para>
 
     </section>
+    </section>
   </section>
 
-
   <section id="cf-gplazma-vorole">
-    <title>Configuring the gplazmalite-vorole-mapping Plugin</title>
+    <title>The gplazmalite-vorole-mapping Plugin</title>
 
     <para>
-      The &cell-gplazma; policy file contains two lines for this
-      plugin.
+      The &cell-gplazma; policy file
+      <filename>/opt/d-cache/etc/dcachesrm-gplazma.policy</filename>
+      contains two lines for this plugin.
     </para>
 
     <blockquote>
@@ -387,26 +457,26 @@ gridVoRoleStorageAuthzPath="/etc/grid-security/storage-authzdb"</programlisting>
     </blockquote>
 
     <para>
-      The second is the storage-authz-db used in other plugins. See
-      the above documentation <link
-      linkend='cf-gplazma-authzdb'>Configuring storage-authzdb</link>
-      for how to create the file.
+      The second is the <filename>storage-authzdb</filename> used in
+      other plugins. See the above documentation <xref
+      linkend='cf-gplazma-authzdb'/> for how to create the file.
     </para>
 
     <section>
       <title>Preparing <filename>grid-vorolemap</filename></title>
 
       <para>
-	The file is similar in format to the grid-mapfile, however
-	there is an additional field following the DN (Certificate
-	Subject), containing the FQAN (Fully Qualified Attribute
-	Name).
+	The file is similar in format to the
+	<filename>grid-mapfile</filename>, however there is an
+	additional field following the DN (Certificate Subject),
+	containing the FQAN (Fully Qualified Attribute Name).
       </para>
 
-      <blockquote>
-	<programlisting width="80">"/DC=org/DC=doegrids/OU=People/CN=Gina Carlson 584065" "/cms/uscms" uscms01
-"/DC=org/DC=doegrids/OU=People/CN=Gina Carlson 584065" "/cms/uscms/Role=cmsprod" cmsprod</programlisting>
-      </blockquote>
+      <informalexample>
+	<programlisting width="80">"/C=DE/O=GermanGrid/OU=DESY/CN=John Doe" "/desy" doegroup
+"/C=DE/DC=GermanGrid/O=DESY/CN=John Doe" "/desy/Role=NULL/" doegroup
+"/C=DE/DC=GermanGrid/O=DESY/CN=John Doe" "/desy/Role=NULL/Capability=NULL" doegroup</programlisting>
+      </informalexample>
 
       <para>
 	Therefore each line has three fields: the user's DN, the
@@ -419,42 +489,45 @@ gridVoRoleStorageAuthzPath="/etc/grid-security/storage-authzdb"</programlisting>
 	<quote>role</quote>. The same user can be mapped to different
 	usernames depending on what their role is. The role is
 	determined by how the user creates their proxy, for example,
-	using <command>voms-proxy-init</command>. The FQAN contains
-	the user's Group, Role (optional), and Capability
-	(optional). The latter two may be set to the string
+	using <link
+	linkend='cb-voms-proxy-glite'><command>voms-proxy-init</command></link>. The
+	FQAN contains the user's Group, Role (optional), and
+	Capability (optional). The latter two may be set to the string
 	<quote>NULL</quote>, in which case they will be ignored by the
 	plugin.
       </para>
 
+      <informalexample>
       <para>
 	If a user is authorized in multiple roles, for example
       </para>
 
-      <blockquote>
-	<programlisting width="80">"/DC=org/DC=doegrids/OU=People/CN=Gina Carlson 584065" "/cms/uscms" uscms01
-"/DC=org/DC=doegrids/OU=People/CN=Gina Carlson 584065" "/cms/uscms/Role=cmsuser" cms2847
-"/DC=org/DC=doegrids/OU=People/CN=Gina Carlson 584065" "/cms/uscms/Role=cmsphedex" phedex
-"/DC=org/DC=doegrids/OU=People/CN=Gina Carlson 584065" "/cms/uscms/Role=cmsprod" cmsprod</programlisting>
-      </blockquote>
+	<programlisting width="80">"/DC=org/DC=doegrids/OU=People/CN=John Doe" "/cms/uscms" uscms01
+"/DC=org/DC=doegrids/OU=People/CN=John Doe" "/cms/uscms/Role=cmsuser" cms2847
+"/DC=org/DC=doegrids/OU=People/CN=John Doe" "/cms/uscms/Role=cmsphedex" phedex
+"/DC=org/DC=doegrids/OU=People/CN=John Doe" "/cms/uscms/Role=cmsprod" cmsprod</programlisting>
 
       <para>
 	they would be mapped to the username corresponding to the role
 	found in the proxy that the user creates for use by the client
-	software. Starting in &dcache; 1.8, if the user actually
-	creates several roles in their proxy, authorization (and
-	subsequent check of path and filesystem permissions) will be
-	attempted for each role in the order that they are found in
-	the proxy. In a griftp &url;, the user may also explicity
-	request a username
+	software. If the user actually creates several roles in their
+	proxy, authorization (and subsequent check of path and
+	filesystem permissions) will be attempted for each role in the
+	order that they are found in the proxy.
       </para>
 
-      <blockquote>
-	<programlisting width="80">gsiftp://cmsprod@griddoor1.oursite.edu:2811/testfile1</programlisting>
-      </blockquote>
+      <para>
+	In a &gridftp; &url;, the user may also explicity request a
+	username.
+      </para>
+
+	<programlisting width="80">gsiftp://doeprod@ftp-door.example.org:2811/testfile1</programlisting>
 
       <para>
 	in which case other roles will be disregarded.
       </para>
+      </informalexample>
+
     </section>
 
     <section>
@@ -466,9 +539,10 @@ gridVoRoleStorageAuthzPath="/etc/grid-security/storage-authzdb"</programlisting>
 	field, such as
       </para>
 
-      <blockquote>
-	<programlisting width="80">"*" "/cms/uscms/Role=cmsprod" cmsprod</programlisting>
-      </blockquote>
+      <informalexample>
+	<programlisting width="80">"*" "/desy/Role=production/" desyprod
+</programlisting>
+      </informalexample>
 
       <para>
 	In that case, any DN with the corresponding role will
@@ -481,32 +555,17 @@ gridVoRoleStorageAuthzPath="/etc/grid-security/storage-authzdb"</programlisting>
 
       <para>
 	Thus a user with subject
+	<literal>/C=DE/O=GermanGrid/OU=DESY/CN=John Doe</literal> and
+	role <literal>/desy/Role=production</literal> will be mapped
+	to username <literal>desyprod</literal> via the above
+	<filename>storage-authzdb</filename> line with
+	<literal>"*"</literal> for the DN, except if there is also a
+	line such as
+	<programlisting>"/C=DE/O=GermanGrid/OU=DESY/CN=John Doe" "/desy/Role=production" desyprod2</programlisting>
       </para>
 
-      <blockquote>
-	<programlisting width="80">"/DC=org/DC=doegrids/OU=People/CN=Ted Hesselroth 897321"</programlisting>
-      </blockquote>
-
       <para>
-	and role
-      </para>
-
-      <blockquote>
-	<programlisting width="80">"/cms/uscms/Role=cmsprod"</programlisting>
-      </blockquote>
-
-      <para>
-	will be mapped to username <literal>cmsprod</literal> via the
-	above storage-authzdb line with <literal>"*"</literal> for the
-	DN, except if there is also a line such as
-      </para>
-
-      <blockquote>
-	<programlisting width="80">"/DC=org/DC=doegrids/OU=People/CN=Ted Hesselroth 898521" "/cms/uscms/Role=cmsprod" uscms01</programlisting>
-      </blockquote>
-
-      <para>
-	in which case the username will be <literal>uscms01</literal>.
+	in which case the username will be <literal>desyprod2</literal>.
       </para>
     </section>
 
@@ -514,12 +573,12 @@ gridVoRoleStorageAuthzPath="/etc/grid-security/storage-authzdb"</programlisting>
       <title>Revocation Entries</title>
 
       <para>
-	To create a revocation entry, add a line with
-	<literal>-</literal> as the username, such as
+	To create a revocation entry, add a line with a dash
+	(<literal>-</literal>) as the username, such as
       </para>
 
       <blockquote>
-	<programlisting width="80">"/DC=org/DC=doegrids/OU=People/CN=Timur Perelmutov 623542" "/uscms/production" -</programlisting>
+	<programlisting width="80">"/C=DE/O=GermanGrid/OU=DESY/CN=John Doe" "/desy/production" -</programlisting>
       </blockquote>
 
       <para>
@@ -565,8 +624,8 @@ gridVoRoleStorageAuthzPath="/etc/grid-security/storage-authzdb"</programlisting>
       </para>
 
       <blockquote>
-	<programlisting width="80">authorize cmsprod  read-write  9811 5063 / /pnfs/fnal.gov/data /
-authorize cmsuser  read-only  10001 6800 / /pnfs/fnal.gov/data /</programlisting>
+	<programlisting width="80">authorize cmsprod  read-write  9811 5063 / /data /
+authorize cmsuser  read-only  10001 6800 / /data /</programlisting>
       </blockquote>
 
 
@@ -592,9 +651,9 @@ authorize cmsuser  read-only  10001 6800 / /pnfs/fnal.gov/data /</programlisting
       </para>
 
       <blockquote>
-	<programlisting width="80">authorize cms821 read-write 10821 7000 / /pnfs/fnal.gov/data/cms821 /
-authorize cms822 read-write 10822 7000 / /pnfs/fnal.gov/data/cms822 /
-authorize cms823 read-write 10823 7000 / /pnfs/fnal.gov/data/cms823 /</programlisting>
+	<programlisting width="80">authorize cms821 read-write 10821 7000 / /data/cms821 /
+authorize cms822 read-write 10822 7000 / /data/cms822 /
+authorize cms823 read-write 10823 7000 / /data/cms823 /</programlisting>
       </blockquote>
 
       <para>
@@ -605,14 +664,16 @@ authorize cms823 read-write 10823 7000 / /pnfs/fnal.gov/data/cms823 /</programli
 	the <filename>storage-authzdb</filename> file. Any groups in
 	the regular expression (defined by enclosure in parentheses)
 	can be referred to in later fields of the line, and the
-	corresponding susbstitution will be made when the file is
+	corresponding substitution will be made when the file is
 	read. For example, the above lines for granting users
 	individual directories can be replaced with
       </para>
 
       <blockquote>
-	<programlisting width="80">authorize cms(\d\d\d) read-write 10$1 7000 / /pnfs/fnal.gov/data/cms$1 /</programlisting>
+	<programlisting width="80">authorize cms(\d\d\d) read-write 10$1 7000 / /data/cms$1 /</programlisting>
       </blockquote>
+
+<!--TODO: Karsten said this does not work! -->
 
       <para>
 	in which case <literal>cms821</literal> matches
@@ -626,9 +687,77 @@ authorize cms823 read-write 10823 7000 / /pnfs/fnal.gov/data/cms823 /</programli
     </section>
   </section>
 
+  <section id="cf-gplazma-kpwd">
+    <title>The kpwd Plugin</title>
+
+    <para>
+      The section in the &cell-gplazma; policy file for the kpwd plugin
+      specifies the location of the <filename>dcache.kpwd</filename>
+      file, for example
+    </para>
+
+    <blockquote>
+      <programlisting width="80"># dcache.kpwd
+kpwdPath="/opt/d-cache/etc/dcache.kpwd"</programlisting>
+    </blockquote>
+
+    <para>
+      To maintain only one such file, make sure that this is the same
+      location as defined in
+      <filename>/opt/d-cache/share/defaults/dcache.properties</filename>.
+    </para>
+
+    <para>
+      Use <filename>/opt/d-cache/share/examples/gplazma/dcache.kpwd</filename>
+      to create this file.
+    </para>
+  </section>
+
+
+  <section id="cf-gplazma-gridmap">
+    <title>The grid-mapfile Plugin</title>
+
+    <para>
+      Two file locations are defined in the policy file for this
+      plugin:
+    </para>
+
+    <blockquote>
+      <programlisting width="80"># grid-mapfile
+gridMapFilePath="/etc/grid-security/grid-mapfile"
+storageAuthzPath="/etc/grid-security/storage-authzdb"</programlisting>
+    </blockquote>
+
+
+    <section>
+      <title>Preparing the <filename>grid-mapfile</filename></title>
+
+      <para>
+	The <filename>grid-mapfile</filename> is the same as that used in other
+	applications. It can be created in various ways, either by
+	connecting directly to VOMS or GUMS servers, or by hand.
+      </para>
+
+      <para>
+	Each line contains two fields: a DN (Certificate Subject) in
+	quotes, and the username it is to be mapped to.
+      </para>
+
+      <blockquote>
+	<programlisting width="80">"/C=DE/O=GermanGrid/OU=DESY/CN=John Doe" johndoe</programlisting>
+      </blockquote>
+
+      <para>
+	When using the grid-mapfile plugin, the
+	<filename>storage-authzdb</filename> file must also be
+	configured. See <xref linkend="cf-gplazma-authzdb"/> for
+	details.
+      </para>
+    </section>
+  </section>
 
   <section id="cf-gplazma-saml">
-    <title>Configuring the saml-vo-mapping Plugin</title>
+    <title>The saml-vo-mapping Plugin</title>
 
     <para>
       There are two lines in the policy file for this plugin.
@@ -646,10 +775,10 @@ saml-vo-mapping-cache-lifetime="60"</programlisting>
       service. Replace the &url; with that of the site-specific <ulink
       url="http://grid.racf.bnl.gov/GUMS/">GUMS</ulink>. When using
       the "GUMSAuthorizationServicePort", the service will only
-      provide the username mapping and it will still be necesary to
+      provide the username mapping and it will still be necessary to
       have the storage-authzdb file used in other plugins. See the
       above documentation <link
-      linkend='cf-gplazma-authzdb'>Configuring
+      linkend='cf-gplazma-authzdb'>
       storage-authzdb</link> for how to create the file. If a GUMS
       server providing a "StorageAuthorizationServicePort" with
       correct uid, gid, and rootpath information for your site is
@@ -671,29 +800,29 @@ saml-vo-mapping-cache-lifetime="60"</programlisting>
     </blockquote>
 
     <para>
-      To turn off cach caching, set the value to 0.The default value is 60
-      seconds except for in &dcache; version 1.9.2, in which the
-      default value is 0; caching is turned off by default in that version.
+      To turn off caching, set the value to 0. The default value is 180
+      seconds.
     </para>
 
   </section>
 
 
   <section id="cf-gplazma-xacml">
-    <title>Configuring the xacml-vo-mapping Plugin</title>
+    <title>The xacml-vo-mapping Plugin</title>
 
     <para>
-     Beginning with &dcache; version 1.9.2, gPlazma includes a new authorization plugin,
-     to support the XACML
-     authorization schema. Using XACML with SOAP messaging allows gPlazma
-     to acquire authorization mappings from any service which supports the
-     <ulink url="http://cd-docdb.fnal.gov/cgi-bin/ShowDocument?docid=2952">obligation profile for grid interoperability</ulink>.
-     Servers presently supporting XACML mapping are the latest releases of
-     GUMS and SCAS. Using the new plugin is optional, and previous
-     configuration files are still compatible with gPlazma. If the
-     installation is an upgrade it will change /opt/d-cache/config/gPlazma.batch.
-     It is normally not necessary to change this file, but if you have customized
-     the previous copy, transfer your changes to the new batch file.
+     &cell-gplazma; includes an authorization plugin, to support the XACML
+     authorization schema. Using XACML with SOAP messaging allows
+     gPlazma to acquire authorization mappings from any service which
+     supports the <ulink
+     url="http://cd-docdb.fnal.gov/cgi-bin/ShowDocument?docid=2952">obligation
+     profile for grid interoperability</ulink>.  Servers presently
+     supporting XACML mapping are the latest releases of GUMS and
+     SCAS. Using the new plugin is optional, and previous
+     configuration files are still compatible with &cell-gplazma;. It is
+     normally not necessary to change this file, but if you have
+     customized the previous copy, transfer your changes to the new
+     batch file.
     </para>
 
     <para>
@@ -703,10 +832,9 @@ saml-vo-mapping-cache-lifetime="60"</programlisting>
 
     <blockquote>
       <programlisting width="80"># XACML-based grid VO role mapping
-XACMLmappingServiceUrl="https://fledgling09.fnal.gov:8443/gums/services/GUMSXACMLAuthorizationServicePort"
+XACMLmappingServiceUrl="https://gums.example.org:8443/gums/services/GUMSXACMLAuthorizationServicePort"
 # Time in seconds to cache the mapping in memory
-xacml-vo-mapping-cache-lifetime="180"
-</programlisting>
+xacml-vo-mapping-cache-lifetime="180"</programlisting>
     </blockquote>
 
 for a <ulink url="http://grid.racf.bnl.gov/GUMS/">GUMS</ulink> server, or, for an SCAS server,
@@ -715,8 +843,7 @@ for a <ulink url="http://grid.racf.bnl.gov/GUMS/">GUMS</ulink> server, or, for a
       <programlisting width="80"># XACML-based grid VO role mapping
 XACMLmappingServiceUrl="https://scas.europeansite.eu:8443"
 # Time in seconds to cache the mapping in memory
-xacml-vo-mapping-cache-lifetime="180"
-</programlisting>
+xacml-vo-mapping-cache-lifetime="180"</programlisting>
     </blockquote>
 
     <para>
@@ -736,16 +863,19 @@ xacml-vo-mapping-cache-lifetime="180"
       Thus a line such as
     </para>
 
-    <programlisting>authorize 13160:9767 read-write 13160 9767 / /pnfs/fnal.gov/data /</programlisting>
+    <blockquote>
+      <programlisting width="80">authorize 13160:9767 read-write 13160 9767 / /data /</programlisting>
+    </blockquote>
 
     <para>
-    in <filename>/etc/grid-security/storage-authzdb</filename> will serve to
-    assign the user mapped by SCAS to uid=13160 and primary gid=9767 the rootpath
-    <filename>/pnfs/fnal.gov/data</filename>. It is best for consistency's sake
-    to fill in the UID and GID fields with the same values as in the "uid:gid" field.
-    Additional secondary gids can be assigned by using comma-separated values in the
-    GID field. Any gids there not already returned as secondary gids by SCAS will
-    be added to the secondary gids list.
+      in <filename>/etc/grid-security/storage-authzdb</filename> will
+      serve to assign the user mapped by SCAS to uid=13160 and primary
+      gid=9767 the rootpath <filename>/data</filename>. It is best for
+      consistency's sake to fill in the UID and GID fields with the
+      same values as in the "uid:gid" field.  Additional secondary
+      gids can be assigned by using comma-separated values in the GID
+      field. Any gids there not already returned as secondary gids by
+      SCAS will be added to the secondary gids list.
     </para>
 
     <para>
@@ -754,7 +884,7 @@ xacml-vo-mapping-cache-lifetime="180"
       authorization (GUMS or SCAS) service, authorizations for the
       saml-vo-mapping method are by default cached for a period of
       time. To change the caching duration, modify the
-      saml-vo-mapping-cache-lifetime value in
+      xacml-vo-mapping-cache-lifetime value in
       <filename>/opt/d-cache/etc/dcachesrm-gplazma.policy</filename>
     </para>
 
@@ -764,7 +894,7 @@ xacml-vo-mapping-cache-lifetime="180"
 
     <para>
       To turn off cach caching, set the value to 0. For xacml-vo-mapping, the
-      default value is 0; caching is turned off by default.
+      default value is 180 seconds.
     </para>
 
   </section>
@@ -776,23 +906,36 @@ xacml-vo-mapping-cache-lifetime="180"
       Here is an example of how a policy file might be set up.
     </para>
 
-    <blockquote>
-      <programlisting width="80">saml-vo-mapping="ON"
+    <informalexample>
+      <programlisting width="80"># Switches
+xacml-vo-mapping="OFF"
+saml-vo-mapping="ON"
 kpwd="ON"
 grid-mapfile="OFF"
 gplazmalite-vorole-mapping="OFF"
+
+# Priorities
+xacml-vo-mapping-priority="5"
 saml-vo-mapping-priority="1"
 kpwd-priority="3"
 grid-mapfile-priority="4"
 gplazmalite-vorole-mapping-priority="2"
+
+# dcache.kpwd
 kpwdPath="/opt/d-cache/etc/dcache.kpwd"
+
+# grid-mapfile
 gridMapFilePath="/etc/grid-security/grid-mapfile"
 storageAuthzPath="/etc/grid-security/storage-authzdb"
+
+# SAML-based grid VO role mapping
 mappingServiceUrl="https://fledgling09.fnal.gov:8443/gums/services/GUMSAuthorizationServicePort"
 saml-vo-mapping-cache-lifetime="60"
+
+# Built-in gPLAZMAlite grid VO role mapping
 gridVoRolemapPath="/etc/grid-security/grid-vorolemap"
 gridVoRoleStorageAuthzPath="/etc/grid-security/storage-authzdb"</programlisting>
-    </blockquote>
+    </informalexample>
 
     <para>
       In this case, &cell-gplazma; will attempt to authorize first
@@ -802,102 +945,75 @@ gridVoRoleStorageAuthzPath="/etc/grid-security/storage-authzdb"</programlisting>
     </para>
 
   </section>
-
+  </section>
 
   <section id="cf-gplazma-setup">
-    <title>The Setup Files </title>
+    <title>Configuring how other &dcache; components work with &cell-gplazma;</title>
 
     <para>
-      Changes to Setup files require a restart of the cell.
+      The properties files are located in <filename
+      class='directory'>/opt/d-cache/share/defaults/</filename>. All
+      values can be redefined in
+      <filename>/opt/d-cache/etc/dcache.conf</filename>. Do not modify
+      any values here as your changes will be lost when you next
+      upgrade. Changes of the properties require a restart of the cell.
     </para>
 
     <section>
-      <title>The <filename>gPlazmaSetup</filename> File</title>
+      <title>The <filename>gPlazma.properties</filename> File</title>
 
       <para>
-	This file will normally be a link to
-	<filename>${ourHomeDir}/config/dCacheSetup</filename>. The
-	section of the file which controls the operation of the cell
-	is as follows:
+	This Java properties file contains default values for
+	&cell-gplazma; configuration parameters.
       </para>
 
+      <para>
+	The number of concurrent requests to process is set as
+      </para>
       <blockquote>
-	<programlisting width="80">gplazmaPolicy=${ourHomeDir}/etc/dcachesrm-gplazma.policy
-#
-# gPlazmaNumberOfSimutaneousRequests  30
-# gPlazmaRequestTimeout               30
-#
-# useGPlazmaAuthorizationModule=false
-# useGPlazmaAuthorizationCell=true</programlisting>
+	<programlisting width="80">gPlazmaNumberOfSimutaneousRequests=30</programlisting>
       </blockquote>
 
-
       <para>
-	The first line defines the path to the &cell-gplazma; policy
-	file. It is set to the default location of the policy file. If
-	the path to the &cell-gplazma; policy file changes, enter the
-	full path in the above line.
+	 Setting this number too high may result in large spikes of
+	 CPU activity and the potential to run out of memory. Setting
+	 the number too low results in potentially slow login
+	 activity.
       </para>
 
       <para>
-	The variable gPlazmaNumberOfSimutaneousRequests determines the
-	number of threads which will be started on the &cell-gplazma;
-	cell to handle requests. The default value should be
-	sufficient, but may be raised or lowered depending on the
-	capacity of the hardware and other processes running on it.
+	It is possible to specifiy to use &cell-gplazma; as a
+	module. Nevertheless the default is
+      </para>
+      <blockquote>
+	<programlisting width="80">useGPlazmaAuthorizationModule=false</programlisting>
+      </blockquote>
+      <para>
+	 This property takes one of two values:
+	 <literal>false</literal> or <literal>true</literal>.
+	 Specifying <literal>false</literal> has no effect. Enabling &cell-gplazma; as a
+	 module results in doors running their own &cell-gplazma;.
+	 This has the advantage of distributing the CPU load but
+	 requires additional maintenance. &cell-gplazma; as a module
+	 may be enabled on a per-door basis.
       </para>
 
       <para>
-	The variable gPlazmaRequestTimeout is the amount of time in
-	seconds that a request thread has to finish an authorization
-	decision. If this time is exceeded, authorization is denied.
+	 Run a centralised &cell-gplazma; service
       </para>
-
+      <blockquote>
+	<programlisting width="80">useGPlazmaAuthorizationCell=true</programlisting>
+      </blockquote>
       <para>
-	The next two variables are not used by &cell-gplazma;, but by
-	&door-gridftp; and &srm;. Their description follows.
+	This property takes one of two values,
+	<literal>false</literal> or <literal>true</literal>,
+	Specifying <literal>true</literal> if &dcache; is to run a
+	single centralised &cell-gplazma;.  Doors may still be
+	configured to use the &cell-gplazma; module.
       </para>
 
     </section>
 
-    <section>
-      <title>The <filename>gridftpdoorSetup</filename> and
-      <filename>srmSetup</filename> Files</title>
-
-      <para>
-	Thes two files will normally be links to
-	<filename>${ourHomeDir}/config/dCacheSetup</filename>. The
-	lines of interest for &cell-gplazma; are
-      </para>
-
-      <blockquote>
-	<programlisting width="80">gplazmaPolicy=${ourHomeDir}/etc/dcachesrm-gplazma.policy</programlisting>
-      </blockquote>
-
-      <para>
-	and
-      </para>
-
-      <blockquote>
-	<programlisting width="80"># useGPlazmaAuthorizationModule=false
-# useGPlazmaAuthorizationCell=true</programlisting>
-      </blockquote>
-
-      <para>
-	The latter two lines control whether the &door-gridftp; or
-	&srm; will authorize locally, or use the &cell-gplazma; for
-	authorization. The default is to use the &cell-gplazma; cell
-	for authorization. If both values are set to
-	<literal>false</literal>, the &door-gridftp; or &srm; will use
-	the <filename>dcache.kpwd</filename> lookup method. A
-	<filename>dcache.kpwd</filename> file must be present on the
-	&door-gridftp; or &srm; node in that case. It is possible to
-	use &cell-gplazma; methods on the &door-gridftp; or &srm;
-	without calling the &cell-gplazma; cell. See the following
-	section.
-      </para>
-
-    </section>
   </section>
 
 
@@ -985,95 +1101,45 @@ useGPlazmaAuthorizationCell=true</programlisting>
   <section id="cf-gplazma-ops">
     <title>&cell-gplazma; Options</title>
 
-    <section>
-      <title>Validating User Attributes in &dcache; 1.8</title>
-
-      <para>
-	A user's roles (Fully Qualified Attribute Names) are read from
-	the certificate chain found within the proxy. These attributes
-	are signed by the user's VOMS server when the proxy is
-	created. Starting with version 1.8, &cell-gplazma; supports
-	checking the signature of the attributes against VOMS server
-	certificates installed on the &cell-gplazma; node. To have
-	&cell-gplazma; validate the proxy attributes, place the voms
-	server certificates in
-	<filename>/etc/grid-security/vomsdir</filename> and in
-	<filename>/opt/d-cache/etc/dcachesrm-gplazma.policy</filename>
-	set
-      </para>
-
-      <blockquote>
-	<programlisting width="80">vomsValidation="true"</programlisting>
-      </blockquote>
-
-      <para>
-	The default is <literal>false</literal>. The same would need
-	to be done on the &srm; or any door node for which
-	&cell-gplazma; modules are called directly as a fallback.
-      </para>
-
-    </section>
-
-    <section>
+      <section>
       <title>Validating User Attributes in &dcache; 1.9</title>
 
       <para>
 	In version 1.9, VOMS attribute validation in &cell-gplazma;
-	uses a method in which installation of the voms server certificate
-	is not required. Instead the signature on an attribute is checked
-	against the ca certificate that signed the voms server certificate.
-	To have &cell-gplazma; validate the proxy attributes in &dcache; 1.9,
-	write configuration directories and "*.lsc" files in
-	<filename>/etc/grid-security/vomsdir</filename> for each authorized voms
-	server according to
-	<ulink url="https://twiki.cern.ch/twiki/bin/view/LCG/VomsFAQforServiceManagers">these instructions</ulink>
-	and in <filename>/opt/d-cache/etc/dcachesrm-gplazma.policy</filename> set
+	uses a method in which installation of the voms server
+	certificate is not required. Instead the signature on an
+	attribute is checked against the ca certificate that signed
+	the voms server certificate.  To have &cell-gplazma; validate
+	the proxy attributes in &dcache; 1.9, write configuration
+	directories and "*.lsc" files in
+	<filename>/etc/grid-security/vomsdir</filename> for each
+	authorized voms server according to <ulink
+	url="https://twiki.cern.ch/twiki/bin/view/LCG/VomsFAQforServiceManagers">these
+	instructions</ulink> and in
+	<filename>/opt/d-cache/etc/dcachesrm-gplazma.policy</filename>
+	set
       </para>
 
-      <blockquote>
 	<programlisting width="80">vomsValidation="true"</programlisting>
-      </blockquote>
 
       <para>
-	As with previous versions, the default is <literal>false</literal>. Whether
-	validation is on or not, there must be a non-empty /etc/grid-security/vomsdir
-	on the node which is running &cell-gplazma;. It is enough to do
+	As with previous versions, the default is
+	<literal>false</literal>. Whether validation is on or not,
+	there must be a non-empty <filename
+	class="directory">/etc/grid-security/vomsdir</filename> on the
+	node which is running &cell-gplazma;. It is enough to do
       </para>
 
-      <screen>&prompt-root; <command>mkdir /etc/grid-security/vomsdir</command>
-<command>touch /etc/grid-security/vomsdir/empty-cert.pem</command></screen>
+      <screen>&prompt-root; <userinput>mkdir /etc/grid-security/vomsdir</userinput>
+&prompt-root; <userinput>touch /etc/grid-security/vomsdir/empty-cert.pem</userinput></screen>
 
       <para>
       to create the non-empty directory.
       </para>
 
     </section>
-
-    <section id="cf-gplazma-ops-del">
-      <title>Delegation to &cell-gplazma;</title>
-
-      <para>
-	In &dcache; version 1.7, &srm; or the &door-gridftp; delegated
-	the user's credentials to &cell-gplazma;, and the user's
-	attributes were extracted from the secure context. For
-	performance purposes, starting in version 1.8 the delegation
-	step is not performed. To turn on delegation, in
-	<filename>/opt/d-cache/config/dCacheSetup</filename> on the
-	node running &srm; or the &door-gridftp;, set the line
-      </para>
-
-
-      <blockquote>
-	<programlisting width="80">delegateToGPlazma=true</programlisting>
-      </blockquote>
-
-      <para>
-	The default value is <literal>false</literal>. To support
-	delegation, host certificates must exist on the host which
-	runs &cell-gplazma;.
-      </para>
-    </section>
   </section>
+
   <section id="cf-gplazma-webadmin-example">
     <title>&cell-gplazma; config example to work with authenticated webadmin</title>
 	<para>

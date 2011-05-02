@@ -60,6 +60,8 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY cell-hopmngr   "<literal>HoppingManager</literal>">
 <!ENTITY cell-hsmflushctl "<literal>HsmFlushControl</literal>">
 <!ENTITY cell-gplazma   "<literal>gPlazma</literal>">
+<!ENTITY cell-gplazma1   "<literal>gPlazma1</literal>">
+<!ENTITY cell-gplazma2   "<literal>gPlazma2</literal>">
 <!ENTITY cell-replicamngr "<literal>ReplicaManager</literal>">
 <!ENTITY cell-system    "<literal>System</literal>">
 <!ENTITY cell-pinmngr   "<literal>PinManager</literal>">
