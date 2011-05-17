@@ -54,11 +54,11 @@ div.toc span.section {
 code.literal, pre.programlisting, pre.screen {
     font-size: 10pt;
     font-family: monospace;
-    white-space: pre;
     overflow: auto;
 }
 
 pre.programlisting, pre.screen {
+    white-space: pre;
     max-width: 60em;
     margin-right: 15px;
     padding: 5px 15px 5px 15px; 
