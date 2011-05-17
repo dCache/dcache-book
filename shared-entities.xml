@@ -45,6 +45,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY domain-srm       "<literal>srm</literal>">
 <!ENTITY domain-info-provider "<literal>infoProviderDomain</literal>">
 <!ENTITY domain-gplazma   "<literal>gPlazmaDomain</literal>">
+<!ENTITY domain-info      "<literal>infoDomain</literal>">
 
 
 <!-- Various cells -->
