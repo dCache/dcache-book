@@ -89,9 +89,10 @@
 
         <listitem>
           <para>
-           &dcache; requires Java 1.6 JRE. Please use
-           &sunjvm; at the latest patch-level (at least
-           1.6.0_18). It is recommendet to use JDK as &dcache;
+           &dcache; requires Java 1.6 JRE. Please use &sunjvm; at the
+           latest patch-level (at the moment of writing this is
+           1.6.0_25) and make sure to upgrade to the newest version
+           frequently. It is recommendet to use JDK as &dcache;
            scripts can make use of some extra features that JDK
            provides to gather more diagnostic information (heap-dump,
            etc). This helps when tracking down bugs.
@@ -102,7 +103,7 @@
           <para>
             &psql; must be installed and running. See <xref
             linkend="cb-postgres-install"/> for more details. It is
-            strongly recommended to use version 8 or higher.
+            strongly recommended to use version 8.3 or higher.
           </para>
         </listitem>
       </itemizedlist>
@@ -145,15 +146,6 @@
             documentation assumes this is so.
           </para>
 
-          <note>
-            <para>
-              Please note it is also possible to run &dcache; with all
-              &psql; accounts requiring passwords. See <xref
-              linkend="cb-postgres-configure"/> for
-              more advice on the configuration of &psql;.
-            </para>
-          </note>
-
           <para>
             To allow local users to access &psql; without requiring a
             password, ensure the file
@@ -165,6 +157,16 @@
           <programlisting>local   all         all                        trust
 host    all         all         127.0.0.1/32   trust
 host    all         all         ::1/128        trust</programlisting>
+
+
+          <note>
+            <para>
+              Please note it is also possible to run &dcache; with all
+              &psql; accounts requiring passwords. See <xref
+              linkend="cb-postgres-configure"/> for
+              more advice on the configuration of &psql;.
+            </para>
+          </note>
 
           <important>
 	    <title>Restarting &psql;</title>
@@ -733,6 +735,20 @@ maxDiskSpace=2T</programlisting>
 	  correct.
 	</para>
       </informalexample>
+
+       <note>
+        <title>Mind the Gap!</title>
+	<para>
+	  The default gap for poolsizes is 4GiB. This means you should
+	  make a bigger pool than 4GiB otherwise you would have to
+	  change this gap in the &dcache; admin tool. See the example
+	  below.  See also <xref linkend="intouch-admin"/>.
+	</para>
+
+	<screen>&dc-prompt-local; <userinput>cd <replaceable>poolName</replaceable></userinput>
+&dc-prompt-pool; <userinput>set gap 2G</userinput>
+&dc-prompt-pool; <userinput>save</userinput></screen>
+       </note>
 
       <para>
 	Adding a pool to a configuration does not modify the pool or
