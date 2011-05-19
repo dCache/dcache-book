@@ -2,6 +2,7 @@
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
                          "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
 <!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+<!ENTITY xrootd-version          "2.1.6">
 %sharedents;
 ]>
 
@@ -9,40 +10,23 @@
 
   <title>dCache as xRootd-Server</title>
 
-  <chapterinfo>
-    <author>
-      <firstname>Martin</firstname>
-      <surname>Radicke</surname>
-    </author>
-    <author>
-      <firstname>Thomas</firstname>
-      <surname>Zangerl</surname>
-    </author>
-  </chapterinfo>
-
   <para>
     This chapter explains how to configure &dcache; in order to access
     it via the &xrootd; protocol, allowing &xrootd;-Clients like
     ROOT's TXNetfile and xrdcp to do file operations against a
-    &dcache; instance in a transparent manner. The current
-    implementation in &dcache; 1.9.9 is based on the most recent
-    production version of the &xrootd; protocol (2.9.6).
+    &dcache; instance in a transparent manner. &dcache; implements
+    version &xrootd-version; of &xrootd; protocol.
   </para>
 
   <section id="cf-xrootd-setup">
     <title>Setting up</title>
 
     <para>
-      The xrootd functionality is contained in all &dcache; releases
-      starting from 1.7.0. Versions prior to this are not supported!
-    </para>
-
-    <para>
       To allow file transfers in and out of &dcache; using xrootd, a
       new &door-xrootd; must be started. This door acts then as the
       entry point to all &xrootd; requests.  Compared to the native
       xrootd server-implementation (produced by SLAC), the
-      &door-xrootd; refers to the <literal>redirector node</literal>.
+      &door-xrootd; corresponds to the <literal>redirector node</literal>.
     </para>
 
     <para>
@@ -58,10 +42,7 @@
 
     <informalexample>
     <para>
-        For example, if your &dcache;-instance is configured to be a head-node
-        and you want to run the &door-xrootd; within the
-        <literal>xrootd-${host.name}Domain</literal>, add/uncomment the
-        following lines in <filename>${dCacheHome}/etc/layouts/head.conf</filename>:
+        You can just add the following lines to the layout file:
     </para>
 
         <programlisting>..
@@ -86,16 +67,6 @@ Starting xrootd-babelfishDomain done</screen>
       Services" (see <xref linkend="intouch-web" />).
     </para>
 
-    <warning>
-      <para>
-	Starting from version 1.7.0 (patchlevel 20), the &door-xrootd;
-	is set to readonly by default. In prior versions, the door is
-	started in unsecure mode, giving clients unrestricted read and
-	write access.  Please refer to <xref linkend="cf-xrootd-sec"/>
-	on how to setup security.
-      </para>
-    </warning>
-
     <section id="cf-xrootd-setup-params">
       <title>Parameters</title>
 
@@ -108,7 +79,7 @@ Starting xrootd-babelfishDomain done</screen>
     <para>
     <emphasis>Per door:</emphasis> Edit your instance's layout file, for
     example
-    <filename>${dCacheHome/etc/layouts/head.conf</filename> and add the
+    <filename>/opt/d-cache/etc/layouts/example.conf</filename> and add the
     desired port for the &door-xrootd; in a separate line (a restart of the
     domain(s) running the &door-xrootd; is required):
     </para>
@@ -121,24 +92,24 @@ Starting xrootd-babelfishDomain done</screen>
 	<listitem>
 	<para>
 	<emphasis>Globally:</emphasis> Edit
-	<filename>${dCacheHome}/etc/dcache.conf</filename> and
-	add the variable <varname>xrootd/port</varname> with the desired value (a
+	<filename>/opt/d-cache/etc/dcache.conf</filename> and
+	add the variable <varname>xrootdPort</varname> with the desired value (a
 	restart of the domain(s) running the &door-xrootd; is required):
     </para>
       <screen>..
-xrootd/port=1095
+xrootdPort=1095
 ..</screen>
     </listitem>
     </orderedlist>
 
     <para>
-      For controlling the &tcp;-portrange within which new &xrootd;-movers
+      For controlling the &tcp;-portrange within which &xrootd;-movers
       will start listening in the &domain-pool;, you can add the properties
       <literal>net.lan.port.min</literal> and
       <literal>net.lan.port.max</literal> to
-      <filename>${dCacheHome}/etc/dcache.conf</filename> and adapt them
+      <filename>/opt/d-cache/etc/dcache.conf</filename> and adapt them
       according to your preferences. The default values can be viewed in
-      <filename>${dCacheHome}/share/defaults/dcache.properties</filename>.
+      <filename>/opt/d-cache/share/defaults/dcache.properties</filename>.
     </para>
 
     <programlisting>..
@@ -146,16 +117,6 @@ net.lan.port.min=30100
 net.lan.port.max=30200
 ..</programlisting>
 
-    <note>
-      <para>
-        Since &dcache; version 1.9.10, the number of simultaneously active
-        &xrootd;-movers of one &dcache;-instance is not limited by the
-        configured portrange anymore.
-        The reason for this is that &dcache; now uses
-        <firstterm>UUIDs</firstterm> included in the &xrootd;-redirect to match
-        the requests on the pool-side to the requests issued to the door.
-      </para>
-    </note>
     </section>
   </section>
 
@@ -210,7 +171,7 @@ root [6] 061101 15:57:42 14991 Xrd: XrdClientSock::RecvRaw: Error reading from s
 	this warning, but has absolutely no effect on subsequent ROOT
 	commands.  It happens because &dcache; closes all &tcp;
 	connections after finishing a file transfer, while xrootd
-	expects to keep them open for later resue.
+	expects to keep them open for later reuse.
       </para>
 
       <para>
@@ -270,32 +231,31 @@ xrootdIsReadOnly=false
 	Please note that due to the unauthenticated nature of this
 	access mode, files can be written and read to/from any
 	subdirectory in the &pnfs; namespace (including the automatic
-	creation of parent directories). Because there is no user
+	creation of parent directories). If there is no user
 	information at the time of request, new files/subdirectories
 	generated through &xrootd; will inherit UID/GID from its
-	parent directory.
+	parent directory. The user used for this can be configured via the
+	xrootdUser property.
       </para>
 
     </section>
 
     <section id="cf-xrootd-sec-selected">
-      <title>Permitting read/write access on selected &pnfs; directories</title>
+      <title>Permitting read/write access on selected directories</title>
 
       <para>
 	To overcome the security issue of uncontrolled &xrootd; read and write
 	access mentioned in the previous section, it is possible to
 	restrict read and write access on a per-directory basis (including
-	subdirectories). This feature is available from &dcache;
-	1.7.0-36 on for controlling write access and since version 1.9.8-1 for
-	controlling read access.
+	subdirectories).
       </para>
 
       <para>
 	To activate this feature, a colon-seperated list containing
-	the full &pnfs; paths of authorized directories must be added
-	to <filename>${dCacheHome}/etc/dcache.conf</filename>. If both read and
+	the full paths of authorized directories must be added
+	to <filename>/opt/d-cache/etc/dcache.conf</filename>. If both read and
 	write access should be authorized for certain directories, add the
-	following line to <filename>${dCacheHome}/etc/dcache.conf</filename>:
+	following line to <filename>/opt/d-cache/etc/dcache.conf</filename>:
       </para>
 
       <programlisting>..
@@ -314,9 +274,9 @@ xrootdAllowedWritePaths=/pnfs/<replaceable>example.org</replaceable>/wpath1:/pnf
 
       <para>
 	A restart of the &door-xrootd; is required to make the changes
-	take effect. As soon as any of the above options is set, all read or write
+	take effect. As soon as any of the above properties are set, all read or write
 	requests to directories not matching the allowed path lists
-	will be refused.
+	will be refused. Symlinks are however not restricted to these prefixes.
       </para>
 
     </section>
@@ -348,7 +308,7 @@ xrootdAllowedWritePaths=/pnfs/<replaceable>example.org</replaceable>/wpath1:/pnf
 	&xrootd; requests. Lines not starting with the
 	<literal>KEY</literal> keyword are ignored. A template can be
 	found in
-	<filename>${dCacheHome}/etc/keystore.template</filename>.
+	<filename>/opt/d-cache/share/examples/xrootd/keystore</filename>.
       </para>
 
       <para>
@@ -382,14 +342,14 @@ xrootdAllowedWritePaths=/pnfs/<replaceable>example.org</replaceable>/wpath1:/pnf
       <para>
 	Only the last two lines are performing the actual conversion,
 	therefore you can skip the previous lines in case you already
-	have a keypair. Make sure that you keystore file correctly
+	have a keypair. Make sure that your keystore file correctly
 	points to the converted keys.
       </para>
 
       <para>
 	To enable the plugin, it is necessary to add the following two lines to
 	the file
-	<filename>${dCacheHome}/etc/dcache.conf</filename>, so that
+	<filename>/opt/d-cache/etc/dcache.conf</filename>, so that
 	it looks like
       </para>
 
@@ -427,7 +387,7 @@ xrootdAllowedWritePaths=/pnfs/<replaceable>example.org</replaceable>/wpath1:/pnf
       <informalexample>
         <para>
           For instance, to enable &gsi; authentication in &xrootd;, add the
-          following line to <filename>{$dCacheHome}/etc/dcache.conf</filename>:
+          following line to <filename>/opt/d-cache/etc/dcache.conf</filename>:
 
           <programlisting>..
 xrootdAuthNPlugin=gsi
@@ -455,6 +415,15 @@ verifyHostCertificateChain=true
         service. Please refer to <xref linkend="cf-gplazma" /> for instructions
         about how to configure &cell-gplazma;.
       </para>
+      <warning>
+	      <title>Security consideration</title>
+	      <para>
+			In general &gsi; on &xrootd; is not secure. It does not provide
+			confidentiality and integrity guarantees and hence does not protect
+			against man-in-the-middle attacks.
+	      </para>
+      </warning>
+
     </section>
 
     <section id="cf-xrootd-sec-precedence">
@@ -499,7 +468,17 @@ verifyHostCertificateChain=true
         priority, overriding all other settings.
       </para>
     </section>
+    <section id="cf-xrootd-other-configuration">
+      <title>Other configuration options</title>
 
+      <para>
+        The &xrootd;-door has several other configuration properties. You can configure various timeout parameters,
+        the thread pool sizes on pools, queue buffer sizes on pools, the &xrootd; root path, the &xrootd; user
+        and the &xrootd; IO queue. Full descriptions on the effect of those can be found in
+        <filename>/opt/d-cache/share/defaults/xrootd.properties</filename>.
+      </para>
+
+    </section>
   </section>
 
 </chapter>
