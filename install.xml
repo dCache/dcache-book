@@ -90,21 +90,31 @@
 
         <listitem>
           <para>
-           &dcache; requires Java 1.6 JRE. Please use
-           &sunjvm; at the latest patch-level (at least
-           1.6.0_18). It is recommendet to use JDK as &dcache;
-           scripts can make use of some extra features that JDK
-           provides to gather more diagnostic information (heap-dump,
-           etc). This helps when tracking down bugs.
+           &dcache; requires Java 1.6 JRE. Please use &sunjvm; at the
+           latest patch-level (at the moment of writing this is
+           1.6.0_25) and check for upgrades frequently. It is
+           recommendet to use JDK as &dcache; scripts can make use of
+           some extra features that JDK provides to gather more
+           diagnostic information (heap-dump, etc). This helps when
+           tracking down bugs.
           </para>
         </listitem>
 
         <listitem>
           <para>
             &psql; must be installed and running. See <xref
-            linkend="cb-postgres-install"/> for more details. It is
-            strongly recommended to use version 8 or higher.
-          </para>
+            linkend="cb-postgres-install"/> for more details.
+	    It is strongly recommended to use version 8.3 or higher.
+	  </para>
+	    <important>
+	      <para>
+		 For good performance it is necessary to maintain and
+		 tune your &psql; server. There are several good books
+		 on this topic, one of which is <ulink
+		 url="http://www.2ndquadrant.com/books/postgresql-9-0-high-performance"><citetitle>PostgreSQL
+		 9.0 High Performance</citetitle></ulink>.
+	      </para>
+	    </important>
         </listitem>
       </itemizedlist>
     </section>
@@ -140,15 +150,6 @@
       <section id="in-install-postgres-trust">
 	<title>Enabling local trust</title>
 
-          <note>
-            <para>
-              Please note it is also possible to run &dcache; with all
-              &psql; accounts requiring passwords. See <xref
-              linkend="cb-postgres-configure"/> for
-              more advice on the configuration of &psql;.
-            </para>
-          </note>
-
           <para>
             Perhaps the simplest configuration is to allow
             password-less access to the database and the following
@@ -166,6 +167,15 @@
           <programlisting>local   all         all                        trust
 host    all         all         127.0.0.1/32   trust
 host    all         all         ::1/128        trust</programlisting>
+
+          <note>
+            <para>
+              Please note it is also possible to run &dcache; with all
+              &psql; accounts requiring passwords. See <xref
+              linkend="cb-postgres-configure"/> for
+              more advice on the configuration of &psql;.
+            </para>
+          </note>
 
           <important>
 	    <title>Restarting &psql;</title>
@@ -516,21 +526,6 @@ Starting dCacheDomain done</screen>
 	created automatically when &dcache; is started.
       </para>
 
-       <note>
-        <title>Mind the Gap!</title>
-	<para>
-	  The default gap for poolsizes is 4GiB. This means you should
-	  make a bigger pool than 4GiB otherwise you would have to
-	  change this gap in the &dcache; admin tool. See the example
-	  below.  See also <xref linkend="intouch-admin"/>.
-	</para>
-
-	<screen>&dc-prompt-local; <userinput>cd <replaceable>poolName</replaceable></userinput>
-&dc-prompt-pool; <userinput>set gap 2G</userinput>
-&dc-prompt-pool; <userinput>save</userinput></screen>
-       </note>
-
-
       <informalexample>
       <para>
 	Consider the following example for adding a pool to a &dcache; layout file.
@@ -582,6 +577,20 @@ maxDiskSpace=2T</programlisting>
 	  correct.
 	</para>
       </informalexample>
+
+       <note>
+        <title>Mind the Gap!</title>
+	<para>
+	  The default gap for poolsizes is 4GiB. This means you should
+	  make a bigger pool than 4GiB otherwise you would have to
+	  change this gap in the &dcache; admin tool. See the example
+	  below.  See also <xref linkend="intouch-admin"/>.
+	</para>
+
+	<screen>&dc-prompt-local; <userinput>cd <replaceable>poolName</replaceable></userinput>
+&dc-prompt-pool; <userinput>set gap 2G</userinput>
+&dc-prompt-pool; <userinput>save</userinput></screen>
+       </note>
 
       <para>
 	Adding a pool to a configuration does not modify the pool or
@@ -697,29 +706,6 @@ srmDomain       running 11182 dcache</screen>
       <section id="in-install-configure-java">
 	<title>&java; heap size</title>
 
-      <note>
-        <para>
-	  &dcache; uses &java; to parse the configuration files and
-	  will search for &java; on the system path first; if it is
-	  found there, no further action is needed. If &java; is not
-	  on the system path, the environment variable
-	  <envar>JAVA_HOME</envar> defines the location of the &java;
-	  installation directory. Alternatively, the environment
-	  variable <envar>JAVA</envar> can be used to point to the
-	  &java; executable directly.
-        </para>
-
-	<para>
-	  If <envar>JAVA_HOME</envar> or <envar>JAVA</envar> cannot be
-	  defined as global environment variables
-	  in the operating system, then they can be defined in either
-	  <filename>/etc/default/dcache</filename> or <filename>/etc/dcache.env</filename>.
-	  These two files are sourced by the init script and allow
-	  <envar>JAVA_HOME</envar>, <envar>JAVA</envar> and
-	  <envar>DCACHE_HOME</envar> to be defined.
-	</para>
-      </note>
-
       <para>
 	By default the &java; heap size and the maximum direct buffer
 	size are defined as
@@ -742,6 +728,31 @@ dcache.java.memory.heap=384m
 dcache.java.memory.direct=16m</programlisting>
 	  </informalexample>
 	</para>
+
+      <note>
+        <para>
+	  &dcache; uses &java; to parse the configuration files and
+	  will search for &java; on the system path first; if it is
+	  found there, no further action is needed. If &java; is not
+	  on the system path, the environment variable
+	  <envar>JAVA_HOME</envar> defines the location of the &java;
+	  installation directory. Alternatively, the environment
+	  variable <envar>JAVA</envar> can be used to point to the
+	  &java; executable directly.
+        </para>
+
+	<para>
+	  If <envar>JAVA_HOME</envar> or <envar>JAVA</envar> cannot be
+	  defined as global environment variables in the operating
+	  system, then they can be defined in either
+	  <filename>/etc/default/dcache</filename> or
+	  <filename>/etc/dcache.env</filename>.  These two files are
+	  sourced by the init script and allow
+	  <envar>JAVA_HOME</envar>, <envar>JAVA</envar> and
+	  <envar>DCACHE_HOME</envar> to be defined.
+	</para>
+      </note>
+
       </section>
 
       <section id="in-install-configure-starting">
@@ -773,23 +784,17 @@ Starting srmDomain  Done (pid=8081)</screen>
   <section id="in-install-multinode">
     <title>Installing &dcache; on several nodes</title>
  
-    <tip>
-      <para>
-	On &dcache; nodes running only pool services you do not need to
-	install &psql;. If your current node hosts only these services,
-	the installation of &psql; can be skipped.
-      </para>
-    </tip>
-
     <para>
-      Installing &dcache; on several nodes is not much more complicated
-      than installing it on a single node.
-      Think about how &dcache; should be organised regarding services and
-      domains. Then adapt the layout files, as
-      described in <xref linkend="in-install-layout" />, to the layout that
-      you have in mind. The files <filename>/opt/d-cache/etc/layouts/head.conf</filename>
-      and <filename>/opt/d-cache/etc/layouts/pool.conf</filename> contain
-      examples for a &dcache; head-node and a &dcache; pool respectively.
+      Installing &dcache; on several nodes is not much more
+      complicated than installing it on a single node.  Think about
+      how &dcache; should be organised regarding services and
+      domains. Then adapt the layout files, as described in <xref
+      linkend="in-install-layout" />, to the layout that you have in
+      mind. The files
+      <filename>/opt/d-cache/etc/layouts/head.conf</filename> and
+      <filename>/opt/d-cache/etc/layouts/pool.conf</filename> contain
+      examples for a &dcache; head-node and a &dcache; pool
+      respectively.
     </para>
 
     <para>
@@ -801,6 +806,14 @@ Starting srmDomain  Done (pid=8081)</screen>
       domain &domain-dcache;, because that domain acts implicitly as a
       broker.
     </para>
+
+    <tip>
+      <para>
+	On &dcache; nodes running only pool services you do not need to
+	install &psql;. If your current node hosts only these services,
+	the installation of &psql; can be skipped.
+      </para>
+    </tip>
 
   </section>
 
