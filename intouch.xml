@@ -2,6 +2,11 @@
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
                          "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
 <!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+<!ENTITY new-user   "<systemitem class='username'>&simple-new-user;</systemitem>">
+<!ENTITY simple-new-user   "<replaceable>new-user</replaceable>">
+<!ENTITY admin   "<systemitem class='admin'>admin</systemitem>">
+<!ENTITY root   "<systemitem class='root'>root</systemitem>">
+
 %sharedents;
 ]>
 
@@ -770,6 +775,42 @@ Connection closed by 192.0.2.11</screen>
       error message <quote>No Route to cell...</quote>.  Type
       <literal>..</literal> to return to the &dc-prompt-local; prompt.
     </para>
+
+     <para>
+      To create a new user, &new-user;, set a new password and to give him/her an access to a particular cell (for example to the &cell-poolmngr;) run following command sequence:
+     </para>
+
+     <screen>&dc-prompt-local; <userinput>cd acm</userinput>
+&dc-prompt-acm; <userinput>create user &simple-new-user;</userinput>
+&dc-prompt-acm; <userinput>create acl cell.PoolManager.execute</userinput>
+&dc-prompt-acm; <userinput>add access -allowed cell.PnfsManager.execute </userinput></screen>
+
+
+     <para>
+      Now you can check the permissions by:
+     </para>
+
+     <screen>&dc-prompt-acm; <userinput>check cell.PnfsManager.execute &simple-new-user;</userinput>
+Allowed
+&dc-prompt-acm; <userinput>show acl cell.PnfsManager.execute &simple-new-user;</userinput>
+&lt;noinheritance&gt;
+&lt;new-user&gt; -&gt; true</screen>
+
+
+     <para>
+      Following commands allow to a particular user an access to every cell:
+     </para>
+
+     <screen>&dc-prompt-acm; <userinput> create acl cell.*.execute</userinput>
+&dc-prompt-acm; <userinput>add access -allowed cell.*.execute &simple-new-user;</userinput></screen>
+
+     <para>
+      To make an user as powerful as &admin; (&dcache;'s equivalent to the &root; user):
+     </para>
+
+     <screen>&dc-prompt-acm; <userinput>create acl *.*.*</userinput>
+&dc-prompt-acm; <userinput>add access -allowed *.*.* &simple-new-user;</userinput></screen>
+
 
     <para>
       All cells know the commands <command>info</command> for general
