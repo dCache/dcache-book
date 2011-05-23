@@ -26,11 +26,9 @@
     -->
   </partintro>
 
-  <xi:include href="cookbook-general.xml"/>  
-  <xi:include href="cookbook-clients.xml"/>  
+  <xi:include href="cookbook-voms-proxy.xml"/>
+  <xi:include href="cookbook-clients.xml"/>
   <xi:include href="cookbook-pool.xml"/>
-
-  <xi:include href="cookbook-classic-se-to-dcache.xml"/>
   <xi:include href="cookbook-postgres.xml"/>
   <xi:include href="cookbook-net.xml"/>
   <xi:include href="cookbook-accounting.xml"/>
