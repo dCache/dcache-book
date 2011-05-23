@@ -30,7 +30,7 @@
   <xi:include href="config-hsm.xml"/>
   <xi:include href="config-hopping.xml"/>
   <xi:include href="config-partitioning.xml"/>
-  <xi:include href="config-central-flushing.xml"/>
+  <!--  <xi:include href="config-central-flushing.xml"/> -->
   <xi:include href="config-gplazma.xml"/>
   <xi:include href="config-xrootd.xml"/>
   <xi:include href="config-SRM.xml"/>
