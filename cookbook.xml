@@ -26,7 +26,6 @@
     -->
   </partintro>
 
-  <xi:include href="cookbook-voms-proxy.xml"/>
   <xi:include href="cookbook-clients.xml"/>
   <xi:include href="cookbook-pool.xml"/>
   <xi:include href="cookbook-postgres.xml"/>
