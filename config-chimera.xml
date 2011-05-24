@@ -20,11 +20,12 @@
       called &cell-pnfsmngr;, which in turn communicates with the
       &chimera; database using a thin &java; layer, which in turn
       communicates directly with the &chimera; database. &chimera;
-      allows direct access to the namespace by providing an &nfs3;
-      and &nfs4; server. Clients can &nfs;-mount the namespace locally.
+      allows direct access to the namespace by providing an &nfs3; and
+      &nfs4; server. Clients can &nfs;-mount the namespace locally.
       This offers the opportunity to use OS-level tools like
       &prog-ls;, &prog-mkdir;, &prog-mv; for &chimera;. Direct
-      I/O-operations like &prog-cp; and &prog-cat; are possible with &nfs4;.
+      I/O-operations like &prog-cp; and &prog-cat; are possible with
+      the &nfs4; door.
     </para>
 
     <para>
@@ -104,18 +105,24 @@ chimera.db.password=secret</programlisting>
 # /data *.my.domain(rw)</programlisting>
 
   <para>
-    As any RPC service &chimera; &nfs; requires <systemitem class='service'>rpcbind</systemitem>
-    service to run on the host. Nevertheless rpcbind have to be configured to accept requests
-    from &chimera; &nfs;. On RHEL6 based systems you need to add
-    <programlisting>RPCBIND_ARGS="-i"</programlisting>
-    into <filename>/etc/sysconfig/rpcbind</filename>. Check you OS manual for details.
+    As any RPC service &chimera; &nfs; requires <systemitem
+    class='service'>rpcbind</systemitem> service to run on the
+    host. Nevertheless <systemitem
+    class='service'>rpcbind</systemitem> has to be configured to
+    accept requests from &chimera; &nfs;. On RHEL6 based systems you
+    need to add
+  </para>
+  <programlisting>RPCBIND_ARGS="-i"</programlisting>
+  <para>
+    into <filename>/etc/sysconfig/rpcbind</filename>. Check your OS
+    manual for details.
   </para>
 
   <para>
     If your OS does not provides <systemitem class='service'>rpcbind</systemitem>
     &chimera; &nfs; can use an embedded <systemitem class='service'>rpcbind</systemitem>.
-    This requires to disable <systemitem class='service'>portmap</systemitem>
-    service if exists.
+    This requires to disable the <systemitem class='service'>portmap</systemitem>
+    service if it exists.
   </para>
 
    <screen>&prompt-root; <userinput>/etc/init.d/portmap stop</userinput>
@@ -278,8 +285,8 @@ StoreName myStore</screen>
 .(tag)(sGroup):STRING</screen>
 
   <para>
-    Directory tags may be used within &dcache; to control which pools
-    are used for storing the files in the directory (see <xref
+    Directory tags may be used within &dcache; to control the file
+    placement policy in the directory (see <xref
     linkend="cf-pm-psu"/>). They might also be used by a
     <firstterm>tertiary storage system</firstterm> for similar
     purposes (e.g. controlling the set of tapes used for the files in
@@ -312,7 +319,7 @@ StoreName myStore</screen>
 
       <listitem>
 	<para>
-	  Contains one line of the form
+	  Must contain one line of the form
 	  <quote><literal>StoreName</literal>
 	  <replaceable>storeName</replaceable></quote> and specifies
 	  the name of the store that is used by &dcache; to construct
@@ -432,6 +439,13 @@ StoreName myStore</screen>
           an inherited tag does not have any effect.
         </para>
       </listitem>
+
+      <listitem>
+	<para>
+	  Empty tags are ignored.
+        </para>
+      </listitem>
+
     </orderedlist>
 
     <para>
