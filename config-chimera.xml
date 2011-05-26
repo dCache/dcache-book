@@ -24,7 +24,8 @@
       &nfs4; server. Clients can &nfs;-mount the namespace locally.
       This offers the opportunity to use OS-level tools like
       &prog-ls;, &prog-mkdir;, &prog-mv; for &chimera;. Direct
-      I/O-operations like &prog-cp; and &prog-cat; are possible with &nfs4;.
+      I/O-operations like &prog-cp; and &prog-cat; are possible with
+      &nfs4; door.
     </para>
 
     <para>
@@ -115,16 +116,19 @@ chimera.db.password=secret</programlisting>
     host. Nevertheless <systemitem
     class='service'>rpcbind</systemitem> has to be configured to
     accept requests from &chimera; &nfs;. On RHEL6 based systems you
-    need to add <screen>RPCBIND_ARGS="-i"</screen> into
-    <filename>/etc/sysconfig/rpcbind</filename>. Check your OS manual
-    for details.
+    need to add 
+  </para>
+  <programlisting>RPCBIND_ARGS="-i"</programlisting>
+  <para>
+    into <filename>/etc/sysconfig/rpcbind</filename>. Check your OS
+    manual for details.
   </para>
 
   <para>
     If your OS does not provide <systemitem class='service'>rpcbind</systemitem>
     &chimera; &nfs; can use an embedded <systemitem class='service'>rpcbind</systemitem>.
-    This requires to disable <systemitem class='service'>portmap</systemitem>
-    service if exists.
+    This requires to disable the <systemitem class='service'>portmap</systemitem>
+    service if it exists.
   </para>
 
    <screen>&prompt-root; <userinput>/etc/init.d/portmap stop</userinput>
@@ -321,7 +325,7 @@ StoreName myStore</screen>
 
       <listitem>
 	<para>
-	  Contains one line of the form
+	  Must contain one line of the form
 	  <quote><literal>StoreName</literal>
 	  <replaceable>storeName</replaceable></quote> and specifies
 	  the name of the store that is used by &dcache; to construct
