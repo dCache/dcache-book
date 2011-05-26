@@ -712,6 +712,14 @@ webdavProtocol=https</programlisting>
   <section id="intouch-admin">
     <title>The Admin Interface</title>
 
+    <important>
+      <title> Just use commands that are documented here</title>
+      <para>
+        Only commands described in this documentation should be used
+	for the administration of a &dcache; system.
+      </para>
+    </important>
+
     <note>
       <para>
 	If you attempt to log into the admin interface without
@@ -900,19 +908,18 @@ namespaceDomain</screen>
     <para>
       There also is the command <command>help</command> for listing all
       commands the cell knows and their parameters. However, many of the
-      commands are only used for debugging and
-      development purposes. Only commands described in this documentation
-      should be used for the administration of a &dcache; system.
+      commands are only used for debugging and development purposes.
     </para>
 
     <para>
       The most useful command of the pool cells is <xref
-        linkend="cmd-rep_ls"/>. It lists the files which are stored in the pool
-      by their &pnfs; IDs:
+        linkend="cmd-rep_ls"/>. To execute this command cd into the pool.
+	It lists the files which are stored in the pool by their &pnfs; IDs:
     </para>
 
-    <screen>000100000000000000001120 &lt;-P---------(0)[0]&gt; 485212 si={myStore:STRING}
-000100000000000000001230 &lt;C----------(0)[0]&gt; 1222287360 si={myStore:STRING}</screen>
+    <screen>&dc-prompt-pool; <userinput>rep ls</userinput>
+    000100000000000000001120 &lt;-P---------(0)[0]&gt; 485212 si={myStore:STRING}
+    000100000000000000001230 &lt;C----------(0)[0]&gt; 1222287360 si={myStore:STRING}</screen>
 
     <para>
       Each file in a pool has one of the 4 primary states:
@@ -921,7 +928,7 @@ namespaceDomain</screen>
       <quote>from client</quote> (<literal>&lt;--C-</literal>), and
       <quote>from store</quote> (<literal>&lt;---S</literal>).
     </para>
-
+    
     <para>
       Two commands in the pool manager are quite useful: <xref
       linkend="cmd-rc_ls"/> lists the requests currently handled by
@@ -929,7 +936,8 @@ namespaceDomain</screen>
       with an error condition is (all in one line):
     </para>
 
-    <screen>000100000000000000001230@0.0.0.0/0.0.0.0 m=1 r=1 [&lt;unknown&gt;]
+    <screen> &dc-prompt-pm; <userinput>rc ls</userinput>
+    000100000000000000001230@0.0.0.0/0.0.0.0 m=1 r=1 [&lt;unknown&gt;]
   [Waiting 08.28 19:14:16]
   {149,No pool candidates available or configured for 'staging'}</screen>
 
@@ -972,11 +980,11 @@ namespaceDomain</screen>
     </para>
 
     <para>
-      The file <filename>config/authorized_keys</filename> contains
+      The file <filename>&file-authorized_keys;</filename> contains
       one line per user. The file has the same format as
       <filename>~/.ssh/authorized_keys</filename> which is used by
       <command>sshd</command>. The keys in
-      <filename>config/authorized_keys</filename> have to be of type
+      <filename>&file-authorized_keys;</filename> have to be of type
       RSA1 as &dcache; only supports SSH protocol 1. Such a key is
       generated with
     </para>
@@ -1013,7 +1021,7 @@ Identity added: /home/<replaceable>user</replaceable>/.ssh/identity (SSH1 key of
     <para>
       Now, insert the public key
       <filename>~/.ssh/identity.pub</filename> as a separate line into
-      <filename>config/authorized_keys</filename>. The comment field
+      <filename>&file-authorized_keys;</filename>. The comment field
       in this line <quote>SSH1 key of
       <replaceable>user</replaceable></quote> has to be changed to the
       &dcache; user name. An example file is:
@@ -1022,6 +1030,7 @@ Identity added: /home/<replaceable>user</replaceable>/.ssh/identity (SSH1 key of
     <programlisting>1024 35 141939124<lineannotation>(... many more numbers ...)</lineannotation>15331 admin</programlisting>
 
     <para>
+      Using ssh-add -L >> &file-authorized_keys; will not work, because the line added is not correct.
       The key manager within &dcache; will read this file every minute.
     </para>
 
@@ -1069,44 +1078,6 @@ echo -e 'cd <replaceable>pool_1</replaceable>\nrep ls\n<lineannotation>(more com
 
   </section>
 
-  <section id="intouch-gui">
-  <title>The Graphical User Interface</title>
-
-    <para>
-      Instead of using &ssh; to access the admin interface, the
-      &dcache; graphical user interface can be used. If it is not
-      included in the &dcache; distribution, it can be downloaded from
-      the <ulink url="http://www.dcache.org/">&dcache;
-      homepage</ulink>. It is started by
-    </para>
-
-    <screen>&prompt-user; <userinput>java -jar org.pcells.jar</userinput></screen>
-
-    <para>
-      First, a new session has to be created with
-
-      <menuchoice>
-        <guimenu>Session</guimenu>
-        <guimenuitem>New...</guimenuitem>
-      </menuchoice>.
-
-      After giving the session a name of your choice, a login mask
-      appears. The session is configured with the
-      <guibutton>Setup</guibutton> button. The only thing that needs
-      to be configured is the hostname. After clicking
-      <guibutton>Apply</guibutton> and <guibutton>Quit</guibutton> you
-      are ready to log in. Pressing the right mouse button clicking
-      <guibutton>Login</guibutton> will scan the &dcache; instance for
-      domains. Cells can be reached by clicking on their name and the
-      same commands can be entered as in the &ssh; login.
-    </para>
-
-    <para>
-      The other tabs of the GUI are very useful for monitoring the
-      &dcache; system.
-    </para>
-
-   </section>
 
 
   <!--
