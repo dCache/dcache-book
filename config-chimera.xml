@@ -104,9 +104,23 @@ chimera.db.password=secret</programlisting>
 # /data *.my.domain(rw)</programlisting>
 
   <para>
-    Before mounting &chimera; you will need to turn off the
-    <systemitem class='service'>portmap</systemitem> daemon.
+    As any RPC service &chimera; &nfs; requires <systemitem
+    class='service'>rpcbind</systemitem> service to run on the
+    host. Nevertheless <systemitem
+    class='service'>rpcbind</systemitem> has to be configured to
+    accept requests from &chimera; &nfs;. On RHEL6 based systems you
+    need to add <screen>RPCBIND_ARGS="-i"</screen> into
+    <filename>/etc/sysconfig/rpcbind</filename>. Check your OS manual
+    for details.
   </para>
+
+  <para>
+    If your OS does not provide <systemitem class='service'>rpcbind</systemitem>
+    &chimera; &nfs; can use an embedded <systemitem class='service'>rpcbind</systemitem>.
+    This requires to disable <systemitem class='service'>portmap</systemitem>
+    service if exists.
+  </para>
+
    <screen>&prompt-root; <userinput>/etc/init.d/portmap stop</userinput>
 Stopping portmap: portmap</screen>
   <para>
