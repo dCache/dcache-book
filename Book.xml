@@ -114,6 +114,13 @@
       </imageobject>
     </mediaobject>
 
+   <mediaobject>
+      <imageobject role="fo">
+	<imagedata fileref="images/logos-emi-helmholtz.svg"
+		   format="SVG" align="center" contentwidth="13cm"/>
+      </imageobject>
+    </mediaobject>
+
   </bookinfo>
 
   <preface>
