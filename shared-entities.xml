@@ -34,6 +34,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY jetty        "<productname>Jetty</productname>">
 <!ENTITY sunjvm        "<productname>Sun JVM</productname>">
 <!ENTITY glite        "<productname>gLite</productname>">
+<!ENTITY netty        "<productname>Netty</productname>">
 
 <!-- Various domains -->
 <!ENTITY domain-http      "<literal>httpDomain</literal>">
@@ -73,6 +74,50 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY cell-webadmin         "<literal>Webadmin</literal>">
 <!ENTITY cell-srm             "<literal>SRM</literal>">
 <!ENTITY cell-remotegsitransfermngr   "<literal>RemoteGSIFTPTransferManager</literal>">
+<!ENTITY cell-ftp             "<literal>FTP</literal>">
+<!ENTITY cell-gridftp             "<literal>gridftp</literal>">
+<!ENTITY cell-kerberosftp             "<literal>kerberosftp</literal>">
+
+
+<!-- Various services -->
+<!-- Services are the names used in layout files -->
+<!ENTITY serv-acl             "<literal>acl</literal>">
+<!ENTITY serv-admin           "<literal>admin</literal>">
+<!ENTITY serv-authdcap        "<literal>authdcap</literal>">
+<!ENTITY serv-billing         "<literal>billing</literal>">
+<!ENTITY serv-broadcast       "<literal>broadcast</literal>">
+<!ENTITY serv-cleaner         "<literal>cleaner</literal>">
+<!ENTITY serv-cns             "<literal>cns</literal>">
+<!ENTITY serv-dcap            "<literal>dcap</literal>">
+<!ENTITY serv-dir             "<literal>dir</literal>">
+<!ENTITY serv-dummy-prstgr    "<literal>dummy-prestager></literal>">
+<!ENTITY serv-ftp             "<literal>ftp</literal>">
+<!ENTITY serv-gplazma         "<literal>gplazma</literal>">
+<!ENTITY serv-gridftp         "<literal>gridftp</literal>">
+<!ENTITY serv-gsidcap         "<literal>gsidcap</literal>">
+<!ENTITY serv-gsi-pam         "<literal>gsi-pam</literal>">
+<!ENTITY serv-httpd           "<literal>httpd</literal>">
+<!ENTITY serv-info            "<literal>info</literal>">
+<!ENTITY serv-kerbdcap        "<literal>kerberosdcap</literal>">
+<!ENTITY serv-kerbftp         "<literal>kerberosftp</literal>">
+<!ENTITY serv-loginbroker     "<literal>loginbroker</literal>">
+<!ENTITY serv-nfsv3           "<literal>nfsv3</literal>">
+<!ENTITY serv-nfsv41          "<literal>nfsv41</literal>">
+<!ENTITY serv-pinmngr         "<literal>pinmanager</literal>">
+<!ENTITY serv-pnfsmngr        "<literal>pnfsmanager</literal>">
+<!ENTITY serv-pool            "<literal>pool</literal>">
+<!ENTITY serv-poolmngr        "<literal>poolmanager</literal>">
+<!ENTITY serv-replica         "<literal>replica</literal>">
+<!ENTITY serv-spacemngr       "<literal>spacemanager</literal>">
+<!ENTITY serv-srm             "<literal>srm</literal>">
+<!ENTITY serv-srm-loginbroker "<literal>srm-loginbroker</literal>">
+<!ENTITY serv-statistics      "<literal>statistics</literal>">
+<!ENTITY serv-topo            "<literal>topo</literal>">
+<!ENTITY serv-transfmngrs     "<literal>transfermanagers</literal>">
+<!ENTITY serv-webadmin        "<literal>webadmin</literal>">
+<!ENTITY serv-webdav          "<literal>webdav</literal>">
+<!ENTITY serv-xrootd          "<literal>xrootd</literal>">
+
 
 <!-- Various protocols: TODO: should these names be prefixed by "protocol-" ? -->
 <!ENTITY dcap     "<systemitem class='protocol'>dCap</systemitem>">
@@ -86,6 +131,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY tcp      "<systemitem class='protocol'>TCP</systemitem>">
 <!ENTITY ip       "<systemitem class='protocol'>IP</systemitem>">
 <!ENTITY http     "<systemitem class='protocol'>HTTP</systemitem>">
+<!ENTITY https    "<systemitem class='protocol'>HTTPS</systemitem>">
 <!ENTITY xrootd   "<systemitem class='protocol'>xrootd</systemitem>">
 <!ENTITY nfs3     "<systemitem class='protocol'>NFS-3</systemitem>">
 <!ENTITY nfs      "<systemitem class='protocol'>NFS</systemitem>">
@@ -97,6 +143,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY html     "<acronym>HTML</acronym>">
 <!ENTITY ldif     "<acronym>LDIF</acronym>">
 <!ENTITY rpm     "<acronym>RPM</acronym>">
+<!ENTITY p12      "<acronym>PKCS12</acronym>">
 
 <!-- Other network concepts -->
 <!ENTITY url      "<acronym>URL</acronym>">
