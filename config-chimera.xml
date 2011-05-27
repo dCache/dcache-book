@@ -257,6 +257,58 @@ Stopping portmap: portmap</screen>
 
 </section>
 
+  <section id="cf-chimera-ids">
+    <title>IDs</title>
+
+    <para>
+      Each file in &chimera; has a unique 18 byte long ID. It is
+      referred to as ChimeraID or as pnfsID. This is comparable to the
+      inode number in other filesystems. The ID used for a file
+      will never be reused, even if the file is deleted. &dcache; uses
+      the ID for all internal references to a file.
+    </para>
+
+    <informalexample>
+      <para>
+	The ID of the file
+	<filename>example.org/data/examplefile</filename> can be
+	obtained by reading the command-file
+	<filename>.(id)(examplefile)</filename> in the directory of
+	the file.
+      </para>
+
+    <screen>&prompt-user; <userinput>cat /example.org/data/'.(id)(examplefile)'</userinput>
+0004000000000000002320B8</screen>
+    </informalexample>
+
+
+    <para>
+      A file in &chimera; can be referred to by the ID for most
+      operations.
+    </para>
+    <informalexample>
+      <para>
+	The name of a file can be obtained from the ID
+	with the command <literal>nameof</literal> as follows:
+    </para>
+
+<screen>&prompt-user; <userinput>cd /example.org/data/</userinput>
+&prompt-user; <userinput>cat '.(nameof)(0004000000000000002320B8)'</userinput>
+examplefile</screen>
+    <para>
+      And the ID of the directory it resides in is obtained by:
+    </para>
+<screen>&prompt-user; <userinput>cat '.(parent)(0004000000000000002320B8)'</userinput>
+0004000000000000001DC9E8</screen>
+    </informalexample>
+
+    <para>
+      This way, the complete path of a file may be obtained starting
+      from the ID.
+    </para>
+
+  </section>
+
 <section id="chimera-tags">
   <title>Directory Tags</title>
 
