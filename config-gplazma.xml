@@ -210,7 +210,7 @@ writing RSA key</screen>
       </para>
     </section>
 
-    <section>
+    <section id="cf-gplazma-certificates-voms">
       <title>VOMS Proxy Certificate</title>
 
       <para>
@@ -225,12 +225,184 @@ writing RSA key</screen>
 	certificate.
       </para>
 
-      <!-- TODO Put chapter Proxy Certificates here, when it passed the review -->
+      <para>
+	You can generate a proxy certificate using the command
+	<command>voms-proxy-init</command>, which is capable of adding
+	VOMS attributes to the proxy. If
+	<command>voms-proxy-init</command> is not installed on your
+	machine get the &glite; repository and install the VOMS
+	clients.
+      </para>
 
+      <screen>&prompt-root; <userinput>cd /etc/yum.repos.d/</userinput>
+&prompt-root; <userinput>wget http://grid-deployment.web.cern.ch/grid-deployment/glite/repos/3.2/glite-UI.repo</userinput>
+&prompt-root; <userinput>yum install glite-security-voms-clients</userinput></screen>
+
+      <section id="cf-gplazma-certificates-voms-proxy-init">
+	<title><command>Creating a VOMS proxy</command></title>
+	<para>
+	  To create a VOMS proxy for your user certificate you need to
+	  execute the <command>voms-proxy-init</command> as a user.
+	</para>
+
+	<informalexample>
+	  <screen>&prompt-user; <userinput>export PATH=/opt/glite/bin/:$PATH</userinput>
+&prompt-user; <userinput>voms-proxy-init</userinput>
+Enter GRID pass phrase:
+Your identity: /C=DE/O=GermanGrid/OU=DESY/CN=John Doe
+
+Creating proxy ........................................................................Done
+Your proxy is valid until Mon Mar  7 22:06:15 2011</screen>
+        </informalexample>
+
+	<section id="cf-gplazma-certificates-voms-proxy-init-voms">
+	  <title>Certifying your membership of a VO</title>
+	  <para>
+	    You can certify your membership of a VO by using the
+	    command <command>voms-proxy-init -voms
+	    <replaceable>yourVO</replaceable></command>. This is
+	    useful as in &dcache; authorization can be done by VO (see
+	    <xref linkend='cf-gplazma-vorole'/>). To be able to use
+	    the extension <command>-voms
+	    <replaceable>yourVO</replaceable></command> you need to be
+	    able to access VOMS servers. To this end you need the the
+	    VOMS server's and the CA's DN. Create a file
+	    <filename>/etc/grid-security/vomsdir/<replaceable>VO</replaceable>/<replaceable>hostname</replaceable>.lsc</filename>
+	    per VOMS server containing on the 1st line the VOMS
+	    server's DN and on the 2nd line, the corresponding CA's
+	    DN. The name of this file should be the fully qualified
+	    hostname followed by an <filename>.lsc</filename>
+	    extension and the file must appear in a subdirectory
+	    <filename
+	    class='directory'>/etc/grid-security/vomsdir/<replaceable>VO</replaceable></filename>
+	    for each VO that is supported by that VOMS server and by
+	    the site.
+	  </para>
+
+	  <para>
+	    At <ulink url="http://operations-portal.egi.eu/vo" /> you
+	    can search for a VO and find this information.
+	  </para>
+
+	  <informalexample>
+	    <para>
+	      For example, the file /etc/grid-security/vomsdir/desy/grid-voms.desy.de.lsc contains:
+	    </para>
+	    <programlisting>/C=DE/O=GermanGrid/OU=DESY/CN=host/grid-voms.desy.de
+/C=DE/O=GermanGrid/CN=GridKa-CA</programlisting>
+          <para>
+	    where the first entry is the DN of the DESY VOMS server
+	    and the second entry is the DN of the CA which signed the
+	    DESY VOMS server's certificate.
+	  </para>
+	  </informalexample>
+
+      <para>
+	In addition, you need to have a file
+	<filename>/opt/glite/etc/vomses</filename> containing your VO's VOMS server.
+      </para>
+
+    <informalexample>
+      <para>
+	For DESY the file <filename>/opt/glite/etc/vomses</filename> should
+	contain the entry
+      </para>
+      <programlisting>"desy" "grid-voms.desy.de" "15104" "/C=DE/O=GermanGrid/OU=DESY/CN=host/grid-voms.desy.de" "desy" "24"</programlisting>
+      <para>
+	The first entry <quote>desy</quote> is the real name or a
+	nickname of your VO. <quote>grid-voms.desy.de</quote> is the
+	hostname of the VOMS server. The number <quote>15104</quote>
+	is the port number the server is listening on. The forth entry
+	is the DN of the server's VOMS certificate. The fifth entry,
+	<quote>desy</quote>, is the VO name and the last entry is the
+	globus version number which is not used anymore and can be
+	omitted.
+      </para>
+
+    </informalexample>
+
+    <informalexample>
+
+      <para>
+	Use the command <command>voms-proxy-init -voms</command> to
+	create a VOMS proxy with VO <quote>desy</quote>.
+      </para>
+
+      <screen>&prompt-user;<userinput> voms-proxy-init -voms desy</userinput>
+Enter GRID pass phrase:
+Your identity: /C=DE/O=GermanGrid/OU=DESY/CN=John Doe
+Creating temporary proxy ....................................................... Done
+Contacting  grid-voms.desy.de:15104 [/C=DE/O=GermanGrid/OU=DESY/CN=host/grid-voms.desy.de] "desy" Done
+Creating proxy .................................... Done
+Your proxy is valid until Mon Mar  7 23:52:13 2011</screen>
+
+  <para>
+    View the information about your VOMS proxy with
+    <command>voms-proxy-info</command>
+  </para>
+
+      <screen>&prompt-user; <userinput>voms-proxy-info</userinput>
+subject   : /C=DE/O=GermanGrid/OU=DESY/CN=John Doe/CN=proxy
+issuer    : /C=DE/O=GermanGrid/OU=DESY/CN=John Doe
+identity  : /C=DE/O=GermanGrid/OU=DESY/CN=John Doe
+type      : proxy
+strength  : 1024 bits
+path      : /tmp/x509up_u500
+timeleft  : 11:28:02</screen>
+
+      <para>
+	The last line tells you how much longer your proxy will be valid.
+      </para>
+      <para>
+	If your proxy is expired you will get
+      </para>
+      <screen>&prompt-user; <userinput>voms-proxy-info</userinput>
+subject   : /C=DE/O=GermanGrid/OU=DESY/CN=John Doe/CN=proxy
+issuer    : /C=DE/O=GermanGrid/OU=DESY/CN=John Doe
+identity  : /C=DE/O=GermanGrid/OU=DESY/CN=John Doe
+type      : proxy
+strength  : 1024 bits
+path      : /tmp/x509up_u500
+timeleft  : 0:00:00</screen>
+
+    <para>
+      The command <command>voms-proxy-info -all</command> gives you
+      information about the proxy and about the VO.
+    </para>
+
+<screen>&prompt-user; <userinput>voms-proxy-info -all</userinput>
+subject   : /C=DE/O=GermanGrid/OU=DESY/CN=John Doe/CN=proxy
+issuer    : /C=DE/O=GermanGrid/OU=DESY/CN=John Doe
+identity  : /C=DE/O=GermanGrid/OU=DESY/CN=John Doe
+type      : proxy
+strength  : 1024 bits
+path      : /tmp/x509up_u500
+timeleft  : 11:24:57
+=== VO desy extension information ===
+VO        : desy
+subject   : /C=DE/O=GermanGrid/OU=DESY/CN=John Doe
+issuer    : /C=DE/O=GermanGrid/OU=DESY/CN=host/grid-voms.desy.de
+attribute : /desy/Role=NULL/Capability=NULL
+attribute : /desy/test/Role=NULL/Capability=NULL
+timeleft  : 11:24:57
+uri       : grid-voms.desy.de:15104</screen>
+
+      <para>
+	Use the command <command>voms-proxy-destroy</command> to destroy your VOMS proxy.
+      </para>
+      <screen>&prompt-user; <userinput>voms-proxy-destroy</userinput>
+&prompt-user; <userinput>voms-proxy-info</userinput>
+
+Couldn't find a valid proxy.
+
+</screen>
+
+    </informalexample>
+
+	</section>
+      </section>
     </section>
-
   </section>
-
   <section id="cf-gplazma-install">
     <title>Configuring how &cell-gplazma; works</title>
 
@@ -490,8 +662,8 @@ gridVoRoleStorageAuthzPath="/etc/grid-security/storage-authzdb"</programlisting>
 	usernames depending on what their role is. The role is
 	determined by how the user creates their proxy, for example,
 	using <link
-	linkend='cb-voms-proxy-glite'><command>voms-proxy-init</command></link>. The
-	FQAN contains the user's Group, Role (optional), and
+	linkend='cf-gplazma-certificates-voms-proxy-init'><command>voms-proxy-init</command></link>.
+	The FQAN contains the user's Group, Role (optional), and
 	Capability (optional). The latter two may be set to the string
 	<quote>NULL</quote>, in which case they will be ignored by the
 	plugin.

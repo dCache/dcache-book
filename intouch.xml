@@ -421,7 +421,7 @@ gplazmalite-vorole-mapping-priority="1"
 	The machine running the &gsidcap; door needs to have a host
 	certificate and you need to have a valid user
 	certificate. In addition, you should have created a <link
-	linkend='cb-voms-proxy-glite'>voms proxy</link> as mentioned
+	linkend='cf-gplazma-certificates-voms-proxy-init'>voms proxy</link> as mentioned
 	<link linkend='intouch-certificates'>above</link>.
       </para>
 
