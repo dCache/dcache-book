@@ -1553,8 +1553,9 @@ remoteGsiftpMaxTransfers=260</programlisting>
 
 	<listitem>
 	  <para>
-	    User needs to use <command>voms-proxy-init</command> to
-	    create a vo proxy.
+	    User needs to use <link
+	    linkend="cf-gplazma-certificates-voms-proxy-init"><command>voms-proxy-init</command></link>
+	    to create a vo proxy.
 	  </para>
 	</listitem>
 
