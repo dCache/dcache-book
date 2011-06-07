@@ -20,8 +20,9 @@ body p {
 
 .replaceable { color: #009000; }
 
-span.term { 
-    font-weight: bold; 
+span.term {
+    font-weight: bold;
+    padding-left: 30px;
 }
 
 div.sidebar { 
