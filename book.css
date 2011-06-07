@@ -17,11 +17,17 @@ body p {
   max-width: 50em;
   overflow: auto;
 }
+body>div.section, body>div.chapter, body>div.part {
+    background: #3cfcfc;
+    width: 80%;
+    padding-right: 1em;
+}
 
 .replaceable { color: #009000; }
 
-span.term { 
-    font-weight: bold; 
+span.term {
+    font-weight: bold;
+    padding-left: 30px;
 }
 
 div.sidebar { 
