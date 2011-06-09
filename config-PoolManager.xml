@@ -2,12 +2,18 @@
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
                          "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
   <!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+  <!ENTITY psu    "<abbrev>PSU</abbrev>">
+  <!ENTITY read   "<literal>read</literal>">
+  <!ENTITY write  "<literal>write</literal>">
+  <!ENTITY p2p    "<literal>p2p</literal>">
+  <!ENTITY cache  "<literal>cache</literal>">
+
   %sharedents;
 ]>
 
 <chapter id="cf-pm">
   
-  <title>Configuring the Pool Manager</title>
+  <title>Configuring the &serv-poolmngr;</title>
 
   <!--
   <para>(We assume a basic knowledge of the functionality and terminology of
@@ -15,481 +21,848 @@
   commands)</para>
   -->
 
-  <para>The heart of a dCache system is the <firstterm>pool
-  manager</firstterm>. When a user performs an action on a file - reading or
-  writing - a <firstterm>transfer request</firstterm> is sent to the dCache
-  system. The pool manager then decides how to handle this request.</para>
+  <para>
+    The heart of a &dcache; system is the &serv-poolmngr;. When a user
+    performs an action on a file - reading or writing - a
+    <firstterm>transfer request</firstterm> is sent to the &dcache;
+    system. The &serv-poolmngr; then decides how to handle this
+    request.
+  </para>
 
-  <para>If a file the user wishes to read resides on one of the storage-pools
-  within the dCache system, it will be transferred from that pool to the user.
-  If it resides on several pools, the file will be retrieved from the pool
-  which is least busy. If all pools the file is stored on are busy, a new copy
-  of the file on an idle pool will be created and this pool will answer the
-  request.</para>
+  <para>
+    If a file the user wishes to read resides on one of the
+    storage-pools within the &dcache; system, it will be transferred
+    from that pool to the user. If it resides on several pools, the
+    file will be retrieved from the pool which is least busy. If all
+    pools the file is stored on are busy, a new copy of the file on an
+    idle pool will be created and this pool will answer the request.
+  </para>
 
-  <para>A new copy can either be created by a <firstterm>pool to pool
-  transfer</firstterm> (<abbrev>p2p</abbrev>) or by fetching it from a
-  connected <firstterm>tertiary storage system</firstterm> (sometimes called
-  <abbrev>HSM</abbrev> - hierarchical storage manager). Fetching a file from a
-  tertiary storage system is called <firstterm>staging</firstterm>. It is also
-  performed if the file is not present on any of the pools in the dCache
-  system. The pool manager also has to decide on which pool the new copy will
-  be created, i.e. staged or p2p-copied.</para>
+  <para>
+    A new copy can either be created by a <firstterm>pool to pool
+    transfer</firstterm> (<abbrev>p2p</abbrev>) or by fetching it from
+    a connected <firstterm>tertiary storage system</firstterm>
+    (sometimes called <abbrev>HSM</abbrev> - hierarchical storage
+    manager). Fetching a file from a tertiary storage system is called
+    <firstterm>staging</firstterm>. It is also performed if the file
+    is not present on any of the pools in the &dcache; system. The pool
+    manager has to decide on which pool the new copy will be
+    created, i.e. staged or p2p-copied.
+  </para>
 
-  <para>The behaviour of the pool manager is highly configurable. In order to
-  exploit the full potential of the software it is essential to understand the
-  mechanisms used and how they are configured. The pool manager is a unique
-  cell in &dcache; and consists of several sub-modules: The important ones
-  are the <firstterm>pool selection unit</firstterm> (<abbrev>PSU</abbrev>)
-  and the <firstterm>cost manager</firstterm> (<abbrev>CM</abbrev>).</para>
+  <para>
+    The behaviour of the &serv-poolmngr; service is highly
+    configurable. In order to exploit the full potential of the
+    software it is essential to understand the mechanisms used and how
+    they are configured. The &serv-poolmngr; service creates the
+    &cell-poolmngr; cell, which is a unique cell in &dcache; and
+    consists of several sub-modules: The important ones are the
+    <firstterm>pool selection unit</firstterm> (<abbrev>&psu;</abbrev>)
+    and the <firstterm>cost manager</firstterm> (<abbrev>CM</abbrev>).
+  </para>
 
-  <para>The PSU is responsible for finding the pools which the pool manager is
-  allowed to use for a specific transfer-request. From those the CM selects
-  the optimal one. By telling the PSU which pools are permitted for which type
-  of transfer-request, the administrator of the dCache system can adjust the
-  system to any kind of scenario: Separate organizations served by separate
-  pools, special pools for writing the data to a tertiary storage system,
-  pools in a DMZ which serves only a certain kind of data (e.g. for the grid).
-  The following section explains the mechanism employed by the PSU and shows
-  how to configure it with several examples.</para>
+  <para>
+    The &serv-poolmngr; can be configured by either directly editing
+    the file <filename>/opt/d-cache/config/PoolManager.conf</filename>
+    or via the <link linkend="intouch-admin">Admin
+    Interface</link>. Changes made via the Admin Interface will be
+    saved in the file
+    <filename>/opt/d-cache/config/PoolManager.conf</filename> by the
+    <command>save</command> command. This file will be parsed,
+    whenever the &dcache; starts up. It is a simple text file
+    containing the corresponding Admin Interface commands. It can
+    therefore also be edited before the system is started. It can also
+    be loaded into a running system with the <command>reload</command>
+    command.  In this chapter we will describe this file.
+<!-- TODO:
+This needs to be explained in the section on the Admin Interface:
+        The syntax of the commands for configuring the &psu; will be
+	explained with the examples below. These commands can be
+	issued within the &cell-poolmngr; to change the configuration
+	while the system is running. The
+	<command>save</command>-command can then be used to save the
+	current configuration to the file
+	<filename>/opt/d-cache/config/PoolManager.conf</filename>.
+-->
+  </para>
+
+  <para>
+    The &psu; is responsible for finding the pool which will be used for
+    a specific transfer-request based on the information from the
+    CM. By telling the &psu; which pools are permitted for which type of
+    transfer-request, the administrator of the &dcache; system can
+    adjust the system to any kind of scenario: Separate organizations
+    served by separate pools, special pools for writing the data to a
+    tertiary storage system, pools in a DMZ which serves only a
+    certain kind of data (e.g., for the grid). The following section
+    explains the mechanism employed by the &psu; and shows how to
+    configure it with several examples.
+  </para>
 
   <section id="cf-pm-psu">
     <title>The Pool Selection Mechanism</title>
 
-    <para>The PSU generates a list of allowable storage-pools for each
-    incoming transfer-request. The PSU-configuration described below tells the
-    PSU which combinations of transfer-request and storage-pool are allowed.
-    Imagine a two-dimensional table with a row for each possible
-    transfer-request and a column for each pool - each field in the table
-    containing either <quote>yes</quote> or <quote>no</quote>. For an incoming
-    transfer-request the PSU will return a list of all pools with
-    <quote>yes</quote> in the corresponding row.</para>
+    <para>
+      The &psu; generates a list of allowed storage-pools for each
+      incoming transfer-request. The &psu; configuration described below
+      tells the &psu; which combinations of transfer-request and
+      storage-pool are allowed. Imagine a two-dimensional table with
+      a row for each possible transfer-request and a column for each
+      pool - each field in the table containing either
+      <quote>yes</quote> or <quote>no</quote>. For an incoming
+      transfer-request the &psu; will return a list of all pools with
+      <quote>yes</quote> in the corresponding row.
+    </para>
 
-    <para>Instead of <quote>yes</quote> and <quote>no</quote> the table really
-    contains a <firstterm>preference</firstterm> - a non-negative integer.
-    However, the PSU configuration is easier to understand if this is
-    ignored.</para>
+    <para>
+      Instead of <quote>yes</quote> and <quote>no</quote> the table
+      really contains a <firstterm>preference</firstterm> - a
+      non-negative integer.  However, the &psu; configuration is easier
+      to understand if this is ignored.
+    </para>
 
-    <para>Actually maintaining such a table in memory (and as user in a
-    configuration file) would be quite inefficient, because of the many
-    possibilities for the transfer-requests. Instead, the PSU consults a set
-    of rules in order to generate the list of allowed pools. Each such rule is
-    called a <firstterm>link</firstterm> because it links a set of
-    transfer-requests to a group of pools. A link consists of a set of
-    condition and a list of pools. If all the conditions are satisfied, the
-    pools belonging to the link are added to the list of allowable
-    pools.</para>
-
-    <para>The main task is to understand how the conditions in a link are
-    defined. After we have dealt with that, the preference values will be
-    discussed and a few examples will follow.</para>
+    <para>
+      Actually maintaining such a table in memory (and as user in a
+      configuration file) would be quite inefficient, because there are
+      many possibilities for the transfer-requests. Instead, the &psu;
+      consults a set of rules in order to generate the list of allowed
+      pools. Each such rule is called a <firstterm>link</firstterm>
+      because it links a set of transfer-requests to a group of pools.
+    </para>
 
     <section>
-      <title>The Condition of a Link</title>
+      <title>Links</title>
+      <para>
+	A link consists of a
+	set of unit groups and a list of pools. If all the unit groups
+	are matched, the pools belonging to the link are added to
+	the list of allowable pools.
+      </para>
 
-      <para>The properties of a transfer-request, which are relevant for the
-      PSU, are the following:<variablelist>
+      <para>
+	A link is defined in the file
+	<filename>/opt/d-cache/config/PoolManager.conf</filename> by
+      </para>
+
+	<cmdsynopsis>
+	  <command>psu create link</command>
+	  <arg choice='plain'><replaceable>link</replaceable></arg>
+	  <arg choice='plain'><replaceable>unitgroup</replaceable></arg>
+
+	  <command>psu set link</command>
+	  <arg choice='plain'><replaceable>link</replaceable></arg>
+	  <arg choice='plain'><parameter>-readpref</parameter>=<replaceable>rpref</replaceable></arg>
+	  <arg choice='plain'><parameter>-writepref</parameter>=<replaceable>wpref</replaceable></arg>
+	  <arg choice='plain'><parameter>-cachepref</parameter>=<replaceable>cpref</replaceable></arg>
+	  <arg choice='plain'><parameter>-p2ppref</parameter>=<replaceable>ppref</replaceable></arg>
+
+	  <command>psu add link</command>
+	  <arg choice='plain'><replaceable>link</replaceable></arg>
+	  <arg choice='plain'><replaceable>poolgroup</replaceable></arg>
+	</cmdsynopsis>
+
+      <para>
+	For the preference values see <xref linkend="cf-pm-psu-pref"/>.
+      </para>
+
+      <para>
+	The main task is to understand how the unit groups in a link
+	are defined. After we have dealt with that, the preference
+	values will be discussed and a few examples will follow.
+      </para>
+
+      <para>
+	The four properties of a transfer request, which are relevant for
+	the &psu;, are the following:
+<!--      </para>
+-->
+	<variablelist>
           <varlistentry>
             <term>Location of the File</term>
-
             <listitem>
-              <para>The directory of the file in the file system.</para>
+	      <para>
+		The location of the file in the file system is not
+		used directly. Each file has the following two
+		properties which can be set per directory:
+	      </para>
+
+		<itemizedlist>
+		  <listitem>
+		    <formalpara>
+		    <title>Storage Class</title>
+
+			The storage class is a string. It is used by a
+			tertiary storage system to decide where to
+			store the file (i.e. on which set of tapes)
+			and &dcache; can use the storage class for a
+			similar purpose (i.e. on which pools the file
+			can be stored.). A detailed description of the
+			syntax and how to set the storage class of a
+			directory in the namespace is given in <xref
+			linkend="secStorageClass" />.
+		    </formalpara>
+		    </listitem>
+
+		    <listitem>
+		    <formalpara>
+		      <title>Cache Class</title>
+			The cache class is a string with essentially
+			the same functionality as the storage class,
+			except that it is not used by a tertiary
+			storage system. It is used in cases, where the
+			storage class does not provide enough
+			flexibility. It should only be used, if an
+			existing configuration using storage classes
+			does not provide sufficient flexibility.
+		      </formalpara>
+
+		    </listitem>
+		  </itemizedlist>
+
+	    </listitem>
+	  </varlistentry>
+
+          <varlistentry>
+            <term>IP Address</term>
+            <listitem>
+	      <para>
+		The IP address of the requesting host.
+	      </para>
+
             </listitem>
           </varlistentry>
 
           <varlistentry>
-            <term>IP Address</term>
-
+            <term>Protocol / Type of Door</term>
             <listitem>
-              <para>The IP address of the requesting host.</para>
+	      <para>
+		The protocol respectively the type of door used by the transfer.
+	      </para>
             </listitem>
           </varlistentry>
 
           <varlistentry>
             <term>Type of Transfer</term>
-
             <listitem>
-              <para>The type of transfer is either <quote>read</quote>,
-              <quote>write</quote>, or "cache". A request for reading a file
-              which is not stored in the cache, but has to be staged from a
-              connected tertiary storage system will trigger a
-              <quote>cache</quote>-request and a subsequent
-              <quote>read</quote>-request. These will be treated as two
-              separate requests.</para>
+              <para>
+		The type of transfer is either &read;, &write;, &p2p;
+		request or &cache;.
+	      </para>
+	      <para>
+		A request for reading a file which is not on a read
+		pool will trigger a &p2p; request and a subsequent
+		&read; request. These will be treated as two separate
+		requests.
+	      </para>
+	      <para>
+		A request for reading a file which is not stored on
+		disk, but has to be staged from a connected tertiary
+		storage system will trigger a &cache; request to fetch
+		the file from the tertiary storage system and a
+		subsequent &read; request. These will be treated as
+		two separate requests.
+	      </para>
             </listitem>
           </varlistentry>
-        </variablelist>The location of the file in the file system is not used
-      directly. Each file has the following two properties which can be set
-      per directory:<variablelist>
-          <varlistentry>
-            <term>Storage Class</term>
-
-            <listitem>
-              <para>The storage class is a string. It is used by a tertiary
-              storage system to decide where to store the file (i.e. on which
-              set of tapes) and dCache can use the storage class for a similar
-              purpose (i.e. on which pools the file can be stored.). A
-              detailed description of the syntax and how to set the storage
-              class of a directory in the namespace is given in <xref
-              linkend="secStorageClass" />.</para>
-            </listitem>
-          </varlistentry>
-
-          <varlistentry>
-            <term>Cache Class</term>
-
-            <listitem>
-              <para>The cache class is a string with essentially the same
-              functionality as the storage class, except that it is not used
-              by a tertiary storage system. It is used in cases, where the
-              storage class does not provide enough flexibility. It should
-              only be used, if an existing configuration using storage classes
-              does not provide sufficient flexibility</para>
-            </listitem>
-          </varlistentry>
-        </variablelist></para>
-
-      <para>Each link contains one or more <firstterm>conditions</firstterm>,
-      all of which have to be satisfied by the transfer-request. Each
-      condition in turn contains several <firstterm>elementary
-      conditions</firstterm>. The condition is satisfied if at least one of
-      the elementary conditions is satisfied. For the mathematically inclined
-      this logical structure can be expressed by the following
-      formula:<informalexample>
-          <programlisting>link ==     ( elemCond1 or elemCond2 ) 
-        and ( elemCond3 or elemCond4 or elemCond5 ) 
-        and ... and ( ... ),</programlisting>
-        </informalexample>where the parentheses are the conditions. The first
-      condition contains the elementary conditions
-      <literal>elemCond1</literal> and <literal>elemCond2</literal>, and the
-      second one contains <literal>elemCond3</literal>,
-      <literal>elemCond4</literal>, and<literal> elemCond5</literal>.</para>
-
-      <para>There are 3 types of elementary conditions: elementary network
-      (<literal>-net</literal>), storage class (<literal>-store</literal>),
-      and cache class conditions (<literal>-dcache</literal>). Each type
-      imposes a condition on the IP address, the storage class, and the cache
-      class, respectively.</para>
-
-      <para>An <emphasis>elementary network condition</emphasis> consists of
-      an IP address and a net mask written as
-      <quote><literal><replaceable>IP-address</replaceable>/<replaceable>net
-      mask</replaceable></literal></quote>, say
-      <quote><literal>111.111.111.0/255.255.255.0</literal></quote>. It is
-      satisfied, if the request is coming from a host with IP address within
-      the subnet given by the address/netmask pair.</para>
-
-      <para>
-	An <emphasis>elementary storage class condition</emphasis> is
-	given by a storage class. It is satisfied if the requested
-	file has this storage class. Simple wild cards are allowed:
-	for this it is important to know that a storage class must
-	always contains exactly one <literal>@</literal>-symbol as
-	will be explained in <xref linkend="secStorageClass" />. In an
-	elementary storage class condition, either the part before the
-	<literal>@</literal>-symbol or both parts may be replaced by a
-	<literal>*</literal>-symbol; for example,
-	<literal>*@osm</literal> and <literal>*@*</literal> are both
-	valid elementary storage class conditions whereas
-	<literal>something@*</literal> is invalid. The
-	<literal>*</literal>-symbol represents a limited wildcard: any
-	string that doesn't contain an <literal>@</literal>-symbol
-	will match.
+        </variablelist>
       </para>
 
-      <para>An <emphasis>elementary cache class condition</emphasis> is given
-      by a cache class. It is satisfied, if the cache class of the requested
-      file agrees with it.</para>
+     <para>
+       Each link contains one or more <firstterm>unit
+       groups</firstterm>, all of which have to be matched by the
+       transfer request. Each unit group in turn contains several
+       <firstterm>units</firstterm>. The unit group is matched if at
+       least one of the units is matched.
+      </para>
 
-      <para>The conditions for the <emphasis>type of transfer</emphasis> are
-      not specified with elementary conditions. Instead, each link contains
-      three attributes <quote><literal>-readpref</literal></quote>,
-      <quote><literal>-writepref</literal></quote>, and
-      <quote><literal>-cachepref</literal></quote>, which specify a preference
-      value for the respective types of transfer. If all the conditions in the
-      link are satisfied, the corresponding preference is assigned to each
-      pool the link points to. Since we are ignoring different preference
-      values at the moment, a preference of <literal>0</literal> stands for
-      <quote>no</quote> and a non-zero preference stands for
-      <quote>yes</quote>.</para>
+      <section>
+	<title>Types of Units</title>
+	<para>
+	  There are four types of units: network
+	  (<literal>-net</literal>), protocol
+	  (<literal>-protocol</literal>), storage class
+	  (<literal>-store</literal>) and cache class
+	  (<literal>-dcache</literal>) units. Each type imposes a
+	  condition on the IP address, the protocol, the storage class
+	  and the cache class respectively.
+	</para>
+	<para>
+	  For each transfer at most one of each of the four unit types
+	  will match.  If more than one unit of the same type could
+	  match the request then the most restrictive unit matches.
+	</para>
+	<para>
+	  The unit that matches is selected from all units defined in
+	  &dcache;, not just those for a particular unit group.  This
+	  means that, if a unit group has a unit that could match a
+	  request but this request also matches a more restrictive
+	  unit defined elsewhere then the less restrictive unit will
+	  not match.
+	</para>
+	  
+	<variablelist>
 
-      <para>The following explanation of the preference values can be skipped
-      at first reading. It will not be relevant, if all non-zero preference
-      values are the same. If you want to try configuring the pool manager
-      right now without bothering about the preferences, you should only use
-      <literal>0</literal> (for <quote>no</quote>) and, say,
-      <literal>10</literal> (for <quote>yes</quote>) as preferences. The first
-      examples below are of this type.</para>
+          <varlistentry>
+            <term>Network Unit</term>
+            <listitem>
+	      <para>
+		A <emphasis>network unit</emphasis> consists of an IP
+		address and a net mask written as
+		<literal><replaceable>IP-address</replaceable>/<replaceable>net
+		mask</replaceable></literal>, say
+		<literal>111.111.111.0/255.255.255.0</literal>. It
+		is satisfied, if the request is coming from a host
+		with IP address within the subnet given by the
+		address/netmask pair.
+	      </para>
+
+	      <screen><command>psu create ugroup</command> <replaceable>name-of-unitgroup</replaceable>
+<command>psu create unit</command><parameter> -net</parameter> <replaceable>IP-address</replaceable>/<replaceable>net mask</replaceable>
+<command>psu addto ugroup</command> <replaceable>name-of-unitgroup</replaceable> <replaceable>IP-address</replaceable>/<replaceable>net mask</replaceable></screen>
+	    </listitem>
+          </varlistentry>
+
+	  <varlistentry>
+	    <term>Protocol Unit</term>
+	    <listitem>
+	      <para>
+		A <emphasis>protocol unit</emphasis> consists of the
+		name of the protocol and the version number written as
+		<replaceable>protocol-name</replaceable>/<replaceable>version-number</replaceable>,
+		e.g., <literal>xrootd/3</literal>.
+	      </para>
+		<screen><command>psu create ugroup</command> <replaceable>name-of-unitgroup</replaceable>
+<command>psu create unit</command><parameter> -protocol</parameter> <replaceable>protocol-name</replaceable>/<replaceable>version-number</replaceable>
+<command>psu addto ugroup</command> <replaceable>name-of-unitgroup</replaceable> <replaceable>protocol-name</replaceable>/<replaceable>version-number</replaceable></screen>
+
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>Storage Class Unit</term>
+	    <listitem>
+	      <para>
+		A <emphasis>storage class unit</emphasis> is given by
+		a storage class. It is satisfied if the requested file
+		has this storage class. Simple wild cards are allowed:
+		for this it is important to know that a storage class
+		must always contain exactly one
+		<literal>@</literal>-symbol as will be explained in
+		<xref linkend="secStorageClass" />. In a storage class
+		unit, either the part before the
+		<literal>@</literal>-symbol or both parts may be
+		replaced by a <literal>*</literal>-symbol; for
+		example, <literal>*@osm</literal> and
+		<literal>*@*</literal> are both valid storage class
+		units whereas <literal>something@*</literal> is
+		invalid. The <literal>*</literal>-symbol represents a
+		limited wildcard: any string that doesn't contain an
+		<literal>@</literal>-symbol will match.
+	      </para>
+	      <screen><command>psu create ugroup</command> <replaceable>name-of-unitgroup</replaceable>
+<command>psu create unit</command> <parameter>-store</parameter> <replaceable>StoreName</replaceable>:<replaceable>StorageGroup</replaceable>@<replaceable>type-of-storage-system</replaceable>
+<command>psu addto ugroup</command> <replaceable>name-of-unitgroup</replaceable> <replaceable>StoreName</replaceable>:<replaceable>StorageGroup</replaceable>@<replaceable>type-of-storage-system</replaceable></screen>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>Cache Class Unit</term>
+	    <listitem>
+	      <para>
+		A <emphasis>cache class unit</emphasis> is given by a
+		cache class. It is satisfied, if the cache class of
+		the requested file agrees with it.
+	      </para>
+	      <screen><command>psu create ugroup</command> <replaceable>name-of-unitgroup</replaceable>
+<command>psu create unit</command> <parameter>-dcache</parameter> <replaceable>name-of-cache-class</replaceable>
+<command>psu addto ugroup</command> <replaceable>name-of-unitgroup</replaceable> <replaceable>name-of-cache-class</replaceable></screen>
+	    </listitem>
+	  </varlistentry>
+
+	</variablelist>
+
+      </section>
+
+      <section id="cf-pm-psu-pref">
+	<title>Preference Values for Type of Transfer</title>
+      <para>
+	The conditions for the <emphasis>type of transfer</emphasis>
+	are not specified with units. Instead, each link contains four
+	attributes <quote><literal>-readpref</literal></quote>,
+	<quote><literal>-writepref</literal></quote>,
+	<quote><literal>-p2ppref</literal></quote> and
+	<quote><literal>-cachepref</literal></quote>, which specify a
+	preference value for the respective types of transfer. If all
+	the unit groups in the link are matched, the corresponding
+	preference is assigned to each pool the link points to. Since
+	we are ignoring different preference values at the moment, a
+	preference of <literal>0</literal> stands for
+	<quote>no</quote> and a non-zero preference stands for
+	<quote>yes</quote>.
+      </para>
+
+      <section>
+	<title>Multiple non-zero Preference Values</title>
+
+	<note>
+	  <para>
+	    This explanation of the preference values can be skipped
+	    at first reading. It will not be relevant, if all non-zero
+	    preference values are the same. If you want to try
+	    configuring the pool manager right now without bothering
+	    about the preferences, you should only use
+	    <literal>0</literal> (for <quote>no</quote>) and, say,
+	    <literal>10</literal> (for <quote>yes</quote>) as
+	    preferences. The first examples below are of this type.
+	  </para>
+	</note>
+
+	<para>
+	  If several different non-zero preference values are used,
+	  the &psu; will not generate a single list but a set of
+	  lists, each containing pools with the same preference. The
+	  Cost Manager will use the list of pools with highest
+	  preference and select the one with the lowest cost for the
+	  transfer. Only if all pools with the highest preference are
+	  offline, the next list will be considered by the Cost
+	  Manager. This can be used to configure a set of fall-back
+	  pools which are used if none of the other pools are
+	  available.
+	</para>
+      </section>
     </section>
-
-    <section>
-      <title>Preference Values</title>
-
-      <para>If more than one preference value different from zero is used, the
-      PSU will not generate a single list but a set of lists, each containing
-      pools with the same preference. The Cost Manager will use the list of
-      pools with highest preference and select the one with the lowest cost
-      for the transfer. Only if all pools with the highest preference are
-      unavailable, the next list will be considered by the Cost Manager. This
-      can be used to configure a set of fall-back pools which are used if none
-      of the other pools are available.</para>
-    </section>
-
-    <section>
-      <title>Syntax and Examples</title>
-
-      <para>The syntax of the commands for configuring the PSU will be
-      explained with the examples below. These commands can be issued within
-      the <literal>PoolManager</literal>-cell to change the configuration
-      while the system is running. The <command>save</command>-command can
-      then be used to save the current configuration to the file
-      <filename>config/PoolManager.conf</filename> in the dCache
-      program-directory. This file will be parsed, whenever the dCache system
-      starts up. It is a simple text file containing the corresponding
-      commands. It can therefore also be edited before the system is started.
-      It can also be loaded into a running system with the
-      <command>reload</command>-command.</para>
 
       <section>
         <title>Pool Groups</title>
 
-        <para>Pools can be grouped together to pool groups. Consider a host
-        <literal>pool1</literal> with two pools, <literal>pool1_1</literal>
-        and <literal>pool1_2</literal>, and a host <literal>pool2</literal>
-        with one pool <literal>pool2_1</literal>. If you want to treat them in
-        the same way, you would create a pool group and put all of them in
-        it:<programlisting><command>psu create pgroup</command> <replaceable>normal-pools</replaceable>
-<command>psu create pool</command> <replaceable>pool1_1</replaceable>
-<command>psu addto pgroup</command> <replaceable>normal-pools</replaceable> <replaceable>pool1_1</replaceable>
-<command>psu create pool</command> <replaceable>pool1_2</replaceable>
-<command>psu addto pgroup</command> <replaceable>normal-pools</replaceable> <replaceable>pool1_2</replaceable>
-<command>psu create pool</command> <replaceable>pool2_1</replaceable>
-<command>psu addto pgroup</command> <replaceable>normal-pools</replaceable> <replaceable>pool2_1</replaceable></programlisting>If
-        you later want to treat <literal>pool1_2</literal> differently from
-        the others, you would remove it from this pool group and add it to a
-        new one:<programlisting><command>psu removefrom pgroup</command> <replaceable>normal-pools</replaceable> <replaceable>pool1_2</replaceable>
-<command>psu create pgroup</command> <replaceable>special-pools</replaceable>
-<command>psu addto pgroup</command> <replaceable>special-pools</replaceable> <replaceable>pool1_2</replaceable></programlisting>In
-        the following, we will assume that the necessary pool groups already
-        exist. All names ending with <quote><literal>-pools</literal></quote>
-        will denote pool groups.</para>
+        <para>
+	  Pools can be grouped together to pool groups.
+	</para>
+	<screen><command>psu create pgroup</command> <replaceable>name-of-poolgroup</replaceable>
+<command>psu create pool</command> <replaceable>name-of-pool</replaceable>
+<command>psu addto pgroup</command> <replaceable>name-of-poolgroup</replaceable> <replaceable>name-of-pool</replaceable></screen>
 
-        <para>Note that a pool-node will register itself with the pool
-        manager: The pool will be created within the PSU and added to the pool
-        group <quote><literal>default</literal></quote>, if that exists. This
-        is why the dCache system will automatically use any new pool-nodes in
-        the standard configuration: All pools are in
-        <quote><literal>default</literal></quote> and can therefore handle any
-        request.</para>
+	<informalexample>
+	  <para>
+	    Consider a host <literal>pool1</literal> with two pools,
+	    <literal>pool1_1</literal> and <literal>pool1_2</literal>,
+	    and a host <literal>pool2</literal> with one pool
+	    <literal>pool2_1</literal>. If you want to treat them in
+	    the same way, you would create a pool group and put all of
+	    them in it:
+	  </para>
+	  <programlisting><command>psu create pgroup</command> normal-pools
+<command>psu create pool</command> pool1_1
+<command>psu addto pgroup</command> normal-pools pool1_1
+<command>psu create pool</command> pool1_2
+<command>psu addto pgroup</command> normal-pools pool1_2
+<command>psu create pool</command> pool2_1
+<command>psu addto pgroup</command> normal-pools pool2_1</programlisting>
+
+          <para>
+	    If you later want to treat <literal>pool1_2</literal>
+	    differently from the others, you would remove it from this
+	    pool group and add it to a new one:
+	  </para>
+	  <programlisting><command>psu removefrom pgroup</command> normal-pools pool1_2
+<command>psu create pgroup</command> special-pools
+<command>psu addto pgroup</command> special-pools pool1_2</programlisting>
+
+	</informalexample>
+	<para>
+	  In the following, we will assume that the necessary pool
+	  groups already exist. All names ending with
+	  <literal>-pools</literal> will denote pool
+	  groups.
+	</para>
+
+        <para>
+	  Note that a pool-node will register itself with the
+	  &cell-poolmngr;: The pool will be created within the &psu; and
+	  added to the pool group
+	  <literal>default</literal>, if that
+	  exists. This is why the &dcache; system will automatically use
+	  any new pool-nodes in the standard configuration: All pools
+	  are in <literal>default</literal> and can
+	  therefore handle any request.
+	</para>
       </section>
 
+      <section>
+	<title>Define a link</title>
+	<para>
+	  Now we have everything we need to define a link.
+	</para>
+	<screen><command>psu create ugroup</command> <replaceable>name-of-unitgroup</replaceable>
+<command>psu create unit</command><parameter> - <replaceable>type</replaceable></parameter> <replaceable>unit</replaceable>
+<command>psu addto ugroup</command> <replaceable>name-of-unitgroup</replaceable> <replaceable>unit</replaceable>
+
+<command>psu create pgroup</command> <replaceable>poolgroup</replaceable>
+<command>psu create pool</command> <replaceable>pool</replaceable>
+<command>psu addto pgroup</command> <replaceable>poolgroup</replaceable> <replaceable>pool</replaceable>
+
+<command>psu create link</command> <replaceable>link</replaceable> <replaceable>name-of-unitgroup</replaceable>
+<command>psu set link</command> <replaceable>link</replaceable> <parameter>-readpref=</parameter><replaceable>10</replaceable> <parameter>-writepref=</parameter><replaceable>0</replaceable> <parameter>-cachepref=</parameter><replaceable>10</replaceable><parameter>-p2ppref=</parameter><replaceable>-1</replaceable>
+<command>psu add link</command> <replaceable>link</replaceable>  <replaceable>poolgroup</replaceable>
+</screen>
+      </section>
+
+    </section>
+
+    <section>
+      <title>Examples</title>
+      <para>
+	Find some examples for the configuration of the &psu; below.
+      </para>
+
       <section id="secExReadWrite">
-        <title>Separate Write and Read Pools</title>
+	<title>Separate Write and Read Pools</title>
 
-        <para>The dCache we are going to configure receives data from a
-        running experiment, stores the data onto a tertiary storage system,
-        and serves as a read cache for users who want to analyze the data.
-        While the new data from the experiment should be stored on highly
-        reliable and therefore expensive systems, the cache functionality may
-        be provided by inexpensive hardware. It is therefore desirable to have
-        a set of pools dedicated for writing the new data and a separate set
-        for reading.</para>
+	<para>
+	  The &dcache; we are going to configure receives data from a
+	  running experiment, stores the data onto a tertiary storage
+	  system, and serves as a read cache for users who want to
+	  analyze the data.  While the new data from the experiment
+	  should be stored on highly reliable and therefore expensive
+	  systems, the cache functionality may be provided by
+	  inexpensive hardware. It is therefore desirable to have a
+	  set of pools dedicated for writing the new data and a
+	  separate set for reading.
+	</para>
 
-        <para>The simplest configuration for such a setup would consist of two
-        links <quote>write-link</quote> and <quote>read-link</quote>. The
-        configuration is as follows:<programlisting><command>psu create unit</command> <parameter>-net</parameter> <replaceable>0.0.0.0/0.0.0.0</replaceable>
-<command>psu create ugroup</command> <replaceable>allnet-cond</replaceable>
-<command>psu addto ugroup</command> <replaceable>allnet-cond</replaceable> <replaceable>0.0.0.0/0.0.0.0</replaceable>
+	<informalexample>
+	  <para>
+	    The simplest configuration for such a setup would consist
+	    of two links <quote>write-link</quote> and
+	    <quote>read-link</quote>. The configuration is as follows:
+	</para>
+	<programlisting><command>psu create pgroup</command> read-pools
+<command>psu create pool</command> pool1
+<command>psu addto pgroup</command> read-pools pool1
+<command>psu create pgroup</command> write-pools
+<command>psu create pool</command> pool2
+<command>psu addto pgroup</command> write-pools pool2
 
-<command>psu create link</command> <replaceable>read-link</replaceable> <replaceable>allnet-cond</replaceable>
-<command>psu set link</command> <replaceable>read-link</replaceable> <parameter>-readpref=</parameter><replaceable>10</replaceable> <parameter>-writepref=</parameter><replaceable>0</replaceable> <parameter>-cachepref=</parameter><replaceable>10</replaceable>
-<command>psu add link</command> <replaceable>read-link</replaceable> <replaceable>read-pools</replaceable>
+<command>psu create unit</command><parameter> -net</parameter> 0.0.0.0/0.0.0.0
+<command>psu create ugroup</command> allnet-cond
+<command>psu addto ugroup</command> allnet-cond 0.0.0.0/0.0.0.0
 
-<command>psu create link</command> <replaceable>write-link</replaceable> <replaceable>allnet-cond</replaceable>
-<command>psu set link</command> <replaceable>write-link</replaceable> <parameter>-readpref=</parameter><replaceable>0</replaceable> <parameter>-writepref=</parameter><replaceable>10</replaceable> <parameter>-cachepref=</parameter><replaceable>0</replaceable>
-<command>psu add link</command> <replaceable>write-link</replaceable> <replaceable>write-pools</replaceable></programlisting>Why
-        is the condition <literal>allnet-cond</literal> necessary? It is used
-        as a condition which is always true in both links. This is needed,
-        because each link contains at least one condition. The commands
-        contain the words <literal>unit</literal> and
-        <literal>ugroup</literal> for historical reasons. They denote
-        elementary conditions and conditions in our nomenclature.</para>
+<command>psu create link</command> read-link allnet-cond
+<command>psu set link</command> read-link <parameter>-readpref=</parameter>10 <parameter>-writepref=</parameter>0 <parameter>-cachepref=</parameter>10
+<command>psu add link</command> read-link read-pools
+
+<command>psu create link</command> write-link allnet-cond
+<command>psu set link</command> write-link <parameter>-readpref=</parameter>0 <parameter>-writepref=</parameter>10 <parameter>-cachepref=</parameter>0
+<command>psu add link</command> write-link write-pools</programlisting>
+        <para>
+	  Why is the unit group <literal>allnet-cond</literal>
+	  necessary? It is used as a condition which is always true in
+	  both links. This is needed, because each link must contain
+	  at least one unit group.
+	</para>
+	</informalexample>
       </section>
 
       <section>
         <title>Restricted Access by IP Address</title>
 
-        <para>You might not want to give access to the pools for the whole
-        network, as in the previous example (<xref
-        linkend="secExReadWrite" />), though. Assume, the experiment data is
-        copied into the cache from the hosts with IP
-        <literal>111.111.111.201</literal>,
-        <literal>111.111.111.202</literal>, and
-        <literal>111.111.111.203</literal>. As you might guess, the subnet of
-        the site is <literal>111.111.111.0/255.255.255.0</literal>. Access
-        from outside should be denied. Then you would modify the above
-        configuration as follows:<programlisting><command>psu create unit</command> <parameter>-net</parameter> <replaceable>111.111.111.0/255.255.255.0</replaceable>
-<command>psu create ugroup</command> <replaceable>allnet-cond</replaceable>
-<command>psu addto ugroup</command> <replaceable>allnet-cond</replaceable> <replaceable>111.111.111.0/255.255.255.0</replaceable>
+        <para>
+	  You might not want to give access to the pools for the whole
+	  network, as in the previous example (<xref
+	  linkend="secExReadWrite" />), though.
+	</para>
+	<informalexample>
+	  <para>
+	    Assume, the experiment data is copied into the cache from
+	    the hosts with IP <literal>111.111.111.201</literal>,
+	    <literal>111.111.111.202</literal>, and
+	    <literal>111.111.111.203</literal>. As you might guess,
+	    the subnet of the site is
+	    <literal>111.111.111.0/255.255.255.0</literal>. Access
+	    from outside should be denied. Then you would modify the
+	    above configuration as follows:
+	</para>
+<programlisting><command>psu create pgroup</command> read-pools
+<command>psu create pool</command> pool1
+<command>psu addto pgroup</command> read-pools pool1
+<command>psu create pgroup</command> write-pools
+<command>psu create pool</command> pool2
+<command>psu addto pgroup</command> write-pools pool2
 
-<command>psu create unit</command> <parameter>-net</parameter> <replaceable>111.111.111.201/255.255.255.255</replaceable>
-<command>psu create unit</command> <parameter>-net</parameter> <replaceable>111.111.111.202/255.255.255.255</replaceable>
-<command>psu create unit</command> <parameter>-net</parameter> <replaceable>111.111.111.203/255.255.255.255</replaceable>
-<command>psu create ugroup</command> <replaceable>write-cond</replaceable>
-<command>psu addto ugroup</command> <replaceable>write-cond</replaceable> <replaceable>111.111.111.201/255.255.255.255</replaceable>
-<command>psu addto ugroup</command> <replaceable>write-cond</replaceable> <replaceable>111.111.111.202/255.255.255.255</replaceable>
-<command>psu addto ugroup</command> <replaceable>write-cond</replaceable> <replaceable>111.111.111.203/255.255.255.255</replaceable>
+<command>psu create unit</command> <parameter>-store</parameter> *@*
 
-<command>psu create link</command> <replaceable>read-link</replaceable> <replaceable>allnet-cond</replaceable>
-<command>psu set link</command> <replaceable>read-link</replaceable> <parameter>-readpref=</parameter><replaceable>10</replaceable> <parameter>-writepref=</parameter><replaceable>0</replaceable> <parameter>-cachepref=</parameter><replaceable>10</replaceable>
-<command>psu add link</command> <replaceable>read-link</replaceable> <replaceable>read-pools</replaceable>
+<command>psu create unit</command> <parameter>-net</parameter> 111.111.111.0/255.255.255.0
+<command>psu create unit</command> <parameter>-net</parameter> 111.111.111.201/255.255.255.255
+<command>psu create unit</command> <parameter>-net</parameter> 111.111.111.202/255.255.255.255
+<command>psu create unit</command> <parameter>-net</parameter> 111.111.111.203/255.255.255.255
 
-<command>psu create link</command> <replaceable>write-link</replaceable> <replaceable>write-cond</replaceable>
-<command>psu set link</command> <replaceable>write-link</replaceable> <parameter>-readpref=</parameter><replaceable>0</replaceable> <parameter>-writepref=</parameter><replaceable>10</replaceable> <parameter>-cachepref=</parameter><replaceable>0</replaceable>
-<command>psu add link</command> <replaceable>write-link</replaceable> <replaceable>write-pools</replaceable></programlisting></para>
+<command>psu create ugroup</command> write-cond
+<command>psu addto ugroup</command> write-cond 111.111.111.201/255.255.255.255
+<command>psu addto ugroup</command> write-cond 111.111.111.202/255.255.255.255
+<command>psu addto ugroup</command> write-cond 111.111.111.203/255.255.255.255
+
+<command>psu create ugroup</command> read-cond
+<command>psu addto ugroup</command> read-cond 111.111.111.0/255.255.255.0
+<command>psu addto ugroup</command> read-cond 111.111.111.201/255.255.255.255
+<command>psu addto ugroup</command> read-cond 111.111.111.202/255.255.255.255
+<command>psu addto ugroup</command> read-cond 111.111.111.203/255.255.255.255
+
+<command>psu create link</command> read-link read-cond
+<command>psu set link</command> read-link <parameter>-readpref=</parameter>10 <parameter>-writepref=</parameter>0 <parameter>-cachepref=</parameter>10
+<command>psu add link</command> read-link read-pools
+
+<command>psu create link</command> write-link write-cond
+<command>psu set link</command> write-link <parameter>-readpref=</parameter>0 <parameter>-writepref=</parameter>10 <parameter>-cachepref=</parameter>0
+<command>psu add link</command> write-link write-pools</programlisting>
+
+        <important>
+	  <para>
+	    For a given transfer exactly zero or one storage class
+	    unit, cache class unit, net unit and protocol unit will
+	    match. As always the most restrictive one will match, the
+	    IP <literal>111.111.111.201</literal> will match the
+	    <literal>111.111.111.201/255.255.255.255</literal> unit
+	    and not the <literal>111.111.111.0/255.255.255.0</literal>
+	    unit. Therefore if you only add
+	    <literal>111.111.111.0/255.255.255.0</literal> to the unit
+	    group <quote>read-cond</quote>, the transfer request
+	    coming from the IP <literal>111.111.111.201</literal> will
+	    only be allowed to write and not to read. The same is true
+	    for transfer requests from <literal>111.111.111.202</literal> and
+	    <literal>111.111.111.203</literal>.
+	  </para>
+	</important>
+	</informalexample>
       </section>
 
       <section>
         <title>Reserving Pools for Storage and Cache Classes</title>
 
-        <para>If pools are financed by one experimental group, they probably
-        do not like it, if it is also used by another group. The best way to
-        restrict data belonging to one experiment to a set of pools is with
-        the help of storage class conditions. If more flexibility is needed,
-        cache class conditions can be used for the same purpose.</para>
+        <para>
+	  If pools are financed by one experimental group, they
+	  probably do not like it if they are also used by another
+	  group. The best way to restrict data belonging to one
+	  experiment to a set of pools is with the help of storage
+	  class conditions. If more flexibility is needed, cache class
+	  conditions can be used for the same purpose.
+	</para>
 
-        <para>Assume, data of experiment A obtained in 2004 is written into
-        subdirectories in the namespace tree which are tagged with the storage
-        class <quote><literal>exp-a:run2004@osm</literal></quote>, and
-        similarly for the other years. (How this is done is described in <xref
-        linkend="secStorageClass" />.) Experiment B uses the storage class
-        <quote><literal>exp-b:alldata@osm</literal></quote> for all its data.
-        Especially important data is tagged with the cache class
-        <quote><literal>important</literal></quote>. (This is described in
-        <xref linkend="secCacheClass" />.) A suitable setup would
-        be<programlisting><command>psu create ugroup</command> <replaceable>exp-a-cond</replaceable>
+	<informalexample>
+	  <para>
+	    Assume, data of experiment A obtained in 2010 is written
+	    into subdirectories in the namespace tree which are tagged
+	    with the storage class
+	    <literal>exp-a:run2010@osm</literal>, and
+	    similarly for the other years. (How this is done is
+	    described in <xref linkend="secStorageClass" />.)
+	    Experiment B uses the storage class
+	    <literal>exp-b:alldata@osm</literal> for
+	    all its data.  Especially important data is tagged with
+	    the cache class
+	    <literal>important</literal>. (This is
+	    described in <xref linkend="secCacheClass" />.) A suitable
+	    setup would be
+	  </para>
+	  <programlisting><command>psu create pgroup</command> exp-a-pools
+<command>psu create pool</command> pool1
+<command>psu addto pgroup</command> exp-a-pools pool1
 
-<command>psu create unit</command> -store <replaceable>exp-a:run2003@osm</replaceable>
-<command>psu addto ugroup</command> <replaceable>exp-a-cond</replaceable> <replaceable>exp-a:run2003@osm</replaceable>
-<command>psu create unit</command> -store <replaceable>exp-a:run2004@osm</replaceable>
-<command>psu addto ugroup</command> <replaceable>exp-a-cond</replaceable> <replaceable>exp-a:run2004@osm</replaceable>
+<command>psu create pgroup</command> exp-b-pools
+<command>psu create pool</command> pool2
+<command>psu addto pgroup</command> exp-b-pools pool2
 
-<command>psu create link</command> <replaceable>exp-a-link</replaceable> <replaceable>allnet-cond</replaceable> <replaceable>exp-a-cond</replaceable>
-<command>psu set link</command> <replaceable>exp-a-link</replaceable> <parameter>-readpref=</parameter><replaceable>10</replaceable> <parameter>-writepref=</parameter><replaceable>10</replaceable> <parameter>-cachepref=</parameter><replaceable>10</replaceable>
-<command>psu add link</command> <replaceable>exp-a-link</replaceable> <replaceable>exp-a-pools</replaceable>
+<command>psu create pgroup</command> exp-b-imp-pools
+<command>psu create pool</command> pool3
+<command>psu addto pgroup</command> exp-b-imp-pools pool3
 
-<command>psu create ugroup</command> <replaceable>exp-b-cond</replaceable>
+<command>psu create unit</command> <parameter>-net</parameter> 111.111.111.0/255.255.255.0
+<command>psu create ugroup</command> allnet-cond
+<command>psu addto ugroup</command> allnet-cond 111.111.111.0/255.255.255.0
 
-<command>psu create unit</command> <parameter>-store</parameter> <replaceable>exp-b:alldata@osm</replaceable>
-<command>psu addto ugroup</command> <replaceable>exp-b-cond</replaceable> <replaceable>exp-b:alldata@osm</replaceable>
+<command>psu create ugroup</command> exp-a-cond
+<command>psu create unit</command> -store exp-a:run2011@osm
+<command>psu addto ugroup</command> exp-a-cond exp-a:run2011@osm
+<command>psu create unit</command> -store exp-a:run2010@osm
+<command>psu addto ugroup</command> exp-a-cond exp-a:run2010@osm
 
-<command>psu create ugroup</command> <replaceable>imp-cond</replaceable>
-<command>psu create unit</command> <parameter>-dcache</parameter> <replaceable>important</replaceable>
-<command>psu addto ugroup</command> <replaceable>imp-cond</replaceable> <replaceable>important</replaceable>
+<command>psu create link</command> exp-a-link allnet-cond exp-a-cond
+<command>psu set link</command> exp-a-link <parameter>-readpref=</parameter>10 <parameter>-writepref=</parameter>10 <parameter>-cachepref=</parameter>10
+<command>psu add link</command> exp-a-link exp-a-pools
 
-<command>psu create link</command> <replaceable>exp-b-link</replaceable> <replaceable>allnet-cond</replaceable> <replaceable>exp-b-cond</replaceable>
-<command>psu set link</command> <replaceable>exp-b-link</replaceable> <parameter>-readpref=</parameter><replaceable>10</replaceable> <parameter>-writepref=</parameter><replaceable>10</replaceable> <parameter>-cachepref=</parameter><replaceable>10</replaceable>
-<command>psu add link</command> <replaceable>exp-b-link</replaceable> <replaceable>exp-b-pools</replaceable>
+<command>psu create ugroup</command> exp-b-cond
+<command>psu create unit</command> <parameter>-store</parameter> exp-b:alldata@osm
+<command>psu addto ugroup</command> exp-b-cond exp-b:alldata@osm
 
-<command>psu create link</command> <replaceable>exp-b-imp-link</replaceable> <replaceable>allnet-cond</replaceable> <replaceable>exp-b-cond</replaceable> <replaceable>imp-cond</replaceable>
-<command>psu set link</command> <replaceable>exp-b-imp-link</replaceable> <parameter>-readpref=</parameter><replaceable>20</replaceable> <parameter>-writepref=</parameter><replaceable>20</replaceable> <parameter>-cachepref=</parameter><replaceable>20</replaceable>
-<command>psu add link</command> <replaceable>exp-b-link</replaceable> <replaceable>exp-b-imp-pools</replaceable></programlisting></para>
+<command>psu create ugroup</command> imp-cond
+<command>psu create unit</command> <parameter>-dcache</parameter> important
+<command>psu addto ugroup</command> imp-cond important
 
-        <para>Data tagged with cache class
-        <quote><literal>important</literal></quote> will always be written and
-        read from pools in the pool group <literal>exp-b-imp-pools</literal>,
-        except when all pools in this group cannot be reached. Then the pools
-        in <literal>exp-a-pools</literal> will be used.</para>
+<command>psu create link</command> exp-b-link allnet-cond exp-b-cond
+<command>psu set link</command> exp-b-link <parameter>-readpref=</parameter>10 <parameter>-writepref=</parameter>10 <parameter>-cachepref=</parameter>10
+<command>psu add link</command> exp-b-link exp-b-pools
 
-        <para>Note again that these will never be used otherwise. Not even, if
-        all pools in <literal>exp-b-imp-pools</literal> are very busy and some
-        pools in <literal>exp-a-pools</literal> have nothing to do and lots of
-        free space.</para>
+<command>psu create link</command> exp-b-imp-link allnet-cond exp-b-cond imp-cond
+<command>psu set link</command> exp-b-imp-link <parameter>-readpref=</parameter>20 <parameter>-writepref=</parameter>20 <parameter>-cachepref=</parameter>20
+<command>psu add link</command> exp-b-link exp-b-imp-pools</programlisting>
 
-        <para>The central IT department might also want to set up a few pools,
-        which are used as fall-back, if none of the pools of the experiments
-        are functioning. These will also be used for internal testing. The
-        following would have to be added to the previous
-        setup:<programlisting><command>psu create link</command> <replaceable>fallback-link</replaceable> <replaceable>allnet-cond</replaceable>
-<command>psu set link</command> <replaceable>fallback-link</replaceable> <parameter>-readpref=</parameter><replaceable>5</replaceable> <parameter>-writepref=</parameter><replaceable>5</replaceable> <parameter>-cachepref=</parameter><replaceable>5</replaceable>
-<command>psu add link</command> <replaceable>fallback-link</replaceable> <replaceable>it-pools</replaceable></programlisting>Note
-        again that these will only be used, if none of the experiments pools
-        can be reached, or if the storage class is not of the form
-        <literal>exp-a:run2003@osm</literal>,
-        <literal>exp-a:run2004@osm</literal>, or
-        <literal>exp-b:alldata@osm</literal>. If the administrator fails to
-        create the elementary condition <literal>exp-a:run2005@osm</literal> and
-        add it to the condition <literal>exp-a-cond</literal>, the fall-back
-        pools will be used eventually.</para>
+          <para>
+	    Data tagged with cache class
+	    <quote><literal>important</literal></quote> will always be
+	    written and read from pools in the pool group
+	    <literal>exp-b-imp-pools</literal>, except when all pools
+	    in this group cannot be reached. Then the pools in
+	    <literal>exp-a-pools</literal> will be used.
+	  </para>
+
+	  <para>
+	    Note again that these will never be used otherwise. Not
+	    even, if all pools in <literal>exp-b-imp-pools</literal>
+	    are very busy and some pools in
+	    <literal>exp-a-pools</literal> have nothing to do and lots
+	    of free space.
+	  </para>
+        </informalexample>
+
+        <para>
+	  The central IT department might also want to set up a few
+	  pools, which are used as fall-back, if none of the pools of
+	  the experiments are functioning. These will also be used for
+	  internal testing. The following would have to be added to
+	  the previous setup:
+	</para>
+
+	<informalexample>
+
+	  <programlisting><command>psu create pgroup</command> it-pools
+<command>psu create pool</command> pool_it
+<command>psu addto pgroup</command> it-pools pool_it
+
+<command>psu create link</command> fallback-link allnet-cond
+<command>psu set link</command> fallback-link <parameter>-readpref=</parameter>5 <parameter>-writepref=</parameter>5 <parameter>-cachepref=</parameter>5
+<command>psu add link</command> fallback-link it-pools</programlisting>
+
+          <para>
+	    Note again that these will only be used, if none of the
+	    experiments pools can be reached, or if the storage class
+	    is not of the form <literal>exp-a:run2009@osm</literal>,
+	    <literal>exp-a:run2010@osm</literal>, or
+	    <literal>exp-b:alldata@osm</literal>. If the administrator
+	    fails to create the unit
+	    <literal>exp-a:run2005@osm</literal> and add it to the
+	    unit group <literal>exp-a-cond</literal>, the fall-back
+	    pools will be used eventually.
+	  </para>
+
+	</informalexample>
       </section>
     </section>
-
+ <!--   </section>
+-->
     <section id="secStorageClass">
       <title>Storage Classes</title>
 
-      <para>The storage class is a string of the form
-      <literal><replaceable>StoreDescriptor</replaceable>@<replaceable>hsm</replaceable></literal>,
-      where <replaceable>hsm</replaceable> denotes the type of
-      tertiary storage system in use, and
-      <replaceable>StoreDescriptor</replaceable> is a string
-      describing the storage class in a syntax which depends on the used
-      tertiary storage system. If no tertiary storage system is used, it is
-      probably best to use
-      <literal><replaceable>hsm</replaceable>=osm</literal>, since
-      this is tested best. Then the
-      <replaceable>StoreDescriptor</replaceable> has the syntax
-      <literal><replaceable>Store</replaceable>:<replaceable>StorageGroup</replaceable></literal>.
-      These can be set within the namespace per directory. Consider for example the
-      following setup:
-      <screen>&prompt-root; <userinput>cd <filename>/pnfs/<replaceable>domain</replaceable>/<replaceable>experiment-a</replaceable>/</filename></userinput>
-&prompt-root; <userinput>cat "<filename>.(tag)(OSMTemplate)</filename>"</userinput>
+      <para>
+	The storage class is a string of the form
+	<literal><replaceable>StoreName</replaceable>:<replaceable>StorageGroup</replaceable>@<replaceable>type-of-storage-system</replaceable></literal>,
+	where <replaceable>type-of-storage-system</replaceable>
+	denotes the type of storage system in use, and
+	<replaceable>StoreName</replaceable>:<replaceable>StorageGroup</replaceable>
+	is a string describing the storage class in a syntax which
+	depends on the storage system. In general use
+	<literal><replaceable>type-of-storage-system</replaceable>=osm</literal>.
+      </para>
+
+      <para>
+	Consider for example the following setup:
+      </para>
+
+      <informalexample>
+	<screen>&prompt-root; <userinput>&install-base-opt;/bin/chimera-cli.sh lstag /data/experiment-a</userinput>
+Total: 2
+OSMTemplate
+sGroup
+&prompt-root; <userinput>&install-base-opt;/bin/chimera-cli.sh readtag /data/experiment-a OSMTemplate</userinput>
 StoreName myStore
-&prompt-root; <userinput>cat "<filename>.(tag)(sGroup)</filename>"</userinput>
-STRING</screen>This is the setup after a fresh installation and it will lead
-      to the storage class <literal>myStore:STRING@osm</literal>. An
-      adjustment to more sensible values will look like<screen>&prompt-root; <userinput>echo "StoreName exp-a" &gt;! "<filename>.(tag)(OSMTemplate)</filename>"</userinput>
-&prompt-root; <userinput>echo "run2004" &gt;! "<filename>.(tag)(sGroup)</filename>"</userinput></screen>and
-      will result in the storage class <literal>exp-a:run2004@osm</literal>.
-      To summarize: The storage class will depend on the directory, the data
-      is stored in and is configurable.</para>
+&prompt-root; <userinput>&install-base-opt;/bin/chimera-cli.sh readtag /data/experiment-a sGroup</userinput>
+STRING</screen>
+
+       <para>
+	 This is the setup after a fresh installation and it will lead
+	 to the storage class
+	 <literal>myStore:STRING@osm</literal>. An adjustment to more
+	 sensible values will look like
+       </para>
+<screen>&prompt-root; <userinput>echo "StoreName exp-a" | /opt/d-cache/bin/chimera-cli.sh Writetag /data/experiment-a OSMTemplate</userinput>
+&prompt-root; <userinput>echo "run2010" | /opt/d-cache/bin/chimera-cli.sh Writetag /data/experiment-a sGroup</userinput></screen>
+
+      <para>
+	and will result in the storage class
+	<literal>exp-a:run2010@osm</literal>. To summarize: The
+	storage class will depend on the directory the data is stored
+	in and is configurable.
+      </para>
+
+      </informalexample>
     </section>
 
     <section id="secCacheClass">
       <title>Cache Class</title>
 
-      <para>Storage classes might already be in use for the configuration of a
-      tertiary storage system. In most cases they should be flexible enough to
-      configure the PSU. However, in rare cases the existing configuration and
-      convention for storage classes might not be flexible enough.</para>
+      <para>
+	Storage classes might already be in use for the configuration
+	of a tertiary storage system. In most cases they should be
+	flexible enough to configure the &psu;. However, in rare cases
+	the existing configuration and convention for storage classes
+	might not be flexible enough.
+      </para>
 
-      <para>Consider for example a situation, where data produced by an
-      experiment always has the same storage class
-      <literal>exp-a:alldata@osm</literal>. This is good for the tertiary
-      storage system, since all data is supposed to go to the same tape set
-      sequentially. However, the data also contains a relatively small amount
-      of meta-data, which is accessed much more often by analysis jobs than
-      the rest of the data. You would like to keep the meta-data on a
-      dedicated set of dCache pools. However, the storage class does not
-      provide means to accomplish that.</para>
+      <para>
+	Consider for example a situation, where data produced by an
+	experiment always has the same storage class
+	<literal>exp-a:alldata@osm</literal>. This is good for the
+	tertiary storage system, since all data is supposed to go to
+	the same tape set sequentially. However, the data also
+	contains a relatively small amount of meta-data, which is
+	accessed much more often by analysis jobs than the rest of the
+	data. You would like to keep the meta-data on a dedicated set
+	of &dcache; pools. However, the storage class does not provide
+	means to accomplish that.
+      </para>
 
-      <para>The cache class of a directory is set by the tag
-      <literal>cacheClass</literal> as follows:<screen>&prompt-root; <userinput>echo "metaData" &gt;! "<filename>.(tag)(cacheClass)</filename>"</userinput></screen>In
-      the above example the meta-data is stored in directories which are
-      tagged in this way.</para>
+      <para>
+	The cache class of a directory is set by the tag
+	<literal>cacheClass</literal> as follows:
+      </para>
+      <screen>&prompt-root; <userinput>echo "metaData" &gt; "<filename>.(tag)(cacheClass)</filename>"</userinput></screen>
+      <para>
+	In the above example the meta-data is stored in directories
+	which are tagged in this way.
+      </para>
 
-      <para>There is a nice trick for easy checking of the existing tags in
-      one directory:<screen>&prompt-root; <userinput>grep '' `cat '.(tags)()'`</userinput>
+      <para>
+	There is a nice trick for easy checking of the existing tags
+	in one directory:
+      </para>
+      <screen>&prompt-root; <userinput>grep '' `cat '.(tags)()'`</userinput>
 .(tag)(OSMTemplate):StoreName exp-a
-.(tag)(sGroup):run2004
-.(tag)(cacheClass):metaData</screen>This only works, if the quote-symbols are
-      used correctly. (tick, tick, back-tick, tick, tick, back-tick).</para>
+.(tag)(sGroup):run2010
+.(tag)(cacheClass):metaData</screen>
+      <para>
+	This only works, if the quote-symbols are used
+	correctly. (tick, tick, back-tick, tick, tick,
+	back-tick).
+      </para>
 
-      <para>Tags are inherited by sub-directories: Changing a tag of a
-      directory will change the tag of each sub-directory, if the tag has
-      never been changed for this sub-directory directly. Changing tags breaks
-      these inheritance links. Directories in namespace should never be moved,
-      since this will mess up the inheritance structure and eventually break
-      the whole system.</para>
+      <para>
+	Tags are inherited by sub-directories: Changing a tag of a
+	directory will change the tag of each sub-directory, if the
+	tag has never been changed for this sub-directory
+	directly. Changing tags breaks these inheritance
+	links. Directories in namespace should never be moved, since
+	this will mess up the inheritance structure and eventually
+	break the whole system.
+      </para>
+
     </section>
   </section>
 
@@ -544,12 +917,7 @@ STRING</screen>This is the setup after a fresh installation and it will lead
       request, these two numbers are merged to build the total cost
       for each pool.  The first step is isolated within a separate
       loadable class.  The second step is done by the cost
-      module.<footnote>
-	<para>
-	  The next development step will be to add the second
-	  calculation as well to the customizable (loadable) class.
-	</para>
-      </footnote>
+      module.
     </para>
 
     <section id="cf-pm-cm-perf">
@@ -588,7 +956,7 @@ STRING</screen>This is the setup after a fresh installation and it will lead
       <para>
 	Then the average is taken for each mover type where
 	<symbol>maxAllowed</symbol> is not zero. For a pool where
-	store, restore and client transfers are allowed, e.g.:
+	store, restore and client transfers are allowed, e.g.,
       </para>
 
       <para>
@@ -769,7 +1137,7 @@ STRING</screen>This is the setup after a fresh installation and it will lead
 	      <para>
 		I.e. the the space cost of a one-week-old LRU file
 		will be <phrase role="math">(1 +
-		breakeven)</phrase>. Not again, that all this only
+		breakeven)</phrase>. Note again, that all this only
 		applies if <phrase role="math">breakeven &lt;
 		1.0</phrase>
 	      </para>
@@ -908,7 +1276,7 @@ STRING</screen>This is the setup after a fresh installation and it will lead
       configurable with the command <xref
       linkend="cmd-set_pool_decision"/>.
 
-      E.g.
+      E.g.,
 
 <screen>&dc-prompt-pm; <userinput>set pool decision <option>-spacecostfactor=3</option> <option>-cpucostfactor=1</option></userinput></screen>
 
@@ -918,62 +1286,6 @@ STRING</screen>This is the setup after a fresh installation and it will lead
     </para>
 
     </section>
-
-    <section>
-      <title>Advanced Customization of the Cost Calculation</title>
-      <para>
-	The cost calcuation scheme described above can be overwritten
-	by the pool manager
-	<quote><command>create</command></quote>-option:
-	
-<screen><option>-costCalculator=<replaceable>newCostCalculator</replaceable></option></screen>
-
-	The default value for
-	<replaceable>newCostCalculator</replaceable> is
-	<literal>CostCalculationV5</literal>. The goal is to compare
-	different pool costs without intermediatly calculating scalar
-	values for performance and space.
-      </para>
-    </section>
-
-    <!--
-    
-    <a name="lrucost">
-   </blockquote>
-</blockquote>
--->
-  </section>
-  
-  <section id="cf-pm-devel">
-    <title>Devel</title>
-    
-    <para>
-      In addition, the PoolCellInfo now is just the CellInfo plus the
-      PoolCostInfo.  The WebCollectorV3 has been modified
-      accordingly. The WebCollectorV0 has been removed.
-    </para>
-
-    <section>
-      <title>Pool 2 Pool transfer client</title>
-
-      <para>
-	The pool 2 pool client transfers are now added to the total
-	cost of a pool and they are reported to the 'pool request' web
-	page as well.
-      </para>
-      
-      <para>
-	Although client pool 2 pool transfers seem to be handled
-	within regular queues, they are not.  Queuing both, p2p server
-	and queue requests, has a (even though small) probability of
-	deadlocks.  So, p2p client requests are never actually queued
-	but they start immediately after they have been requested.
-	The p2p client 'max number of transfers' is only used to
-	calculate the costs for those transfers.
-      </para>
-      
-    </section>
-    
 
   </section>
 

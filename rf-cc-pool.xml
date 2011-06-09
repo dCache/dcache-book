@@ -216,15 +216,15 @@ t      data amount in TBytes</screen>
 
   <refentry id="cmd-p2p_set_max_active">
     <refmeta>
-      <refentrytitle><command>p2p set max active</command></refentrytitle>
+      <refentrytitle><command>mover set max active -queue=p2p</command></refentrytitle>
     </refmeta>
     <refnamediv>
-      <refname><command>p2p set max active</command></refname>
+      <refname><command>mover set max active -queue=p2p</command></refname>
       <refpurpose>Set the maximum number of active pool-to-pool server transfers.</refpurpose>
     </refnamediv>
     <refsynopsisdiv>
       <cmdsynopsis>
-        <command>p2p set max active</command>
+        <command>mover set max active -queue=p2p</command>
         <arg choice="plain"><replaceable>maxActiveP2PTransfers</replaceable></arg>
       </cmdsynopsis>
       <variablelist>
