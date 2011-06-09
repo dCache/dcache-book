@@ -209,8 +209,11 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!-- !ENTITY pi-fo-bgcolour-bg   "<?dbfo bgcolor='#FDFDFD'?>" -->
 <!ENTITY pi-fo-bgcolour-bg    "<?dbfo bgcolor='#FFFFFF'?>">
 
-
-<!-- Misc -->
+<!-- Paths -->
+<!ENTITY install-base-opt "<filename class='directory'>/opt/d-cache</filename>">
 <!ENTITY ns-base "<filename class='directory'>/data</filename>">
+
+<!-- Files -->
+<!ENTITY file-authorized_keys "<filename class='directory'>&install-base-opt;/etc/authorized_keys</filename>">
 <!-- <!ENTITY ndash "&#x2013;"> -->
 
