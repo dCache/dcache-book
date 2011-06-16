@@ -39,18 +39,17 @@
   <para>
     This chapter provides some background information and details on
     configuring &dcache; to use &acl;s and how to administer the
-    resulting system.  Some additional information can be found on the
-    wiki page: <ulink
-    url="http://trac.dcache.org/projects/dcache/wiki/Integrate"/>.
+    resulting system.
   </para>
 
   <note>
-    <title>Known limitations</title>
-    
+    <title>&acl;s and &pnfs;</title>
+
     <para>
-      At the time of writing, support for &acl;s in &dcache; is not
-      complete.  The &srm; component lacks support for &acl;s.  The
-      other &dcache; doors support &acl;s on all operations.
+      &acl;s are only supported with the &chimera; name space
+      backend. Versions before 1.9.12 had partial support for &acl;s
+      with the &pnfs; backend, however due to the limitations of that
+      implementation &acl;s were practically useless with &pnfs;.
     </para>
   </note>
 
@@ -139,7 +138,7 @@
       directory's &acl;.  The inherited &ace;s are specially marked so
       that only those that are intended will be inherited.
     </para>
-    
+
     <para>
       Inheritance only happens when a new file or directory is
       created.  After creation, the &acl; of the new file or directory
@@ -157,231 +156,79 @@
   </section>
 
 
-  <section id="cf-acl-perm-handlers">
-    <title>&acl;s and permission handlers</title>
-
-    <para>
-      &dcache; provides support for &acl;s by introducing the concept
-      of a <firstterm>permission handler</firstterm>.  A permission
-      handler may be queried to determine if an end user is authorised
-      for some file-based operation (namespace or data transfer).  A
-      permission handler will supply one of three decisions: allow,
-      deny and defer.
-    </para>
-
-    <para>
-      &dcache; operates with a chain (or ordered list) of permission
-      handlers.  When determining if an end user is authorised for
-      some operation the first permission handler in the chain is
-      checked.  If that permission handler decides that the operation
-      should be allowed or denied for that end user then &dcache; will
-      authorise or deny that user respectively.  If the first
-      permission handler defers then the next permission handler in
-      the chain is queried.
-    </para>
-
-    <para>
-      If this second permission handler returns allow or denied the
-      &dcache; will authorise or deny that user respectively.  If the
-      second permission handler also defers then &dcache; will
-      continue down the chain and query the next permission handler.
-      If the chain is exhausted then an <quote>always deny</quote>
-      policy is used (TODO: is this true?).
-    </para>
-
-    <para>
-      The <literal>UnixPermissionHandler</literal> is an example
-      permission handler.  It provides the standard Unix permission
-      model and decides whether an end user is authorised based on
-      file and directory ownership and group-ownership and the set of
-      permissions.  This permission handler will always come to a
-      decision whether an end user is authorised or not, so will never
-      return a defer decision.  Therefore any permission handler
-      placed in the chain after a
-      <literal>UnixPermissionHandler</literal> is superfluous.
-    </para>
-
-    <para>
-      The <literal>ACLPermissionHandler</literal> is a permission
-      handler that implements the NFS v4 &acl; model.  Users and
-      groups of users may be authorised for different operations.
-      This is independent of a file and directory ownership.  With
-      these &acl;s how new files and directories inherit permissions
-      is described explicitly.  These aspects will be described in
-      detail <link linkend="cf-acl-inheritance">later on in this
-      chapter</link>.
-    </para>
-
-    <para>
-      By default &dcache; uses the
-      <literal>UnixPermissionHandler</literal>.  This provides
-      backwards compatability with older versions of &dcache;. To
-      enable support for &acl;s, the &acl; configuration section in
-      <filename>dCacheSetup</filename> file must be configured as
-      described in <xref linkend="cf-acl-dcachesetup-permhandler"/>
-    </para>
-  </section>
-
   <section id="cf-acl-db-install">
     <title>Database configuration</title>
 
     <para>
-      &dcache; &acl; support requires database tables to store &acl;
-      and &ace; information.  Depending on the &dcache; instance, this
-      may require adjusting the database schema.  This section
-      describes the operations necessary for &chimera;- and
-      &pnfs;-based &dcache; instances.
+      &acl; support requires database tables to store &acl; and &ace;
+      information.  These tables are part of the &chimera; name space
+      backend and for a new installation no additional steps are
+      needed to prepare the database.
     </para>
 
-    <section>
-      <title>&chimera;</title>
-
-      <para>
-	If a site has migrated from &pnfs; to &chimera; then the
-	<database>chimera</database> database already exists but the
-	database schema must be extended to support &acl;s.  This is
-	achieved by running two SQL files:
-      </para>
+    <para>
+        Early versions of &chimera; (before &dcache; 1.9.3) did not create
+        the &acl; table during installation. If the database is
+        lacking the extra table then it has to be created before
+        enabling &acl; support. This is achieved by applying two SQL
+        files:
+    </para>
 
 <screen>&prompt-root; <userinput>psql chimera &lt; /opt/d-cache/libexec/chimera/sql/addACLtoChimeraDB.sql</userinput>
 &prompt-root; <userinput>psql chimera &lt; /opt/d-cache/libexec/chimera/sql/pgsql-procedures.sql</userinput></screen>
-    </section>
-
-
-    <section>
-      <title>&pnfs;</title>
-
-      <para>
-	If you are not going to migrate to &chimera; and you want to
-	use &acl;s with &pnfs; then you must create a database to
-	store &acl; data within.  The following commands will create
-	the database <database>aclpnfs</database> so it may be used to
-	store &dcache; &acl; data.
-      </para>
-
-      <screen>&prompt-root; <userinput>createdb aclpnfs</userinput>
-&prompt-root; <userinput>psql aclpnfs &lt; /opt/d-cache/libexec/chimera/sql/create-dCacheACL.sql</userinput></screen>
-
-    </section>
   </section>
 
   <section id="cf-acl-dcachesetup">
-    <title>&dcache; configuration</title>
+    <title>Configuring &acl; support</title>
 
     <para>
-      The <filename>dCacheSetup</filename> file contains a number of
-      settings that may be adjusted to configure &dcache;'s permission
-      settings.  These settings are are described in this section.
+      The <filename>dcache.conf</filename> and layout files contain a
+      number of settings that may be adjusted to configure &dcache;'s
+      permission settings.  These settings are are described in this
+      section.
     </para>
 
-    <section id="cf-acl-dcachesetup-permhandler">
-      <title>permissionHandler</title>
+    <section id="cf-acl-config-enable">
+      <title>Enabling &acl; support</title>
 
       <para>
-	The <literal>permissionHandler</literal> setting describes the
-	Permission Handler chain that &dcache; will use.  It contains
-	a list of permission handlers that will form the chain.  Valid
-	permission handlers are
-	<literal>diskCacheV111.services.acl.UnixPermissionHandler</literal>
-	and
-	<literal>diskCacheV111.services.acl.ACLPermissionHandler</literal>.
-	Not specifying a <literal>permissionHandler</literal> value is
-	equivalent to specifying the UnixPermissionHandler.
+        To enable &acl; support set the property
+        <varname>aclEnabled</varname> to <literal>true</literal>. This
+        property applies to the &serv-pnfsmngr; and &serv-acl; services
+        and only need to be defined for these services.
       </para>
-
-      <important>
-	<title>No spaces</title>
-	<para>
-	  Remember when writing <literal>permissionHandler</literal>
-	  options that the value must be a single line leaving no
-	  space before and after the separating comma.
-	</para>
-      </important>
-
-      <example>
-	<title>Only use Unix authorisation model</title>
-
-	<para>
-	  The following setting results in &dcache; using Only the
-	  Unix authorisation model.  The decision about whether an end
-	  user is authorised is based on file and directory ownership
-	  and group-ownership and on the file or directory permissions:
-	</para>
-	<programlisting>permissionHandler=diskCacheV111.services.acl.UnixPermissionHandler</programlisting>
-      </example>
-
-      <example>
-	<title>Only &acl;s authorisation model </title>
-
-	<para>
-	  Only the NFS v4 &acl; authorisation model is used:
-	</para>
-
-	<programlisting>permissionHandler=diskCacheV111.services.acl.ACLPermissionHandler</programlisting>
-      </example>
-
-      <example>
-	<title>&acl;s first, Unix as a fall-back</title>
-
-	<para>
-	  The &acl; permissions are checked first. If &acl;s do not
-	  state whether an operation is allowed or denied then Unix
-	  permissions are checked:
-	</para>
-
-	<programlisting>permissionHandler=diskCacheV111.services.acl.ACLPermissionHandler,
-diskCacheV111.services.acl.UnixPermissionHandler</programlisting>
-      </example>
     </section>
 
-    <section id="cf-acl-dcachesetup-db">
-      <title>Database connection</title>
+    <section id="cf-acl-config-admin">
+      <title>Enabling the &serv-acl; service</title>
 
-      <para>
-	In the <literal>ACL Configuration</literal> section of the
-	<filename>dCacheSetup</filename> file uncomment the variable
-	<varname>aclConnUrl</varname> and replace the database name
-	<database>chimera</database> in the URI with the name of the
-	&acl; database just created.  If the database is hosted by a
-	remote PostGreSQL instance then the host part of the URI
-	(<literal>localhost</literal> in the default) must also be replaced.
-      </para>
+        <para>
+          To query and define &acl;s on files and directories enable
+          the &serv-acl; service. This service exposes a command line
+          interface to administer &acl;s. The command line interface
+          of the service is described in section <xref
+          linkend="cf-acl-admin"/>.
+        </para>
 
-      <para>
-	If the database is <database>aclpnfs</database> and hosted by
-	the &psql; instance on machine <systemitem
-	class='fqdomainname'>db-server.example.org</systemitem>, the
-	correct configuration line is
-      </para>
+        <para>
+            To enable the &serv-acl; service, you have to change the
+            layout file corresponding to your &dcache;-instance.
+            Enable the &serv-acl; service within the domain that you
+            want to run it in by adding the following line
+        </para>
 
-      <programlisting>aclConnUrl=jdbc:postgresql://db-server.example.org/aclpnfs?prepareThreshold=3</programlisting>
+        <programlisting>..
+[<replaceable>domainName</replaceable>/acl]
+..</programlisting>
 
-      <caution>
-	<title>Apply changes to all doors</title>
-
-	<para>
-	  The change must be applied to the
-	  <filename>dCacheSetup</filename> file on all doors.  If the
-	  &psql; instance hosting the database is on the same machine
-	  then <systemitem class='systemname'>localhost</systemitem>
-	  may be used.
-	</para>
-      </caution>
-
-      <tip>
-	Many sites can refer to a node using just the short name; for
-	example, <systemitem class='systemname'>db-server</systemitem>
-	instead of <systemitem
-	class='fqdomainname'>db-server.example.org</systemitem> in the
-	above example.
-      </tip>
     </section>
+
   </section>
 
 
 <!-- Section ACL Administration  -->
   <section id="cf-acl-admin">
-    <title>&acl; Administration</title>
+    <title>Administrating &acl;s</title>
 
     <para>
       Altering &dcache; &acl; behaviour is achieved by connecting to
@@ -439,8 +286,8 @@ diskCacheV111.services.acl.UnixPermissionHandler</programlisting>
       </para>
 
       <section>
-	<title>Description of the &ace; structure.</title>
-	
+	<title>Description of the &ace; structure</title>
+
 	<para>
 	  The <replaceable>ACE</replaceable> arguments to the
 	  <command>setfacl</command> command have a specific format.
@@ -454,7 +301,7 @@ diskCacheV111.services.acl.UnixPermissionHandler</programlisting>
 	    <rhs>
 	      <nonterminal def="#ebnf.ace.subject">Subject</nonterminal> ':'
 	      <nonterminal def="#ebnf.ace.access">Access</nonterminal> | <sbr/>
-	    
+
 	      <nonterminal def="#ebnf.ace.subject">Subject</nonterminal> ':'
 	      <nonterminal def="#ebnf.ace.access">Access</nonterminal> ':'
 	      <nonterminal def="#ebnf.ace.inheritance">Inheritance</nonterminal>
@@ -473,7 +320,7 @@ diskCacheV111.services.acl.UnixPermissionHandler</programlisting>
 	      'AUTHENTICATED@'
 	    </rhs>
 	  </production>
-	  
+
 	  <production id="ebnf.ace.access">
 	    <lhs>Access</lhs>
 	    <rhs>
@@ -481,7 +328,7 @@ diskCacheV111.services.acl.UnixPermissionHandler</programlisting>
 	      '-' <nonterminal def="#ebnf.ace.mask">Mask</nonterminal>
 	    </rhs>
 	  </production>
-	  
+
 	  <production id="ebnf.ace.mask">
 	    <lhs>Mask</lhs>
 	    <rhs>
@@ -493,7 +340,7 @@ diskCacheV111.services.acl.UnixPermissionHandler</programlisting>
 
 	  <production id="ebnf.ace.maskItem">
 	    <lhs>MaskItem</lhs>
-	    <rhs> 
+	    <rhs>
 	      'r' | 'l' | 'w' | 'f' | 's' | 'a' | 'n' |
 	      'N' | 'x' | 'd' | 'D' | 't' | 'T' | 'c' |
 	      'C' | 'o'
@@ -502,25 +349,25 @@ diskCacheV111.services.acl.UnixPermissionHandler</programlisting>
 
 	  <production id="ebnf.ace.inheritance">
 	    <lhs>Inheritance</lhs>
-	    
+
 	    <rhs>
 	      <nonterminal def="#ebnf.ace.inheritance">Inheritance</nonterminal> <nonterminal def="#ebnf.ace.flag">Flag</nonterminal> | <sbr/>
 	      <nonterminal def="#ebnf.ace.flag">Flag</nonterminal>
 	    </rhs>
 	  </production>
-	  
+
 	  <production id="ebnf.ace.flag">
 	    <lhs>Flag</lhs>
 	    <rhs>'f' | 'd' | 'o'</rhs>
 	  </production>
-	  
+
 	  <production id="ebnf.ace.user">
 	    <lhs>UserID</lhs>
 	    <rhs>INTEGER</rhs>
 	  </production>
-	  
+
 	  <production id="ebnf.ace.group">
-	    <lhs>GroupID</lhs>	    
+	    <lhs>GroupID</lhs>
 	    <rhs>INTEGER</rhs>
 	  </production>
 	</productionset>
@@ -538,12 +385,12 @@ diskCacheV111.services.acl.UnixPermissionHandler</programlisting>
 	    apply.  It acts as a filter so that only those users that
 	    match the Subject will have their access rights affected.
 	  </para>
-	  
+
 	  <para>
 	    As indicated by the EBNF above, the Subject of an &ace;
 	    can take one of several forms.  These are described below:
 	  </para>
-      
+
 	  <variablelist>
 	    <?dbhtml list-presentation="table"?>
 	    <?dbhtml term-presentation="bold" ?>
@@ -655,14 +502,14 @@ diskCacheV111.services.acl.UnixPermissionHandler</programlisting>
 
 	<section>
 	  <title>Access mask</title>
-      
+
 	  <para>
 	    &ace-access; (defined in the <link
 	    linkend="ebnf.ace">&ace; EBNF</link> above) describes what
 	    kind of operations are being described by the &ace; and
 	    whether the &ace; is granting permission or denying it.
 	  </para>
-	  
+
 	  <para>
 	    An individual &ace; can either grant permissions or deny
 	    them, but never both.  However, an &acl; may be composed
@@ -688,7 +535,7 @@ diskCacheV111.services.acl.UnixPermissionHandler</programlisting>
 	    reading a file since the Access begins with a
 	    <literal>-</literal>.
 	  </para>
-	  
+
 	  <para>
 	    The first character of &ace-access; must be
 	    <literal>+</literal> or <literal>-</literal>, no other
@@ -738,7 +585,7 @@ diskCacheV111.services.acl.UnixPermissionHandler</programlisting>
 	      described in the following table.
 	    </para>
 	  </note>
-	  
+
 	  <variablelist>
 	    <?dbhtml list-presentation="table"?>
 	    <?dbhtml term-presentation="bold" ?>
@@ -973,24 +820,6 @@ diskCacheV111.services.acl.UnixPermissionHandler</programlisting>
 	    order doesn't matter.
 	  </para>
 
-	  <note>
-	    <title>Chimera only</title>
-
-	    <para>
-	      Note that inheritance is only available with &chimera;.
-	      When using &acl;s with &pnfs;, there is no inheritance
-	      of &ace;s on the newly created objects (files or
-	      directories).
-	    </para>
-
-	    <para>
-	      To provide a similar functionality for a &pnfs;-based
-	      &dcache; instance, the system administrator will have to
-	      set &acl;s on the newly created objects external to
-	      &dcache;, either manually or by writing a script.
-	    </para>
-	  </note>
-
 	  <variablelist>
 	    <?dbhtml list-presentation="table"?>
 	    <?dbhtml term-presentation="bold" ?>
@@ -1089,13 +918,13 @@ diskCacheV111.services.acl.UnixPermissionHandler</programlisting>
 		</para>
 	      </listitem>
 	    </varlistentry>
-	  </variablelist>      
+	  </variablelist>
 	</section>
       </section>
 
       <section>
 	<title>Examples</title>
-      
+
 	<para>
 	  This section gives some specific examples of how to set
 	  &acl;s to achieve some specific behaviour.
@@ -1137,7 +966,7 @@ diskCacheV111.services.acl.UnixPermissionHandler</programlisting>
 	    explicitly set.
 	  </para>
 	</example>
-      
+
 	<example>
 	  <title>&acl; to deny a group</title>
 
@@ -1157,8 +986,8 @@ diskCacheV111.services.acl.UnixPermissionHandler</programlisting>
 	    contents.  As this &ace; is first, it takes precedence
 	    over other &ace;s.
 	  </para>
-	    
-	  <para> 
+
+	  <para>
 	    The second &ace; allows everyone to list the directory's
 	    content.  If an end user who is a member of group 2000
 	    attempts to list a directory then their request will match
@@ -1174,7 +1003,7 @@ diskCacheV111.services.acl.UnixPermissionHandler</programlisting>
 	    1000 and group 2000 attempts to create a subdirectory then
 	    their request will match the first &ace; and be denied.
 	  </para>
-	</example>	
+	</example>
 
 	<example>
 	  <title>&acl; to allow a user to delete all files and subdirectories</title>
@@ -1219,7 +1048,7 @@ diskCacheV111.services.acl.UnixPermissionHandler</programlisting>
 	    directory <filename
 	    class="directory">/pnfs/example.org/data/exampleDir</filename>
 	  </para>
-	    
+
 	  <para>
 	    Since the second &ace; has both the <literal>d</literal>
 	    and <literal>f</literal> inheritance flags, it will be
