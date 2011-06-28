@@ -126,7 +126,7 @@
         The RPM packages may be installed right away, for example
         using the command:
       </para>
-      <screen>&prompt-root; <userinput>rpm -ivh dcache-server-<replaceable>version</replaceable>noarch.rpm</userinput></screen>
+      <screen>&prompt-root; <userinput>rpm -ivh dcache-server-<replaceable>version</replaceable>.noarch.rpm</userinput></screen>
 
        <para>
        The actual sources lie at <ulink url="http://www.dcache.org/downloads.shtml"/>.
@@ -308,16 +308,16 @@ CREATE TRIGGER
 	linkend="intouch-admin"/>) you will need to generate &ssh;-keys.
       </para>
 
-      <screen>&prompt-root; <userinput>ssh-keygen -b 768 -t rsa1 -f /opt/d-cache/config/server_key -N ""</userinput>
+      <screen>&prompt-root; <userinput>ssh-keygen -b 768 -t rsa1 -f /opt/d-cache/etc/server_key -N ""</userinput>
 Generating public/private rsa1 key pair.
-Your identification has been saved in /opt/d-cache/config/server_key.
-Your public key has been saved in /opt/d-cache/config/server_key.pub.
+Your identification has been saved in /opt/d-cache/etc/server_key.
+Your public key has been saved in /opt/d-cache/etc/server_key.pub.
 The key fingerprint is:
 33:ac:91:4c:21:4e:63:aa:2d:90:58:4d:72:e6:b5:88 root@example.org
-&prompt-root; <userinput>ssh-keygen -b 1024 -t rsa1 -f /opt/d-cache/config/host_key -N ""</userinput>
+&prompt-root; <userinput>ssh-keygen -b 1024 -t rsa1 -f /opt/d-cache/etc/host_key -N ""</userinput>
 Generating public/private rsa1 key pair.
-Your identification has been saved in /opt/d-cache/config/host_key.
-Your public key has been saved in /opt/d-cache/config/host_key.pub.
+Your identification has been saved in /opt/d-cache/etc/host_key.
+Your public key has been saved in /opt/d-cache/etc/host_key.pub.
 The key fingerprint is:
 75:a4:2b:24:cc:75:ad:b7:bd:8b:dd:1a:3e:96:3f:9d root@example.org</screen>
       <para>
