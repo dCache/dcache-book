@@ -57,9 +57,9 @@ COMMENTS_INSTALLED = $(ALL_COMMENTS:%=%__COMMENTS_INSTALL__)
 
 WWW_SERVER = www.dcache.org
 WWW_SERVER_BASE_DIR = /data/www/dcache.org
-WWW_LOCATION = /manuals/Book-1.9.13/
-WWW_TEST_LOCATION = /manuals/Book-1.9.13-test/
-WWW_COMMENTS_LOCATION = /manuals/Book-1.9.13-comments/
+WWW_LOCATION = /manuals/Book-1.9.14/
+WWW_TEST_LOCATION = /manuals/Book-1.9.14-test/
+WWW_COMMENTS_LOCATION = /manuals/Book-1.9.14-comments/
 
 # NB we don't do deps on txt as it depends on html-single output.  This
 #    is cheating, but hey, it works.
