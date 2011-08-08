@@ -22,117 +22,125 @@
   </chapterinfo>
 
   <para>
-    Initially &dcache; has been designed to be a disk cache in front of a Tape Storage System,
-    moving files onto the tape-backend and restoring them when needed. Those operations are
-    handled transparently to the user. The downside of this approach is that a simple read of
-    a file, not being on disk, automatically triggers a tape operation. As tape operations are
-    expensive and may interfere with storing raw data, coming from the Tier 0, this feature
-    had to be reviewed. As a result, it has been agreed with the experiments that only a production
-    user should be allowed to trigger such a tape operation. &dcache; is now implementing a first version
-    of such a protective mechanism.
-  </para>
-
-  <para>
-    A &dcache; system administrator may specify a list of &dn;s/&fqan;s which are
-    allowed to trigger tape read accesses for files not being available on disk. Users, requesting
-    tape-only files, and not being on that <firstterm>white list</firstterm>, will receive a permission
-    error and no tape operation is launched. Starting with the 1.9.9 series, stage protection
-    can be enhanced to allow authorization specific to a &dcache; storage group. The additional
-    configuration parameter is optional allowing the stage protection to be backwards compatible
-    when stage authorization is not specific to a storage group.
+    A &dcache; system administrator may specify a list of
+    &dn;s/&fqan;s which are allowed to trigger tape restores for files
+    not being available on disk. Users, requesting tape-only files,
+    and not being on that <firstterm>white list</firstterm>, will
+    receive a permission error and no tape operation is
+    launched. Stage protection can be enhanced to allow authorization
+    specific to a &dcache; storage group. The additional configuration
+    parameter is optional allowing the stage protection to be
+    backwards compatible when stage authorization is not specific to a
+    storage group.
    </para>
 
   <section id="cf-stage-protection-configuration">
     <title>Configuration of Stage Protection</title>
 
   <para>
-  Stage protection can optionally be configured in the &cell-poolmngr;
-  rather than on the doors and &cell-pinmngr;. Thus the white list needs to be present
-  on a single node only. To enable this, define the following parameter in <filename>etc/dcache.conf</filename>:
+    Stage protection can optionally be configured in the
+    &serv-poolmngr; rather than on the doors and the &serv-pinmngr;. Thus
+    the white list needs to be present on a single node only. To
+    enable this, define the following parameter in
+    <filename>&install-base-opt;/etc/dcache.conf</filename>:
   </para>
 
   <programlisting>stagePolicyEnforcementPoint=PoolManager</programlisting>
 
 
   <para>
-  The file name of the white list must be configured by setting the
-  <varname>stageConfigurationFilePath</varname> parameter in <filename>etc/dcache.conf</filename>:
+    The file name of the white list must be configured by setting the
+    <varname>stageConfigurationFilePath</varname> parameter in
+    <filename>&install-base-opt;/etc/dcache.conf</filename>:
   </para>
 
-  <programlisting>stageConfigurationFilePath=${ourHomeDir}/config/StageConfiguration.conf</programlisting>
+  <programlisting>stageConfigurationFilePath=/opt/d-cache/config/StageConfiguration.conf</programlisting>
 
   <para>
-  The parameter only needs to be defined on the nodes which enforce the stage protection,
-  i.e., either on the doors and &cell-pinmngr;, or in &cell-poolmngr;.
+    The parameter needs to be defined on all nodes which enforce the
+    stage protection, i.e., either on the doors and the
+    &serv-pinmngr;, or in the &serv-poolmngr; depending on the stage
+    policy enforcement point.
   </para>
 
   </section>
 
   <section id="cf-stage-protection-whiteList">
-  <title>Definition of the White List</title>
+    <title>Definition of the White List</title>
 
-  <para>
-  The Stage Configuration File will contain a white list.
-  Each line of the white list may contain up to three regular
-  expressions enclosed in double quotes.
-  The regular expressions match &dn;, &fqan;, and Storage Group written in the following format:
-  </para>
+    <para>
+      The Stage Configuration File will contain a white list.  Each
+      line of the white list may contain up to three regular
+      expressions enclosed in double quotes.  The regular expressions
+      match the &dn;, &fqan;, and the Storage Group written in the
+      following format:
+    </para>
 
       <cmdsynopsis>
-    <arg choice='plain'>"<replaceable>DN</replaceable>"</arg>
-    <arg choice='opt'>"<replaceable>FQAN</replaceable>"
-    <arg choice='opt'>"<replaceable>StorageGroup</replaceable>"</arg>
-    </arg>
+	<arg choice='plain'>"<replaceable>DN</replaceable>"</arg>
+	<arg choice='opt'>"<replaceable>FQAN</replaceable>"
+	<arg choice='opt'>"<replaceable>StorageGroup</replaceable>"</arg>
+	</arg>
       </cmdsynopsis>
 
   <para>
-   Lines starting with a hash symbol <literal>#</literal> are discarded as comments.
-   </para>
-
-   <para>
-   The regular expression syntax follows the syntax defined for the
-  <ulink url="http://java.sun.com/javase/6/docs/api/java/util/regex/Pattern.html">
-    Java Pattern class </ulink>.
+    Lines starting with a hash symbol <literal>#</literal> are discarded as comments.
   </para>
 
   <para>
-    Here are some examples of the White List Records for the 1.9.9 series:
+    The regular expression syntax follows the syntax defined for the
+    <ulink url="http://java.sun.com/javase/6/docs/api/java/util/regex/Pattern.html">
+    Java Pattern class </ulink>.
   </para>
 
-  <programlisting>".*" "/atlas/Role=production"
+  <informalexample>
+    <para>
+      Here are some examples of the White List Records:
+    </para>
+
+    <programlisting>".*" "/atlas/Role=production"
 "/C=DE/O=DESY/CN=Kermit the frog"
 "/C=DE/O=DESY/CN=Beaker" "/desy"
 "/O=GermanGrid/.*" "/desy/Role=.*"</programlisting>
 
-<para>
-    This example authorizes a number of different groups of users:
-  </para>
+    <para>
+      This example authorizes a number of different groups of users:
+    </para>
 
   <itemizedlist>
     <listitem>
-      Any user with the <phrase xml:space='preserve'>&fqan; <literal>/atlas/Role=production</literal></phrase>.
+      Any user with the <phrase xml:space='preserve'>&fqan;
+      <literal>/atlas/Role=production</literal></phrase>.
     </listitem>
     <listitem>
-      The user with the <phrase xml:space='preserve'>&dn; <literal>/C=DE/O=DESY/CN=Kermit the frog</literal></phrase>, irrespective
-      of which VOMS groups he belongs to.
+      The user with the <phrase xml:space='preserve'>&dn;
+      <literal>/C=DE/O=DESY/CN=Kermit the frog</literal></phrase>,
+      irrespective of which VOMS groups he belongs to.
     </listitem>
     <listitem>
-      The user with the <phrase xml:space='preserve'>&dn; <literal>/C=DE/O=DESY/CN=Beaker</literal></phrase> but only if he is
-      also identified as a member of VO <literal>desy</literal>
-      (<phrase xml:space='preserve'>&fqan; <literal>/desy</literal></phrase>)
+      The user with the <phrase xml:space='preserve'>&dn;
+      <literal>/C=DE/O=DESY/CN=Beaker</literal></phrase> but only if
+      he is also identified as a member of VO <literal>desy</literal>
+      (<phrase xml:space='preserve'>&fqan;
+      <literal>/desy</literal></phrase>)
     </listitem>
     <listitem>
-      Any user with &dn; and &fqan; that match <literal>/O=GermanGrid/.*</literal> and <literal>/atlas/Role=.*</literal>
-      respectively.
+      Any user with &dn; and &fqan; that match
+      <literal>/O=GermanGrid/.*</literal> and
+      <literal>/desy/Role=.*</literal> respectively.
     </listitem>
   </itemizedlist>
+
+  </informalexample>
 
   <para>
     If a storage group is specified all three parameters must be provided.
     The regular expression <literal>".*"</literal> may be used to authorize any &dn;
     or any &fqan;. Consider the following example:
   </para>
-<programlisting>".*" "/atlas/Role=production" "h1:raw@osm"
+
+  <informalexample>
+    <programlisting>".*" "/atlas/Role=production" "h1:raw@osm"
 "/C=DE/O=DESY/CN=Scooter" ".*" "sql:chimera@osm"</programlisting>
 
   <para>
@@ -149,20 +157,36 @@
     </listitem>
   </itemizedlist>
 
-  <para> With the plain &dcap; protocol the &dn; and &fqan; are not known for any users.
-    Therefore, there is a special case for &dcap; users in 1.9.9. In order to allow all &dcap; users
-    to stage files the white list should contain the following record:
-  </para>
-  <programlisting>"" ""</programlisting>
+  </informalexample>
 
-  <para>In case this line is commented or not present in the white list,
-  all &dcap; users will be disallowed to stage files.
+  <para> 
+    With the plain &dcap; protocol the &dn; and &fqan; are not known
+    for any users.
+  </para>
+  <informalexample>
+    <para>
+      In order to allow all &dcap; users to stage files
+      the white list should contain the following record:
+    </para>
+    <programlisting>"" ""</programlisting>
+
+    <para>
+      In case this line is commented or not present in the white list,
+      all &dcap; users will be disallowed to stage files.
+    </para>
+  </informalexample>
+
+  <para>
+    It is possible to allow all &dcap; users to stage files located in a certain storage group.
   </para>
 
-  <para>In the following example, all &dcap; users are allowed to stage files located
-  in the storage group <literal>h1:raw@osm</literal>:
-  </para>
-  <programlisting>"" "" "h1:raw@osm"</programlisting>
+  <informalexample>
+    <para>
+      In this example, all &dcap; users are allowed to stage files
+      located in the storage group <literal>h1:raw@osm</literal>:
+    </para>
+    <programlisting>"" "" "h1:raw@osm"</programlisting>
+  </informalexample>
 
   </section>
 
