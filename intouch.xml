@@ -338,7 +338,7 @@ Your proxy is valid until Thu Mar 31 21:49:06 2011</screen>
 
     <para>
       In this tutorial we will use the <link
-      linkend='cf-gplazma-vorole'>gplazmalite-vorole-mapping
+      linkend='cf-gplazma-plug-inconfig-vorolemap'>gplazmalite-vorole-mapping
       plugin</link>. To this end you need to edit the
       <filename>/etc/grid-security/grid-vorolemap</filename> and the
       <filename>/etc/grid-security/storage-authzdb</filename> as well
