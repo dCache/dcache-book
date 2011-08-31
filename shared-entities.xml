@@ -24,6 +24,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY chimera      "<productname>Chimera</productname>">
 <!ENTITY xml          "<abbrev>XML</abbrev>">
 <!ENTITY hsm          "<abbrev>HSM</abbrev>">
+<!ENTITY tss          "<abbrev>TSS</abbrev>">
 <!ENTITY pnfs         "<productname><literal>pnfs</literal></productname>">
 <!ENTITY gip          "<abbrev>GIP</abbrev>">
 <!ENTITY yaim         "<abbrev>YAIM</abbrev>">
@@ -32,7 +33,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY java         "<productname>Java</productname>">
 <!ENTITY tomcat       "<productname>Tomcat</productname>">
 <!ENTITY jetty        "<productname>Jetty</productname>">
-<!ENTITY sunjvm        "<productname>Sun JVM</productname>">
+<!ENTITY sunjvm       "<productname>Sun JVM</productname>">
 <!ENTITY glite        "<productname>gLite</productname>">
 <!ENTITY netty        "<productname>Netty</productname>">
 
@@ -195,7 +196,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY dc-prompt-skmadmin "<prompt>(skm) admin &gt;</prompt>">
 <!ENTITY dc-prompt-topo     "<prompt>(topo) admin &gt;</prompt>">
 
-
+<!ENTITY dc-prompt-spacemngr  "<prompt>(SrmSpaceManager) admin &gt;</prompt>">
 <!ENTITY dc-prompt-pnfsmngr  "<prompt>(PnfsManager) admin &gt;</prompt>">
 <!ENTITY dc-prompt-acm       "<prompt>(acm) admin &gt;</prompt>">
 <!ENTITY dc-prompt-admindoor "<prompt>(System@adminDoorDomain) admin &gt;</prompt>">
