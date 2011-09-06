@@ -197,6 +197,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY dc-prompt-pnfsmngr  "<prompt>(PnfsManager) admin &gt;</prompt>">
 <!ENTITY dc-prompt-acm       "<prompt>(acm) admin &gt;</prompt>">
 <!ENTITY dc-prompt-admindoor "<prompt>(System@adminDoorDomain) admin &gt;</prompt>">
+<!ENTITY dc-prompt-pool1  "<prompt>(pool_1) admin &gt;</prompt>">
 
 <!-- Shell prompts -->
 <!ENTITY prompt-user   "<prompt>[user] $</prompt>">
@@ -210,5 +211,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 
 <!-- Misc -->
 <!ENTITY ns-base "<filename class='directory'>/data</filename>">
+<!ENTITY install-base-opt "<filename class='directory'>/opt/d-cache</filename>">
+<!ENTITY file-authorized_keys "<filename class='directory'>&install-base-opt;/config/authorized_keys</filename>">
 <!-- <!ENTITY ndash "&#x2013;"> -->
 
