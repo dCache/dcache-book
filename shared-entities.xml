@@ -200,6 +200,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY dc-prompt-pnfsmngr  "<prompt>(PnfsManager) admin &gt;</prompt>">
 <!ENTITY dc-prompt-acm       "<prompt>(acm) admin &gt;</prompt>">
 <!ENTITY dc-prompt-admindoor "<prompt>(System@adminDoorDomain) admin &gt;</prompt>">
+<!ENTITY dc-prompt-pool1  "<prompt>(pool_1) admin &gt;</prompt>">
 
 <!-- Shell prompts -->
 <!ENTITY prompt-user   "<prompt>[user] $</prompt>">
