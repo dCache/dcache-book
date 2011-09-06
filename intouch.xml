@@ -6,6 +6,8 @@
 <!ENTITY simple-new-user   "<replaceable>new-user</replaceable>">
 <!ENTITY admin   "<systemitem class='admin'>admin</systemitem>">
 <!ENTITY root   "<systemitem class='root'>root</systemitem>">
+<!ENTITY dc-prompt-routingmgr "<prompt>(RoutingMgr@dCacheDoorDomain) admin &gt;</prompt>">
+<!ENTITY dc-prompt-pooldomain "<prompt>(System@poolDomain) admin &gt;</prompt>">
 
 %sharedents;
 ]>
@@ -720,26 +722,29 @@ webdavProtocol=https</programlisting>
       </para>
     </important>
 
-    <note>
-      <para>
-	If you attempt to log into the admin interface without
-	generating the &ssh;-keys you will get an error message.
-      </para>
-      <screen>&prompt-user; <userinput>ssh -c blowfish -p 22223 -l admin headnode.example.org</userinput>
+    <section>
+      <title>First steps</title>
+
+      <note>
+	<para>
+	  If you attempt to log into the admin interface without
+	  generating the &ssh;-keys you will get an error message.
+	</para>
+	<screen>&prompt-user; <userinput>ssh -c blowfish -p 22223 -l admin headnode.example.org</userinput>
 Connection closed by 192.0.2.11</screen>
+        <para>
+	  See <xref linkend="in-install-ssh-keys" />.
+	</para>
+      </note>
+
+
       <para>
-	See <xref linkend="in-install-ssh-keys" />.
+	&dcache; has a powerful administration interface. It is
+	accessed with the &ssh; protocol. The server is part of the
+	&domain-adminDoor; domain. Connect to it with
       </para>
-    </note>
 
-
-    <para>
-      &dcache; has a powerful administration interface. It is accessed
-      with the &ssh; protocol. The server is part of the
-      &domain-adminDoor; domain. Connect to it with
-    </para>
-
-    <screen>&prompt-user; <userinput>ssh -c blowfish -p 22223 -l admin headnode.example.org</userinput></screen>
+      <screen>&prompt-user; <userinput>ssh -c blowfish -p 22223 -l admin headnode.example.org</userinput></screen>
 
     <para>
       The initial password is
@@ -753,7 +758,6 @@ Connection closed by 192.0.2.11</screen>
 
 &dc-prompt-local;</screen>
 
-
     <para>
       The password can now be changed with
     </para>
@@ -766,29 +770,251 @@ Connection closed by 192.0.2.11</screen>
 
     <para>
       This already illustrates how to navigate within the
-      administration interface: Starting from the local prompt
-      (&dc-prompt-local;) the command <command>cd</command> takes you
-      to the specified <glossterm linkend="gl-cell">cell</glossterm>
-      (here &cell-acm;, the access control manager). There
-      two commands are executed. The escape sequence
-      <command>..</command> takes you back to the local prompt and
-      <command>logoff</command> exits the admin shell.
+      administration interface:
+    </para>
+    <para>
+      Starting from the local prompt (&dc-prompt-local;) the command
+      <command>cd</command> takes you to the specified <glossterm
+      linkend="gl-cell">cell</glossterm> (here &cell-acm;, the access
+      control manager). There two commands are executed. The escape
+      sequence <command>..</command> takes you back to the local
+      prompt and <command>logoff</command> exits the admin shell.
     </para>
 
     <para>
-      Note that <command>cd</command> only works from the local
-      prompt. If the cell you are trying to access does not exist, the
-      <command>cd</command> command will not complain.  However,
-      trying to execute any command subsequently will result in an
-      error message <quote>No Route to cell...</quote>.  Type
-      <literal>..</literal> to return to the &dc-prompt-local; prompt.
+      There also is the command <command>help</command> for listing all
+      commands the cell knows and their parameters. However, many of the
+      commands are only used for debugging and development purposes.
     </para>
 
-     <para>
-      To create a new user, &new-user;, set a new password and to give him/her an access to a particular cell (for example to the &cell-poolmngr;) run following command sequence:
-     </para>
+    <note>
+      <para>
+	If the cells are <firstterm>well-known</firstterm>, they can
+	be accessed without adding the domain-scope. See <xref
+	linkend="cf-cellpackage" /> for more information.
+      </para>
+    </note>
 
-     <screen>&dc-prompt-local; <userinput>cd acm</userinput>
+    <para>
+      The domains that are running on the &dcache;-instance, can be
+      viewed in the layout-configuration (see <xref linkend="in"
+      />). Additionally, there is the &cell-topo; cell, which keeps
+      track of the instance's domain topology. If it is running, it
+      can be used to obtain the list of domains the following way:
+    </para>
+
+    <informalexample>
+      <screen>&dc-prompt-local; <userinput>cd topo</userinput>
+&dc-prompt-topo; <userinput>ls</userinput>
+adminDoorDomain
+gsidcapDomain
+dcapDomain
+utilityDomain
+gPlazmaDomain
+webdavDomain
+gridftpDomain
+srmDomain
+dCacheDomain
+httpdDomain
+namespaceDomain
+poolDomain</screen>
+    </informalexample>
+    <note>
+      <para>
+        The &cell-topo; cell rescans periodically which domains are
+        running, so it can take some time until <command>ls</command>
+        displays the full domain list.
+      </para>
+    </note>
+
+    <para>
+       If you want to find out which cells are running on a certain
+       domain, you can issue the command <command>ps</command> in the
+       &cell-system; cell of the domain.
+    </para>
+
+    <informalexample>
+      <para>
+	For example, if you want to list the cells running on the
+	<literal>poolDomain</literal>, <command>cd</command> to its
+	&cell-system; cell and issue the <command>ps</command>
+	command.
+      </para>
+
+      <screen>&dc-prompt-topo; <userinput>..</userinput>
+&dc-prompt-local; <userinput>cd System@poolDomain</userinput>
+&dc-prompt-pooldomain; <userinput>ps</userinput>
+  Cell List
+------------------
+c-dCacheDomain-101-102
+System
+pool_2
+c-dCacheDomain-101
+pool_1
+RoutingMgr
+lm</screen>
+    </informalexample>
+
+
+    <para>
+      The cells in the domain can be accessed using
+      <command>cd</command> together with the cell-name scoped by the
+      domain-name. So first, one has to get back to the local prompt,
+      as the <command>cd</command> command will not work otherwise.
+    </para>
+
+    <note>
+      <para>
+	Note that <command>cd</command> only works from the local
+	prompt. If the cell you are trying to access does not exist,
+	the <command>cd</command> command will complain.
+      </para>
+      <informalexample>
+	<screen>&dc-prompt-local; <userinput>cd nonsense</userinput>
+java.lang.IllegalArgumentException: Cannot cd to this cell as it doesn't exist</screen>
+      </informalexample>
+
+      <para>
+	Type <command>..</command> to return to the &dc-prompt-local;
+	prompt.
+      </para>
+    </note>
+
+    <para>
+      Login to the routing manager of the &domain-dcache; to get a
+      list of all well-known cells you can directly
+      <command>cd</command> to without having to add the domain.
+    </para>
+    <informalexample>
+      <screen>&dc-prompt-pooldomain; <userinput>..</userinput>
+&dc-prompt-local; <userinput>cd RoutingMgr@dCacheDomain</userinput>
+&dc-prompt-routingmgr; <userinput>ls</userinput>
+Our routing knowledge :
+ Local : [PoolManager, topo, broadcast, LoginBroker, info]
+ adminDoorDomain : [pam]
+ gsidcapDomain : [DCap-gsi-example.dcache.org]
+ dcapDomain : [DCap-example.dcache.org]
+ utilityDomain : [gsi-pam, PinManager]
+ gPlazmaDomain : [gPlazma]
+ webdavDomain : [WebDAV-example.dcache.org]
+ gridftpDomain : [GFTP-example.dcache.org]
+ srmDomain : [RemoteTransferManager, CopyManager, SrmSpaceManager, SRM-example.dcache.org]
+ httpdDomain : [billing, srm-LoginBroker, TransferObserver]
+ poolDomain : [pool_2, pool_1]
+ namespaceDomain : [PnfsManager, dirLookupPool, cleaner]</screen>
+    </informalexample>
+
+    <para>
+      All cells know the commands <command>info</command> for general
+      information about the cell and <command>show pinboard</command>
+      for listing the last lines of the <glossterm
+      linkend="gl-pinboard">pinboard</glossterm> of the cell. The
+      output of these commands contains useful information for solving
+      problems.
+    </para>
+    <para>
+      It is a good idea to get aquainted with the normal output in the
+      following cells: &cell-poolmngr;, &cell-pnfsmngr;, and the pool
+      cells (e.g., &cell-pool-eg;).
+    </para>
+
+
+
+    <para>
+      The most useful command of the pool cells is <xref
+      linkend="cmd-rep_ls"/>. To execute this command
+      <command>cd</command> into the pool.  It lists the files which
+      are stored in the pool by their &pnfs; IDs:
+    </para>
+
+    <informalexample>
+      <screen>&dc-prompt-routingmgr; <userinput>..</userinput>
+&dc-prompt-pool1; <userinput>rep ls</userinput>
+000100000000000000001120 &lt;-P---------(0)[0]&gt; 485212 si={myStore:STRING}
+000100000000000000001230 &lt;C----------(0)[0]&gt; 1222287360 si={myStore:STRING}</screen>
+
+    <para>
+      Each file in a pool has one of the 4 primary states:
+      <quote>cached</quote> (<literal>&lt;C---</literal>),
+      <quote>precious</quote> (<literal>&lt;-P--</literal>),
+      <quote>from client</quote> (<literal>&lt;--C-</literal>), and
+      <quote>from store</quote> (<literal>&lt;---S</literal>).
+    </para>
+    </informalexample>
+
+    <para>
+      See <xref linkend='cf-tss-pools-admin'/> for more information
+      about <command>rep ls</command>.
+    </para>
+    <para>
+      The most important commands in the &cell-poolmngr; are: <xref
+      linkend="cmd-rc_ls"/> and <command>cm ls -r</command>.
+    </para>
+    <para>
+      <command>rc ls</command> lists the requests currently handled
+      by the &cell-poolmngr;. A typical line of output for a read request
+      with an error condition is (all in one line):
+    </para>
+
+    <informalexample>
+      <screen>&dc-prompt-pool1; <userinput>..</userinput>
+&dc-prompt-local; <userinput>cd PoolManager</userinput>
+&dc-prompt-pm; <userinput>rc ls</userinput>
+000100000000000000001230@0.0.0.0/0.0.0.0 m=1 r=1 [&lt;unknown&gt;]
+[Waiting 08.28 19:14:16]
+{149,No pool candidates available or configured for 'staging'}</screen>
+
+    <para>
+      As the error message at the end of the line indicates, no pool
+      was found containing the file and no pool could be used for
+      staging the file from a tertiary storage system.
+    </para>
+    </informalexample>
+
+    <para>
+      See <xref linkend='cf-tss-monitor-clAdmin'/> for more
+      information about the command <command>rc ls</command>
+    </para>
+
+    <para>
+      Finally, <xref linkend="cmd-cm_ls"/> with the option
+      <option>-r</option> gives the information about the pools
+      currently stored in the cost module of the pool manager. A
+      typical output is:
+    </para>
+
+    <informalexample>
+      <!-- TODO: following is too long, needs breaking up -->
+      <screen>&dc-prompt-pm; <userinput>cm ls <option>-r</option></userinput>
+pool_1={R={a=0;m=2;q=0};S={a=0;m=2;q=0};M={a=0;m=100;q=0};PS={a=0;m=20;q=0};PC={a=0;m=20;q=0};
+    <lineannotation>(...continues...)</lineannotation>   SP={t=2147483648;f=924711076;p=1222772572;r=0;lru=0;{g=20000000;b=0.5}}}
+pool_1={Tag={{hostname=example.org}};size=0;SC=0.16221282938326134;CC=0.0;}
+pool_2={R={a=0;m=2;q=0};S={a=0;m=2;q=0};M={a=0;m=100;q=0};PS={a=0;m=20;q=0};PC={a=0;m=20;q=0};
+    <lineannotation>(...continues...)</lineannotation>   SP={t=2147483648;f=2147483648;p=0;r=0;lru=0;{g=4294967296;b=250.0}}}
+pool_2={Tag={{hostname=example.org}};size=0;SC=2.7939677238464355E-4;CC=0.0;}</screen>
+    </informalexample>
+
+    <para>
+      While the first line for each pool gives the information stored
+      in the cache of the cost module, the second line gives the costs
+      (SC: <glossterm linkend="gl-space_cost">space cost</glossterm>,
+      CC: <glossterm linkend="gl-performance_cost">performance
+      cost</glossterm>) calculated for a (hypothetical) file of zero
+      size. For details on how these are calculated and their meaning,
+      see <xref linkend="cf-pm-cm"/>.
+    </para>
+
+    </section>
+
+    <section>
+      <title>Create a new user</title>
+      <para>
+	To create a new user, &new-user;, set a new password and to
+	give him/her an access to a particular cell (for example to
+	the &cell-poolmngr;) run following command sequence:
+      </para>
+
+      <screen>&dc-prompt-local; <userinput>cd acm</userinput>
 &dc-prompt-acm; <userinput>create user &simple-new-user;</userinput>
 &dc-prompt-acm; <userinput>set passwd -user=&simple-new-user; <replaceable>newPasswd</replaceable> <replaceable>newPasswd</replaceable></userinput>
 &dc-prompt-acm; <userinput>create acl cell.PoolManager.execute</userinput>
@@ -820,163 +1046,16 @@ Allowed
      <screen>&dc-prompt-acm; <userinput>create acl *.*.*</userinput>
 &dc-prompt-acm; <userinput>add access -allowed *.*.* &simple-new-user;</userinput></screen>
 
+    </section>
 
-    <para>
-      All cells know the commands <command>info</command> for general
-      information about the cell and <command>show pinboard</command>
-      for listing the last lines of the <glossterm
-      linkend="gl-pinboard">pinboard</glossterm> of the cell. The
-      output of these commands contains useful information for solving
-      problems. It is a good idea to get aquainted with the normal
-      output in the following cells: &cell-poolmngr;, &cell-pnfsmngr;,
-      and the pool cells (e.g., &cell-pool-eg;).
-    </para>
+    <section>
+      <title>Use of the &ssh; Admin Interface by scripts</title>
 
-    <para>
-       If you want to find out which cells are running on a certain domain,
-       you can issue the command <command>ps</command> in the &cell-system;
-       cell of the domain. For example, if you want to list the cells running
-       on the &domain-adminDoor;, <command>cd</command> to its &cell-system;
-       cell and issue the
-       <command>ps</command> command.
-    </para>
 
-    <screen>&dc-prompt-local; <userinput>cd System@adminDoorDomain</userinput>
-&dc-prompt-admindoor; <userinput>ps</userinput>
-  Cell List
-------------------
-acm
-alm
-skm
-c-dCacheDomain-101-102
-System
-c-dCacheDomain-101
-RoutingMgr
-alm-admin-103
-pam
-lm</screen>
-
-    <para>
-      The cells in the domain can be accessed using
-      <command>cd</command> together with the cell-name scoped by the
-      domain-name. So first, one has to get back to the local prompt,
-      as the <command>cd</command> command will not work otherwise.
-    </para>
-
-    <screen>&dc-prompt-admindoor; <userinput>..</userinput>
-&dc-prompt-local; <userinput>cd skm@adminDoorDomain</userinput>
-&dc-prompt-skmadmin;</screen>
-
-    <note>
       <para>
-	If the cells are <firstterm>well-known</firstterm>, they can
-	be accessed without adding the domain-scope. See <xref
-	linkend="cf-cellpackage" /> for more information.
-      </para>
-    </note>
-
-    <para>
-      The domains that are running on the &dcache;-instance, can be
-      viewed in the layout-configuration (see <xref linkend="in"
-      />). Additionally, there is the &cell-topo; cell, which keeps
-      track of the instance's domain topology. If it is running, it
-      can be used to obtain the list of domains the following way:
-    </para>
-
-    <screen>&dc-prompt-local; <userinput>cd topo</userinput>
-&dc-prompt-topo; <userinput>ls</userinput>
-dirDomain
-infoDomain
-adminDoorDomain
-spacemanagerDomain
-utilityDomain
-gPlazmaDomain
-nfsDomain
-dCacheDomain
-httpdDomain
-statisticsDomain
-namespaceDomain</screen>
-
-    <note>
-      <para>
-        The &cell-topo; cell rescans periodically which domains are running, so
-        it can take some time until <command>ls</command> displays the full
-        domain list.
-      </para>
-    </note>
-
-    <para>
-      There also is the command <command>help</command> for listing all
-      commands the cell knows and their parameters. However, many of the
-      commands are only used for debugging and development purposes.
-    </para>
-
-    <para>
-      The most useful command of the pool cells is <xref
-        linkend="cmd-rep_ls"/>. To execute this command cd into the pool.
-	It lists the files which are stored in the pool by their &pnfs; IDs:
-    </para>
-
-    <screen>&dc-prompt-pool; <userinput>rep ls</userinput>
-    000100000000000000001120 &lt;-P---------(0)[0]&gt; 485212 si={myStore:STRING}
-    000100000000000000001230 &lt;C----------(0)[0]&gt; 1222287360 si={myStore:STRING}</screen>
-
-    <para>
-      Each file in a pool has one of the 4 primary states:
-      <quote>cached</quote> (<literal>&lt;C---</literal>),
-      <quote>precious</quote> (<literal>&lt;-P--</literal>),
-      <quote>from client</quote> (<literal>&lt;--C-</literal>), and
-      <quote>from store</quote> (<literal>&lt;---S</literal>).
-    </para>
-    
-    <para>
-      Two commands in the pool manager are quite useful: <xref
-      linkend="cmd-rc_ls"/> lists the requests currently handled by
-      the pool manager. A typical line of output for a read request
-      with an error condition is (all in one line):
-    </para>
-
-    <screen> &dc-prompt-pm; <userinput>rc ls</userinput>
-    000100000000000000001230@0.0.0.0/0.0.0.0 m=1 r=1 [&lt;unknown&gt;]
-  [Waiting 08.28 19:14:16]
-  {149,No pool candidates available or configured for 'staging'}</screen>
-
-    <para>
-      As the error message at the end of the line indicates, no pool
-      was found containing the file and no pool could be used for
-      staging the file from a tertiary storage system.
-    </para>
-
-    <para>
-      Finally, <xref linkend="cmd-cm_ls"/> with the option
-      <option>-r</option> gives the information about the pools
-      currently stored in the cost module of the pool manager. A
-      typical output is:
-    </para>
-
-    <!-- TODO: following is too long, needs breaking up -->
-    <screen>&dc-prompt-pm; <userinput>cm ls <option>-r</option></userinput>
-<replaceable>poolName1</replaceable>={R={a=0;m=2;q=0};S={a=0;m=2;q=0};M={a=0;m=100;q=0};PS={a=0;m=20;q=0};PC={a=0;m=20;q=0};
-    <lineannotation>(...continues...)</lineannotation>   SP={t=2147483648;f=924711076;p=1222772572;r=0;lru=0;{g=20000000;b=0.5}}}
-<replaceable>poolName1</replaceable>={Tag={{hostname=<replaceable>hostname</replaceable>}};size=0;SC=0.16221282938326134;CC=0.0;}
-<replaceable>poolName2</replaceable>={R={a=0;m=2;q=0};S={a=0;m=2;q=0};M={a=0;m=100;q=0};PS={a=0;m=20;q=0};PC={a=0;m=20;q=0};
-    <lineannotation>(...continues...)</lineannotation>   SP={t=2147483648;f=2147483648;p=0;r=0;lru=0;{g=4294967296;b=250.0}}}
-<replaceable>poolName2</replaceable>microcebus_2={Tag={{hostname=<replaceable>hostname</replaceable>}};size=0;SC=2.7939677238464355E-4;CC=0.0;}</screen>
-
-    <para>
-      While the first line for each pool gives the information stored
-      in the cache of the cost module, the second line gives the costs
-      (SC: <glossterm linkend="gl-space_cost">space cost</glossterm>,
-      CC: <glossterm linkend="gl-performance_cost">performance
-      cost</glossterm>) calculated for a (hypothetical) file of zero
-      size. For details on how these are calculated and their meaning,
-      see <xref linkend="cf-pm-cm"/>.
-    </para>
-
-    <para>
-      The &ssh; admin interface can be used non-interactively by
-      scripts. For this the &dcache;-internal &ssh; server uses
-      public/private key pairs.
+	The &ssh; admin interface can be used non-interactively by
+	scripts. For this the &dcache;-internal &ssh; server uses
+	public/private key pairs.
     </para>
 
     <para>
@@ -1075,6 +1154,8 @@ EOF</programlisting>
 echo -e 'cd <replaceable>pool_1</replaceable>\nrep ls\n<lineannotation>(more commands here)</lineannotation>\nlogoff' \
   | ssh -c blowfish -p 22223 admin@<replaceable>adminNode</replaceable> \
   | tr -d '\r' &gt; rep_ls.out</programlisting>
+
+    </section>
 
   </section>
 
