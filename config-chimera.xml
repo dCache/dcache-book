@@ -310,20 +310,114 @@ examplefile</screen>
   <title>Directory Tags</title>
 
   <para>
-    In the mounted &chimera; namespace, each directory can have a
-    number of tags. The existing tags may be listed with
+     In the &chimera; namespace, each directory can have a number of
+     tags. These directory tags may be used within &dcache; to control
+     the file placement policy in the pools (see <xref
+     linkend="cf-pm-psu"/>). They might also be used by a <link
+     linkend='cf-tss'>tertiary storage system</link> for similar
+     purposes (e.g. controlling the set of tapes used for the files in
+     the directory).
   </para>
 
+  <note>
+    <para>
+      Directory tags are not needed to control the behaviour of
+      &dcache;. &dcache; works well without directory tags.
+    </para>
+  </note>
+
+  <section>
+    <title>Create, List and Read Directory Tags if the Namespace is not Mounted</title>
+  <para>
+    You can create tags with
+  </para>
+
+    <screen>&prompt-user; <userinput>echo "<replaceable>content</replaceable>" | &chimera-cli; writetag <replaceable>directory</replaceable> <replaceable>tagName</replaceable></userinput></screen>
+
+    <para>
+      list tags with
+    </para>
+
+    <screen>&prompt-user; <userinput>&chimera-cli; lstag <replaceable>directory</replaceable> </userinput></screen>
+
+    <para>
+      and read tags with
+    </para>
+    <screen>&prompt-user; <userinput>&chimera-cli; readtag <replaceable>directory</replaceable> <replaceable>tagName</replaceable></userinput></screen>
+
+    <informalexample>
+    <para>
+      Create tags for the directory <filename class='directory'>data</filename> with
+    </para>
+      <screen>&prompt-user; <userinput>echo "myGroup" | &chimera-cli; writetag /data sGroup</userinput>
+&prompt-user; <userinput>echo "StoreName myStore" | &chimera-cli; writetag /data OSMTemplate</userinput></screen>
+    <para>
+      list the existing tags with
+    </para>
+      <screen>&prompt-user; <userinput>&chimera-cli; lstag /data</userinput>
+Total: 2
+OSMTemplate
+sGroup</screen>
+    <para>
+      and their content with
+    </para>
+    <screen>&prompt-user; <userinput>&chimera-cli; readtag /data OSMTemplate</userinput>
+StoreName myStore
+&prompt-user; <userinput>&chimera-cli; readtag /data sGroup</userinput>
+myGroup</screen>
+    </informalexample>
+
+  </section>
+
+
+  <section>
+    <title>Create, List and Read Directory Tags if the Namespace is Mounted</title>
+
+    <para>
+      If the namespace is mounted, change to the directory
+      for which the tag should be set and create a tag with
+    </para>
+
+    <screen>&prompt-user; <userinput>cd <replaceable>directory</replaceable></userinput>
+&prompt-user; <userinput>echo '<replaceable>content1</replaceable>' > '<filename>.(tag)(<replaceable>tagName1</replaceable>)</filename>'</userinput>
+&prompt-user; <userinput>echo '<replaceable>content2</replaceable>' > '<filename>.(tag)(<replaceable>tagName2</replaceable>)</filename>'</userinput></screen>
+
+  <para>
+    Then the existing tags may be listed with
+  </para>
   <screen>&prompt-user; <userinput>cat '<filename>.(tags)()</filename>'</userinput>
-.(tag)(OSMTemplate)
-.(tag)(sGroup)</screen>
+.(tag)(<replaceable>tagname1</replaceable>)
+.(tag)(<replaceable>tagname2</replaceable>)</screen>
 
   <para>
     and the content of a tag can be read with
   </para>
 
-  <screen>&prompt-user; <userinput>cat '<filename>.(tag)(OSMTemplate)</filename>'</userinput>
-StoreName myStore</screen>
+  <screen>&prompt-user; <userinput>cat '<filename>.(tag)(<replaceable>tagname1</replaceable>)</filename>'</userinput>
+<replaceable>content1</replaceable>
+&prompt-user; <userinput>cat '<filename>.(tag)(<replaceable>tagName2</replaceable>)</filename>'</userinput>
+<replaceable>content2</replaceable></screen>
+
+  <informalexample>
+    <para>
+      Create tags for the directory <filename class='directory'>data</filename> with
+    </para>
+    <screen>&prompt-user; <userinput>cd data</userinput>
+&prompt-user; <userinput>echo 'StoreName myStore' > '<filename>.(tag)(OSMTemplate)</filename>'</userinput>
+&prompt-user; <userinput>echo 'myGroup' > '<filename>.(tag)(sGroup)</filename>'</userinput></screen>
+    <para>
+      list the existing tags with
+    </para>
+    <screen>&prompt-user; <userinput>cat '<filename>.(tags)()</filename>'</userinput>
+.(tag)(OSMTemplate)
+.(tag)(sGroup)</screen>
+    <para>
+      and their content with
+    </para>
+    <screen>&prompt-user; <userinput>cat '<filename>.(tag)(OSMTemplate)</filename>'</userinput>
+StoreName myStore
+&prompt-user; <userinput>cat '<filename>.(tag)(sGroup)</filename>'</userinput>
+ myGroup</screen>
 
   <para>
     A nice trick to list all tags with their contents is
@@ -331,117 +425,13 @@ StoreName myStore</screen>
 
   <screen>&prompt-user; <userinput>grep "" $(cat  ".(tags)()")</userinput>
 .(tag)(OSMTemplate):StoreName myStore
-.(tag)(sGroup):STRING</screen>
+.(tag)(sGroup):myGroup</screen>
+  </informalexample>
+  </section>
 
-  <para>
-    Directory tags may be used within &dcache; to control the file
-    placement policy in the directory (see <xref
-    linkend="cf-pm-psu"/>). They might also be used by a
-    <firstterm>tertiary storage system</firstterm> for similar
-    purposes (e.g. controlling the set of tapes used for the files in
-    the directory).
-  </para>
 
-  <para>
-    Even if the directory tags are not used to control the behaviour
-    of &dcache;, some tags have to be set for the directories where
-    &dcache; files are stored. The installation procedure takes care
-    of this: In the directory <filename
-    class="directory">/data/</filename> two tags are set to default
-    values:
-  </para>
-
-  <screen>&prompt-user; <userinput>cd /data/</userinput>
-&prompt-user; <userinput>grep "" $(cat ".(tags)()")</userinput>
-.(tag)(OSMTemplate):StoreName myStore
-.(tag)(sGroup):STRING</screen>
-
-  <para>
-    The following directory tags appear in the &dcache; context:
-  </para>
-
-  <variablelist>
-    <title>Directory Tags for &dcache;</title>
-
-    <varlistentry>
-      <term>OSMTemplate</term>
-
-      <listitem>
-	<para>
-	  Must contain one line of the form
-	  <quote><literal>StoreName</literal>
-	  <replaceable>storeName</replaceable></quote> and specifies
-	  the name of the store that is used by &dcache; to construct
-	  the <glossterm linkend="gl-storage_class">storage
-	  class</glossterm> if the <glossterm
-	  linkend="gl-hsm_type">&hsm; type</glossterm> is
-	  <literal>osm</literal>.
-	</para>
-      </listitem>
-    </varlistentry>
-
-    <varlistentry>
-      <term>&hsm;Type</term>
-
-      <listitem>
-	<para>
-	  The <glossterm linkend="gl-hsm_type">&hsm; type</glossterm> is
-	  normally determined from the other existing tags. E.g., if
-	  the tag <literal>OSMTemplate</literal> exists, &hsm; type
-	  <literal>osm</literal> is assumed. With this tag it can be
-	  set explicitly. A class implementing that &hsm; type has to
-	  exist. Currently the only implementations are
-	  <literal>osm</literal> and <literal>enstore</literal>.
-          </para>
-        </listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term>sGroup</term>
-
-	<listitem>
-          <para>
-	    The storage group is also used to construct the <glossterm
-	    linkend="gl-storage_class">storage Class</glossterm> if
-	    the <glossterm linkend="gl-hsm_type">&hsm; type</glossterm>
-	    is <literal>osm</literal>.
-          </para>
-        </listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term>cacheClass</term>
-
-	<listitem>
-	  <para>
-	    The cache class is only used to control on which pools the
-            files in a directory may be stored, while the storage
-            class (constructed from the two above tags) might also be
-            used by the &hsm;. The cache class is only needed if the
-            above two tags are already fixed by &hsm; usage and more
-            flexibility is needed.
-          </para>
-        </listitem>
-      </varlistentry>
-
-      <varlistentry>
-        <term>&hsm;Instance</term>
-
-	<listitem>
-	  <para>
-	    If not set, the &hsm; instance will be the same as the
-	    &hsm; type. Setting this tag will only change the name as
-	    used in the <glossterm linkend="gl-storage_class">storage
-	    class</glossterm> and in the pool commands.
-          </para>
-        </listitem>
-      </varlistentry>
-    </variablelist>
-
-    <para>
-      There are more tags used by &dcache; if the &hsm; type
-      <literal>enstore</literal> is used.
-    </para>
+  <section>
+    <title>Directory Tags and Command Files</title>
 
     <para>
       When creating or changing directory tags by writing to the
@@ -497,6 +487,132 @@ StoreName myStore</screen>
 
     </orderedlist>
 
+  </section>
+
+
+  <section>
+    <title>Directory Tags for &dcache;</title>
+    <para>
+      The following directory tags appear in the &dcache; context:
+    </para>
+    <variablelist>
+      <varlistentry>
+	<term>OSMTemplate</term>
+
+	<listitem>
+	  <para>
+	    Must contain a line of the form
+	    <quote><literal>StoreName</literal>
+	    <replaceable>storeName</replaceable></quote> and specifies
+	    the name of the store that is used by &dcache; to
+	    construct the <link
+	    linkend="chimera-tags-storageClass">storage class</link> if
+	    the <glossterm linkend="gl-hsm_type">&hsm;
+	    type</glossterm> is <literal>osm</literal>.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>&hsm;Type</term>
+
+	<listitem>
+	  <para>
+	    The <glossterm linkend="gl-hsm_type">&hsm;
+	    type</glossterm> is normally determined from the other
+	    existing tags. E.g., if the tag
+	    <literal>OSMTemplate</literal> exists, &hsm; type
+	    <literal>osm</literal> is assumed. With this tag it can be
+	    set explicitly. A class implementing that &hsm; type has
+	    to exist. Currently the only implementations are
+	    <literal>osm</literal> and <literal>enstore</literal>.
+          </para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>sGroup</term>
+
+	<listitem>
+          <para>
+	    The storage group is also used to construct the <link
+	    linkend="chimera-tags-storageClass">storage Class</link> if
+	    the <glossterm linkend="gl-hsm_type">&hsm; type</glossterm>
+	    is <literal>osm</literal>.
+          </para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>cacheClass</term>
+
+	<listitem>
+	  <para>
+	    The cache class is only used to control on which pools the
+            files in a directory may be stored, while the storage
+            class (constructed from the two above tags) might also be
+            used by the &hsm;. The cache class is only needed if the
+            above two tags are already fixed by &hsm; usage and more
+            flexibility is needed.
+          </para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>&hsm;Instance</term>
+
+	<listitem>
+	  <para>
+	    If not set, the &hsm; instance will be the same as the
+	    &hsm; type. Setting this tag will only change the name as
+	    used in the <link linkend="chimera-tags-storageClass">storage
+	    class</link> and in the pool commands.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </section>
+
+
+  <section id='chimera-tags-storageClass'>
+    <title>Storage Class and Directory Tags</title>
+
+    <para>
+      The <link linkend="secStorageClass">storage class</link> is a
+      string of the form
+      <replaceable>StoreName</replaceable>:<replaceable>StorageGroup</replaceable>@<replaceable>hsm-type</replaceable>,
+      where <replaceable>StoreName</replaceable> is given by the
+      <literal>OSMTemplate</literal> tag,
+      <replaceable>StorageGroup</replaceable> by the
+      <literal>sGroup</literal> tag and
+      <replaceable>hsm-type</replaceable> by the
+      <literal>HSMType</literal> tag. As mentioned above the
+      <literal>HSMType</literal> tag is assumed to be
+      <literal>osm</literal> if the tag <literal>OSMTemplate</literal>
+      exists.
+    </para>
+    <para>
+      In the examples above two tags have been created.
+    </para>
+
+    <informalexample>
+      <screen>&prompt-user; <userinput>&chimera-cli; lstag /data</userinput>
+Total: 2
+OSMTemplate
+sGroup</screen>
+
+      <para>
+	As the tag <literal>OSMTemplate</literal> was created the tag
+	&hsm; type is assumed to be <literal>osm</literal>.
+      </para>
+      <para>
+	The storage class of the files which are copied into the
+	directory <filename class='directory'>/data</filename> after
+	the tags have been set will be
+	<literal>myStore:myGroup@osm</literal>.
+      </para>
+    </informalexample>
+
     <para>
       If directory tags are used to control the behaviour of &dcache;
       and/or a tertiary storage system, it is a good idea to plan the
@@ -506,7 +622,95 @@ StoreName myStore</screen>
       tags can only be created by creating a new directory.
     </para>
 
+    <informalexample>
+      <para>
+	Assume that data of two experiments,
+	<literal>experiment-a</literal> and
+	<literal>experiment-b</literal> is written into a namespace
+	tree with subdirectories <filename
+	class='directory'>/data/experiment-a</filename> and <filename
+	class='directory'>/data/experiment-b</filename>. As some pools
+	of the &dcache; are financed by
+	<literal>experiment-a</literal> and others by
+	<literal>experiment-b</literal> they probably do not like it
+	if they are also used by the other group. To avoid this the
+	directories of <literal>experiment-a</literal> and
+	<literal>experiment-b</literal> can be tagged.
+      </para>
+      <screen>&prompt-user; <userinput>echo "StoreName exp-a" | /opt/d-cache/bin/chimera-cli.sh writetag /data/experiment-a OSMTemplate</userinput>
+&prompt-user; <userinput>echo "StoreName exp-b" | /opt/d-cache/bin/chimera-cli.sh writetag /data/experiment-b OSMTemplate</userinput></screen>
+      <para>
+	Data from <literal>experiment-a</literal> taken in 2010 shall
+	be written into the directory <filename
+	class='directory'>/data/experiment-a/2010</filename> and data
+	from <literal>experiment-a</literal> taken in 2011 shall be
+	written into <filename
+	class='directory'>/data/experiment-a/2011</filename>. Data
+	from <literal>experiment-b</literal> shall be written into
+	<filename class='directory'>/data/experiment-b</filename>. Tag
+	the directories correspondingly.
+      </para>
+      <screen>&prompt-user; <userinput>echo "run2010" | /opt/d-cache/bin/chimera-cli.sh writetag /data/experiment-a/2010 sGroup</userinput>
+&prompt-user; <userinput>echo "run2011" | /opt/d-cache/bin/chimera-cli.sh writetag /data/experiment-a/2011 sGroup</userinput>
+&prompt-user; <userinput>echo "alldata" | /opt/d-cache/bin/chimera-cli.sh writetag /data/experiment-b sGroup</userinput></screen>
+
+      <para>
+	List the content of the tags by
+      </para>
+
+    <screen>&prompt-user; <userinput>&chimera-cli; readtag /data/experiment-a/2010 OSMTemplate</userinput>
+StoreName exp-a
+&prompt-user; <userinput>&chimera-cli; readtag /data/experiment-a/2010 sGroup</userinput>
+run2010
+&prompt-user; <userinput>&chimera-cli; readtag /data/experiment-a/2011 OSMTemplate</userinput>
+StoreName exp-a
+&prompt-user; <userinput>&chimera-cli; readtag /data/experiment-a/2011 sGroup</userinput>
+run2011
+&prompt-user; <userinput>&chimera-cli; readtag /data/experiment-b/2011 OSMTemplate</userinput>
+StoreName exp-b
+&prompt-user; <userinput>&chimera-cli; readtag /data/experiment-b/2011 sGroup</userinput>
+alldata</screen>
+
+      <para>
+	As the tag <literal>OSMTemplate</literal> was created the
+	&hsm; type is assumed to be <literal>osm</literal>.
+      </para>
+
+      <para>
+	The storage classes of the files which are copied into these directories after the
+	tags have been set will be
+      </para>
+      <itemizedlist>
+	<listitem>
+	  <literal>exp-a:run2010@osm</literal> for the files in <filename
+	class='directory'>/data/experiment-a/2010</filename>
+	</listitem>
+	<listitem>
+	  <literal>exp-a:run2011@osm</literal> for the files in <filename
+	class='directory'>/data/experiment-a/2011</filename>
+	</listitem>
+	<listitem>
+	  <literal>exp-b:alldata@osm</literal> for the files in <filename
+	class='directory'>/data/experiment-b</filename>
+	</listitem>
+      </itemizedlist>
+
+      <para>
+	<!-- TODO Link to example as soon as it has an id -->
+	To see how storage classes are used for pool selection have a
+	look at the example 'Reserving Pools for Storage and Cache
+	Classes' in the PoolManager chapter.
+      </para>
+    </informalexample>
+
+    <para>
+      There are more tags used by &dcache; if the &hsm; type
+      <literal>enstore</literal> is used.
+    </para>
   </section>
+
+  </section>
+
 
  <!--  <section id="chimera-deleteFiles">
     <title>Deleting Files in &chimera;</title>
