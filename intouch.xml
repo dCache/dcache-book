@@ -476,6 +476,7 @@ gplazmalite-vorole-mapping-priority="1"
 
      </section>
 
+
      <section id="intouch-client-https">
        <title>&webdav; with certificates</title>
        <para>
@@ -515,6 +516,17 @@ webdavProtocol=https</programlisting>
 	 <uri>https://<replaceable>dcache.example.org</replaceable>:2880</uri>
 	 with your browser.
        </para>
+
+       <important>
+	 <para>
+	 If the host certificate contains an extended key usage
+	 extension, it must include the extended usage for server
+	 authentication. Therefore you have to make sure that your
+	 host certificate is either unrestricted or it is explicitly
+	 allowed as a certificate for <literal>TLS Web Server
+	 Authentication</literal>.
+	 </para>
+       </important>
 
        <section>
 	 <title>Allowing authenticated and non-authenticated access with &webdav;</title>
@@ -1156,6 +1168,8 @@ echo -e 'cd <replaceable>pool_1</replaceable>\nrep ls\n<lineannotation>(more com
   | tr -d '\r' &gt; rep_ls.out</programlisting>
 
     </section>
+
+
 
   </section>
 
