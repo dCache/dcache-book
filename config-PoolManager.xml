@@ -130,7 +130,7 @@ This needs to be explained in the section on the Admin Interface:
       because it links a set of transfer-requests to a group of pools.
     </para>
 
-    <section>
+    <section id='cf-pm-links'>
       <title>Links</title>
       <para>
 	A link consists of a
@@ -864,6 +864,135 @@ STRING</screen>
       </para>
 
     </section>
+
+    <section id='cf-pm-linkgroups'>
+      <title>Link Groups</title>
+
+	<para>
+	  The &cell-poolmngr; supports a type of objects called
+	  <firstterm>link groups</firstterm>. These link groups are
+	  used by the <link linkend='cf-srm-space'>&srm;
+	  &cell-spacemngr;</link> to make reservations against
+	  space. Each link group corresponds to a number of &dcache;
+	  pools in the following way: A link group is a collection of
+	  <link linkend='cf-pm-links'>links</link> and each link
+	  points to a set of pools. Each link group knows about the
+	  size of its available space, which is the sum of all sizes
+	  of available space in all the pools included in this link
+	  group.
+         </para>
+
+	   <para>
+	     To create a new link group login to the <link
+	     linkend='intouch-admin'>Admin Interface</link> and
+	     <command>cd</command> to the &cell-poolmngr;.
+	   </para>
+	   <screen>&dc-prompt-local; <userinput>cd PoolManager</userinput>
+&dc-prompt-pm; <userinput>psu create linkGroup <replaceable>linkgroup</replaceable></userinput>
+&dc-prompt-pm; <userinput>psu addto linkGroup <replaceable>linkgroup</replaceable> <replaceable>link</replaceable></userinput>
+&dc-prompt-pm; <userinput>save</userinput></screen>
+
+
+           <para>
+	     With <command>save</command> the changes will be saved to
+	     the file
+	     <filename>&install-base-opt;/config/PoolManager.conf</filename>.
+	   </para>
+
+	   <note>
+	     <para>
+	       You can also edit the file
+	       <filename>&install-base-opt;/config/PoolManager.conf</filename>
+	       to create a new link group. Please make sure that it
+	       already exists. Otherwise you will have to create it
+	       first via the Admin Interface by
+	     </para>
+	     <screen>&dc-prompt-pm; <userinput>save</userinput></screen>
+
+	     <para>
+	       Edit the file
+	       <filename>&install-base-opt;/config/PoolManager.conf</filename>
+	     </para>
+
+	     <screen><command>psu create linkGroup</command> <replaceable>linkgroup</replaceable>
+<command>psu addto linkGroup</command> <replaceable>linkgroup</replaceable> <replaceable>link</replaceable></screen>
+
+             <para>
+	       After editing this file you will have to restart the
+	       domain which contains the &cell-poolmngr; cell to apply
+	       the changes.
+	     </para>
+	   </note>
+
+         <note>
+	   <para>
+	     Administrators will have to take care, that a pool is not
+	     present in more than one link group.
+	   </para>
+	 </note>
+
+      <formalpara>
+	<title>Properties of <link
+	linkend='cf-srm-intro-spaceReservation'>space
+	reservation</link>.</title> The &dcache; administrator can specify a
+	<firstterm><literal>RetentionPolicy</literal></firstterm> and
+	an <firstterm><literal>AccessLatency</literal></firstterm> for
+	the space reservation, where
+	<literal>RetentionPolicy</literal> describes the quality of
+	the storage service that will be provided for the data (files)
+	stored in this space reservation and
+	<literal>AccessLatency</literal> describes the availability of
+	this data. 
+      </formalpara>
+      <para>
+	A link group has five boolean properties called
+	<varname>replicaAllowed</varname>,
+	<varname>outputAllowed</varname>,
+	<varname>custodialAllowed</varname>,
+	<varname>onlineAllowed</varname> and
+	<varname>nearlineAllowed</varname>. The values of these
+	properties (<literal>true</literal> or
+	<literal>false</literal>) can be configured via the Admin
+	Interface or directly in the file
+	<filename>/opt/d-cache/config/PoolManager.conf</filename>.
+      </para>
+      <para>
+	The link groups contained in a space reservation match the
+	<literal>RetentionPolicy</literal> and the
+	<literal>AccessLatency</literal> of the space reservation.
+      </para>
+
+      <screen>&dc-prompt-pm; <userinput>psu set linkGroup custodialAllowed <replaceable>linkgroup</replaceable> <replaceable>true|false</replaceable></userinput>
+&dc-prompt-pm; <userinput>psu set linkGroup outputAllowed <replaceable>linkgroup</replaceable> <replaceable>true|false</replaceable></userinput>
+&dc-prompt-pm; <userinput>psu set linkGroup replicaAllowed <replaceable>linkgroup</replaceable> <replaceable>true|false</replaceable></userinput>
+&dc-prompt-pm; <userinput>psu set linkGroup onlineAllowed <replaceable>linkgroup</replaceable> <replaceable>true|false</replaceable></userinput>
+&dc-prompt-pm; <userinput>psu set linkGroup nearlineAllowed <replaceable>linkgroup</replaceable> <replaceable>true|false</replaceable></userinput></screen>
+
+       <para>
+	 Moreover an attribute can be assigned to a link group.
+       </para>
+       <screen>&dc-prompt-pm; <userinput>psu set linkGroup attribute <replaceable>linkgroup</replaceable> <replaceable>key</replaceable>=<replaceable>value</replaceable></userinput></screen>
+
+       <informalexample>
+	 Possible assignments for attributes are:
+	 <screen>&dc-prompt-pm; <userinput>psu set linkGroup attribute name-of-LinkGroup VO=dteam001</userinput>
+&dc-prompt-pm; <userinput>psu set linkGroup attribute name-of-LinkGroup VO=cms001</userinput>
+&dc-prompt-pm; <userinput>psu set linkGroup attribute name-of-LinkGroup HSM=osm</userinput></screen>
+       </informalexample>
+
+       <note>
+	 <para>
+	  Please note that that it is up to administrators that the
+	  link groups' attributes are specified correctly.
+	 </para>
+	 <para>
+	   For example &dcache; will not complain if the link group
+	   that does not support tape backend will be declared as one
+	   that supports <literal>custodial</literal>.
+	 </para>
+       </note>
+    </section>
+
   </section>
 
   <section id="cf-pm-cm">
