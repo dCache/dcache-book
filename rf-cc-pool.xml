@@ -355,7 +355,7 @@ t      data amount in TBytes</screen>
       <para>
         The gap parameter is used within the space cost
         calculation scheme described in <xref
-          linkend="cf-pm-cm-space"/>. It specifies the size of free
+          linkend="cf-pm-classic-space"/>. It specifies the size of free
         space below which it will be assumed that the pool is full
         and consequently the least recently used file has to be
         removed if a new file has to be stored on the pool. If, on
@@ -403,7 +403,7 @@ t      data amount in TBytes</screen>
       <para>
         The breakeven parameter is used within the space cost
         calculation scheme described in <xref
-          linkend="cf-pm-cm-space"/>.
+          linkend="cf-pm-classic-space"/>.
       </para>
     </refsection>
   </refentry>

@@ -12,7 +12,7 @@
 ]>
 
 <chapter id="cf-pm">
-  
+
   <title>Configuring the &serv-poolmngr;</title>
 
   <!--
@@ -33,9 +33,10 @@
     If a file the user wishes to read resides on one of the
     storage-pools within the &dcache; system, it will be transferred
     from that pool to the user. If it resides on several pools, the
-    file will be retrieved from the pool which is least busy. If all
-    pools the file is stored on are busy, a new copy of the file on an
-    idle pool will be created and this pool will answer the request.
+    file will be retrieved from one of the pools determined by a
+    configurable load balancing policy. If all pools the file is
+    stored on are busy, a new copy of the file on an idle pool will be
+    created and this pool will answer the request.
   </para>
 
   <para>
@@ -57,8 +58,10 @@
     they are configured. The &serv-poolmngr; service creates the
     &cell-poolmngr; cell, which is a unique cell in &dcache; and
     consists of several sub-modules: The important ones are the
-    <firstterm>pool selection unit</firstterm> (<abbrev>&psu;</abbrev>)
-    and the <firstterm>cost manager</firstterm> (<abbrev>CM</abbrev>).
+    <firstterm>pool selection unit</firstterm>
+    (<abbrev>&psu;</abbrev>) and the load balancing policy as defined
+    by the <firstterm>partition manager</firstterm>
+    (<abbrev>PM</abbrev>).
   </para>
 
   <para>
@@ -73,7 +76,8 @@
     containing the corresponding Admin Interface commands. It can
     therefore also be edited before the system is started. It can also
     be loaded into a running system with the <command>reload</command>
-    command.  In this chapter we will describe this file.
+    command.  In this chapter we will describe the commands allowed in
+    this file.
 <!-- TODO:
 This needs to be explained in the section on the Admin Interface:
         The syntax of the commands for configuring the &psu; will be
@@ -87,16 +91,15 @@ This needs to be explained in the section on the Admin Interface:
   </para>
 
   <para>
-    The &psu; is responsible for finding the pool which will be used for
-    a specific transfer-request based on the information from the
-    CM. By telling the &psu; which pools are permitted for which type of
-    transfer-request, the administrator of the &dcache; system can
-    adjust the system to any kind of scenario: Separate organizations
-    served by separate pools, special pools for writing the data to a
-    tertiary storage system, pools in a DMZ which serves only a
-    certain kind of data (e.g., for the grid). The following section
-    explains the mechanism employed by the &psu; and shows how to
-    configure it with several examples.
+    The &psu; is responsible for finding the set of pools which can be
+    used for a specific transfer-request based. By telling the &psu;
+    which pools are permitted for which type of transfer-request, the
+    administrator of the &dcache; system can adjust the system to any
+    kind of scenario: Separate organizations served by separate pools,
+    special pools for writing the data to a tertiary storage system,
+    pools in a DMZ which serves only a certain kind of data (e.g., for
+    the grid). The following section explains the mechanism employed
+    by the &psu; and shows how to configure it with several examples.
   </para>
 
   <section id="cf-pm-psu">
@@ -299,7 +302,7 @@ This needs to be explained in the section on the Admin Interface:
 	  unit defined elsewhere then the less restrictive unit will
 	  not match.
 	</para>
-	  
+
 	<variablelist>
 
           <varlistentry>
@@ -421,13 +424,13 @@ This needs to be explained in the section on the Admin Interface:
 	  If several different non-zero preference values are used,
 	  the &psu; will not generate a single list but a set of
 	  lists, each containing pools with the same preference. The
-	  Cost Manager will use the list of pools with highest
-	  preference and select the one with the lowest cost for the
-	  transfer. Only if all pools with the highest preference are
-	  offline, the next list will be considered by the Cost
-	  Manager. This can be used to configure a set of fall-back
-	  pools which are used if none of the other pools are
-	  available.
+	  Pool Manager will use the list of pools with highest
+	  preference and select a pool according to the load balancing
+	  policy for the transfer. Only if all pools with the highest
+	  preference are offline, the next list will be considered by
+	  the Pool Manager. This can be used to configure a set of
+	  fall-back pools which are used if none of the other pools
+	  are available.
 	</para>
       </section>
     </section>
@@ -942,7 +945,7 @@ STRING</screen>
 	the storage service that will be provided for the data (files)
 	stored in this space reservation and
 	<literal>AccessLatency</literal> describes the availability of
-	this data. 
+	this data.
       </formalpara>
       <para>
 	A link group has five boolean properties called
@@ -995,427 +998,1212 @@ STRING</screen>
 
   </section>
 
-  <section id="cf-pm-cm">
-    <title>The Cost Module</title>
+  <section id="cf-pm-pm">
+    <title>The Partition Manager</title>
 
-    <para>
-      From the allowable pools as determined by the <glossterm
-      linkend="gl-pm-comp-psu">pool selection unit</glossterm>, the pool
-      manager determines the pool used for storing or reading a file
-      by calculating a <glossterm linkend="gl-cost">cost</glossterm>
-      value for each pool. The pool with the lowest cost is used.
-    </para>
+    <para>The partition manager defines one or more load balancing
+    policies. Whereas the &psu; produces a prioritized set of
+    candidate pools using a collection of rules defined by the
+    administrator, the load balancing policy determines the specific
+    pool to use. It is also the load balancing policy that determines
+    when to fall back to lesser prirority links, or when to trigger
+    creation of additional copies of a file.</para>
 
-    <para>
-      If a client requests to read a file which is stored on more than
-      one allowable pool, the <glossterm
-      linkend="gl-performance_cost">performance costs</glossterm> are
-      calculated for these pools. In short, this cost value describes
-      how much the pool is currently occupied with transfers.
-    </para>
+    <para>Since the load balancing policy and parameters are defined
+    per partition, understanding the partition manager is essential to
+    tuning load balancing. This does not imply that one has to
+    partition the &dcache; instance. It is perfectly valid to use a
+    single partition for the complete instance.</para>
 
-    <para>
-      If a pool has to be selected for storing a file, which is either
-      written by a client or <glossterm
-      linkend="gl-restore">restored</glossterm> from a <glossterm
-      linkend="gl-tape_backend">tape backend</glossterm>, this
-      performance cost is combined with a <glossterm
-      linkend="gl-space_cost">space cost</glossterm> value to a
-      <glossterm linkend="gl-cost">total cost</glossterm> value for
-      the decision. The space cost describes how much it
-      <quote>hurts</quote> to free space on the pool for the file.
-    </para>
+    <para>This section documents the use of the partition manager, how
+    to create partitions, set parameters and how to associate links
+    with partitions. In the following sections the available partition
+    types and their configuration parameters are described.</para>
 
-    <para>
-      The <glossterm linkend="gl-pm-comp-cm">cost module</glossterm> is
-      responsible for calculating the cost values for all pools.  The
-      pools regularly send all necessary information about space usage
-      and request queue lengths to the cost module.  It can be
-      regarded as a cache for all this information.  This way it is
-      not necessary to send <quote>get cost</quote> requests to the
-      pools for each client request. The cost module interpolates the
-      expected costs until a new precise information package is coming
-      from the pools.  This mechanism prevents clumping of requests.
-    </para>
+    <section id="cf-pm-pm-overview">
+        <title>Overview</title>
 
-    <para>
-      Calculating the cost for a data transfer is done in two
-      steps. First, the cost module merges all information about space
-      and transfer queues of the pools to calucate the performance and
-      space costs separately.  Second, in the case of a write or stage
-      request, these two numbers are merged to build the total cost
-      for each pool.  The first step is isolated within a separate
-      loadable class.  The second step is done by the cost
-      module.
-    </para>
+        <para>There are various parameters that affect the load
+        balancing policy. Some of them are generic and apply to any
+        load balancing policy, but many are specific to a particular
+        policy. To avoid limiting the complete &dcache; instance to a
+        single configuration, the choice of load balancing policy and
+        the various parameters apply to
+        <firstterm>partitions</firstterm> of the instance. The load
+        balancing algorithm and the available parameters is determined
+        by the <firstterm>partition type</firstterm>.</para>
 
-    <section id="cf-pm-cm-perf">
-      <title>The Performance Cost</title>
+        <para>Each &psu; link can be associated with a different
+        partion and the policy and parameters of that partition will
+        be used to choose a pool from the set of candidate pools. The
+        only partition that exists without being explicitly created is
+        the partition called <literal>default</literal>. This
+        partition is used by all links that do not explicitly identify
+        a partition. Other partitions can be created or modified as
+        needed.</para>
 
-      <para>
-	The load of a pool is determined by comparing the current
-	number of active and waiting <glossterm>transfers</glossterm>
-	to the maximum number of concurrent transfers allowed.
+        <para>The <literal>default</literal> partition has a
+        hard-coded partition type called
+        <literal>classic</literal>. This type implements the one load
+        balancing policy that was available in &dcache; before version
+        2.0. The <literal>classic</literal> partition type is
+        described later. Other partitions have one of a number of
+        available types. The system is pluggable, meaning that third
+        party plugins can be loaded at runtime and add additional
+        partition types, thus providing the ultimate control over load
+        balancing in &dcache;. Documentation on how to develop plugins
+        is beyond the scope of this chapter.</para>
 
-	This is done separately for each of the transfer types
-	(<glossterm linkend="gl-store">store</glossterm>, <glossterm
-	linkend="gl-restore">restore</glossterm>, pool-to-pool client,
-	pool-to-pool server, and client request) with the following
-	equation:
-      </para>
-
-      <para>
-	perfCost(per Type) = ( activeTransfers + waitingTransfers ) / maxAllowed .
-      </para>
-
-      <para>
-	The maximum number of concurrent transfers
-	(<symbol>maxAllowed</symbol>) can be configured with the commands
-	<xref linkend="cmd-st_set_max_active"/> (store),
-	<xref linkend="cmd-rh_set_max_active"/> (restore),
-	<xref linkend="cmd-mover_set_max_active"/> (client request),
-	<xref linkend="cmd-p2p_set_max_active"/> (pool-to-pool server), and
-	<xref linkend="cmd-pp_set_max_active"/> (pool-to-pool client). 
-        <!-- (NOCLUE: <command moreinfo="refentry"><xref linkend="cmd-flush_set_max_active"/></command>) -->
-
-	<!-- NOCLUE: Some more info about the meanings of these parameters would be nice. -->
-      </para>
-
-
-      <para>
-	Then the average is taken for each mover type where
-	<symbol>maxAllowed</symbol> is not zero. For a pool where
-	store, restore and client transfers are allowed, e.g.,
-      </para>
-
-      <para>
-	perfCost(total) = ( perfCost(store) + perfCost(restore) + perfCost(client) ) / 3 ,
-      </para>
-
-      <para>
-	and for a read only pool:
-      </para>
-
-      <para>
-	perfCost(total) = ( perfCost(restore) + perfCost(client) ) / 2 .
-      </para>
-
-      <para>
-	For a well balanced system, the performance cost should not exceed 1.0.
-      </para>
-
+        <para>To ease the management of partition parameters, a common
+        set of shared parameters can be defined outside all
+        partitions. Any parameter not explicitly set on a partition
+        inherits the value from the common set. If not defined in the
+        common set, a default value determined by the partition type
+        is used. Currently, the common set of parameters happens to be
+        the same as the parameters of the <literal>default</literal>
+        partition, however this is only due to compatibility
+        constraints and may change in future versions.</para>
     </section>
 
-    <section id="cf-pm-cm-space">
-      <title>The Space Cost</title>
+    <section id="cf-pm-pm-commands">
+        <title>Managing Partitions</title>
 
-      <para>
-	In this section only the new scheme for calculating the space 
-	cost will be described. Be aware, that the old scheme will be
-	used if the <glossterm linkend="gl-breakeven">breakeven
-	parameter</glossterm> of a pool is larger or equal 1.0.
-      </para>
-      
-      <para>
-	The cost value used for determining a pool for storing a file
-	depends either on the free space on the pool or on the age of
-	the <glossterm linkend="gl-lru">least recently used (LRU)
-	file</glossterm>, which whould have to be deleted. 
-      </para>
+        <para>Commands related to &dcache; partitioning:</para>
 
-      <para>
-	The space cost is calculated as follows:
+        <itemizedlist>
+            <listitem>
+                <para>
+                    <cmdsynopsis>
+                        <command>pm types</command>
+                    </cmdsynopsis>
+                    Lists available partition types. New partition types
+                    can be added through plugins.
+                </para>
+            </listitem>
 
-	<informaltable frame="none">
-	  <tgroup cols="6" colsep="none" rowsep="none" align="left">
-	    <colspec colnum="1" colname="if" colwidth="20"/>
-	    <colspec colnum="2" colname="formula" colwidth="5*"/>
-	    <colspec colnum="3" colname="and" colwidth="25"/>
-	    <colspec colnum="4" colname="formula" colwidth="3*"/>
-	    <colspec colnum="5" colname="then" colwidth="25"/>
-	    <colspec colnum="6" colname="formula" colwidth="8*"/>
-	    <tbody>
-	      <row>
-		<entry>If </entry>
-		<entry>
-		  <phrase role="math">
-		    freeSpace &gt; gapPara
-		  </phrase>
-		</entry>
-		<entry></entry>
-		<entry></entry>
-		<entry> then </entry>
-		<entry>	
-		  <phrase role="math">
-		    spaceCost = 3 * newFileSize / freeSpace
-		  </phrase>
-		</entry>
-	      </row>
-	      <row>
-		<entry>If </entry>
-		<entry>
-		  <phrase role="math">
-		    freeSpace &lt;= gapPara
-		  </phrase>
-		</entry>
-		<entry>
-		  and
-		</entry>
-		<entry>
-		  <phrase role="math">
-		    lruAge &lt; 60
-		  </phrase>
-		</entry>
-		<entry> then </entry>
-		<entry>
-		  <phrase role="math">
-		    spaceCost = 1 + costForMinute
-		  </phrase>
-		</entry>
-	      </row>
-	      <row>
-		<entry>If </entry>
-		<entry>
-		  <phrase role="math">
-		    freeSpace &lt;= gapPara
-		  </phrase>
-		</entry>
-		<entry>
-		  and
-		</entry>
-		<entry>
-		  <phrase role="math">
-		    lruAge &gt;= 60
-		  </phrase>
-		</entry>
-		<entry> then </entry>
-		<entry>
-		  <phrase role="math">
-		    spaceCost = 1 + costForMinute * 60 / lruAge
-		  </phrase>
-		</entry>
-	      </row>
-	    </tbody>
-	  </tgroup>
-	</informaltable>
+            <listitem>
+                <para>
+                    <cmdsynopsis>
+                        <command>pm create</command>
+                        <arg choice='opt'>-type=<replaceable>partitionType</replaceable></arg>
+                        <arg choice='plain'><replaceable>partitionName</replaceable></arg>
+                    </cmdsynopsis>
+                    Creates a new partition. If no partition type is
+                    specified, then a <literal>classic</literal> partition
+                    is created.
+                </para>
+            </listitem>
 
-	where the variable names have the following meanings:
+            <listitem>
+                <para>
+                    <cmdsynopsis>
+                        <command>pm set</command>
+                        <arg choice='opt'><replaceable>partitionName</replaceable></arg>
+                        <arg choice='plain'>-<replaceable>parameterName</replaceable>
+                        =<replaceable>value</replaceable>|off</arg>
+                    </cmdsynopsis>
+                    Sets a parameter
+                    <replaceable>parameterName</replaceable> to a new
+                    value.
+                </para>
 
-	<variablelist>
-	  <varlistentry>
-	    <term><phrase role="math">freeSpace</phrase></term>
-	    <listitem>
-	      <para>
-		The free space left on the pool
-	      </para>
-	    </listitem>
-	  </varlistentry>
-	  <varlistentry>
-	    <term><phrase role="math">newFileSize</phrase></term>
-	    <listitem>
-	      <para>
-		The size of the file to be written to one of the pools, and at least 50MB.
-	      </para>
-	    </listitem>
-	  </varlistentry>
-	  <varlistentry>
-	    <term><phrase role="math">lruAge</phrase></term>
-	    <listitem>
-	      <para>
-		The age of the <glossterm linkend="gl-lru">least
-		  recently used file</glossterm> on the pool.
-	      </para>
-	    </listitem>
-	  </varlistentry>
-	  <varlistentry>
-	    <term><phrase role="math">gapPara</phrase></term>
-	    <listitem>
-	      <para>
-		The gap parameter. Default is 4GB. The size of free
-		space below which it will be assumed that the pool is
-		full and consequently the least recently used file has
-		to be removed. If, on the other hand, the free space
-		is greater than <varname>gapPara</varname>, it will be
-		expensive to store a file on the pool which exceeds
-		the free space.
-	      </para>
-	      <para>
-		It can be set per pool with the <xref
-		linkend="cmd-set_gap"/> command. This has to be done
-		in the pool cell and not in the pool manager
-		cell. Nevertheless it only influences the cost
-		calculation scheme within the pool manager and not the
-		bahaviour of the pool itself.
-	      </para>
-	    </listitem>
-	  </varlistentry>
-	  <varlistentry>
-	    <term><phrase role="math">costForMinute</phrase></term>
-	    <listitem>
-	      <para>
-		A parameter which fixes the space cost of a
-		one-minute-old LRU file to <phrase role="math">(1 +
-		costForMinute)</phrase>.  It can be set with the <xref
-		linkend="cmd-set_breakeven"/>, where
-	      </para>
+                <para>If <replaceable>partitionName</replaceable> is
+                omitted, the common shared set of parameters is
+                updated. The value is used by any partition for which
+                the parameter is not explicitly set.</para>
 
-	      <para>
-		  costForMinute = breakeven * 7 * 24 * 60.
-	      </para>
+                <para>If a parameter is set to <literal>off</literal>
+                then this parameter is no longer defined and is
+                inherited from the common shared set of parameters, or
+                a partition type specific default value is used if the
+                parameter is not defined in the common set.
+                </para>
+            </listitem>
 
-	      <para>
-		I.e. the the space cost of a one-week-old LRU file
-		will be <phrase role="math">(1 +
-		breakeven)</phrase>. Note again, that all this only
-		applies if <phrase role="math">breakeven &lt;
-		1.0</phrase>
-	      </para>
-	    </listitem>
-	  </varlistentry>
-	</variablelist>
-	
-	The prescription above can be stated a little differently as follows:
+            <listitem>
+                <para>
+                    <cmdsynopsis>
+                        <command>pm ls</command>
+                        <arg choice='opt'>-l</arg>
+                        <arg choice='opt'><replaceable>partitionName</replaceable></arg>
+                    </cmdsynopsis>
+                    Lists a single or all partitions, including the
+                    type of each partition. If a partition name or the
+                    <literal>-l</literal> option are used, then the
+                    partition parameters are shown too. Inherited and
+                    default values are identified as such.
+                </para>
+            </listitem>
 
-	<informaltable frame="none">
-	  <tgroup cols="4">
-	    <colspec colnum="1" colname="if"       colwidth="20"/>
-	    <colspec colnum="2" colname="formula"  colwidth="*"/>
-	    <colspec colnum="3" colname="then"     colwidth="25"/>
-	    <colspec colnum="4" colname="formula2" colwidth="2*"/>
-	    <tbody>
-	      <row>
-		<entry>If </entry>
-		<entry>
-		  freeSpace &gt; gapPara
-		</entry>
-		<entry> then </entry>
-		<entry>		  
-		    spaceCost = 3 * newFileSize / freeSpace
-		</entry>
-	      </row>
-	      <row>
-		<entry>If </entry>
-		<entry>
-		  freeSpace &lt;= gapPara
-		</entry>
-		<entry> then </entry>
-		<entry>		  
-		    spaceCost = 1 + breakeven * 7 * 24 * 60 * 60 / lruAge
-		  ,
-		</entry> 
-	      </row>
-	    </tbody>
-	  </tgroup>
-	</informaltable>
+            <listitem>
+                <para>
+                    <cmdsynopsis>
+                        <command>pm destroy</command>
+                        <arg choice='plain'><replaceable>partitionName</replaceable></arg>
+                    </cmdsynopsis>
+                    Removes a partition from &dcache;. Any links
+                    configured to use this partition will fall back to
+                    the <literal>default</literal> partition.
+                </para>
+            </listitem>
+        </itemizedlist>
 
-	where <varname>newFileSize</varname> is at least 50MB and
-	<varname>lruAge</varname> at least one minute.
-      </para>
+        <para>A partition, so far, is just a set of parameters which
+        may or may not differ from the default set. To let a partition
+        relate to a part of the &dcache;, links are used.  Each link
+        may be assigned to exactly one partition. If not set, or the
+        assigned partition doesn't exist, the link defaults to the
+        <literal>default</literal> partition.</para>
 
-      <section>
-	<title>Rationale</title>
+        <cmdsynopsis>
+            <command>psu set link</command>
+            <arg><replaceable>linkName</replaceable></arg>
+            <arg choice='plain'>-section=<replaceable>partitionName</replaceable></arg>
+            <arg rep='repeat' choice='opt'><replaceable>other-options</replaceable></arg>
+        </cmdsynopsis>
 
-	<!-- <para>
-	NOCLUE
-	</para> -->
+        <para>Whenever this link is chosen for pool selection, the
+        associated parameters of the assigned partition will become
+        active for further processing.</para>
 
-	<para>
-	  As the last version of the formula suggests, a pool can be
-	  in two states: Either <phrase role="math">freeSpace &gt;
-	  gapPara</phrase> or <phrase role="math">freeSpace &lt;=
-	  gapPara</phrase> - either there is free space left to store
-	  files without deleting cached files or there isn't.
-	</para>
+        <warning>
+            <para>Depending on the way links are setup it may very
+            well happen that more than just one link is triggered for
+            a particular &dcache; request. This is not illegal but
+            leads to an ambiguity in selecting an appropriate &dcache;
+            partition. If only one of the selected links has a
+            partition assigned, this partition is chosen.  Otherwise,
+            if different links point to different partitions, the
+            result is indeterminate.  This issue is not yet solved and
+            we recommend to clean up the &serv-poolmngr; configuration
+            to eliminate links with the same preferences for the same
+            type of requests.
+            </para>
+        </warning>
 
-	<para>
-	  Therefore, <varname>gapPara</varname> should be around the
-	  size of the smallest files which frequently might be written
-	  to the pool. If files smaller than
-	  <varname>gapPara</varname> appear very seldom or never, the
-	  pool might get stuck in the first of the two cases with a
-	  high cost.
-	</para>
+        <para>In the <link linkend="intouch-web">Web Interface</link> you
+        can find a web page listing partitions and more information.  You
+        will find a page summarizing the partition status of the
+        system. This is essentially the output of the command <command>pm
+        ls -l</command>.</para>
 
-	<para>
-	  If the LRU file is smaller than the new file, other files
-	  might have to be deleted. If these are much younger than the
-	  LRU file, this space cost calculation scheme might not lead
-	  to a selection of the optimal pool. However, in praxis this
-	  happens very seldomly and this scheme turns out to be very
-	  efficient.
-	</para>
-      
-      </section>
-
+        <informalexample>
+            <para>
+                For your &dcache; on <systemitem
+                class='domainname'>dcache.example.org</systemitem> the address is
+            </para>
+            <para>
+                <uri>http://dcache.example.org:2288/poolInfo/parameterHandler/set/matrix/*</uri>
+            </para>
+        </informalexample>
     </section>
-    
-    <section id="cf-pm-cm-total">
-      <title>The Total Cost</title>
-    
-    <para>
-      The total cost is a linear combination of the <glossterm
-      linkend="gl-performance_cost">performance</glossterm> and
-      <glossterm linkend="gl-space_cost">space cost</glossterm>.
 
-      I.e.
+    <section id="cf-pm-pm-examples">
+        <title>Examples</title>
+        <para>
+            For the subsequent examples we assume a basic &serv-poolmngr;
+            setup :
+        </para>
 
-<!-- 
-<screen><varname>cost</varname> = <varname>ccf</varname> * <varname>performance_cost</varname> + <varname>scf</varname> * <varname>space_cost</varname>,</screen>
--->
-<!--	<m:math xmlns:m="http://www.w3.org/1998/Math/MathML">
-	  <m:mrow>
-	    <m:mi>totalCost</m:mi>
-	    <m:mo>=</m:mo>
-	    <m:mi>ccf</m:mi>
-	    <m:mo>*</m:mo>
-	    <m:mi>perfCost</m:mi>
-	    <m:mo>+</m:mo>
-	    <m:mi>scf</m:mi>
-	    <m:mo>*</m:mo>
-	    <m:mi>spaceCost</m:mi>
-	  </m:mrow>
-	</m:math>,-->
- 	<!--
-	<m:math xmlns:m="http://www.w3.org/1998/Math/MathML">
-	  <m:mrow>
-	  <m:apply>
-	    <m:eq/>
-	    <m:ci>totalCost</m:ci>
-	    <m:apply>
-	      <m:plus/>
-	      <m:apply>
-		<m:times/>
-		<m:ci>ccf</m:ci>
-		<m:ci>perfCost</m:ci>
-	      </m:apply>
-	      <m:apply>
-		<m:times/>
-		<m:ci>scf</m:ci>
-		<m:ci>spaceCost</m:ci>
-	      </m:apply>
-	    </m:apply>
-	  </m:apply>
-	  </m:mrow>
-	</m:math>
-	-->
-	  totalCost = ccf * perfCost + scf * spaceCost ,
+        <informalexample>
+<programlisting>#
+# define the units
+#
+psu create -protocol   */*
+psu create -protocol   xrootd/*
+psu create -net        0.0.0.0/0.0.0.0
+psu create -net        131.169.0.0/255.255.0.0
+psu create -store      *@*
+#
+#  define unit groups
+#
+psu create ugroup  any-protocol
+psu create ugroup  any-store
+psu create ugroup  world-net
+psu create ugroup  xrootd
+#
+psu addto ugroup any-protocol */*
+psu addto ugroup any-store    *@*
+psu addto ugroup world-net    0.0.0.0/0.0.0.0
+psu addto ugroup desy-net     131.169.0.0/255.255.0.0
+psu addto ugroup xrootd       xrootd/*
+#
+#  define the pools
+#
+psu create pool pool1
+psu create pool pool2
+#
+#  define the pool groups
+#
+psu create pgroup default-pools
+psu create pgroup special-pools
+#
+psu addto pgroup default-pools pool1
+psu addto pgroup default-pools pool2
+#
+psu addto pgroup special-pools pool1
+psu addto pgroup special-pools pool2
+#</programlisting>
+        </informalexample>
 
+        <section>
+            <title>Disallowing pool to pool transfers for special pool
+            groups based on the access protocol</title>
 
-      where <varname>ccf</varname> and <varname>scf</varname> are
-      configurable with the command <xref
-      linkend="cmd-set_pool_decision"/>.
+            <para>
+                For a special set of pools, where we only allow the &xrootd;
+                protocol, we don't want the datasets to be replicated on high
+                load while for the rest of the pools we allow replication on
+                hot spot detection.
+            </para>
+            <informalexample>
+<programlisting>#
+#
+pm set default        -p2p=0.4
+pm set xrootd-section -p2p=0.0
+#
+psu create link default-link any-protocol any-store world-net
+psu add    link default-link default-pools
+psu set    link default-link -readpref=10 -cachepref=10 -writepref=0
+#
+psu create link xrootd-link xrootd any-store world-net
+psu add    link xrootd-link special-pools
+psu set    link xrootd-link -readpref=11 -cachepref=11 -writepref=0
+psu set    link xrootd-link -section=xrootd-section
+#        </programlisting>
+            </informalexample>
+        </section>
 
-      E.g.,
+        <section>
+            <title>Choosing pools randomly for incoming traffic only</title>
 
-<screen>&dc-prompt-pm; <userinput>set pool decision <option>-spacecostfactor=3</option> <option>-cpucostfactor=1</option></userinput></screen>
+            <para>
+                For a set of pools we select pools following the default
+                setting of cpu and space related cost factors. For incoming
+                traffic from outside, though, we select the same pools, but in
+                a randomly distributed fashion.  Please
+                note that this is not really a physical partitioning of the
+                &dcache; system, but rather a virtual one, applied to the same
+                set of pools.
+            </para>
+            <informalexample>
+<programlisting>#
+#
+pm set default          -cpucostfactor=0.2 -spacecostfactor=1.0
+pm set incoming-section -cpucostfactor=0.0 -spacecostfactor=0.0
+#
+psu create link default-link any-protocol any-store desy-net
+psu add    link default-link default-pools
+psu set    link default-link -readpref=10 -cachepref=10 -writepref=10
+#
+psu create link default-link any-protocol any-store world-net
+psu add    link default-link default-pools
+psu set    link default-link -readpref=10 -cachepref=10 -writepref=0
+#
+psu create link incoming-link any-protocol any-store world-net
+psu add    link incoming-link default-pools
+psu set    link incoming-link -readpref=10 -cachepref=10 -writepref=10
+psu set    link incoming-link -section=incoming-section
+#</programlisting>
+            </informalexample>
+        </section>
 
-      will give the <glossterm linkend="gl-space_cost">space
-      cost</glossterm> three times the weight of the <glossterm
-      linkend="gl-performance_cost">performance cost</glossterm>.
-    </para>
 
     </section>
 
   </section>
 
+  <section id="cf-pm-classic">
+      <title>Classic Partitions</title>
+
+      <para>The <literal>classic</literal> partition type implements
+      the load balancing policy known from &dcache; releases before
+      version 2.0. This partition type is still the default. This
+      section describes this load balancing policy and the available
+      configuration parameters.</para>
+
+      <informalexample>
+          <para>To create a classic partition use the command:
+          <command>pm create</command> -type=classic
+          <replaceable>partitionName</replaceable>
+          </para>
+      </informalexample>
+
+      <section id="cf-pm-classic-policy">
+          <title>Load Balancing Policy</title>
+
+          <para>From the allowable pools as determined by the
+          <glossterm linkend="gl-pm-comp-psu">pool selection
+          unit</glossterm>, the pool manager determines the pool used
+          for storing or reading a file by calculating a <glossterm
+          linkend="gl-cost">cost</glossterm> value for each pool. The
+          pool with the lowest cost is used.</para>
+
+          <para>If a client requests to read a file which is stored on
+          more than one allowable pool, the <glossterm
+          linkend="gl-performance_cost">performance costs</glossterm>
+          are calculated for these pools. In short, this cost value
+          describes how much the pool is currently occupied with
+          transfers.</para>
+
+          <para>If a pool has to be selected for storing a file, which
+          is either written by a client or <glossterm
+          linkend="gl-restore">restored</glossterm> from a <glossterm
+          linkend="gl-tape_backend">tape backend</glossterm>, this
+          performance cost is combined with a <glossterm
+          linkend="gl-space_cost">space cost</glossterm> value to a
+          <glossterm linkend="gl-cost">total cost</glossterm> value
+          for the decision. The space cost describes how much it
+          <quote>hurts</quote> to free space on the pool for the file.
+          </para>
+
+          <para>The <glossterm linkend="gl-pm-comp-cm">cost
+          module</glossterm> is responsible for calculating the cost
+          values for all pools.  The pools regularly send all
+          necessary information about space usage and request queue
+          lengths to the cost module.  It can be regarded as a cache
+          for all this information.  This way it is not necessary to
+          send <quote>get cost</quote> requests to the pools for each
+          client request. The cost module interpolates the expected
+          costs until a new precise information package is coming from
+          the pools.  This mechanism prevents clumping of requests.
+          </para>
+
+          <para>Calculating the cost for a data transfer is done in
+          two steps. First, the cost module merges all information
+          about space and transfer queues of the pools to calculate
+          the performance and space costs separately.  Second, in the
+          case of a write or stage request, these two numbers are
+          merged to build the total cost for each pool. The first step
+          is isolated within a separate loadable class. The second
+          step is done by the partition.
+          </para>
+      </section>
+
+      <section id="cf-pm-classic-perf">
+          <title>The Performance Cost</title>
+
+          <para>
+              The load of a pool is determined by comparing the
+              current number of active and waiting
+              <glossterm>transfers</glossterm> to the maximum number
+              of concurrent transfers allowed.
+
+              This is done separately for each of the transfer types
+              (<glossterm linkend="gl-store">store</glossterm>,
+              <glossterm linkend="gl-restore">restore</glossterm>,
+              pool-to-pool client, pool-to-pool server, and client
+              request) with the following equation:
+          </para>
+
+          <para>
+              perfCost(per Type) = ( activeTransfers + waitingTransfers ) / maxAllowed .
+          </para>
+
+          <para>
+              The maximum number of concurrent transfers
+              (<symbol>maxAllowed</symbol>) can be configured with the commands
+              <xref linkend="cmd-st_set_max_active"/> (store),
+              <xref linkend="cmd-rh_set_max_active"/> (restore),
+              <xref linkend="cmd-mover_set_max_active"/> (client request),
+              <xref linkend="cmd-p2p_set_max_active"/> (pool-to-pool server), and
+              <xref linkend="cmd-pp_set_max_active"/> (pool-to-pool client).
+              <!-- (NOCLUE: <command moreinfo="refentry"><xref linkend="cmd-flush_set_max_active"/></command>) -->
+
+              <!-- NOCLUE: Some more info about the meanings of these parameters would be nice. -->
+          </para>
+
+
+          <para>
+              Then the average is taken for each mover type where
+              <symbol>maxAllowed</symbol> is not zero. For a pool
+              where store, restore and client transfers are allowed,
+              e.g.,
+          </para>
+
+          <para>
+              perfCost(total) = ( perfCost(store) + perfCost(restore) + perfCost(client) ) / 3 ,
+          </para>
+
+          <para>
+              and for a read only pool:
+          </para>
+
+          <para>
+              perfCost(total) = ( perfCost(restore) + perfCost(client) ) / 2 .
+          </para>
+
+          <para>
+              For a well balanced system, the performance cost should not exceed 1.0.
+          </para>
+
+      </section>
+
+      <section id="cf-pm-classic-space">
+          <title>The Space Cost</title>
+
+          <para>
+              In this section only the new scheme for calculating the space
+              cost will be described. Be aware, that the old scheme will be
+              used if the <glossterm linkend="gl-breakeven">breakeven
+              parameter</glossterm> of a pool is larger or equal 1.0.
+          </para>
+
+          <para>
+              The cost value used for determining a pool for storing a file
+              depends either on the free space on the pool or on the age of
+              the <glossterm linkend="gl-lru">least recently used (LRU)
+              file</glossterm>, which whould have to be deleted.
+          </para>
+
+          <para>
+              The space cost is calculated as follows:
+
+              <informaltable frame="none">
+                  <tgroup cols="6" colsep="none" rowsep="none" align="left">
+                      <colspec colnum="1" colname="if" colwidth="20"/>
+                      <colspec colnum="2" colname="formula" colwidth="5*"/>
+                      <colspec colnum="3" colname="and" colwidth="25"/>
+                      <colspec colnum="4" colname="formula" colwidth="3*"/>
+                      <colspec colnum="5" colname="then" colwidth="25"/>
+                      <colspec colnum="6" colname="formula" colwidth="8*"/>
+                      <tbody>
+                          <row>
+                              <entry>If </entry>
+                              <entry>
+                                  <phrase role="math">
+                                      freeSpace &gt; gapPara
+                                  </phrase>
+                              </entry>
+                              <entry></entry>
+                              <entry></entry>
+                              <entry> then </entry>
+                              <entry>
+                                  <phrase role="math">
+                                      spaceCost = 3 * newFileSize / freeSpace
+                                  </phrase>
+                              </entry>
+                          </row>
+                          <row>
+                              <entry>If </entry>
+                              <entry>
+                                  <phrase role="math">
+                                      freeSpace &lt;= gapPara
+                                  </phrase>
+                              </entry>
+                              <entry>
+                                  and
+                              </entry>
+                              <entry>
+                                  <phrase role="math">
+                                      lruAge &lt; 60
+                                  </phrase>
+                              </entry>
+                              <entry> then </entry>
+                              <entry>
+                                  <phrase role="math">
+                                      spaceCost = 1 + costForMinute
+                                  </phrase>
+                              </entry>
+                          </row>
+                          <row>
+                              <entry>If </entry>
+                              <entry>
+                                  <phrase role="math">
+                                      freeSpace &lt;= gapPara
+                                  </phrase>
+                              </entry>
+                              <entry>
+                                  and
+                              </entry>
+                              <entry>
+                                  <phrase role="math">
+                                      lruAge &gt;= 60
+                                  </phrase>
+                              </entry>
+                              <entry> then </entry>
+                              <entry>
+                                  <phrase role="math">
+                                      spaceCost = 1 + costForMinute * 60 / lruAge
+                                  </phrase>
+                              </entry>
+                          </row>
+                      </tbody>
+                  </tgroup>
+              </informaltable>
+
+              where the variable names have the following meanings:
+
+              <variablelist>
+                  <varlistentry>
+                      <term><phrase role="math">freeSpace</phrase></term>
+                      <listitem>
+                          <para>
+                              The free space left on the pool
+                          </para>
+                      </listitem>
+                  </varlistentry>
+                  <varlistentry>
+                      <term><phrase role="math">newFileSize</phrase></term>
+                      <listitem>
+                          <para>
+                              The size of the file to be written to one of the pools, and at least 50MB.
+                          </para>
+                      </listitem>
+                  </varlistentry>
+                  <varlistentry>
+                      <term><phrase role="math">lruAge</phrase></term>
+                      <listitem>
+                          <para>
+                              The age of the <glossterm linkend="gl-lru">least
+                              recently used file</glossterm> on the pool.
+                          </para>
+                      </listitem>
+                  </varlistentry>
+                  <varlistentry>
+                      <term><phrase role="math">gapPara</phrase></term>
+                      <listitem>
+                          <para>
+                              The gap parameter. Default is 4 GiB. The
+                              size of free space below which it will
+                              be assumed that the pool is full and
+                              consequently the least recently used
+                              file has to be removed. If, on the other
+                              hand, the free space is greater than
+                              <varname>gapPara</varname>, it will be
+                              expensive to store a file on the pool
+                              which exceeds the free space.
+                          </para>
+                          <para>
+                              It can be set per pool with the <xref
+                              linkend="cmd-set_gap"/> command. This
+                              has to be done in the pool cell and
+                              not in the pool manager
+                              cell. Nevertheless it only influences
+                              the cost calculation scheme within the
+                              pool manager and not the bahaviour of
+                              the pool itself.
+                          </para>
+                      </listitem>
+                  </varlistentry>
+                  <varlistentry>
+                      <term><phrase role="math">costForMinute</phrase></term>
+                      <listitem>
+                          <para>
+                              A parameter which fixes the space cost
+                              of a one-minute-old LRU file to
+                              <phrase role="math">(1 +
+                              costForMinute)</phrase>.  It can be
+                              set with the <xref
+                              linkend="cmd-set_breakeven"/>, where
+                          </para>
+
+                          <para>
+                              costForMinute = breakeven * 7 * 24 * 60.
+                          </para>
+
+                          <para>
+                              I.e. the the space cost of a
+                              one-week-old LRU file will be <phrase
+                              role="math">(1 +
+                              breakeven)</phrase>. Note again, that
+                              all this only applies if <phrase
+                              role="math">breakeven &lt;
+                              1.0</phrase>
+                          </para>
+                      </listitem>
+                  </varlistentry>
+              </variablelist>
+
+              The prescription above can be stated a little differently as follows:
+
+              <informaltable frame="none">
+                  <tgroup cols="4">
+                      <colspec colnum="1" colname="if"       colwidth="20"/>
+                      <colspec colnum="2" colname="formula"  colwidth="*"/>
+                      <colspec colnum="3" colname="then"     colwidth="25"/>
+                      <colspec colnum="4" colname="formula2" colwidth="2*"/>
+                      <tbody>
+                          <row>
+                              <entry>If </entry>
+                              <entry>
+                                  freeSpace &gt; gapPara
+                              </entry>
+                              <entry> then </entry>
+                              <entry>
+                                  spaceCost = 3 * newFileSize / freeSpace
+                              </entry>
+                          </row>
+                          <row>
+                              <entry>If </entry>
+                              <entry>
+                                  freeSpace &lt;= gapPara
+                              </entry>
+                              <entry> then </entry>
+                              <entry>
+                                  spaceCost = 1 + breakeven * 7 * 24 * 60 * 60 / lruAge
+                                  ,
+                              </entry>
+                          </row>
+                      </tbody>
+                  </tgroup>
+              </informaltable>
+
+              where <varname>newFileSize</varname> is at least 50MB and
+              <varname>lruAge</varname> at least one minute.
+          </para>
+
+          <section>
+              <title>Rationale</title>
+
+              <!-- <para>
+                   NOCLUE
+                   </para> -->
+
+              <para>
+                  As the last version of the formula suggests, a
+                  pool can be in two states: Either <phrase
+                  role="math">freeSpace &gt; gapPara</phrase> or
+                  <phrase role="math">freeSpace &lt;=
+                  gapPara</phrase> - either there is free space left
+                  to store files without deleting cached files or
+                  there isn't.
+              </para>
+
+              <para>
+                  Therefore, <varname>gapPara</varname> should be
+                  around the size of the smallest files which
+                  frequently might be written to the pool. If files
+                  smaller than <varname>gapPara</varname> appear
+                  very seldom or never, the pool might get stuck in
+                  the first of the two cases with a high cost.
+              </para>
+
+              <para>
+                  If the LRU file is smaller than the new file,
+                  other files might have to be deleted. If these are
+                  much younger than the LRU file, this space cost
+                  calculation scheme might not lead to a selection
+                  of the optimal pool. However, in pratice this
+                  happens very seldomly and this scheme turns out to
+                  be very efficient.
+              </para>
+
+          </section>
+
+      </section>
+
+      <section id="cf-pm-classic-total">
+          <title>The Total Cost</title>
+
+          <para>
+              The total cost is a linear combination of the
+              <glossterm
+                  linkend="gl-performance_cost">performance</glossterm>
+              and <glossterm linkend="gl-space_cost">space
+              cost</glossterm>.
+
+              I.e.
+
+              <!--
+                  <screen><varname>cost</varname> = <varname>ccf</varname> * <varname>performance_cost</varname> + <varname>scf</varname> * <varname>space_cost</varname>,</screen>
+              -->
+              <!--	<m:math xmlns:m="http://www.w3.org/1998/Math/MathML">
+                  <m:mrow>
+                  <m:mi>totalCost</m:mi>
+                  <m:mo>=</m:mo>
+                  <m:mi>ccf</m:mi>
+                  <m:mo>*</m:mo>
+                  <m:mi>perfCost</m:mi>
+                  <m:mo>+</m:mo>
+                  <m:mi>scf</m:mi>
+                  <m:mo>*</m:mo>
+                  <m:mi>spaceCost</m:mi>
+                  </m:mrow>
+                  </m:math>,-->
+              <!--
+                  <m:math xmlns:m="http://www.w3.org/1998/Math/MathML">
+                  <m:mrow>
+                  <m:apply>
+                  <m:eq/>
+                  <m:ci>totalCost</m:ci>
+                  <m:apply>
+                  <m:plus/>
+                  <m:apply>
+                  <m:times/>
+                  <m:ci>ccf</m:ci>
+                  <m:ci>perfCost</m:ci>
+                  </m:apply>
+                  <m:apply>
+                  <m:times/>
+                  <m:ci>scf</m:ci>
+                  <m:ci>spaceCost</m:ci>
+                  </m:apply>
+                  </m:apply>
+                  </m:apply>
+                  </m:mrow>
+                  </m:math>
+              -->
+              totalCost = ccf * perfCost + scf * spaceCost ,
+
+
+              where <varname>ccf</varname> and <varname>scf</varname> are
+              configurable with the command <xref
+              linkend="cmd-set_pool_decision"/>.
+
+              E.g.,
+
+              <screen>&dc-prompt-pm; <userinput>set pool decision <option>-spacecostfactor=3</option> <option>-cpucostfactor=1</option></userinput></screen>
+
+              will give the <glossterm linkend="gl-space_cost">space
+              cost</glossterm> three times the weight of the <glossterm
+              linkend="gl-performance_cost">performance cost</glossterm>.
+          </para>
+      </section>
+
+      <section id="cf-pm-classic-parameters">
+          <title>Parameters of Classic Partitions</title>
+
+          <para>Classic partitions have a large number of tunable
+          parameters. These parameters are set using the <command>pm
+          set</command> command.</para>
+
+          <informalexample>
+              <para>To set the space cost factor on the
+              <literal>default</literal> partition to
+              <literal>0.3</literal>, use the following
+              command:</para>
+              <programlisting>
+                  <command>pm set</command> default -spacecostfactor=0.3
+              </programlisting>
+          </informalexample>
+
+          <informaltable>
+              <tgroup cols="3" align="left">
+                  <colspec colnum="1"  colwidth="13em"/>
+                  <colspec colnum="2"  colwidth="*"/>
+                  <colspec colnum="3"  colwidth="4em"/>
+                  <thead>
+                      <row>
+                          <entry>Command</entry>
+                          <entry>Meaning</entry>
+                          <entry>Type</entry>
+                      </row>
+                  </thead>
+
+                  <tbody>
+
+                      <row>
+                          <entry>
+                              <cmdsynopsis>
+                                  <command>pm set</command>
+                                  <arg><replaceable>partitionName</replaceable></arg>
+                                  <arg choice='plain'>-spacecostfactor=<replaceable>scf</replaceable></arg>
+                              </cmdsynopsis>
+                          </entry>
+                          <entry>
+                              <para>
+                                  Sets the <literal>space cost factor</literal> for the partition.
+                              </para>
+                              <para>
+                                  The default value is <literal>1.0</literal>.
+                              </para>
+                          </entry>
+                          <entry>
+                              float
+                          </entry>
+                      </row>
+
+                      <row>
+                          <entry>
+                              <cmdsynopsis>
+                                  <command>pm set</command>
+                                  <arg><replaceable>partitionName</replaceable></arg>
+                                  <arg choice='plain'>-cpucostfactor=<replaceable>ccf</replaceable></arg>
+                              </cmdsynopsis>
+                          </entry>
+                          <entry>
+                              <para>
+                                  Sets the cpu cost factor for the partition.
+                              </para>
+                              <para>
+                                  The default value is <literal>1.0</literal>.
+                              </para>
+                          </entry>
+                          <entry>
+                              float
+                          </entry>
+                      </row>
+
+                      <row>
+                          <entry>
+                              <cmdsynopsis>
+                                  <command>pm set</command>
+                                  <arg><replaceable>partitionName</replaceable></arg>
+                                  <arg choice='plain'>-idle=<replaceable>idle-value</replaceable></arg>
+                              </cmdsynopsis>
+                          </entry>
+                          <entry>
+                              <para>
+                                  The concept of the <firstterm>idle value</firstterm>
+                                  will be turned on if
+                                  <replaceable>idle-value</replaceable> &gt;
+                                  <literal>0.0</literal>.
+                              </para>
+                              <para>
+                                  A pool is idle if its performance cost is smaller than
+                                  the <replaceable>idle-value</replaceable>. Otherwise
+                                  it is not idle.
+                              </para>
+                              <para>
+                                  If one or more pools that satisfy the read request are
+                                  idle then only one of them is chosen for a particular
+                                  file irrespective of total cost. I.e. if the same file
+                                  is requested more than once it will always be taken
+                                  from the same pool. This allowes the copies on the
+                                  other pools to age and be garbage collected.
+                              </para>
+                              <para>
+                                  The default value is <literal>0.0</literal>, which
+                                  disables this feature.
+                              </para>
+                          </entry>
+                          <entry>
+                              float
+                          </entry>
+                      </row>
+
+                      <row>
+                          <entry>
+                              <cmdsynopsis>
+                                  <command>pm set</command>
+                                  <arg><replaceable>partitionName</replaceable></arg>
+                                  <arg choice='plain'>-p2p=<replaceable>p2p-value</replaceable></arg>
+                              </cmdsynopsis>
+                          </entry>
+                          <entry>
+                              <para>
+                                  Sets the static replication threshold for the
+                                  partition.
+                              </para>
+                              <para>
+                                  If the performance cost on the best pool exceeds
+                                  <replaceable>p2p-value</replaceable> and the value for
+                                  <link
+                                      linkend='slope'><replaceable>slope</replaceable></link>
+                                  = <literal>0.0</literal> then this pool is called
+                                  <firstterm>hot</firstterm> and a pool to pool
+                                  replication may be triggered.
+                              </para>
+                              <para>
+                                  The default value is <literal>0.0</literal>, which
+                                  disables this feature.
+                              </para>
+                          </entry>
+                          <entry>
+                              float
+                          </entry>
+                      </row>
+
+                      <row>
+                          <entry>
+                              <cmdsynopsis>
+                                  <command>pm set</command>
+                                  <arg><replaceable>partitionName</replaceable></arg>
+                                  <arg choice='plain'>-alert=<replaceable>value</replaceable></arg>
+                              </cmdsynopsis>
+                          </entry>
+                          <entry>
+                              <para>
+                                  Sets the <firstterm>alert value</firstterm> for the
+                                  partition.
+                              </para>
+                              <para>
+                                  If the best pool's performance cost exceeds the p2p
+                                  value and the alert value then no pool to pool copy is
+                                  triggered and a message will be logged stating that no
+                                  pool to pool copy will be made.
+                              </para>
+                              <para>
+                                  The default value is <literal>0.0</literal>, which
+                                  disables this feature.
+                              </para>
+                          </entry>
+                          <entry>
+                              float
+                          </entry>
+                      </row>
+
+                      <row>
+                          <entry>
+                              <cmdsynopsis>
+                                  <command>pm set</command>
+                                  <arg><replaceable>partitionName</replaceable></arg>
+                                  <arg choice='plain'>-panic=<replaceable>value</replaceable></arg>
+                              </cmdsynopsis>
+                          </entry>
+                          <entry>
+                              <para>
+                                  Sets the <firstterm>panic cost cut level</firstterm>
+                                  for the partition.
+                              </para>
+                              <para>
+                                  If the performance cost of the best pool exceeds the
+                                  panic cost cut level the request will fail.
+                              </para>
+                              <para>
+                                  The default value is <literal>0.0</literal>, which
+                                  disables this feature.
+                              </para>
+                          </entry>
+                          <entry>
+                              float
+                          </entry>
+                      </row>
+
+                      <row>
+                          <entry>
+                              <cmdsynopsis>
+                                  <command>pm set</command>
+                                  <arg><replaceable>partitionName</replaceable></arg>
+                                  <arg choice='plain'>-fallback=<replaceable>value</replaceable></arg>
+                              </cmdsynopsis>
+                          </entry>
+                          <entry>
+                              <para>
+                                  Sets the fallback cost cut level for the partition.
+                              </para>
+                              <para>
+                                  If the best pool's performance cost exceeds the
+                                  fallback cost cut level then a pool of the next
+                                  <firstterm>level</firstterm> will be chosen. This
+                                  means for example that instead of choosing a pool with
+                                  <literal>readpref</literal> = 20 a pool with
+                                  <literal>readpref</literal> &lt; 20 will be chosen.
+                              </para>
+                              <para>
+                                  The default value is <literal>0.0</literal>, which disables this feature.
+                              </para>
+                          </entry>
+                          <entry>
+                              float
+                          </entry>
+                      </row>
+
+                      <row>
+                          <entry id='slope'>
+                              <cmdsynopsis>
+                                  <command>pm set</command>
+                                  <arg><replaceable>partitionName</replaceable></arg>
+                                  <arg choice='plain'>-slope=<replaceable>slope</replaceable></arg>
+                              </cmdsynopsis>
+                          </entry>
+                          <entry>
+                              <para>
+                                  Sets the dynamic replication threshold value for the
+                                  partition.
+                              </para>
+                              <para>
+                                  If <replaceable>slope</replaceable>&gt;
+                                  <literal>0.01</literal> then the product of best
+                                  pool's performance cost and
+                                  <replaceable>slope</replaceable> is used as threshold
+                                  for pool to pool replication.
+                              </para>
+                              <para>
+                                  If the performance cost on the best pool exceeds this
+                                  threshold then this pool is called hot.
+                              </para>
+
+                              <para>
+                                  The default value is <literal>0.0</literal>, which disables this feature.
+                              </para>
+                          </entry>
+                          <entry>
+                              float
+                          </entry>
+                      </row>
+
+                      <row>
+                          <entry>
+                              <cmdsynopsis>
+                                  <command>pm set</command>
+                                  <arg><replaceable>partitionName</replaceable></arg>
+                                  <arg choice='plain'>-p2p-allowed=<replaceable>value</replaceable></arg>
+                              </cmdsynopsis>
+                          </entry>
+                          <entry>
+                              <para>
+                                  This value can be specified if an &hsm; is attached to
+                                  the &dcache;.
+                              </para>
+                              <para>
+                                  If a partition has no &hsm; connected, then this
+                                  option is overridden. This means that no matter which
+                                  value is set for <literal>p2p-allowed</literal> the
+                                  pool to pool replication will always be allowed.
+                              </para>
+                              <para>
+                                  By setting <replaceable>value</replaceable> =
+                                  <literal>off</literal> the values for
+                                  <literal>p2p-allowed</literal>,
+                                  <literal>p2p-oncost</literal> and
+                                  <literal>p2p-fortransfer</literal> will take over the
+                                  value of the default partition.
+                              </para>
+                              <para>
+                                  If <replaceable>value</replaceable> =
+                                  <literal>yes</literal> then pool to pool replication
+                                  is allowed.
+                              </para>
+                              <para>
+                                  As a side effect of setting <replaceable>value</replaceable> =
+                                  <literal>no</literal> the values for
+                                  <literal>p2p-oncost</literal> and
+                                  <literal>p2p-fortransfer</literal> will also be set to
+                                  <literal>no</literal>.
+                              </para>
+                              <para>
+                                  The default value is <literal>yes</literal>.
+                              </para>
+                          </entry>
+                          <entry>
+                              boolean
+                          </entry>
+                      </row>
+
+                      <row>
+                          <entry>
+                              <cmdsynopsis>
+                                  <command>pm set</command>
+                                  <arg><replaceable>partitionName</replaceable></arg>
+                                  <arg choice='plain'>-p2p-oncost=<replaceable>value</replaceable></arg>
+                              </cmdsynopsis>
+                          </entry>
+                          <entry>
+                              <para>
+                                  Determines whether pool to pool replication is allowed
+                                  if the best pool for a read request is hot.
+                              </para>
+                              <para>
+                                  The default value is <literal>no</literal>.
+                              </para>
+                          </entry>
+                          <entry>
+                              boolean
+                          </entry>
+                      </row>
+
+                      <row>
+                          <entry>
+                              <cmdsynopsis>
+                                  <command>pm set</command>
+                                  <arg><replaceable>partitionName</replaceable></arg>
+                                  <arg choice='plain'>-p2p-fortransfer=<replaceable>value</replaceable></arg>
+                              </cmdsynopsis>
+                          </entry>
+                          <entry>
+                              <para>
+                                  If the best pool is hot and the requested file will be
+                                  copied either from the hot pool or from tape to
+                                  another pool, then the requested file will be read
+                                  from the pool where it just had been copied to if
+                                  <replaceable>value</replaceable> = <literal>yes</literal>.
+                                  If
+                                  <replaceable>value</replaceable> = <literal>no</literal>
+                                  then the requested file will be read from the hot
+                                  pool.
+                              </para>
+                              <para>
+                                  The default value is <literal>no</literal>.
+                              </para>
+                          </entry>
+                          <entry>
+                              boolean
+                          </entry>
+                      </row>
+
+                      <row>
+                          <entry>
+                              <cmdsynopsis>
+                                  <command>pm set</command>
+                                  <arg><replaceable>partitionName</replaceable></arg>
+                                  <arg choice='plain'>-stage-allowed=<replaceable>value</replaceable></arg>
+                              </cmdsynopsis>
+                          </entry>
+                          <entry>
+                              <para>
+                                  Set the <firstterm>stage allowed value</firstterm> to
+                                  <literal>yes</literal> if a tape system is connected
+                                  and to <literal>no</literal> otherwise.
+                              </para>
+                              <para>
+                                  As a side effect, setting the value for
+                                  <literal>stage-allowed</literal> to
+                                  <literal>no</literal> changes the value for
+                                  <literal>stage-oncost</literal> to
+                                  <literal>no</literal>.
+                              </para>
+                              <para>
+                                  The default value is <literal>no</literal>.
+                              </para>
+                          </entry>
+                          <entry>
+                              boolean
+                          </entry>
+                      </row>
+
+                      <row>
+                          <entry>
+                              <cmdsynopsis>
+                                  <command>pm set</command>
+                                  <arg><replaceable>partitionName</replaceable></arg>
+                                  <arg choice='plain'>-stage-oncost=<replaceable>value</replaceable></arg>
+                              </cmdsynopsis>
+                          </entry>
+                          <entry>
+                              <para>
+                                  If the best pool is hot, p2p-oncost is disabled and an
+                                  &hsm; is connected to a pool then this parameter
+                                  determines whether to stage the requested file to a
+                                  different pool.
+                              </para>
+                              <para>
+                                  The default value is <literal>no</literal>.
+                              </para>
+                          </entry>
+                          <entry>
+                              boolean
+                          </entry>
+                      </row>
+
+                      <row>
+                          <entry>
+                              <cmdsynopsis>
+                                  <command>pm set</command>
+                                  <arg><replaceable>partitionName</replaceable></arg>
+                                  <arg choice='plain'>-max-copies=<replaceable>copies</replaceable></arg>
+                              </cmdsynopsis>
+                          </entry>
+                          <entry>
+                              <para>
+                                  Sets the maximal number of replicas of one file. If the maximum is
+                                  reached no more replicas will be created.
+                              </para>
+                              <para>
+                                  The default value is <literal>500</literal>.
+                              </para>
+                          </entry>
+                          <entry>
+                              integer
+                          </entry>
+                      </row>
+
+                  </tbody>
+              </tgroup>
+          </informaltable>
+
+
+      </section>
+  </section>
 </chapter>
