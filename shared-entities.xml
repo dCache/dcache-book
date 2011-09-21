@@ -17,7 +17,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 -->
 
 <!-- dCache-version -->
-<!ENTITY dcache-version          "1.9.14">
+<!ENTITY dcache-version          "2.0">
 
 <!-- "Products" or high-level services -->
 <!ENTITY dcache       "<productname>dCache</productname>">
