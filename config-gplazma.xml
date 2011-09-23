@@ -1351,6 +1351,20 @@ kpwdPath="&install-base-opt;/etc/dcache.kpwd"</programlisting>
           Use <filename>&install-base-opt;/share/examples/gplazma/dcache.kpwd</filename>
           to create this file.
         </para>
+
+        <para>
+          To be able to alter entries in the <filename>dcache.kpwd</filename> file conveniantly
+	  the dcache script offers support for doing this.
+          <informalexample>
+		 <programlisting>&prompt-user;dcache kpwd dcuseradd testuser -u 12345 -g 1000 -h / -f / -w read-write -p password</programlisting>
+
+		adds this to the kpwd file:
+
+		 <programlisting>passwd testuser ae39aec3 read-write 12345 1000 / /</programlisting>
+          </informalexample>
+	  There are many more commands for altering the kpwd-file, see the dcache-script help for further commands available.
+        </para>
+
       </section>
 
       <section id="cf-gplazma-gridmap">
@@ -1695,28 +1709,28 @@ kpwdPath="&install-base-opt;/etc/dcache.kpwd"
 
 mapping "/C=DE/O=ExampleOrganisation/OU=EXAMPLE/CN=John Doe" john
 # the following are the user auth records
-login jans read-write 1000 100 / / /
+login john read-write 1700 1000 / / /
 /C=DE/O=ExampleOrganisation/OU=EXAMPLE/CN=John Doe
 
 # set pwd
-passwd john 8402480 read-write 1000 100 / / /</programlisting>
+passwd john 8402480 read-write 1700 1000 / / /</programlisting>
         <para>
           This maps the subject part of a Grid-Certificate
           <literal>subject=/C=DE/O=ExampleOrganisation/OU=EXAMPLE/CN=John Doe</literal> to
           the User <systemitem class="username">john</systemitem> and the entry
-          <programlisting>login john read-write 1000 100 / / /
+          <programlisting>login john read-write 1700 1000 / / /
             /C=DE/O=GermanGrid/OU=DESY/CN=John Doe</programlisting> applies
           unix-like values to <systemitem class="username">john</systemitem>, most
-          important is the <literal>100</literal>, because it is the assigned &gid;.
+          important is the <literal>1000</literal>, because it is the assigned &gid;.
           This must match the value of the <varname>webadminAdminGid</varname>
           configured in your webadmin.  This is sufficient for login using a
           certificate. The entry
-          <programlisting>passwd john 8402480 read-write 1000 100 / / /</programlisting>
+          <programlisting>passwd john 8402480 read-write 1700 1000 / / /</programlisting>
           enables Username/Password login, such as a valid login would be user
           <systemitem class="username">john</systemitem> with some password.  The
           password is encrypted with the kpwd-algorithm (also see <xref
               linkend="cf-gplazma-kpwd"/>) and then stored in the file.  Again the
-          <literal>100</literal> here is the assigned &gid;.
+          <literal>1000</literal> here is the assigned &gid;.
         </para>
       </informalexample>
     </section>

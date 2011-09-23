@@ -18,9 +18,7 @@
 
 
   <para>
-    The &cell-webadmin;-interface receives the information from
-	&dcache; &cell-info; service as &xml; which are parsed and presented. For authentication and
-	authorisation it offers usage of username/password (currently KAuth-File) or
+	For authentication and authorisation it offers usage of username/password (currently KAuth-File) or
 	grid-certificates talking to &cell-gplazma;. It also offers a non-authenticated,
 	read-only mode.
   </para>
@@ -28,6 +26,7 @@
   <para>
 	If you are logged in as admin it is possible to send a command to multiple pools or
 	a whole	poolgroup in one go. It is even possible to send a command to any &dcache;-Cell.
+	Also, there is information like their size, their id and used space on linkgroups and spacetokens available.
   </para>
 
   <para>
@@ -39,11 +38,12 @@
   <section id="cf-webadmin-install">
     <title>Installation</title>
     <para>
-      To enable your &dcache; to run the &cell-webadmin;-interface your system has to run
-      the &cell-info; service. For the authenticated mode a configured &cell-gplazma; is also
-      required (see also <xref linkend="cf-gplazma-webadmin-example"/>).
-      The KAuth-File has to be on the same machine then the &cell-webadmin; for
-      this to work. For a non-authenticated &cell-webadmin; you just need to add the &cell-webadmin;
+      For the authenticated mode a configured &cell-gplazma; is
+      required (see also <xref linkend="cf-gplazma-webadmin-example"/>). The user may either authenticate by presenting his grid certificate or
+      by entering a valid username/password combination. This way it is possible to login even if the user does not have a grid-certificate.
+      The KAuth-File has to be on the same machine as the &cell-webadmin; for
+      this to work with &cell-gplazma1;, because it is the only available username/password login mechanism of &cell-gplazma1;.
+      For a non-authenticated &cell-webadmin; you just need to add the &cell-webadmin;
       service to a domain and configure the port &cell-webadmin; will listen on - <varname>webadminHttpPort</varname>.
     </para>
     <para>
@@ -84,9 +84,6 @@ webadminAdminGid=1000</programlisting>
       <xref linkend="cf-gplazma-webadmin-example"/>.
 
       After startup of webadmin you can reach it via <uri>http://example.com:8080/webadmin</uri>.
-      Since webadmin bases on the &cell-info; it takes some time until all values are populated,
-      because &cell-info; needs to collect them first. It is recommended to let &cell-info; run on
-      the same machine then &cell-webadmin;.
     </para>
   </section>
 
