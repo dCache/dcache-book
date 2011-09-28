@@ -42,7 +42,7 @@
     &serv-poolmngr; rather than on the doors and the &serv-pinmngr;. Thus
     the white list needs to be present on a single node only. To
     enable this, define the following parameter in
-    <filename>&install-base-opt;/etc/dcache.conf</filename>:
+    <filename>&path-ode-ed;/dcache.conf</filename>:
   </para>
 
   <programlisting>stagePolicyEnforcementPoint=PoolManager</programlisting>
@@ -51,10 +51,10 @@
   <para>
     The file name of the white list must be configured by setting the
     <varname>stageConfigurationFilePath</varname> parameter in
-    <filename>&install-base-opt;/etc/dcache.conf</filename>:
+    <filename>&path-ode-ed;/dcache.conf</filename>:
   </para>
 
-  <programlisting>stageConfigurationFilePath=/opt/d-cache/config/StageConfiguration.conf</programlisting>
+  <programlisting>stageConfigurationFilePath=&path-odc-ed;/StageConfiguration.conf</programlisting>
 
   <para>
     The parameter needs to be defined on all nodes which enforce the

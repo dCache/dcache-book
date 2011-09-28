@@ -45,7 +45,7 @@
       &hsm;
       <glosssee otherterm="gl-tss">tertiary storage system</glosssee>
     </glossentry>
-      
+
     <glossentry id="gl-hsm_type">
       <glossterm>HSM type</glossterm>
       <glossdef>
@@ -60,7 +60,7 @@
 	</para>
       </glossdef>
     </glossentry>
-      
+
     <glossentry id="gl-lfs">
       <glossterm>Large File Store (<abbrev>LFS</abbrev>)</glossterm>
       <glossdef>
@@ -82,7 +82,7 @@
 	  file</glossterm>, describes how that pool should behave.
 	  This option can take three possible values:
 	</para>
-	
+
 	<variablelist>
           <varlistentry>
             <term><literal>none</literal></term>
@@ -118,7 +118,7 @@
 		the aging procedure and will be removed as soon as new
 		space is needed.
 	      </para>
-	     
+
 	      <note>
 		<para>
 		  The <literal>volatile</literal> lfs mode is
@@ -130,7 +130,7 @@
 	</variablelist>
       </glossdef>
     </glossentry>
-      
+
       <glossentry id="gl-store">
 	<glossterm>to store</glossterm>
 	<glossdef>
@@ -140,7 +140,7 @@
 	  </para>
 	</glossdef>
       </glossentry>
-      
+
       <glossentry id="gl-restore">
 	<glossterm>to restore</glossterm>
 	<glossdef>
@@ -151,7 +151,7 @@
 	  </para>
 	</glossdef>
       </glossentry>
-      
+
       <glossentry id="gl-stage">
 	<glossterm>to stage</glossterm>
 	<glosssee otherterm="gl-restore">to restore</glosssee>
@@ -200,7 +200,7 @@
           It is located at
           <filename>$dcache_home/config/dCacheSetup</filename>
           (typically
-          <filename>/opt/d-cache/config/dCacheSetup</filename>). Each
+          <filename>&path-odc-ed;/dCacheSetup</filename>). Each
           <glossterm linkend="gl-domain">domain</glossterm> uses the
           file
           <filename>config/<replaceable>domainName</replaceable>Setup</filename>
@@ -225,7 +225,7 @@
 	<glossdef>
 	  <para>
 	    The poollist files are a collection of files in the
-	    <filename class="directory">/opt/d-cache/config</filename>
+	    <filename class="directory">&path-odc-ed;</filename>
 	    directory.  Each <literal>poollist</literal> file
 	    describes the set of <glossterm
 	    linkend="gl-pool">pools</glossterm> that should be
@@ -535,7 +535,7 @@
       <glossentry id="gl-pnfs-id">
 	<glossterm>&pnfs; ID</glossterm>
 	<glossdef>
-	  <para> 
+	  <para>
 	    Each component (file, directory, etc) in a &pnfs; instance
 	    has a unique ID: a 24-digit hexadecimal number.  This
 	    unique ID is used in &dcache; to refer to files without
@@ -676,7 +676,7 @@
 	</para>
       </glossdef>
     </glossentry>
-    
+
       <glossentry id="gl-precious">
 	<glossterm>Precious Replica</glossterm>
 	<glossdef>
@@ -924,7 +924,7 @@
 	  <alt>
 	    <varname>cost</varname> = <varname>ccf</varname> * <varname>performance_cost</varname> + <varname>scf</varname> * <varname>space_cost</varname>
 	  </alt>
-	  
+
 	  <mediaobject>
 	  </mediaobject>
 	</informalequation>
@@ -941,7 +941,7 @@
       <glossterm>performance cost</glossterm>
       <glossdef>
 	<para>
-	  
+
 	</para>
 
 	<glossseealso>gl-cost</glossseealso>
@@ -954,11 +954,11 @@
       <glossdef>
 
 	<para>
-	  
+
 	</para>
 
 	<glossseealso>gl-cost</glossseealso>
-	    
+
       </glossdef>
     </glossentry>
 

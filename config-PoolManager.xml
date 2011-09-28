@@ -66,11 +66,11 @@
 
   <para>
     The &serv-poolmngr; can be configured by either directly editing
-    the file <filename>/opt/d-cache/config/PoolManager.conf</filename>
+    the file <filename>&path-odc-ed;/PoolManager.conf</filename>
     or via the <link linkend="intouch-admin">Admin
     Interface</link>. Changes made via the Admin Interface will be
     saved in the file
-    <filename>/opt/d-cache/config/PoolManager.conf</filename> by the
+    <filename>&path-odc-ed;/PoolManager.conf</filename> by the
     <command>save</command> command. This file will be parsed,
     whenever the &dcache; starts up. It is a simple text file
     containing the corresponding Admin Interface commands. It can
@@ -86,7 +86,7 @@ This needs to be explained in the section on the Admin Interface:
 	while the system is running. The
 	<command>save</command>-command can then be used to save the
 	current configuration to the file
-	<filename>/opt/d-cache/config/PoolManager.conf</filename>.
+	<filename>&path-odc-ed;/PoolManager.conf</filename>.
 -->
   </para>
 
@@ -144,7 +144,7 @@ This needs to be explained in the section on the Admin Interface:
 
       <para>
 	A link is defined in the file
-	<filename>/opt/d-cache/config/PoolManager.conf</filename> by
+	<filename>&path-odc-ed;/PoolManager.conf</filename> by
       </para>
 
 	<cmdsynopsis>
@@ -780,13 +780,13 @@ This needs to be explained in the section on the Admin Interface:
       </para>
 
       <informalexample>
-	<screen>&prompt-root; <userinput>&install-base-opt;/bin/chimera-cli.sh lstag /data/experiment-a</userinput>
+	<screen>&prompt-root; <userinput>&path-odb-n-s;chimera-cli.sh lstag /data/experiment-a</userinput>
 Total: 2
 OSMTemplate
 sGroup
-&prompt-root; <userinput>&install-base-opt;/bin/chimera-cli.sh readtag /data/experiment-a OSMTemplate</userinput>
+&prompt-root; <userinput>&path-odb-n-s;chimera-cli.sh readtag /data/experiment-a OSMTemplate</userinput>
 StoreName myStore
-&prompt-root; <userinput>&install-base-opt;/bin/chimera-cli.sh readtag /data/experiment-a sGroup</userinput>
+&prompt-root; <userinput>&path-odb-n-s;chimera-cli.sh readtag /data/experiment-a sGroup</userinput>
 STRING</screen>
 
        <para>
@@ -795,8 +795,8 @@ STRING</screen>
 	 <literal>myStore:STRING@osm</literal>. An adjustment to more
 	 sensible values will look like
        </para>
-<screen>&prompt-root; <userinput>echo "StoreName exp-a" | /opt/d-cache/bin/chimera-cli.sh Writetag /data/experiment-a OSMTemplate</userinput>
-&prompt-root; <userinput>echo "run2010" | /opt/d-cache/bin/chimera-cli.sh Writetag /data/experiment-a sGroup</userinput></screen>
+<screen>&prompt-root; <userinput>echo "StoreName exp-a" | &path-odb-n-s;chimera-cli.sh Writetag /data/experiment-a OSMTemplate</userinput>
+&prompt-root; <userinput>echo "run2010" | &path-odb-n-s;chimera-cli.sh Writetag /data/experiment-a sGroup</userinput></screen>
 
       <para>
 	and will result in the storage class
@@ -899,13 +899,13 @@ STRING</screen>
            <para>
 	     With <command>save</command> the changes will be saved to
 	     the file
-	     <filename>&install-base-opt;/config/PoolManager.conf</filename>.
+	     <filename>&path-odc-ed;/PoolManager.conf</filename>.
 	   </para>
 
 	   <note>
 	     <para>
 	       You can also edit the file
-	       <filename>&install-base-opt;/config/PoolManager.conf</filename>
+	       <filename>&path-odc-ed;/PoolManager.conf</filename>
 	       to create a new link group. Please make sure that it
 	       already exists. Otherwise you will have to create it
 	       first via the Admin Interface by
@@ -914,7 +914,7 @@ STRING</screen>
 
 	     <para>
 	       Edit the file
-	       <filename>&install-base-opt;/config/PoolManager.conf</filename>
+	       <filename>&path-odc-ed;/PoolManager.conf</filename>
 	     </para>
 
 	     <screen><command>psu create linkGroup</command> <replaceable>linkgroup</replaceable>

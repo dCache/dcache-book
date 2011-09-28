@@ -71,9 +71,9 @@
 	    Create the root of the &chimera; namespace and a
 	    world-writable directory for &dcap; to write into by
 	  </para>
-	  <screen>&prompt-root; <userinput>/opt/d-cache/bin/chimera-cli.sh mkdir /data</userinput>
-&prompt-root; <userinput>/opt/d-cache/bin/chimera-cli.sh mkdir /data/world-writable</userinput>
-&prompt-root; <userinput>/opt/d-cache/bin/chimera-cli.sh chmod /data/world-writable 777</userinput></screen>
+	  <screen>&prompt-root; <userinput>&path-odb-n-s;chimera-cli.sh mkdir /data</userinput>
+&prompt-root; <userinput>&path-odb-n-s;chimera-cli.sh mkdir /data/world-writable</userinput>
+&prompt-root; <userinput>&path-odb-n-s;chimera-cli.sh chmod /data/world-writable 777</userinput></screen>
 
           <para>
 	   Copy the data (here <filename>/bin/sh</filename> is used as
@@ -118,7 +118,7 @@ Stopping portmap: portmap</screen>
           <para>
 	    and restart &dcache;.
 	  </para>
-	  <screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache restart</userinput></screen>
+	  <screen>&prompt-root; <userinput>&path-odb-n-s;dcache restart</userinput></screen>
 
 	  <para>
 	    Now you can mount &chimera;.
@@ -182,18 +182,18 @@ Stopping portmap: portmap</screen>
 webdavAnonymousAccess=FULL
 webdavRootPath=/data/world-writable</programlisting>
 	<para>
-	  to the file <filename>/opt/d-cache/etc/layouts/mylayout.conf</filename>.
+	  to the file <filename>&path-ode-ed;/layouts/mylayout.conf</filename>.
 	</para>
 
         <para>
 	  You can also specifiy the last two lines in
-	  <filename>/opt/d-cache/etc/dcache.conf</filename>.
+	  <filename>&path-ode-ed;/dcache.conf</filename>.
 	</para>
 
         <para>
 	  Now you can start the &webdav; domain
 	</para>
-	<screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache start webdavDomain</userinput></screen>
+	<screen>&prompt-root; <userinput>&path-odb-n-s;dcache start webdavDomain</userinput></screen>
 
         <para>
 	  and access your files via
@@ -345,7 +345,7 @@ Your proxy is valid until Thu Mar 31 21:49:06 2011</screen>
       <filename>/etc/grid-security/grid-vorolemap</filename> and the
       <filename>/etc/grid-security/storage-authzdb</filename> as well
       as the
-      <filename>/opt/d-cache/etc/dcachesrm-gplazma.policy</filename>.
+      <filename>&path-ode-ed;/dcachesrm-gplazma.policy</filename>.
     </para>
     <informalexample>
       <para>
@@ -361,7 +361,7 @@ Your proxy is valid until Thu Mar 31 21:49:06 2011</screen>
 authorize  doegroup read-write 12345 1234 / / /</programlisting>
 
       <para>
-	The <filename>/opt/d-cache/etc/dcachesrm-gplazma.policy</filename>:
+	The <filename>&path-ode-ed;/dcachesrm-gplazma.policy</filename>:
       </para>
       <programlisting># Switches
 xacml-vo-mapping="OFF"
@@ -481,7 +481,7 @@ gplazmalite-vorole-mapping-priority="1"
        <title>&webdav; with certificates</title>
        <para>
 	 To use &webdav; with certificates you change the entry in
-	 <filename>/opt/d-cache/etc/layouts/mylayout.conf</filename> from
+	 <filename>&path-ode-ed;/layouts/mylayout.conf</filename> from
        </para>
 
        <programlisting>[webdavDomain]
@@ -501,16 +501,16 @@ webdavProtocol=https</programlisting>
 	 Then you will need to import the host certificate into the
 	 &dcache; keystore using the command
        </para>
-       <screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache import hostcert</userinput></screen>
+       <screen>&prompt-root; <userinput>&path-odb-n-s;dcache import hostcert</userinput></screen>
        <para>
 	 and initialise your truststore by
        </para>
-<screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache import cacerts</userinput></screen>
+<screen>&prompt-root; <userinput>&path-odb-n-s;dcache import cacerts</userinput></screen>
 
        <para>
 	 Now you need to restart the &webdav; domain
        </para>
-       <screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache restart webdavDomain</userinput></screen>
+       <screen>&prompt-root; <userinput>&path-odb-n-s;dcache restart webdavDomain</userinput></screen>
        <para>
 	 and access your files via
 	 <uri>https://<replaceable>dcache.example.org</replaceable>:2880</uri>
@@ -615,11 +615,17 @@ webdavProtocol=https</programlisting>
       files of &dcache;.
     </para>
 
-    <para>
+    <para layout='opt'>
       The &dcache; software is installed in one directory, normally
       <filename class="directory">/opt/d-cache/</filename>.  All
-      configuration files can be found here. In the following relative
-      filenames will always be relative to this directory.
+      configuration files can be found here.
+    </para>
+
+    <para layout='fhs'>
+      The &dcache; software is installed in various directories
+      according to the Filesystem Hierarchy Standard.  All
+      configuration files can be found in <filename
+      class="directory">/etc/dcache</filename>.
     </para>
 
     <para>
@@ -627,11 +633,11 @@ webdavProtocol=https</programlisting>
       linkend="gl-domain">domain</glossterm> is restarted:
     </para>
 
-    <screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache restart <replaceable>domainName</replaceable></userinput></screen>
+    <screen>&prompt-root; <userinput>&path-odb-n-s;dcache restart <replaceable>domainName</replaceable></userinput></screen>
 
     <para>
       Log files of domains are by default stored in
-      <filename>/var/log/<replaceable>domainName</replaceable>.log</filename>. We
+      <filename>&path-vl-vld;/<replaceable>domainName</replaceable>.log</filename>. We
       strongly encourage to configure logrotate to rotate the &dcache;
       log files to avoid filling up the log file system. This can
       typically be achieved by creating the file
@@ -639,7 +645,7 @@ webdavProtocol=https</programlisting>
       content:
     </para>
 
-    <programlisting>/var/log/*Domain.log {
+    <programlisting>&path-vl-vld;/*.log {
     compress
     rotate 100
     missingok

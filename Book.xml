@@ -9,7 +9,7 @@
       xmlns:xi="http://www.w3.org/2001/XInclude">
 
   <title>The dCache Book</title>
-  <subtitle>for &dcache-version;-series</subtitle>
+  <subtitle>for &dcache-version;-series (&layout-current; layout)</subtitle>
   <titleabbrev>dCache Book</titleabbrev>
 
   <bookinfo>
@@ -25,6 +25,25 @@
 	several problems and tasks which might occur during operating
 	of a &dcache; system. Finally, the last two parts contain a
 	glossary and a parameter and command reference.
+      </para>
+
+      <para>
+	Each release of &dcache; is available in two file layouts:
+	&layout-fhs; and &layout-opt;.  The &layout-fhs;
+	layout has files located according to the <ulink
+	url='http://www.pathname.com/fhs/'>Filesystem Hierarchy
+	Standard</ulink>.  Most modern distributions have adopted the
+	FHS, so we recommend that fresh installations of &dcache; used
+	this layout.
+      </para>
+
+      <para>
+	The &layout-opt; layout places all the files in <filename
+	class="directory">/opt/d-cache</filename> directory.  This is
+	where previous versions of &dcache; located all the packaged
+	files.  The &layout-opt; layout is provided for backwards
+	compatibility and to satisfy those sites that cannot use the
+	&layout-fhs; layout.
       </para>
     </abstract>
 
@@ -64,7 +83,7 @@
       mechanisms to automatically increase performance and balance loads, increase resilience
       and availability. It also supplies advanced control systems to manage data as well as data
       flows. Normal filesystem (btrfs, ext4, XFS, ZFS) is used to store data on storage nodes.
-           
+
       There are several ways of accessing data stored in &dcache;:
 
       <itemizedlist>
@@ -75,14 +94,14 @@
         <listitem><para>&srm; (versions 1.1 and 2.2) </para></listitem>
         <listitem><para>&dcap; and &gsidcap; </para></listitem>
       </itemizedlist>
-      
-      &dcache; supports certificate based authentication through the Grid Security Infrastructure 
-      used in &gsiftp;, &gsidcap; transfer protocols and  the &srm; management protocol. 
+
+      &dcache; supports certificate based authentication through the Grid Security Infrastructure
+      used in &gsiftp;, &gsidcap; transfer protocols and  the &srm; management protocol.
       Certificate authentication is also available for &http; and &webdav;.
-      
-      &dcache; also supports fine-grain authorization with support for POSIX file permissions 
+
+      &dcache; also supports fine-grain authorization with support for POSIX file permissions
       and &nfs;-style access control lists.
-      
+
       Other features of &dcache; are:
       <itemizedlist>
         <listitem><para>Resilience and high availability can be implemented in different ways by having multiple replicas of the same files.</para></listitem>
@@ -258,4 +277,3 @@
   <xi:include href="reference.xml"/>
 
 </book>
-

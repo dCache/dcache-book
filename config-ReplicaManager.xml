@@ -8,7 +8,7 @@
 <chapter id="cf-repman">
 
   <title>Resilience with the Replica Manager</title>
-  
+
   <chapterinfo>
     <author>
       <firstname>Alex</firstname>
@@ -44,30 +44,30 @@
     linkend="gl-p2p">pool to pool transfer</glossterm>. If 4 or more
     replicas exist, some of them will be deleted.
   </para>
-  
+
   <section id="cf-repman-install">
     <title>Installation</title>
-	
+
     <para>
       To activate Replica Manager you need make changes in all 3
       places:
     </para>
 
     <orderedlist numeration="arabic">
-      <listitem>   
+      <listitem>
 	<para>
            <filename>etc/node_config</filename> on <emphasis>all admin
            nodes</emphasis> in this &dcache; instance.
-          </para>        
+          </para>
       </listitem>
-		
+
       <listitem>
 	<para>
 	  <filename>replicaSetup</filename> file on node where replica
 	  manager is runnig
 	</para>
       </listitem>
-		
+
       <listitem>
 	<para>
 	  define Resilient pool group(s) in
@@ -76,7 +76,7 @@
       </listitem>
 
     </orderedlist>
-	
+
  <programlisting>#  - - - - Will Replica Manager be started?
 #   Values:  no, yes
 #   Default: no
@@ -92,7 +92,7 @@
       <quote>no</quote> and a replica manager is started somewhere, it
       will not work properly.
     </para>
-	
+
 <programlisting>#replicaManager=no
 
 #  - - - - Which pool-group will be the group of resilient pools?
@@ -119,16 +119,16 @@
       this and other changes.
    </para>
 
-  </section> 
-  
+  </section>
+
   <section id="cf-repman-start">
     <title>Starting the Replica Manager</title>
-	
+
     <para>
       Beginning with version 1.6.6 of &dcache; the replica manager
       can be started as follows:
     </para>
-	
+
     <para>
       The replica manager will use the same &psql; database and
       database user <database class="user">srmdcache</database> as the
@@ -142,15 +142,15 @@
 
     <screen>&prompt-root; <userinput>su postgres</userinput>
 &prompt-user; <userinput>createdb -U srmdcache replicas</userinput>
-&prompt-user; <userinput>psql -U srmdcache -d replicas -f /opt/d-cache/etc/psql_install_replicas.sql</userinput>
+&prompt-user; <userinput>psql -U srmdcache -d replicas -f &path-ode-ed;/psql_install_replicas.sql</userinput>
 &prompt-user; <userinput>exit</userinput></screen>
-      
+
     <para>
       The start-up script <filename>bin/dcache-core</filename> already
       contains the correct lines to start and stop the domain
       containing the replica manager as comments. Just remove the two
       hash (<quote>#</quote>) signs and restart the &dcache; instance.
-      The replica manager may also be started separately by 
+      The replica manager may also be started separately by
     </para>
 
     <screen>&prompt-root; <userinput>/opt/d-cache/jobs/replica -logfile=/opt/d-cache/log/replica.log start</userinput></screen>
@@ -168,7 +168,7 @@
       of the replica manager the pool configuration in the database
       will be recreated.
     </para>
-  </section> 
+  </section>
 
 
   <section id="cf-repman-op">
@@ -185,7 +185,7 @@
       replication are called <firstterm>deficient
       replicas</firstterm>.
     </para>
-      
+
     <para>
       Later on some of the failed pools can come up and bring online
       more valid replicas.  If there are too many replicas for some
@@ -193,19 +193,19 @@
       replicas</firstterm> and they will be <quote>reduced</quote>.
       Extra replicas will be deleted from pools.
     </para>
-    
+
     <para>
       Resilience Manager (RM) counts number of replicas for each file
       in the pools which can be used online (see Pool States below)
       and keeps number of replicas within the valid range (min, max).
     </para>
-    
+
     <para>
       RM keeps information about pool state, list of the replicas (
       file ID, pool ) and current copy/delete operations in persistent
       database.
     </para>
-    
+
     <para>
       For each replica RM keeps list of pools where it can be found.
       For the pools pool state is kept in DB. There is table which
@@ -219,7 +219,7 @@
 	  <imagedata fileref="images/resilient_poolstate_v1-0.svg"
 		     format="SVG" align="center" contentwidth="10cm" />
 	</imageobject>
-	<imageobject role="html"> 
+	<imageobject role="html">
 	  <imagedata fileref="images/resilient_poolstate_v1-0.png"
 		     format="PNG" align="center"/>
 	</imageobject>
@@ -235,7 +235,7 @@
     <variablelist>
       <varlistentry>
 	<term>online</term>
-	
+
 	<listitem>
 	  <para>
 	    normal operation. Replicas in this state are readable and
@@ -247,7 +247,7 @@
 
       <varlistentry>
 	<term>down</term>
-	  
+
 	<listitem>
 	  <para>
 	    &dcache; pool is stopped by operator or crashed. On
@@ -258,7 +258,7 @@
 	    online again, RM will update list of replicas in the pool
 	    and store it in the DB.
 	  </para>
-    
+
 	  <para>
 	    Replicas in pools which are <quote>down</quote> are not
 	    <quote>counted</quote>, so when pool crashes it reduces
@@ -266,12 +266,12 @@
 	    files. The crash of the pool (pool departure) may trigger
 	    replication of multiple files.
 	  </para>
-	
+
 	  <para>
 	    Pool recovery (arrival) may rigger massive deletition of
 	    file replicas, not necessarily in this pool.
 	  </para>
-	    
+
 	  <para>
 	    There are special situations when operator wants to change
 	    pool state and he/she does not want to trigger massive
@@ -285,8 +285,8 @@
 
       <varlistentry>
 	<term>offline</term>
-	
-	<listitem>  
+
+	<listitem>
 	  <para>
 	    replicas in this pool are counted whether this pool is up
 	    or down. It does done matter fore replication purpose if
@@ -303,8 +303,8 @@
 
       <varlistentry>
 	<term>down</term>
-	
-	<listitem>    
+
+	<listitem>
 	  <para>
 	    operator needs to set pool or set of pools down
 	    permanently and wants to make sure that there no replicas
@@ -318,8 +318,8 @@
       <varlistentry>
 	<term>drainoff</term>
 	<term>offline-prepare</term>
-	
-	<listitem>    
+
+	<listitem>
 	  <para>
 	    transient states between online and down or offline states
 	    respectively.  If there are files which can be
@@ -334,7 +334,7 @@
       </varlistentry>
     </variablelist>
 
-      
+
     <note>
       <para>
 	Currently replicas counted separately in groups of
@@ -349,13 +349,13 @@
       turn pool down there is command to check number of files which
       can be locked in this pool.
     </para>
-      
+
     <para>
       v1.0 &mdash; these states called <quote>transient</quote> but
       pool does not automatically turned down
     </para>
 
-    <section id="cf-repman-op-start"> 
+    <section id="cf-repman-op-start">
       <title>Startup</title>
 
       <para>
@@ -369,7 +369,7 @@
 	suspend ajustments until system arrives to more or less stable
 	configuration.
       </para>
-    
+
       <para>
 	When RM starts it cleans up DB. Then it waits for some time to
 	give a chance to the pools to get connected. RM tries do not
@@ -380,7 +380,7 @@
 	connected. Currently this is implemented by some delay to
 	start adjustments to get chance to the pools to connect.
       </para>
-    
+
       <para>
 	Normally (during Cold Start) all information in DB is cleaned
 	up and recreated again by polling pools which are online
@@ -391,15 +391,15 @@
 	make sure all pools come up online and/or get connected. Pools
 	which once get connected to RM are in online or down state.
       </para>
-    
-	  
+
+
       <para>
 	It can be annoying to wait for some large period of time until
 	all known <quote>good</quote> pools get connected. There is
 	<quote>Hot Restart</quote> option to accelerate restart of the
 	system after the crash of the head node.
       </para>
-	  
+
       <para>
 	On Hot Restart RM retrieves information about pools state
 	before the crash from DB and saves pools state to some
@@ -435,7 +435,7 @@
 
     </section>
 
-    
+
     <section id="cf-repman-op-more">
       <title>More on operation</title>
 
@@ -444,14 +444,14 @@
 	count of the replicas within the valid range, the other
 	threads help to do this.
       </para>
-    
+
       <para>
 	Adjuster. Information about all replicas is kept in
 	DB. Adjuster makes several queries in DB during adjustment
 	cycle to get the list of files for which replicas must be
 	reduced or replicated:
       </para>
-    
+
 
       <itemizedlist>
 	<listitem>
@@ -467,8 +467,8 @@
 	  <para>deficient replicas, Nrep &lt; min</para>
 	</listitem>
       </itemizedlist>
-    
-    
+
+
       <para>
 	Number of replicas is counted in pools which are online or
 	offline. Offline-prepare or drainoff pools considered
@@ -476,8 +476,8 @@
 	replication. Last replica of the file in the system must not
 	be removed.
       </para>
-	  
-	
+
+
       <para>
 	The information in DB updated when new replica is added or
 	removed from the pool. When some pool changes it's state all
@@ -488,7 +488,7 @@
 	adjustment cycle is triggered by timeout to make sure RM did
 	not miss anything because some messages get lost.
       </para>
-	  
+
       <para>
 	When it is found that replica needs replication or reduction
 	the worker thread starts to do the job asynchronously. Number
@@ -511,7 +511,7 @@
 	replicas of the first file without delay considering the
 	previous operation with the file complete.
       </para>
-	  
+
       <para>
 	Sometimes Adjuster gets error on operation with replica and in
 	some cases if it does the same operation with the same replica
@@ -523,7 +523,7 @@
 	this replica into operation administrator shall manually
 	<emphasis><quote>release</quote></emphasis> this replica.
       </para>
-    
+
       <para>
 	When pool changes its state RM receives a message which can be
 	lost or is not sent in some cases like pool crash. To make
@@ -536,7 +536,7 @@
 	<quote>no pool configuration change</quote> in the log file
 	&mdash; but it is still running.
       </para>
-      
+
       <para>
 	Cyclical threads &mdash; Adjuster and WatchDog write and
 	timestamps it's current state in DB. It is displayed on Web
@@ -558,7 +558,7 @@
 	for debug only &mdash; do not use them as they can stop RM operating
 	properly.
       </para>
-	
+
       <informaltable frame="none">
 	<tgroup cols="2">
 
@@ -573,7 +573,7 @@
 	      </entry>
 	      <entry>set pool state</entry>
 	    </row>
-	  
+
 	    <row>
 	      <entry>
 		<userinput>show pool
@@ -581,7 +581,7 @@
 	      </entry>
 	      <entry>show pool state</entry>
 	    </row>
-	  
+
 	    <row>
 	      <entry>
 		<userinput>ls unique
@@ -595,7 +595,7 @@
 		</para>
 	      </entry>
 	    </row>
-	  
+
 	    <row>
 	      <entry>
 		<userinput>exclude
@@ -607,7 +607,7 @@
 		</para>
 	      </entry>
 	    </row>
-	  
+
 	    <row>
 	      <entry>
 		<userinput>release
@@ -619,7 +619,7 @@
 		</para>
 	      </entry>
 	    </row>
-	  
+
 	    <row>
 	      <entry>
 		<userinput>debug true | false</userinput>
@@ -635,7 +635,7 @@
       </informaltable>
 
     </section>
-    
+
     <section id="cf-repman-op-hybrid">
       <title>Hybrid &dcache;</title>
 
@@ -656,9 +656,9 @@
       <para>
 	Add to <filename>PoolManager.conf</filename>:
       </para>
-										
+
       <screen>psu create pgroup ResilientPools</screen>
-										
+
       <screen>psu addto  pgroup ResilientPools <replaceable>myPoolName001</replaceable>
 psu addto  pgroup ResilientPools <replaceable>myPoolName002</replaceable>
 psu addto  pgroup ResilientPools <replaceable>myPoolName003</replaceable></screen>
@@ -679,7 +679,7 @@ psu addto  pgroup ResilientPools <replaceable>myPoolName003</replaceable></scree
 	ReplicaManager.java,v 1.22 2004/08/25 22:32:07 cvs Exp
 	$</computeroutput>
       </para>
-	  
+
       <para>
 	You do not need to put these arguments in the batch file until
 	you want to change these defaults and you know what are you
@@ -688,7 +688,7 @@ psu addto  pgroup ResilientPools <replaceable>myPoolName003</replaceable></scree
 	default) mode of startup and (min,max) for desired range of
 	number of replicas of the file.
       </para>
-										
+
       <informaltable frame="none">
 	<tgroup cols="2">
 
@@ -710,7 +710,7 @@ psu addto  pgroup ResilientPools <replaceable>myPoolName003</replaceable></scree
 		</para>
 	      </entry>
 	    </row>
-	  
+
 	    <row>
 	      <entry>
 		-debug=false | true
@@ -726,12 +726,12 @@ psu addto  pgroup ResilientPools <replaceable>myPoolName003</replaceable></scree
 	      <entry namest="c1" nameend="c2" align='center' morerows='0'
 		     valign='bottom'><emphasis>Startup mode</emphasis></entry>
 	    </row>
-	  
+
 	    <row>
 	      <entry>-hotRestart</entry>
 	      <entry/>
 	    </row>
-	    
+
 	    <row>
 	      <entry align="center">default</entry>
 
@@ -745,12 +745,12 @@ psu addto  pgroup ResilientPools <replaceable>myPoolName003</replaceable></scree
 		</para>
 	      </entry>
 	    </row>
-	  
+
 	    <row>
 	      <entry>-coldStart</entry>
 	      <entry/>
 	    </row>
-	  
+
 	    <row>
 	      <entry align="center">optional</entry>
 	      <entry>
@@ -761,12 +761,12 @@ psu addto  pgroup ResilientPools <replaceable>myPoolName003</replaceable></scree
 		</para>
 	      </entry>
 	    </row>
-	  
+
 	    <row>
 	      <entry>-delayDBStartTO=1200</entry>
 	      <entry>on Cold Start:</entry>
 	    </row>
-	  
+
 	    <row>
 	      <entry align="center">20 min</entry>
 	      <entry>
@@ -778,7 +778,7 @@ psu addto  pgroup ResilientPools <replaceable>myPoolName003</replaceable></scree
 		</para>
 	      </entry>
 	    </row>
-	  
+
 	    <row>
 	      <entry>-delayAdjStartTO=1260</entry>
 	      <entry>
@@ -791,19 +791,19 @@ psu addto  pgroup ResilientPools <replaceable>myPoolName003</replaceable></scree
 		</para>
 	      </entry>
 	    </row>
-	  
+
 	    <row>
 	      <entry align="center">21 min</entry>
 	      <entry/>
 	    </row>
-	  
+
 	    <row>
 	      <entry namest="c1" nameend="c2" align='center' morerows='0'
 		     valign='bottom'>
 		<emphasis>DB connection</emphasis>
 	      </entry>
 	    </row>
-	  
+
 	    <row>
 	      <entry>
 		-dbURL=jdbc:postgresql://dbservernode.domain.edu:5432/replicas
@@ -819,7 +819,7 @@ psu addto  pgroup ResilientPools <replaceable>myPoolName003</replaceable></scree
 		</para>
 	      </entry>
 	    </row>
-	  
+
 	    <row>
 	      <entry>
 		-jdbcDrv=org.postgresql.Driver
@@ -832,7 +832,7 @@ psu addto  pgroup ResilientPools <replaceable>myPoolName003</replaceable></scree
 		</para>
 	      </entry>
 	    </row>
-	  
+
 	    <row>
 	      <entry>
 		-dbUser=myDBUserName
@@ -843,7 +843,7 @@ psu addto  pgroup ResilientPools <replaceable>myPoolName003</replaceable></scree
 		</para>
 	      </entry>
 	    </row>
-	  
+
 	    <row>
 	      <entry>
 		-dbPass=myDBUserPassword
@@ -873,14 +873,14 @@ psu addto  pgroup ResilientPools <replaceable>myPoolName003</replaceable></scree
 		</para>
 	      </entry>
 	    </row>
-	  
+
 	    <row>
 	      <entry>
 		-waitReplicateTO=43200
 	      </entry>
 	      <entry/>
 	    </row>
-	  
+
 	    <row>
 	      <entry align="center">12 hours</entry>
 	      <entry>
@@ -889,14 +889,14 @@ psu addto  pgroup ResilientPools <replaceable>myPoolName003</replaceable></scree
 		</para>
 	      </entry>
 	    </row>
-	  
+
 	    <row>
 	      <entry>
 		-waitReduceTO=43200
 	      </entry>
 	      <entry/>
 	    </row>
-	  
+
 	    <row>
 	      <entry align="center">12 hours</entry>
 	      <entry>
@@ -905,12 +905,12 @@ psu addto  pgroup ResilientPools <replaceable>myPoolName003</replaceable></scree
 		</para>
 	      </entry>
 	    </row>
-	  
+
 	    <row>
 	      <entry>-waitDBUpdateTO=600</entry>
 	      <entry/>
 	    </row>
-	  
+
 	    <row>
 	      <entry align="center">10 min</entry>
 	      <entry>
@@ -921,19 +921,19 @@ psu addto  pgroup ResilientPools <replaceable>myPoolName003</replaceable></scree
 		</para>
 	      </entry>
 	    </row>
-	  
+
 	    <row>
 	      <entry>
 		-poolWatchDogPeriod=600
 	      </entry>
 	      <entry/>
 	    </row>
-	  
+
 	    <row>
 	      <entry align="center">10 min</entry>
 	      <entry/>
 	    </row>
-	    
+
 	  </tbody>
 	</tgroup>
       </informaltable>
@@ -952,7 +952,7 @@ psu addto  pgroup ResilientPools <replaceable>myPoolName003</replaceable></scree
 
   <section id="cf-repman-monitoring-install">
     <title>Monitoring Installation</title>
-	
+
     <para><emphasis>DRAFT</emphasis></para>
 
 
@@ -1001,7 +1001,7 @@ psu addto  pgroup ResilientPools <replaceable>myPoolName003</replaceable></scree
 	    and install it folowing the instruction form the web site.
 	  </para>
 	</listitem>
-	
+
 	<listitem>
 	  <para>
 	    &tomcat; uses port 8080 by default, but we have changed it
@@ -1036,7 +1036,7 @@ psu addto  pgroup ResilientPools <replaceable>myPoolName003</replaceable></scree
 	  <para>
 	    start the &tomcat;:
 	  </para>
-	      
+
 	  <screen>&prompt-root; <userinput>tomcat/apache-tomcat-5.5.x/bin/startup.sh</userinput></screen>
 	</listitem>
       </itemizedlist>
@@ -1047,7 +1047,7 @@ psu addto  pgroup ResilientPools <replaceable>myPoolName003</replaceable></scree
 	http://<replaceable>your.hostname:8090</replaceable>/replica
       </para>
     </section>
-	
+
   </section>
-  
+
 </chapter>

@@ -516,13 +516,14 @@ create diskCacheV111.hsmControl.flush.HsmFlushControlManager <replaceable>FlushM
    <section id="cf-gui">
      <title>Setting up and using the flush control web pages.</title>
 
+     <!-- FIXME: we shouldn't advise people to edit batch files -->
      <para>
        In order to keep track on the flush activities the flush
        control web pages need to be activated. Add a new <literal>set
        alias</literal> directive somewhere between the <command>define
        context httpdSetup endDefine</command> and the
        <command>endDefine</command> command in the
-       <filename>/opt/d-cache/config/httpd.batch</filename> file.
+       <filename>&path-ods-usd;/services/httpd.batch</filename> file.
      </para>
 
      <programlisting>define context httpdSetup endDefine
@@ -601,12 +602,13 @@ psu addto pgroup flushPoolGroup migration-pool-2
 
        </blockquote>
 
+       <!-- FIXME: users shouldn't have to edit batch files -->
        <blockquote>
 	 <title>Setting up the central flush batch file.</title>
 
 	 <para>
 	   Create a batchfile
-	   <filename>/opt/d-cache/config/hsmcontrol.batch</filename>
+	   <filename>&path-ods-usd;/services/hsmcontrol.batch</filename>
 	   with the following content :
 	 </para>
 
@@ -637,6 +639,7 @@ create diskCacheV111.hsmControl.flush.HsmFlushControlManager FlushManager  \
         "
 #</programlisting>
 
+         <!-- FIXME: This is broken, dCache doesn't work this way -->
         <para>
 	  Change to <filename>/opt/d-cache/jobs</filename> and run
 	  <filename>./initPackage.sh</filename>. Ignore possible

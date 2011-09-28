@@ -34,7 +34,7 @@
     <title>Scope of this chapter</title>
     <para>
       This document describes how to enable a standard &dcache;
-      installation to interact with a Tertiary Storage System. 
+      installation to interact with a Tertiary Storage System.
       In this description we assume that
       <itemizedlist>
 	<listitem>
@@ -682,7 +682,7 @@ cClass0<replaceable>CacheClass</replaceable>;hsm=<replaceable>StorageType</repla
 
 	 <para>
 	   Alternatively, if the file
-	   <filename>/opt/d-cache/config/PoolManager.conf</filename>
+	   <filename>&path-odc-ed;/PoolManager.conf</filename>
 	   does already exist you can add the entry
 	   <programlisting>rc set stage on</programlisting>
 	   and restart the
@@ -691,7 +691,7 @@ cClass0<replaceable>CacheClass</replaceable>;hsm=<replaceable>StorageType</repla
 
 	 <warning>
 	   Do not create the file
-	   <filename>/opt/d-cache/config/PoolManager.conf</filename>
+	   <filename>&path-odc-ed;/PoolManager.conf</filename>
 	   with this single entry! This will result in an error.
 	 </warning>
 
@@ -705,8 +705,8 @@ cClass0<replaceable>CacheClass</replaceable>;hsm=<replaceable>StorageType</repla
 	  configured correctly to work without &tss;, you will find
 	  the entry <literal>lfs=precious</literal> in the layout file
 	  (that is located in <filename
-	  class='directory'>/opt/d-cache/etc/layouts</filename> and in
-	  the file <filename>/opt/d-cache/etc/dcache.conf</filename>
+	  class='directory'>&path-ode-ed;/layouts</filename> and in
+	  the file <filename>&path-ode-ed;/dcache.conf</filename>
 	  respectively) for each pool service. This entry is a
 	  disk-only-option and has to be removed for each pool which
 	  should be connected to a &tss;. This will default the
@@ -791,7 +791,7 @@ rh set max active <replaceable>numberOfConcurrentGETs</replaceable></programlist
 	    We provide a <link linkend='tss-executable'>script</link>
 	    to simulate a connection to a &tss;.  To use this script
 	    place it in the directory <filename
-	    class='directory'>/opt/d-cache/jobs</filename>, and create
+	    class='directory'>&path-odj-usdl;</filename>, and create
 	    a directory to simulate the base of the &tss;.
 	  </para>
 	  <programlisting>&prompt-root; <userinput>mkdir -p /hsmTape/data</userinput></programlisting>
@@ -802,8 +802,8 @@ rh set max active <replaceable>numberOfConcurrentGETs</replaceable></programlist
 	  </para>
 
 	  <programlisting>&dc-prompt-local; cd pool_1
-&dc-prompt-pool1; hsm set osm osm 
-&dc-prompt-pool1; hsm set osm -command=/opt/d-cache/jobs/hsmscript.sh
+&dc-prompt-pool1; hsm set osm osm
+&dc-prompt-pool1; hsm set osm -command=&path-odj-usdl;/hsmscript.sh
 &dc-prompt-pool1; hsm set osm -hsmBase=/hsmTape
 &dc-prompt-pool1; st set max active 5
 &dc-prompt-pool1; rh set max active 5
@@ -910,7 +910,7 @@ Flush Initiated</programlisting>
     </informalexample>
 
     <para>
-      A file that has been flushed to tape gets the flag 'C'. 
+      A file that has been flushed to tape gets the flag 'C'.
     </para>
     <informalexample>
       <programlisting>[example.dcache.org] &dc-prompt-pool1; rep ls
@@ -993,7 +993,7 @@ Fetch request queued</programlisting>
 	  depending on the individual configuration. In the default
 	  logging setup only errors are reported. This behavior can be
 	  changed by either modifying
-	  <filename>/opt/d-cache/etc/logback.xml</filename> or using
+	  <filename>&path-ode-ed;/logback.xml</filename> or using
 	  the &dcache; CLI to increase the log level of particular
 	  components as described <link
 	  linkend='cf-tss-monitor-log-cli'>below</link>.
@@ -1001,11 +1001,11 @@ Fetch request queued</programlisting>
 
       <section>
 	<title>Increase the &dcache; log level by changes in
-	<filename>/opt/d-cache/etc/logback.xml</filename></title>
+	<filename>&path-ode-ed;/logback.xml</filename></title>
 	<para>
 	  If you intend to increase the log level of all components on
 	  a particular host you would need to change the
-	  <filename>/opt/d-cache/etc/logback.xml</filename> file as
+	  <filename>&path-ode-ed;/logback.xml</filename> file as
 	  described below. &dcache; components need to be restarted to
 	  activate the changes.
 	</para>
@@ -1138,7 +1138,7 @@ stdout:
           <para>
 	    Request the file <filename>test.root</filename>
 	  </para>
-	  <programlisting>&prompt-user; /opt/d-cache/dcap/bin/dccp dcap://example.dcache.org:/data/test.root test.root</programlisting>
+	  <programlisting>&prompt-user; &path-oddb-n-s;dccp dcap://example.dcache.org:/data/test.root test.root</programlisting>
           <para>
 	    Check the &cell-poolmngr; Restore Queue:
 	  </para>
