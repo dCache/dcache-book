@@ -607,10 +607,10 @@ effective_cache_size = 16384            # typically 8KB each</programlisting>
 
       <para>
       The defaults for the configuration parameters for the &cell-srm; service can be found in
-      <filename>/opt/d-cache/share/defauls/dcache.properties</filename>.
+      <filename>&path-ods-usd;/defauls/dcache.properties</filename>.
 
       If you want to modify parameters, copy them to
-      <filename>/opt/d-cache/etc/dcache.conf</filename>
+      <filename>&path-ode-ed;/dcache.conf</filename>
       and update their value.
       </para>
 
@@ -1441,7 +1441,7 @@ remoteGsiftpMaxTransfers=260</programlisting>
 	</para>
 
 	<informalexample>
-	  <programlisting>SpaceManagerLinkGroupAuthorizationFileName=/opt/d-cache/etc/LinkGroupAuthorization.conf</programlisting>
+	  <programlisting>SpaceManagerLinkGroupAuthorizationFileName=&path-ode-ed;/LinkGroupAuthorization.conf</programlisting>
 	</informalexample>
       </section>
 

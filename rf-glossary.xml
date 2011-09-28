@@ -200,7 +200,7 @@
           It is located at
           <filename>$dcache_home/config/dCacheSetup</filename>
           (typically
-          <filename>/opt/d-cache/config/dCacheSetup</filename>). Each
+          <filename>&path-odc-ed;/dCacheSetup</filename>). Each
           <glossterm linkend="gl-domain">domain</glossterm> uses the
           file
           <filename>config/<replaceable>domainName</replaceable>Setup</filename>
@@ -225,7 +225,7 @@
 	<glossdef>
 	  <para>
 	    The poollist files are a collection of files in the
-	    <filename class="directory">/opt/d-cache/config</filename>
+	    <filename class="directory">&path-odc-ed;</filename>
 	    directory.  Each <literal>poollist</literal> file
 	    describes the set of <glossterm
 	    linkend="gl-pool">pools</glossterm> that should be

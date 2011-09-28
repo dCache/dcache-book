@@ -74,7 +74,7 @@
     If both do, we recommend to use &cell-gplazma2;. For legacy reasons version
     <literal>1</literal> is used as default. To set the version set
     <varname>gplazma.version</varname> property in
-    <filename>&install-base-opt;/etc/dcache.conf</filename> to
+    <filename>&path-ode-ed;/dcache.conf</filename> to
     <literal>1</literal> or <literal>2</literal>.
   </para>
 
@@ -147,7 +147,7 @@ gplazma.version = 2</programlisting>
       </para>
       <para>
         The &cell-gplazma; policy, located in the
-        <filename>&install-base-opt;/etc/dcachesrm-gplazma.policy</filename> file,
+        <filename>&path-ode-ed;/dcachesrm-gplazma.policy</filename> file,
         controls the authorization plug-ins to be used (<literal>ON</literal>
         or <literal>OFF</literal> for each plug-in) and the order of their
         execution.
@@ -213,7 +213,7 @@ saml-vo-mapping-priority="1"
 kpwd-priority="3"
 
 # dcache.kpwd
-kpwdPath="&install-base-opt;/etc/dcache.kpwd"
+kpwdPath="&path-ode-ed;/dcache.kpwd"
 
 # SAML-based grid VO role mapping
 mappingServiceUrl="https://fledgling09.fnal.gov:8443/gums/services/GUMSAuthorizationServicePort"
@@ -240,7 +240,7 @@ saml-vo-mapping-cache-lifetime="60"</programlisting>
           authorized &voms; server according to <ulink
               url="https://twiki.cern.ch/twiki/bin/view/LCG/VomsFAQforServiceManagers">
             these instructions</ulink> and set the <varname>vomsValidation</varname>
-          in <filename>&install-base-opt;/etc/dcachesrm-gplazma.policy</filename> to
+          in <filename>&path-ode-ed;/dcachesrm-gplazma.policy</filename> to
           <literal>true</literal>.
         </para>
 
@@ -286,7 +286,7 @@ saml-vo-mapping-cache-lifetime="60"</programlisting>
             independent sites or as a fallback method. The file contains
             different records for authorization and mappings.  Its format is
             documented within the sample file in
-            <filename>&install-base-opt;/share/examples/gplazma/dcache.kpwd</filename>.
+            <filename>&path-ods-usd;/examples/gplazma/dcache.kpwd</filename>.
             In the first step a &dn; or &kerberos; principal is mapped to a
             username. To authorize the user has to provide the password
             belonging to the mapped username to get &uid; and &gid; and user
@@ -370,7 +370,7 @@ saml-vo-mapping-cache-lifetime="60"</programlisting>
         it by setting <varname>gplazma.version</varname> to
         <literal>2</literal> in <filename>dcache.conf</filename>. This is
         described in the first part of this chapter.  Afterwards edit
-        <filename>&install-base-opt;/etc/gplazma.conf</filename> with your
+        <filename>&path-ode-ed;/gplazma.conf</filename> with your
         favourite editor (e.g., vim) to match your requirements. The plug-ins
         will be used in the order &auth;, &map;, &account; and &session;.
         Within these groups they are used in the order they are specified.
@@ -667,7 +667,7 @@ session requisite authzdb</programlisting>
                 <row>
                   <entry><varname>pwdfile</varname></entry>
                   <entry>Path to <filename>dcache.kpwd</filename></entry>
-                  <entry><filename>&install-base-opt;/etc/dcache.kpwd</filename></entry>
+                  <entry><filename>&path-ode-ed;/dcache.kpwd</filename></entry>
                 </row>
               </tbody>
             </tgroup>
@@ -1142,7 +1142,7 @@ Couldn't find a valid proxy.</screen>
       <title>The gplazmalite-vorole-mapping plug-in</title>
       <para>
         The &cell-gplazma; policy file
-        <filename>&install-base-opt;/etc/dcachesrm-gplazma.policy</filename> contains
+        <filename>&path-ode-ed;/dcachesrm-gplazma.policy</filename> contains
         two lines for this plug-in.
       </para>
 
@@ -1339,16 +1339,16 @@ authorize cms823 read-write 10823 7000 / /data/cms823 /</programlisting>
 
         <informalexample>
           <programlisting># dcache.kpwd
-kpwdPath="&install-base-opt;/etc/dcache.kpwd"</programlisting>
+kpwdPath="&path-ode-ed;/dcache.kpwd"</programlisting>
         </informalexample>
         <para>
           To maintain only one such file, make sure that this is the same
           location as defined in
-          <filename>&install-base-opt;/share/defaults/dcache.properties</filename>.
+          <filename>&path-ods-usd;/defaults/dcache.properties</filename>.
         </para>
 
         <para>
-          Use <filename>&install-base-opt;/share/examples/gplazma/dcache.kpwd</filename>
+          Use <filename>&path-ods-usd;/examples/gplazma/dcache.kpwd</filename>
           to create this file.
         </para>
       </section>
@@ -1419,7 +1419,7 @@ saml-vo-mapping-cache-lifetime="60"</programlisting>
           service, authorizations for the &gp1-saml; are by default cached for a
           period of time. To change the caching duration, modify the
           <varname>saml-vo-mapping-cache-lifetime</varname> value in
-          <filename>&install-base-opt;/etc/dcachesrm-gplazma.policy</filename>
+          <filename>&path-ode-ed;/dcachesrm-gplazma.policy</filename>
         </para>
 
         <programlisting>saml-vo-mapping-cache-lifetime="120"</programlisting>
@@ -1504,7 +1504,7 @@ xacml-vo-mapping-cache-lifetime="180"</programlisting>
           &scas;) service, authorizations for the &gp1-saml; method are by default
           cached for a period of time. To change the caching duration, modify the
           <varname>xacml-vo-mapping-cache-lifetime</varname> value in
-          <filename>&install-base-opt;/etc/dcachesrm-gplazma.policy</filename>
+          <filename>&path-ode-ed;/dcachesrm-gplazma.policy</filename>
         </para>
 
         <programlisting>saml-vo-mapping-cache-lifetime="120"</programlisting>
@@ -1522,9 +1522,9 @@ xacml-vo-mapping-cache-lifetime="180"</programlisting>
       &dcache; has many parameters that can be used to configure the systems behaviour.
       You can find all these parameters well documented and together with their
       default values in the properties files in
-      <filename class='directory'>&install-base-opt;/share/defaults/</filename>.  To
+      <filename class='directory'>&path-ods-usd;/defaults/</filename>.  To
       use non-default values, you have to set the new values in
-      <filename>&install-base-opt;/etc/dcache.conf</filename> or in the layout file.
+      <filename>&path-ode-ed;/dcache.conf</filename> or in the layout file.
       Do not change the defaults in the properties files! After changing a
       parameter you have to restart the concerned cells.
     </para>
@@ -1617,7 +1617,7 @@ xacml-vo-mapping-cache-lifetime="180"</programlisting>
           to occur:
         </para>
 
-        <programlisting>gplazmaPolicy=&install-base-opt;/etc/dcachesrm-gplazma.policy</programlisting>
+        <programlisting>gplazmaPolicy=&path-ode-ed;/dcachesrm-gplazma.policy</programlisting>
 
         <para>
           No adjustable timeout is available, but any blocking would likely be due
@@ -1644,7 +1644,7 @@ useGPlazmaAuthorizationCell=true</programlisting>
           Make sure that the line for <varname>gplazmaPolicy</varname>
         </para>
 
-        <programlisting>gplazmaPolicy=&install-base-opt;/etc/dcachesrm-gplazma.policy</programlisting>
+        <programlisting>gplazmaPolicy=&path-ode-ed;/dcachesrm-gplazma.policy</programlisting>
 
         <para>
           set to a local policy file on the node. The &cell-gplazma;
@@ -1662,7 +1662,7 @@ useGPlazmaAuthorizationCell=true</programlisting>
       </para>
       <informalexample>
         <para>
-          The <filename>&install-base-opt;/etc/dcachesrm-gplazma.policy</filename> file would look like this:
+          The <filename>&path-ode-ed;/dcachesrm-gplazma.policy</filename> file would look like this:
         </para>
         <programlisting># Switches
 xacml-vo-mapping="OFF"
@@ -1684,12 +1684,12 @@ gplazmalite-vorole-mapping-priority="2"
 # A valid path is required if corresponding switch is ON.
 
 # dcache.kpwd
-kpwdPath="&install-base-opt;/etc/dcache.kpwd"
+kpwdPath="&path-ode-ed;/dcache.kpwd"
 
 # #################################################################################
 # END</programlisting>
         <para>
-          The <filename>&install-base-opt;/etc/dcache.kpwd</filename> file would look like this:
+          The <filename>&path-ode-ed;/dcache.kpwd</filename> file would look like this:
         </para>
         <programlisting>version 2.1
 

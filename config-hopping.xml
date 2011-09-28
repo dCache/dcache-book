@@ -352,9 +352,10 @@ psu set link ocean-copy-link -p2ppref=100 -readpref=100 -writepref=0 -cachepref=
 
 	<itemizedlist>
 	  <listitem>
+	    <!-- FIXME: don't create batch files -->
 	    <para>
 	      Create a file <filename>hopping.batch</filename> in the
-	      <filename>/opt/d-cache/config</filename> directory with
+	      <filename>&path-ods-usd;/services</filename> directory with
 	      the following content :
 	    </para>
 
@@ -391,19 +392,8 @@ psu set link ocean-copy-link -p2ppref=100 -readpref=100 -writepref=0 -cachepref=
 
 	  <listitem>
 	    <para>
-	      change to <filename>/opt/d-cache/jobs</filename>
-	    </para>
-	  </listitem>
-
-	  <listitem>
-	    <para>
-	      Run ./initPackage.sh
-	    </para>
-	  </listitem>
-
-	  <listitem>
-	    <para>
-	      Start the service ./hopping start
+	      Add the <literal>hopping</literal> service to a domain
+	      and restart the domain.
 	    </para>
 	  </listitem>
 	</itemizedlist>
@@ -411,7 +401,7 @@ psu set link ocean-copy-link -p2ppref=100 -readpref=100 -writepref=0 -cachepref=
 	<para>
 	  Initially no rules are configured for the hopping
 	  manager. You may add rules by either edit the
-	  <filename>/opt/d-cache/config/HoppingManager.conf</filename>
+	  <filename>&path-odc-ed;/HoppingManager.conf</filename>
 	  and restart the hopping service, or use the admin interface
 	  and save the modifications by 'save' into
 	  <filename>HoppingManager.conf</filename>

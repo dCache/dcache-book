@@ -16,13 +16,12 @@
 
   <para>
     The raw information about all dCache activities can be found in
-    <filename>billing/<replaceable>YYYY</replaceable>/<replaceable>MM</replaceable>/billing-<replaceable>YYYY.MM.DD</replaceable></filename>.<footnote>
+    <filename>&path-od-vld;/billing/<replaceable>YYYY</replaceable>/<replaceable>MM</replaceable>/billing-<replaceable>YYYY.MM.DD</replaceable></filename><footnote layout='opt'>
     <para>
-      Filenames will always be relative to the dCache installation
+	Filenames will always be relative to the &dcache; installation
       directory, which defaults to <filename>/opt/d-cache/</filename>.
     </para>
-    </footnote>
-
+    </footnote>.
     A typical line looks like
   </para>
 
@@ -45,8 +44,8 @@
   </para>
 
   <para>
-    The dCache web interface (described in <xref
-      linkend="intouch-web"/>) contains under the menue point
+    The &dcache; web interface (described in <xref
+      linkend="intouch-web"/>) contains under the menu point
     <quote>Actions Log</quote> summary information extracted from
     the information in the <filename>billing</filename>-directory.
   </para>
