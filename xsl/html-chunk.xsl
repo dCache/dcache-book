@@ -86,7 +86,9 @@
   </xsl:template>
 
   <xsl:template name="user.header.navigation">
-    <xsl:comment>#include virtual="&location-l3-template;"</xsl:comment>
+    <xsl:variable name="location" select="concat('/template/l3-docs-book-2.0-', $layout, '-header.shtml')"/>
+
+    <xsl:comment>#include virtual="<xsl:value-of select="$location"/>"</xsl:comment>
   </xsl:template>
 
   <xsl:template name="user.footer.navigation">
