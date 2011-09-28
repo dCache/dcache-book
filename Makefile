@@ -37,10 +37,8 @@ FO_FILES  = $(SOURCES:%.xml=%-a4.fo) $(SOURCES:%.xml=%-letter.fo) $(SOURCES:%.xm
 PDF_FILES = $(FO_FILES:%.fo=%.pdf)
 
 HTML_SINGLE_FILES = $(SOURCES:%.xml=%.$(HTML_EXT)) $(SOURCES:%.xml=%-fhs.$(HTML_EXT))
-HTML_CHUNK_FILES = $(SOURCES:%.xml=%/index.$(HTML_EXT)) $(SOURCES:%.xml=%-fhs/index.$(HTML_EXT))
-HTML_COMMENTS_FILES = $(SOURCES:%.xml=%-comments/index.$(HTML_EXT)) $(SOURCES:%.xml=%-fhs-comments/index.$(HTML_EXT))
-HTML_ALL_CHUNK_FILES = $(SOURCES:%.xml=%) $(SOURCES:%.xml=%-fhs)
-HTML_ALL_COMMENTS_FILES = $(SOURCES:%.xml=%-comments) $(SOURCES:%.xml=%-fhs-comments)
+HTML_CHUNK_FILES = $(SOURCES:%.xml=%/index.$(HTML_EXT)) $(SOURCES:%.xml=%/index-fhs.$(HTML_EXT)) $(SOURCES:%.xml=%/index-comments.$(HTML_EXT)) $(SOURCES:%.xml=%/index-fhs-comments.$(HTML_EXT))
+HTML_ALL_CHUNK_FILES = $(SOURCES:%.xml=%)
 
 TXT_FILES = $(SOURCES:%.xml=%.txt) $(SOURCES:%.xml=%-fhs.txt)
 
@@ -56,22 +54,19 @@ GFX_FILES = images/important.png images/warning.png images/caution.png images/no
 
 # Used by deploy target
 ALL = $(HTML_SINGLE_FILES) $(PDF_FILES) $(HTML_ALL_CHUNK_FILES) $(EPUB_FILES) book.css $(GFX_FILES)
-ALL_COMMENTS = $(HTML_ALL_COMMENTS_FILES) book.css $(GFX_FILES)
 ALL_INSTALLED = $(ALL:%=%__INSTALL__)
 ALL_TEST_INSTALLED = $(ALL:%=%__TEST_INSTALL__)
-COMMENTS_INSTALLED = $(ALL_COMMENTS:%=%__COMMENTS_INSTALL__)
 
 
 WWW_SERVER = www.dcache.org
 WWW_SERVER_BASE_DIR = /data/www/dcache.org
 WWW_LOCATION = /manuals/Book-1.9.13/
 WWW_TEST_LOCATION = /manuals/Book-1.9.13-test/
-WWW_COMMENTS_LOCATION = /manuals/Book-1.9.13-comments/
 
 # NB we don't do deps on txt as it depends on html-single output.  This
 #    is cheating, but hey, it works.
 
-DEP_FILES = $(FO_DEPS) $(HTML_SINGLE_DEPS) $(HTML_CHUNK_DEPS) $(HTML_COMMENTS_DEPS) $(PROFILED_DEPS)
+DEP_FILES = $(FO_DEPS) $(HTML_SINGLE_DEPS) $(HTML_CHUNK_DEPS) $(PROFILED_DEPS)
 
 
 ######### Common options
@@ -104,13 +99,11 @@ info:
 	@echo "  all             -- build PDF, HTML, text, man and epub"
 	@echo "  pdf             -- build PDF versions"
 	@echo "  html            -- build HTML pages"
-	@echo "  comments        -- build HTML pages with comments"
 	@echo "  txt             -- build text version"
 	@echo "  man             -- build man pages"
 	@echo "  epub            -- build EPUB version"
 	@echo "  deploy          -- deploy files to http://${WWW_SERVER}${WWW_LOCATION}"
 	@echo "  test-deploy     -- deploy files to http://${WWW_SERVER}${WWW_TEST_LOCATION}"
-	@echo "  comments-deploy -- deploy files to http://${WWW_SERVER}${WWW_COMMENTS_LOCATION}"
 	@echo
 	@echo "More specific build targets:"
 	@echo
@@ -148,25 +141,27 @@ html-chunk: $(HTML_CHUNK_FILES)
 
 
 %.$(HTML_EXT): %-opt.xml $(STYLESHEETS_HTML) shared-entities.xml
-	$(XSLTPROC) $(XSLT_FLAGS) --stringparam html.ext ".$(HTML_EXT)" -o $@ xsl/html-single.xsl $<
+	$(XSLTPROC) $(XSLT_FLAGS) --stringparam html.ext ".$(HTML_EXT)" --stringparam layout opt -o $@ xsl/html-single.xsl $<
 
 %/index.$(HTML_EXT): %-opt.xml $(STYLESHEETS_CHUNK) shared-entities.xml
-	$(XSLTPROC) $(XSLT_FLAGS) --stringparam html.ext ".$(HTML_EXT)" --stringparam base.dir $(@:%/index.$(HTML_EXT)=%)/ --stringparam comments.enabled false xsl/html-chunk.xsl $<
+	$(XSLTPROC) $(XSLT_FLAGS) --stringparam html.ext ".$(HTML_EXT)" --stringparam layout opt --stringparam base.dir $(@:%/index.$(HTML_EXT)=%)/ --stringparam comments.enabled false xsl/html-chunk.xsl $<
 
 
 %-fhs.$(HTML_EXT): %-fhs.xml $(STYLESHEETS_HTML) shared-entities.xml
-	$(XSLTPROC) $(XSLT_FLAGS) --stringparam html.ext ".$(HTML_EXT)" -o $@ xsl/html-single.xsl $<
+	$(XSLTPROC) $(XSLT_FLAGS) --stringparam html.ext ".$(HTML_EXT)" --stringparam layout fhs -o $@ xsl/html-single.xsl $<
 
-%-fhs/index.$(HTML_EXT): %-fhs.xml $(STYLESHEETS_CHUNK) shared-entities.xml
-	$(XSLTPROC) $(XSLT_FLAGS) --stringparam html.ext ".$(HTML_EXT)" --stringparam base.dir $(@:%/index.$(HTML_EXT)=%)/ --stringparam comments.enabled false xsl/html-chunk.xsl $<
+%/index-fhs.$(HTML_EXT): %-fhs.xml $(STYLESHEETS_CHUNK) shared-entities.xml
+	$(XSLTPROC) $(XSLT_FLAGS) --stringparam html.ext "-fhs.$(HTML_EXT)" --stringparam layout fhs --stringparam base.dir $(@:%/index-fhs.$(HTML_EXT)=%)/ --stringparam comments.enabled false xsl/html-chunk.xsl $<
+
 
 #  Commented chunked HTML
 #
-comments: $(HTML_COMMENTS_FILES)
 
-%-comments/index.$(HTML_EXT): %.xml $(STYLESHEETS_CHUNK) shared-entities.xml
-	$(XSLTPROC) $(XSLT_FLAGS) --stringparam html.ext ".$(HTML_EXT)" --stringparam base.dir $(@:%/index.$(HTML_EXT)=%)/ --stringparam comments.enabled true xsl/html-chunk.xsl $<
-# TODO: review whether to use the same rule for comments and uncommented chunked output.
+%/index-comments.$(HTML_EXT): %-opt.xml $(STYLESHEETS_CHUNK) shared-entities.xml
+	$(XSLTPROC) $(XSLT_FLAGS) --stringparam html.ext "-comments.$(HTML_EXT)" --stringparam layout opt --stringparam base.dir $(@:%/index-comments.$(HTML_EXT)=%)/ --stringparam comments.enabled true xsl/html-chunk.xsl $<
+
+%/index-fhs-comments.$(HTML_EXT): %-fhs.xml $(STYLESHEETS_CHUNK) shared-entities.xml
+	$(XSLTPROC) $(XSLT_FLAGS) --stringparam html.ext "-comments-fhs.$(HTML_EXT)" --stringparam layout fhs --stringparam base.dir $(@:%/index-fhs-comments.$(HTML_EXT)=%)/ --stringparam comments.enabled true xsl/html-chunk.xsl $<
 
 
 ###### Text only
@@ -270,28 +265,18 @@ comments-deploy: $(COMMENTS_INSTALLED)
 	chmod a+r,g+w $<
 	scp -p $< $(WWW_SERVER):$(WWW_SERVER_BASE_DIR)$(WWW_TEST_LOCATION)
 
-%__COMMENTS_INSTALL__: %
-	chmod a+r,g+w $<
-	scp -p $< $(WWW_SERVER):$(WWW_SERVER_BASE_DIR)$(WWW_COMMENTS_LOCATION)
-
 #  Unfortunately, we need a special case here.
-Book__INSTALL__: Book/index.$(HTML_EXT)
+Book__INSTALL__: $(HTML_CHUNK_FILES)
 	chmod -R a+Xr,g+w Book/*
 	chmod g+s Book
 	find Book -type d -exec chmod g+s \{\} \;
 	scp -pr Book/* $(WWW_SERVER):$(WWW_SERVER_BASE_DIR)$(WWW_LOCATION)
 
-Book__TEST_INSTALL__: Book/index.$(HTML_EXT)
+Book__TEST_INSTALL__: $(HTML_CHUNK_FILES)
 	chmod -R a+Xr,g+w Book/*
 	chmod g+s Book
 	find Book -type d -exec chmod g+s \{\} \;
 	scp -pr Book/* $(WWW_SERVER):$(WWW_SERVER_BASE_DIR)$(WWW_TEST_LOCATION)
-
-Book-comments__COMMENTS_INSTALL__: Book-comments/index.$(HTML_EXT)
-	chmod -R a+Xr,g+w Book-comments/*
-	chmod g+s Book-comments
-	find Book-comments -type d -exec chmod g+s \{\} \;
-	scp -pr Book-comments/* $(WWW_SERVER):$(WWW_SERVER_BASE_DIR)$(WWW_COMMENTS_LOCATION)
 
 
 
@@ -322,9 +307,6 @@ distclean: clean
 
 .%-chunk.d: %.xml
 	$(XSLTPROC) --nonet -stringparam output-file $(@:.%-chunk.d=%/index.$(HTML_EXT)) --stringparam initial-file $< --stringparam graphics none --stringparam dep-file $@ dependency.xsl $< > $@
-
-.%-comments.d: %.xml
-	$(XSLTPROC) --nonet -stringparam output-file $(@:.%-comments.d=%-comments/index.$(HTML_EXT)) --stringparam initial-file $< --stringparam graphics none --stringparam dep-file $@ dependency.xsl $< > $@
 
 .PHONY:	all pdf html html-single html-chunked
 .PHONY: clean distclean
