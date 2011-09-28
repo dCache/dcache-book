@@ -142,7 +142,7 @@
 
     <screen>&prompt-root; <userinput>su postgres</userinput>
 &prompt-user; <userinput>createdb -U srmdcache replicas</userinput>
-&prompt-user; <userinput>psql -U srmdcache -d replicas -f /opt/d-cache/etc/psql_install_replicas.sql</userinput>
+&prompt-user; <userinput>psql -U srmdcache -d replicas -f &path-ode-ed;/psql_install_replicas.sql</userinput>
 &prompt-user; <userinput>exit</userinput></screen>
       
     <para>

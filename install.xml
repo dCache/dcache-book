@@ -195,7 +195,7 @@ Starting postgresql service:                               [  OK  ]</screen>
           of those files. &chimera; itself stores the data in a
           relational database. We will use &psql; in this tutorial.
           The properties of &chimera; are defined in
-          <filename>/opt/d-cache/share/defaults/chimera.properties</filename>.
+          <filename>&path-ods-usd;/defaults/chimera.properties</filename>.
           See <xref linkend="cf-chimera"/> for more information.
         </para>
 
@@ -216,35 +216,35 @@ Enter it again:
 CREATE ROLE
 <lineannotation>You do not need to enter a password.</lineannotation>
 
-&prompt-root; <userinput>psql -U chimera chimera -f /opt/d-cache/libexec/chimera/sql/create.sql</userinput>
-psql:/opt/d-cache/libexec/chimera/sql/create.sql:23: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_inodes_pkey" for table "t_inodes"
+&prompt-root; <userinput>psql -U chimera chimera -f &path-odl-usd;/chimera/sql/create.sql</userinput>
+psql:&path-odl-usd;/chimera/sql/create.sql:23: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_inodes_pkey" for table "t_inodes"
 CREATE TABLE
-psql:/opt/d-cache/libexec/chimera/sql/create.sql:35: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_dirs_pkey" for table "t_dirs"
+psql:&path-odl-usd;/chimera/sql/create.sql:35: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_dirs_pkey" for table "t_dirs"
 CREATE TABLE
-psql:/opt/d-cache/libexec/chimera/sql/create.sql:45: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_inodes_data_pkey" for table "t_inodes_data"
+psql:&path-odl-usd;/chimera/sql/create.sql:45: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_inodes_data_pkey" for table "t_inodes_data"
 <lineannotation>many more like this...</lineannotation>
 INSERT 0 1
 <lineannotation>many more like this...</lineannotation>
 INSERT 0 1
 CREATE INDEX
 CREATE INDEX
-psql:/opt/d-cache/libexec/chimera/sql/create.sql:256: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_storageinfo_pkey" for table "t_storageinfo"
+psql:&path-odl-usd;/chimera/sql/create.sql:256: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_storageinfo_pkey" for table "t_storageinfo"
 CREATE TABLE
-psql:/opt/d-cache/libexec/chimera/sql/create.sql:263: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_access_latency_pkey" for table "t_access_latency"
+psql:&path-odl-usd;/chimera/sql/create.sql:263: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_access_latency_pkey" for table "t_access_latency"
 CREATE TABLE
-psql:/opt/d-cache/libexec/chimera/sql/create.sql:270: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_retention_policy_pkey" for table "t_retention_policy"
+psql:&path-odl-usd;/chimera/sql/create.sql:270: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_retention_policy_pkey" for table "t_retention_policy"
 CREATE TABLE
-psql:/opt/d-cache/libexec/chimera/sql/create.sql:295: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_locationinfo_pkey" for table "t_locationinfo"
+psql:&path-odl-usd;/chimera/sql/create.sql:295: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_locationinfo_pkey" for table "t_locationinfo"
 CREATE TABLE
-psql:/opt/d-cache/libexec/chimera/sql/create.sql:311: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_locationinfo_trash_pkey" for table "t_locationinfo_trash"
+psql:&path-odl-usd;/chimera/sql/create.sql:311: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_locationinfo_trash_pkey" for table "t_locationinfo_trash"
 CREATE TABLE
 CREATE INDEX
-psql:/opt/d-cache/libexec/chimera/sql/create.sql:332: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_acl_pkey" for table "t_acl"
+psql:&path-odl-usd;/chimera/sql/create.sql:332: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_acl_pkey" for table "t_acl"
 CREATE TABLE
 CREATE INDEX
 
 &prompt-root; <userinput>createlang -U postgres plpgsql chimera</userinput>
-&prompt-root; <userinput>psql -U chimera chimera -f /opt/d-cache/libexec/chimera/sql/pgsql-procedures.sql</userinput>
+&prompt-root; <userinput>psql -U chimera chimera -f &path-odl-usd;/chimera/sql/pgsql-procedures.sql</userinput>
 CREATE FUNCTION
 CREATE FUNCTION
 CREATE FUNCTION
@@ -300,23 +300,23 @@ CREATE TRIGGER
 	linkend="intouch-admin"/>) you will need to generate &ssh;-keys.
       </para>
 
-      <screen>&prompt-root; <userinput>ssh-keygen -b 768 -t rsa1 -f /opt/d-cache/etc/server_key -N ""</userinput>
+      <screen>&prompt-root; <userinput>ssh-keygen -b 768 -t rsa1 -f &path-ode-ed;/server_key -N ""</userinput>
 Generating public/private rsa1 key pair.
-Your identification has been saved in /opt/d-cache/etc/server_key.
-Your public key has been saved in /opt/d-cache/etc/server_key.pub.
+Your identification has been saved in &path-ode-ed;/server_key.
+Your public key has been saved in &path-ode-ed;/server_key.pub.
 The key fingerprint is:
 33:ac:91:4c:21:4e:63:aa:2d:90:58:4d:72:e6:b5:88 root@example.org
-&prompt-root; <userinput>ssh-keygen -b 1024 -t rsa1 -f /opt/d-cache/etc/host_key -N ""</userinput>
+&prompt-root; <userinput>ssh-keygen -b 1024 -t rsa1 -f &path-ode-ed;/host_key -N ""</userinput>
 Generating public/private rsa1 key pair.
-Your identification has been saved in /opt/d-cache/etc/host_key.
-Your public key has been saved in /opt/d-cache/etc/host_key.pub.
+Your identification has been saved in &path-ode-ed;/host_key.
+Your public key has been saved in &path-ode-ed;/host_key.pub.
 The key fingerprint is:
 75:a4:2b:24:cc:75:ad:b7:bd:8b:dd:1a:3e:96:3f:9d root@example.org</screen>
       <para>
 	Now you can start &dcache;.
       </para>
 
-<screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache start</userinput>
+<screen>&prompt-root; <userinput>&path-odb-n-s;dcache start</userinput>
 Starting dCacheDomain done</screen>
 
      <para>
@@ -356,24 +356,24 @@ Starting dCacheDomain done</screen>
         configuration files:
 	<itemizedlist>
 	  <listitem>
-            <filename class="directory">/opt/d-cache/share/defaults</filename>
+            <filename class="directory">&path-ods-usd;/defaults</filename>
 	  </listitem>
 
 	  <listitem>
-	    <filename>/opt/d-cache/etc/dcache.conf</filename>
+	    <filename>&path-ode-ed;/dcache.conf</filename>
 	  </listitem>
 
 	  <listitem>
-	    <filename class="directory">/opt/d-cache/etc/layouts</filename>
+	    <filename class="directory">&path-ode-ed;/layouts</filename>
 	  </listitem>
 	</itemizedlist>
-	The folder <filename class="directory">/opt/d-cache/share/defaults</filename>
+	The folder <filename class="directory">&path-ods-usd;/defaults</filename>
 	contains the default
 	settings of the &dcache;.
         If one of the default configuration values needs to be changed, copy the default
 	setting of this value from one of the files in
-	<filename class='directory'>/opt/d-cache/share/defaults</filename>
-        to the file <filename>/opt/d-cache/etc/dcache.conf</filename>, which initially is
+	<filename class='directory'>&path-ods-usd;/defaults</filename>
+        to the file <filename>&path-ode-ed;/dcache.conf</filename>, which initially is
 	empty and update the value.
 	  </para>
 	  <para>
@@ -381,7 +381,7 @@ Starting dCacheDomain done</screen>
 	domain.
 	For the customized configuration of your &dcache; you will create a
 	<filename>mylayout.conf</filename> file in
-	<filename class="directory">/opt/d-cache/etc/layouts</filename>.
+	<filename class="directory">&path-ode-ed;/layouts</filename>.
 	  </para>
 	</section>
 
@@ -438,18 +438,18 @@ Starting dCacheDomain done</screen>
 	of them is read by &dcache; when starting up. By default it is the
 	<filename>single.conf</filename>.
 	If the &dcache; should be started with another layout file you will have to make
-	this configuration in <filename>/opt/d-cache/etc/dcache.conf</filename>.
+	this configuration in <filename>&path-ode-ed;/dcache.conf</filename>.
       </para>
 
       <informalexample>
 	<programlisting>dcache.layout=mylayout</programlisting>
-	This entry in <filename>/opt/d-cache/etc/dcache.conf</filename>
+	This entry in <filename>&path-ode-ed;/dcache.conf</filename>
 	will instruct &dcache; to read the layout file
-	<filename>/opt/d-cache/etc/layouts/mylayout.conf</filename> when starting up.
+	<filename>&path-ode-ed;/layouts/mylayout.conf</filename> when starting up.
       </informalexample>
 
       <informalexample>
-	These are the first lines of <filename>/opt/d-cache/etc/layouts/single.conf</filename>:
+	These are the first lines of <filename>&path-ode-ed;/layouts/single.conf</filename>:
 	<programlisting>messageBroker=none
 
 [dCacheDomain]
@@ -502,7 +502,7 @@ Starting dCacheDomain done</screen>
 	This is because the
 	defined domains need to be able to communicate with each other. The default value is
 	<literal>messageBroker=cells</literal>, as defined in the defaults
-	<filename>/opt/d-cache/share/defaults/dcache.properties</filename>.
+	<filename>&path-ods-usd;/defaults/dcache.properties</filename>.
 	</important>
     </section>
 
@@ -613,7 +613,7 @@ maxDiskSpace=2T</programlisting>
 	<para>
 	  For security reasons you might want to run &dcache; as a
 	  non-&user-root; user. This needs to be configured in
-	  <filename>/opt/d-cache/etc/dcache.conf</filename> and the
+	  <filename>&path-ode-ed;/dcache.conf</filename> and the
 	  ownership of the pools and the billing directories need to
 	  be changed.
 	</para>
@@ -634,13 +634,13 @@ maxDiskSpace=2T</programlisting>
 &prompt-root;<userinput>chown dcache /var/log/dcache</userinput></screen>
 	    <para>
 	      and add two lines to
-	      <filename>/opt/d-cache/etc/dcache.conf</filename>.
+	      <filename>&path-ode-ed;/dcache.conf</filename>.
 	  </para>
 	  <programlisting>dcache.user=dcache
 dcache.paths.billing=/var/log/dcache</programlisting>
 	  <para>
 	    In the layout file
-	    <filename>/opt/d-cache/etc/layouts/mylayout.conf</filename>
+	    <filename>&path-ode-ed;/layouts/mylayout.conf</filename>
 	    a pool was defined.
 	  </para>
 	  <programlisting>[${host.name}Domain/pool]
@@ -677,7 +677,7 @@ dcache.user=root
           <para>
 	    Now you can start &dcache; as user &user-dcache;
 	  </para>
-	  <screen>&prompt-root;<userinput>/opt/d-cache/bin/dcache  start</userinput>
+	  <screen>&prompt-root;<userinput>&path-odb-n-s;dcache start</userinput>
 Starting dCacheDomain done
 Starting namespaceDomain done
 Starting gPlazmaDomain done
@@ -686,7 +686,7 @@ Starting srmDomain done</screen>
             and verifiy that &dcache; is running as &user-dcache; and
             the &nfs; server is running as &user-root;.
 	  </para>
-	  <screen>&prompt-root;<userinput>/opt/d-cache/bin/dcache status</userinput>
+	  <screen>&prompt-root;<userinput>&path-odb-n-s;dcache status</userinput>
 DOMAIN          STATUS  PID   USER
 dCacheDomain    running 11040 dcache
 namespaceDomain running 11117 root
@@ -704,7 +704,7 @@ srmDomain       running 11182 dcache</screen>
 	<programlisting>dcache.java.memory.heap=512m
 dcache.java.memory.direct=512m</programlisting>
         Again, these values can be changed in
-	<filename>/opt/dcache/etc/dcache.conf</filename>.
+	<filename>&path-ode-ed;/dcache.conf</filename>.
       </para>
 
 	<para>
@@ -751,10 +751,10 @@ dcache.java.memory.direct=16m</programlisting>
 	<title>Starting &dcache;</title>
 	<para>
 	  All configured components can now be started with
-	  <userinput>/opt/d-cache/bin/dcache start</userinput>.
+	  <userinput>&path-odb-n-s;dcache start</userinput>.
 	</para>
 	<informalexample>
-	  <screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache start</userinput>
+	  <screen>&prompt-root; <userinput>&path-odb-n-s;dcache start</userinput>
 Starting dCacheDomain  Done (pid=7574)
 Starting namespaceDomain  Done (pid=7647)
 Starting gPlazmaDomain  Done (pid=8002)
@@ -762,7 +762,7 @@ Starting srmDomain  Done (pid=8081)</screen>
 	</informalexample>
       </section>
 
-      <para> 
+      <para>
 	Now you can have a look at your &dcache; via The Web
 	Interface, see <xref linkend="intouch-web">intouch-web</xref>:
 	<uri>http://<replaceable>httpd.example.org</replaceable>:2288/</uri>,
@@ -783,8 +783,8 @@ Starting srmDomain  Done (pid=8081)</screen>
       domains. Then adapt the layout files, as described in <xref
       linkend="in-install-layout" />, to the layout that you have in
       mind. The files
-      <filename>/opt/d-cache/etc/layouts/head.conf</filename> and
-      <filename>/opt/d-cache/etc/layouts/pool.conf</filename> contain
+      <filename>&path-ode-ed;/layouts/head.conf</filename> and
+      <filename>&path-ode-ed;/layouts/pool.conf</filename> contain
       examples for a &dcache; head-node and a &dcache; pool
       respectively.
     </para>
@@ -792,7 +792,7 @@ Starting srmDomain  Done (pid=8081)</screen>
     <para>
       On any other nodes than the head node,
       <varname>broker.host</varname> has to be added to
-      <filename>/opt/d-cache/etc/dcache.conf</filename>.
+      <filename>&path-ode-ed;/dcache.conf</filename>.
       <varname>broker.host</varname> should point to the host running
       your &dcache; broker. Usually that is the host containing the
       special domain &domain-dcache;, because that domain acts

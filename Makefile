@@ -27,23 +27,30 @@ STYLESHEETS_EPUB := xsl/epub.xsl xsl/common.xsl
 #########  Some derived locations: output files
 #
 
-FO_FILES  = $(SOURCES:%.xml=%-a4.fo) $(SOURCES:%.xml=%-letter.fo)
+FHS_PROFILED_SRC = Book-fhs.xml
+OPT_PROFILED_SRC = Book-opt.xml
+
+PROFILED_SOURCES = $(FHS_PROFILED_SRC) $(OPT_PROFILED_SRC)
+
+FO_FILES  = $(SOURCES:%.xml=%-a4.fo) $(SOURCES:%.xml=%-letter.fo) $(SOURCES:%.xml=%-fhs-a4.fo) $(SOURCES:%.xml=%-fhs-letter.fo)
+
 PDF_FILES = $(FO_FILES:%.fo=%.pdf)
 
-HTML_SINGLE_FILES = $(SOURCES:%.xml=%.$(HTML_EXT))
-HTML_CHUNK_FILES = $(SOURCES:%.xml=%/index.$(HTML_EXT))
-HTML_COMMENTS_FILES = $(SOURCES:%.xml=%-comments/index.$(HTML_EXT))
-HTML_ALL_CHUNK_FILES = $(SOURCES:%.xml=%)
-HTML_ALL_COMMENTS_FILES = $(SOURCES:%.xml=%-comments)
+HTML_SINGLE_FILES = $(SOURCES:%.xml=%.$(HTML_EXT)) $(SOURCES:%.xml=%-fhs.$(HTML_EXT))
+HTML_CHUNK_FILES = $(SOURCES:%.xml=%/index.$(HTML_EXT)) $(SOURCES:%.xml=%-fhs/index.$(HTML_EXT))
+HTML_COMMENTS_FILES = $(SOURCES:%.xml=%-comments/index.$(HTML_EXT)) $(SOURCES:%.xml=%-fhs-comments/index.$(HTML_EXT))
+HTML_ALL_CHUNK_FILES = $(SOURCES:%.xml=%) $(SOURCES:%.xml=%-fhs)
+HTML_ALL_COMMENTS_FILES = $(SOURCES:%.xml=%-comments) $(SOURCES:%.xml=%-fhs-comments)
 
-TXT_FILES = $(SOURCES:%.xml=%.txt)
+TXT_FILES = $(SOURCES:%.xml=%.txt) $(SOURCES:%.xml=%-fhs.txt)
 
 FO_DEPS = $(FO_FILES:%=.%.d)
 HTML_SINGLE_DEPS = $(HTML_SINGLE_FILES:%=.%.d)
 HTML_CHUNK_DEPS = $(SOURCES:%.xml=.%-chunk.d)
 HTML_COMMENTS_DEPS = $(SOURCES:%.xml=.%-comments.d)
+PROFILED_DEPS = $(PROFILED_SOURCES:%.xml=.%.d)
 
-EPUB_FILES = $(SOURCES:%.xml=%.epub)
+EPUB_FILES = $(SOURCES:%.xml=%.epub) $(SOURCES:%.xml=%-fhs.epub)
 
 GFX_FILES = images/important.png images/warning.png images/caution.png images/note.png images/tip.png
 
@@ -64,7 +71,7 @@ WWW_COMMENTS_LOCATION = /manuals/Book-1.9.12-comments/
 # NB we don't do deps on txt as it depends on html-single output.  This
 #    is cheating, but hey, it works.
 
-DEP_FILES = $(FO_DEPS) $(HTML_SINGLE_DEPS) $(HTML_CHUNK_DEPS) $(HTML_COMMENTS_DEPS)
+DEP_FILES = $(FO_DEPS) $(HTML_SINGLE_DEPS) $(HTML_CHUNK_DEPS) $(HTML_COMMENTS_DEPS) $(PROFILED_DEPS)
 
 
 ######### Common options
@@ -118,6 +125,17 @@ info:
 all: pdf html txt man epub
 
 
+###### Profile targets
+#
+#  Converting generic book into flavour-specific book
+
+%-fhs.xml: %.xml
+	$(XSLTPROC) $(XSLT_FLAGS) --stringparam  profile.layout fhs -o $@ xsl/profile.xsl $<
+
+%-opt.xml: %.xml
+	$(XSLTPROC) $(XSLT_FLAGS) --stringparam  profile.layout opt -o $@ xsl/profile.xsl $<
+
+
 ###### HTML targets
 #
 
@@ -129,11 +147,17 @@ html-single: $(HTML_SINGLE_FILES)
 html-chunk: $(HTML_CHUNK_FILES)
 
 
-%.$(HTML_EXT): %.xml $(STYLESHEETS_HTML) shared-entities.xml
+%.$(HTML_EXT): %-opt.xml $(STYLESHEETS_HTML) shared-entities.xml
 	$(XSLTPROC) $(XSLT_FLAGS) --stringparam html.ext ".$(HTML_EXT)" -o $@ xsl/html-single.xsl $<
 
-%/index.$(HTML_EXT): %.xml $(STYLESHEETS_CHUNK) shared-entities.xml
-#	$(XSLTPROC) $(XSLT_FLAGS) -o $(@:%/index.$(HTML_EXT)=%)/ xsl/html-chunk.xsl $<
+%/index.$(HTML_EXT): %-opt.xml $(STYLESHEETS_CHUNK) shared-entities.xml
+	$(XSLTPROC) $(XSLT_FLAGS) --stringparam html.ext ".$(HTML_EXT)" --stringparam base.dir $(@:%/index.$(HTML_EXT)=%)/ --stringparam comments.enabled false xsl/html-chunk.xsl $<
+
+
+%-fhs.$(HTML_EXT): %-fhs.xml $(STYLESHEETS_HTML) shared-entities.xml
+	$(XSLTPROC) $(XSLT_FLAGS) --stringparam html.ext ".$(HTML_EXT)" -o $@ xsl/html-single.xsl $<
+
+%-fhs/index.$(HTML_EXT): %-fhs.xml $(STYLESHEETS_CHUNK) shared-entities.xml
 	$(XSLTPROC) $(XSLT_FLAGS) --stringparam html.ext ".$(HTML_EXT)" --stringparam base.dir $(@:%/index.$(HTML_EXT)=%)/ --stringparam comments.enabled false xsl/html-chunk.xsl $<
 
 #  Commented chunked HTML
@@ -163,9 +187,15 @@ txt: $(TXT_FILES)
 #
 
 ## TODO: we should autogenerate dependencies, like with other targets
-man: Book.xml $(STYLESHEETS_MAN) shared-entities.xml
+man: man-opt man-fhs
+
+man-opt: Book-opt.xml $(STYLESHEETS_MAN) shared-entities.xml
 	@[ ! -d man ] && mkdir man || :
-	$(XSLTPROC) $(XSLT_FLAGS) --output man/ xsl/man.xsl $<
+	$(XSLTPROC) $(XSLT_FLAGS) --output man-opt/ xsl/man.xsl $<
+
+man-fhs: Book-fhs.xml $(STYLESHEETS_MAN) shared-entities.xml
+	@[ ! -d man ] && mkdir man || :
+	$(XSLTPROC) $(XSLT_FLAGS) --output man-fhs/ xsl/man.xsl $<
 
 
 ###### EPUB targets
@@ -174,7 +204,14 @@ man: Book.xml $(STYLESHEETS_MAN) shared-entities.xml
 ## TODO: we should autogenerate dependencies, like with other targets
 epub: $(EPUB_FILES)
 
-%.epub: %.xml $(STYLESHEETS_EPUB) shared-entities.xml
+%.epub: %-opt.xml $(STYLESHEETS_EPUB) shared-entities.xml
+	$(XSLTPROC) $(XSLT_FLAGS) xsl/epub.xsl $<
+	echo application/epub+zip > mimetype
+	zip -rn mimetype $@ mimetype META-INF OEBPS
+	rm -rf mimetype META-INF OEBPS
+
+
+%-fhs.epub: %-fhs.xml $(STYLESHEETS_EPUB) shared-entities.xml
 	$(XSLTPROC) $(XSLT_FLAGS) xsl/epub.xsl $<
 	echo application/epub+zip > mimetype
 	zip -rn mimetype $@ mimetype META-INF OEBPS
@@ -187,10 +224,16 @@ epub: $(EPUB_FILES)
 #
 pdf: $(PDF_FILES)
 
-%-a4.fo: %.xml $(STYLESHEETS_FO) shared-entities.xml
+%-fhs-a4.fo: %-fhs.xml $(STYLESHEETS_FO) shared-entities.xml
 	$(XSLTPROC) $(XSLT_FLAGS) --output $@ --stringparam paper.type A4  xsl/fo.xsl $<
 
-%-letter.fo: %.xml $(STYLESHEETS_FO) shared-entities.xml
+%-fhs-letter.fo: %-fhs.xml $(STYLESHEETS_FO) shared-entities.xml
+	$(XSLTPROC) $(XSLT_FLAGS) --output $@ --stringparam paper.type letter xsl/fo.xsl $<
+
+%-a4.fo: %-opt.xml $(STYLESHEETS_FO) shared-entities.xml
+	$(XSLTPROC) $(XSLT_FLAGS) --output $@ --stringparam paper.type A4  xsl/fo.xsl $<
+
+%-letter.fo: %-opt.xml $(STYLESHEETS_FO) shared-entities.xml
 	$(XSLTPROC) $(XSLT_FLAGS) --output $@ --stringparam paper.type letter xsl/fo.xsl $<
 
 %.pdf: %.fo
@@ -259,11 +302,17 @@ clean:
 	rm -rf *~ *.bak
 
 distclean: clean
-	rm -rf $(WEB_LOCATION) $(TXT_FILES) $(PDF_FILES) $(FO_FILES) $(DEP_FILES) $(HTML_SINGLE_FILES) $(HTML_ALL_CHUNK_FILES) $(HTML_ALL_COMMENTS_FILES) $(STYLESHEETS_TITLEPAGE) $(EPUB_FILES)
+	rm -rf $(WEB_LOCATION) $(TXT_FILES) $(PDF_FILES) $(FO_FILES) $(DEP_FILES) $(HTML_SINGLE_FILES) $(HTML_ALL_CHUNK_FILES) $(HTML_ALL_COMMENTS_FILES) $(STYLESHEETS_TITLEPAGE) $(EPUB_FILES) $(PROFILED_SOURCES)
 
 
 ###### Create (dynamic) Makefile dependencies
 #
+
+.%-fhs.xml.d .%-opt.xml.d: %.xml
+	$(XSLTPROC) --nonet -stringparam output-file $(@:.%.d=%) --stringparam initial-file $< --stringparam graphics SVG --stringparam dep-file $@ dependency.xsl $< > $@
+
+.%-fhs-letter.fo.d .%-fhs-a4.fo.d: %.xml
+	$(XSLTPROC) --nonet -stringparam output-file $(@:.%.d=%) --stringparam initial-file $< --stringparam graphics SVG  --stringparam dep-file $@ dependency.xsl $< > $@
 
 .%-letter.fo.d .%-a4.fo.d: %.xml
 	$(XSLTPROC) --nonet -stringparam output-file $(@:.%.d=%) --stringparam initial-file $< --stringparam graphics SVG  --stringparam dep-file $@ dependency.xsl $< > $@

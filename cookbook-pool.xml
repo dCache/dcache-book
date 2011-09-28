@@ -744,7 +744,7 @@ Running tasks:
       for a short moment, though.
       Log out of the pool, and stop the domain running the pool:
 
-<screen>&prompt-root; <userinput>/opt/d-cache/bin/dcache stop <replaceable>poolDomain</replaceable></userinput>
+<screen>&prompt-root; <userinput>&path-odb-n-s;dcache stop <replaceable>poolDomain</replaceable></userinput>
 Stopping <replaceable>poolDomain</replaceable> (pid=6070) 0 1 2 3 done
 &prompt-root;</screen>
 

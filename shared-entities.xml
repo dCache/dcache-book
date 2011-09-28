@@ -19,6 +19,35 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!-- dCache-version -->
 <!ENTITY dcache-version          "1.9.12">
 
+<!-- dCache packages files in one of two different layouts.  These are
+     profiled in the documentation using the 'layout' attribute.  The
+     layout with files stored under the '/opt/d-cache' directory is
+     'opt' and the FHS-compliant layout is 'fhs'.  Short pieces of
+     text may be marked up with the generic DocBook 'phrase' markup:
+
+         <phrase layout='opt'>some /opt/d-cache specific text</phrase>
+         <phrase layout='fhs'>some FHS specific text</phrase>
+
+     The 'phrase' markup adds no semantics to the text, so may be used
+     for specifying any text that should appear for some specific layout.
+
+     The 'phrase' markup may not contain any block-level markup.  To
+     make block-level markup layout-specific, simply use the 'layout'
+     attribute in the block-level markup directly; for example
+
+         <para layout='opt'>
+             This paragraph appears only in the
+             &layout-opt; layout book.
+         </para>
+      -->
+
+<!-- The names of the different layouts -->
+<!ENTITY layout-fhs "FHS">
+<!ENTITY layout-opt "opt">
+<!-- The name of the layout that is currently being generated -->
+<!ENTITY layout-current "<phrase layout='fhs'>&layout-fhs;</phrase><phrase layout='opt'>&layout-opt;</phrase>">
+
+
 <!-- "Products" or high-level services -->
 <!ENTITY dcache       "<productname>dCache</productname>">
 <!ENTITY chimera      "<productname>Chimera</productname>">
@@ -212,10 +241,71 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY pi-fo-bgcolour-bg    "<?dbfo bgcolor='#FFFFFF'?>">
 
 <!-- Paths -->
-<!ENTITY install-base-opt "<filename class='directory'>/opt/d-cache</filename>">
 <!ENTITY ns-base "<filename class='directory'>/data</filename>">
 
-<!-- Files -->
-<!ENTITY file-authorized_keys "<filename class='directory'>&install-base-opt;/etc/authorized_keys</filename>">
+
+
+<!-- Profiled paths.
+
+     These are paths that describe the location of a file or directory when
+     the path is different depending on whether we are referring to the
+     opt-layout (/opt/d-cache/...) or the FHS layout.  For example, the
+     script 'dcache' is located either in '/opt/d-cache/bin' or '/usr/sbin'
+     depending on which layout dCache has been built for.
+
+     These entities provide a single compact way of representing the path
+     where the correct path is substituted automatically.  The entity contains
+     no sematic markup ('phrase' carries no meaning), so may be used in any
+     context.
+
+     The entity names have the following structure:
+
+         'path-' <opt label> '-' <FHS label> ['-s']
+
+     The two labels are either the first letter of the directories that make
+     up the path or a single 'n' (indicating "nothing"); for example:
+         '/opt/d-cache/etc' -> 'ode'
+         '/etc/dcache' -> 'ed'
+
+     For example, '&path-ode-ed;/dcache.conf' expands to
+     '/opt/d-cache/etc/dcache.conf' for the opt-layout and
+     '/etc/dcache/dcache.conf' for the FHS layout.
+
+     The final '-s' indicates that the path has a terminating slash for at
+     least one layout.  This is normally used with a 'n' label.
+
+     If a label is 'n' and there is also an 's' then the expansion for that
+     layout will be empty; for example '&path-odb-n-s;dcache' expands to
+     '/opt/d-cache/bin/dcache' for the opt-layout and to 'dcache' for the FHS
+     layout.
+
+     As a rule-of-thumb, entities defined here are the smallest path that
+     captures the differences; so, for example, the two paths
+         '/opt/d-cache/libexec/chimera/sql/create.sql and
+         '/usr/share/dcache/chimera/sql/create.sql'
+     are written as '&path-odl-usd;/chimera/sql/create.sql'
+-->
+<!ENTITY path-ode-ed "<phrase layout='opt'>/opt/d-cache/etc</phrase><phrase layout='fhs'>/etc/dcache</phrase>">
+<!ENTITY path-ods-usd "<phrase layout='opt'>/opt/d-cache/share</phrase><phrase layout='fhs'>/usr/share/dcache</phrase>">
+<!ENTITY path-odl-usd "<phrase layout='opt'>/opt/d-cache/libexec</phrase><phrase layout='fhs'>/usr/share/dcache</phrase>">
+<!ENTITY path-odc-ed "<phrase layout='opt'>/opt/d-cache/config/</phrase><phrase layout='fhs'>/etc/dcache/</phrase>">
+<!ENTITY path-odj-usdl "<phrase layout='opt'>/opt/d-cache/jobs</phrase><phrase layout='fhs'>/usr/share/dcache/lib</phrase>">
+<!ENTITY path-oddl-uld "<phrase layout='opt'>/opt/d-cache/dcap/lib</phrase><phrase layout='fhs'>/usr/lib/dcache</phrase>">
+
+<!ENTITY path-od-vld "<phrase layout='opt'>/opt/d-cache</phrase><phrase layout='fhs'>/var/lib/dcache</phrase>">
+<!ENTITY path-vl-vld "<phrase layout='opt'>/var/log</phrase><phrase layout='fhs'>/var/log/dcache</phrase>">
+
+<!ENTITY path-odb-n-s "<phrase layout='opt'>/opt/d-cache/bin/</phrase>">
+<!ENTITY path-oddb-n-s "<phrase layout='opt'>/opt/d-cache/dcap/bin/</phrase>">
+
+
+<!ENTITY file-authorized_keys "<filename class='directory'>&path-ode-ed;/authorized_keys</filename>">
+
+
+
+<!ENTITY path-odb-ub "<phrase layout='opt'>/opt/d-cache/bin/</phrase><phrase layout='fhs'>/usr/bin/</phrase>">
+<!ENTITY path-odb-us "<phrase layout='opt'>/opt/d-cache/bin/</phrase><phrase layout='fhs'>/usr/sbin/</phrase>">
+
+
 <!-- <!ENTITY ndash "&#x2013;"> -->
 

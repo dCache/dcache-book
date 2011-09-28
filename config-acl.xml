@@ -174,8 +174,8 @@
         files:
     </para>
 
-<screen>&prompt-root; <userinput>psql chimera &lt; /opt/d-cache/libexec/chimera/sql/addACLtoChimeraDB.sql</userinput>
-&prompt-root; <userinput>psql chimera &lt; /opt/d-cache/libexec/chimera/sql/pgsql-procedures.sql</userinput></screen>
+<screen>&prompt-root; <userinput>psql chimera &lt; &path-odl-usd;/chimera/sql/addACLtoChimeraDB.sql</userinput>
+&prompt-root; <userinput>psql chimera &lt; &path-odl-usd;/chimera/sql/pgsql-procedures.sql</userinput></screen>
   </section>
 
   <section id="cf-acl-dcachesetup">
