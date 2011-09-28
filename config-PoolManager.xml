@@ -896,13 +896,13 @@ STRING</screen>
            <para>
 	     With <command>save</command> the changes will be saved to
 	     the file
-	     <filename>&install-base-opt;/config/PoolManager.conf</filename>.
+	     <filename>&path-odc-ed;/PoolManager.conf</filename>.
 	   </para>
 
 	   <note>
 	     <para>
 	       You can also edit the file
-	       <filename>&install-base-opt;/config/PoolManager.conf</filename>
+	       <filename>&path-odc-ed;/PoolManager.conf</filename>
 	       to create a new link group. Please make sure that it
 	       already exists. Otherwise you will have to create it
 	       first via the Admin Interface by
@@ -911,7 +911,7 @@ STRING</screen>
 
 	     <para>
 	       Edit the file
-	       <filename>&install-base-opt;/config/PoolManager.conf</filename>
+	       <filename>&path-odc-ed;/PoolManager.conf</filename>
 	     </para>
 
 	     <screen><command>psu create linkGroup</command> <replaceable>linkgroup</replaceable>
