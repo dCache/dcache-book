@@ -14,7 +14,9 @@
   <xsl:include href="html-common.xsl"/>
 
   <xsl:template name="user.header.content">
-    <xsl:comment>#include virtual="&location-l3-template;"</xsl:comment>
+    <xsl:variable name="location" select="concat('/template/l3-docs-book-1.9.12-', $layout, '-header.shtml')"/>
+
+    <xsl:comment>#include virtual="<xsl:value-of select="$location"/>"</xsl:comment>
   </xsl:template>
 
   <xsl:template name="user.footer.content">
