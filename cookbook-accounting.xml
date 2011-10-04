@@ -55,24 +55,8 @@
     The accounting information can also be redirected into a
     database.
 
-<!-- For this the start-up configuration of the standard
-    admin node has to be modified. (See <xref
-    linkend="cf-cellpackage"/> for background information.) The
-    billing information is written by the <quote>billing</quote>
-    cell, which is started in the <quote>httpd</quote>
-    domain. Therefore, the corresponding
-    <command>create</command>-line in the
-    <filename>config/httpd.batch</filename> file has to be changed
-    to something like
-    <programlisting>create ... TODO: FILL</programlisting>
+    <!-- TODO: add information about database -->
     
-    TODO: Create Tables? Schema?
-    
-    After that, the <quote>httpd</quote> domain has to be restarted with
-    
-<screen><rootprompt/><replaceable>/opt/d-cache/</replaceable>jobs/httpd stop
-<rootprompt/><replaceable>/opt/d-cache/</replaceable>jobs/httpd -logfile=<replaceable>/opt/d-cache/</replaceable>log/httpd.log start</screen>-->
-
     When interested in this feature, please contact
     <email>support@dcache.org</email>.
   </para>
