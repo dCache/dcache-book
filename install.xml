@@ -11,12 +11,13 @@
 
   <title>Installing &dcache;</title>
 
+<!--
   <chapterinfo>
     <author>
       <firstname>Michael</firstname>
       <surname>Ernst</surname>
       <affiliation>
-        <shortaffil>FNAL</shortaffil>
+	<shortaffil>FNAL</shortaffil>
       </affiliation>
     </author>
 
@@ -45,6 +46,7 @@
     </author>
 
   </chapterinfo>
+-->
 
   <para>
     The first section describes the installation of a fresh &dcache;
@@ -275,7 +277,8 @@ CREATE TRIGGER
          <para>
           Several management components running on the head node as
           well as the &srm; will use the database
-          <database>dcache</database> for state information:
+          <database>dcache</database> for storing their state
+          information:
 	 </para>
 
 	 <screen>&prompt-root; <userinput>createdb -U srmdcache dcache</userinput></screen>
@@ -533,7 +536,6 @@ Starting dCacheDomain done</screen>
 [${host.name}Domain/pool]
 name=pool1
 path=/srv/dcache/pool1
-waitForFiles=${path}/data
 maxDiskSpace=2T</programlisting>
 
         <para>
@@ -559,15 +561,22 @@ maxDiskSpace=2T</programlisting>
 	</para>
 
 	 <para>
-	  In the example above the name of the pool is
-	  <literal>pool1</literal> and the pool has 2 Tebibytes.  The
-	  example pool waits for the data directory (<filename
-	  class='directory'>${path}/data</filename>) to become
-	  available.  The <literal>${path}</literal> will expand to
-	  the value of the <varname>path</varname> property, so the
-	  example <varname>waitForFiles</varname> value is always
-	  correct.
-	</para>
+	   In the example above the name of the pool is
+	   <literal>pool1</literal> and the pool has 2 Tebibytes.
+	 </para>
+
+<!--	 TODO: Find a place where to put this info
+         <para>
+	   <programlisting>waitForFiles=${path}/data</programlisting>
+	   The example pool waits for the data directory (<filename
+	   class='directory'>${path}/data</filename>) to become
+	   available.  The <literal>${path}</literal> will expand to
+	   the value of the <varname>path</varname> property, so the
+	   example <varname>waitForFiles</varname> value is always
+	   correct.
+	 </para>
+-->
+
       </informalexample>
 
        <note>
@@ -597,12 +606,10 @@ maxDiskSpace=2T</programlisting>
 [${host.name}Domain/pool]
 name=pool1
 path=/srv/dcache/pool1
-waitForFiles=${path}/data
 maxDiskSpace=2T
 [${host.name}Domain/pool]
 name=pool2
 path=/srv/dcache/pool2
-waitForFiles=${path}/data
 maxDiskSpace=2T</programlisting>
       </informalexample>
 
@@ -646,7 +653,6 @@ dcache.paths.billing=/var/log/dcache</programlisting>
 	  <programlisting>[${host.name}Domain/pool]
 name=pool1
 path=/path/to/pool1
-waitForFiles=${path}/data
 maxDiskSpace=2T</programlisting>
           <para>
 	    Change the ownership of the directory of the pool.
