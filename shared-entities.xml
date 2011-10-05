@@ -17,7 +17,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 -->
 
 <!-- dCache-version -->
-<!ENTITY dcache-version          "2.0">
+<!ENTITY dcache-version          "2.1">
 
 <!-- dCache packages files in one of two different layouts.  These are
      profiled in the documentation using the 'layout' attribute.  The

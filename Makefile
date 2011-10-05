@@ -1,7 +1,7 @@
 ######## Configuration
 #
 
-DCACHE_VERSION=2.0
+DCACHE_VERSION=2.1
 
 #
 #  This makefile supports multiple targets.  Currently we have only one.
