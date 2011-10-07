@@ -47,7 +47,7 @@ FO_DEPS = $(FO_FILES:%=.%.d)
 HTML_SINGLE_DEPS = $(HTML_SINGLE_FILES:%=.%.d)
 HTML_CHUNK_DEPS = $(SOURCES:%.xml=.%-chunk.d)
 HTML_COMMENTS_DEPS = $(SOURCES:%.xml=.%-comments.d)
-PROFILED_DEPS = $(PROFILED_SOURCES:%.xml=.%.d)
+PROFILED_DEPS = $(PROFILED_SOURCES:%.xml=.%.xml.d)
 
 EPUB_FILES = $(SOURCES:%.xml=%.epub) $(SOURCES:%.xml=%-fhs.epub)
 
@@ -313,4 +313,4 @@ distclean: clean
 .PHONY: clean distclean
 .PRECIOUS: $(FO_FILES)
 
--include $(DEP_FILES)
+include $(DEP_FILES)
