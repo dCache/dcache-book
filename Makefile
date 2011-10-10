@@ -44,9 +44,9 @@ TXT_FILES = $(SOURCES:%.xml=%.txt) $(SOURCES:%.xml=%-fhs.txt)
 
 FO_DEPS = $(FO_FILES:%=.%.d)
 HTML_SINGLE_DEPS = $(HTML_SINGLE_FILES:%=.%.d)
-HTML_CHUNK_DEPS = $(SOURCES:%.xml=.%-chunk.d)
-HTML_COMMENTS_DEPS = $(SOURCES:%.xml=.%-comments.d)
-PROFILED_DEPS = $(PROFILED_SOURCES:%.xml=.%.d)
+HTML_CHUNK_DEPS = $(SOURCES:%.xml=.%-chunk.d) $(SOURCES:%.xml=.%-fhs-chunk.d)
+HTML_COMMENTS_DEPS = $(SOURCES:%.xml=.%-comments.d) $(SOURCES:%.xml=.%-fhs-comments.d)
+PROFILED_DEPS = $(PROFILED_SOURCES:%.xml=.%.xml.d)
 
 EPUB_FILES = $(SOURCES:%.xml=%.epub) $(SOURCES:%.xml=%-fhs.epub)
 
@@ -66,7 +66,7 @@ WWW_TEST_LOCATION = /manuals/Book-1.9.12-test/
 # NB we don't do deps on txt as it depends on html-single output.  This
 #    is cheating, but hey, it works.
 
-DEP_FILES = $(FO_DEPS) $(HTML_SINGLE_DEPS) $(HTML_CHUNK_DEPS) $(PROFILED_DEPS)
+DEP_FILES = $(FO_DEPS) $(HTML_SINGLE_DEPS) $(HTML_CHUNK_DEPS) $(PROFILED_DEPS) $(HTML_COMMENTS_DEPS)
 
 
 ######### Common options
@@ -161,7 +161,7 @@ html-chunk: $(HTML_CHUNK_FILES)
 	$(XSLTPROC) $(XSLT_FLAGS) --stringparam html.ext "-comments.$(HTML_EXT)" --stringparam layout opt --stringparam base.dir $(@:%/index-comments.$(HTML_EXT)=%)/ --stringparam comments.enabled true xsl/html-chunk.xsl $<
 
 %/index-fhs-comments.$(HTML_EXT): %-fhs.xml $(STYLESHEETS_CHUNK) shared-entities.xml
-	$(XSLTPROC) $(XSLT_FLAGS) --stringparam html.ext "-comments-fhs.$(HTML_EXT)" --stringparam layout fhs --stringparam base.dir $(@:%/index-fhs-comments.$(HTML_EXT)=%)/ --stringparam comments.enabled true xsl/html-chunk.xsl $<
+	$(XSLTPROC) $(XSLT_FLAGS) --stringparam html.ext "-fhs-comments.$(HTML_EXT)" --stringparam layout fhs --stringparam base.dir $(@:%/index-fhs-comments.$(HTML_EXT)=%)/ --stringparam comments.enabled true xsl/html-chunk.xsl $<
 
 
 ###### Text only
@@ -296,20 +296,32 @@ distclean: clean
 .%-fhs.xml.d .%-opt.xml.d: %.xml
 	$(XSLTPROC) --nonet -stringparam output-file $(@:.%.d=%) --stringparam initial-file $< --stringparam graphics SVG --stringparam dep-file $@ dependency.xsl $< > $@
 
-.%-fhs-letter.fo.d .%-fhs-a4.fo.d: %.xml
+.%-letter.fo.d .%-a4.fo.d: %-opt.xml
 	$(XSLTPROC) --nonet -stringparam output-file $(@:.%.d=%) --stringparam initial-file $< --stringparam graphics SVG  --stringparam dep-file $@ dependency.xsl $< > $@
 
-.%-letter.fo.d .%-a4.fo.d: %.xml
+.%-fhs-letter.fo.d .%-fhs-a4.fo.d: %-fhs.xml
 	$(XSLTPROC) --nonet -stringparam output-file $(@:.%.d=%) --stringparam initial-file $< --stringparam graphics SVG  --stringparam dep-file $@ dependency.xsl $< > $@
 
-.%.$(HTML_EXT).d: %.xml
+.%.$(HTML_EXT).d: %-opt.xml
 	$(XSLTPROC) --nonet -stringparam output-file $(@:.%.d=%) --stringparam initial-file $< --stringparam graphics none --stringparam dep-file $@ dependency.xsl $< > $@
 
-.%-chunk.d: %.xml
-	$(XSLTPROC) --nonet -stringparam output-file $(@:.%-chunk.d=%/index.$(HTML_EXT)) --stringparam initial-file $< --stringparam graphics none --stringparam dep-file $@ dependency.xsl $< > $@
+.%-fhs.$(HTML_EXT).d: %-fhs.xml
+	$(XSLTPROC) --nonet -stringparam output-file $(@:.%.d=%) --stringparam initial-file $< --stringparam graphics none --stringparam dep-file $@ dependency.xsl $< > $@
+
+.%-chunk.d: %-opt.xml
+	$(XSLTPROC) --nonet -stringparam output-file $(@:.%.xml=%/index.$(HTML_EXT)) --stringparam initial-file $< --stringparam graphics none --stringparam dep-file $@ dependency.xsl $< > $@
+
+.%-fhs-chunk.d: %-fhs.xml
+	$(XSLTPROC) --nonet -stringparam output-file $(@:.%-fhs-chunk.d=%/index-fhs.$(HTML_EXT)) --stringparam initial-file $< --stringparam graphics none --stringparam dep-file $@ dependency.xsl $< > $@
+
+.%-comments.d: %-opt.xml
+	$(XSLTPROC) --nonet -stringparam output-file $(@:.%-comments.d=%/index-comments.$(HTML_EXT)) --stringparam initial-file $< --stringparam graphics none --stringparam dep-file $@ dependency.xsl $< > $@
+
+.%-fhs-comments.d: %-fhs.xml
+	$(XSLTPROC) --nonet -stringparam output-file $(@:.%-fhs-comments.d=%/index-fhs-comments.$(HTML_EXT)) --stringparam initial-file $< --stringparam graphics none --stringparam dep-file $@ dependency.xsl $< > $@
 
 .PHONY:	all pdf html html-single html-chunked
 .PHONY: clean distclean
 .PRECIOUS: $(FO_FILES)
 
--include $(DEP_FILES)
+include $(DEP_FILES)
