@@ -18,6 +18,8 @@
 <!ENTITY gp2-kpwd "<literal>kpwd</literal> plug-in">
 <!ENTITY gp2-x509 "<literal>x509</literal> plug-in">
 <!ENTITY gp2-voms "<literal>voms</literal> plug-in">
+<!ENTITY gp2-krb5 "<literal>krb5</literal> plug-in">
+<!ENTITY gp2-nsswitch "<literal>nsswitch</literal> plug-in">
 
 <!ENTITY auth "<literal>auth</literal>">
 <!ENTITY map "<literal>map</literal>">
@@ -747,6 +749,43 @@ session requisite authzdb</programlisting>
             other plug-ins.
           </para>
 
+        </section>
+        <section id="cf-gplazma-gp2-configuration-plug-ins-krb5">
+          <title>krb5</title>
+          <para>
+              The &gp2-krb5; is a &map; plug-in that stipes away kerberos
+              realm part of principal and uses remaining part as the UserNamePrincipal.
+        <informalexample>
+<literal>remote-user@KRB-DOMAIN.EXAMPLE.ORG</literal> to <literal>local-user</literal>
+        </informalexample>
+          </para>
+          <para>The result of &gp2-krb5; can be used by other plug-ins.</para>
+        </section>
+        <section id="cf-gplazma-gp2-configuration-plug-ins-nsswitch">
+          <title>nsswitch</title>
+            <para>
+              The &gp2-nsswitch; is a &map;, &identity; and &session; plug-in
+              which uses the system's <literal>nsswitch</literal> configuration to provide
+              user mapping as well as user and group forward and reverse map.
+            </para>
+            <para>
+              Typically &gp2-nsswitch; will be combined with &gp2-vorolemap;, &gp2-gridmap;
+              or &gp2-krb5;:
+        <informalexample>
+          <programlisting># Map grid users to local accounts
+auth    optional  x509 #1
+auth    optional  voms #2
+map     requisite vorolemap #3
+map     requisite nsswitch #4
+session requisite nsswitch #5</programlisting>
+        <para>
+          In this example following is happening: extract user's DN (1),
+          extract and verify VOMS attributes (2), map DN+Role to a local
+          account (3), extract uid and gids for a local account (4) and, 
+          finally, extract users home directory (5).
+        </para>
+        </informalexample>
+            </para>
         </section>
       </section>
     </section>
