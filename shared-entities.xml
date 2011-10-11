@@ -288,7 +288,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY path-ode-ed "<phrase layout='opt'>/opt/d-cache/etc</phrase><phrase layout='fhs'>/etc/dcache</phrase>">
 <!ENTITY path-ods-usd "<phrase layout='opt'>/opt/d-cache/share</phrase><phrase layout='fhs'>/usr/share/dcache</phrase>">
 <!ENTITY path-odl-usd "<phrase layout='opt'>/opt/d-cache/libexec</phrase><phrase layout='fhs'>/usr/share/dcache</phrase>">
-<!ENTITY path-odc-ed "<phrase layout='opt'>/opt/d-cache/config/</phrase><phrase layout='fhs'>/etc/dcache/</phrase>">
+<!ENTITY path-odc-ed "<phrase layout='opt'>/opt/d-cache/config</phrase><phrase layout='fhs'>/etc/dcache</phrase>">
 <!ENTITY path-odj-usdl "<phrase layout='opt'>/opt/d-cache/jobs</phrase><phrase layout='fhs'>/usr/share/dcache/lib</phrase>">
 <!ENTITY path-oddl-uld "<phrase layout='opt'>/opt/d-cache/dcap/lib</phrase><phrase layout='fhs'>/usr/lib/dcache</phrase>">
 
