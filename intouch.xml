@@ -339,6 +339,13 @@ Your proxy is valid until Thu Mar 31 21:49:06 2011</screen>
     </informalexample>
 
     <para>
+      Authentication and authorization in &dcache; is done by the
+      &serv-gplazma; service. Define this service in the layout file.
+    </para>
+    <programlisting>[gPlazmaDomain]
+[gPlazmaDomain/gplazma]</programlisting>
+
+    <para>
       In this tutorial we will use the <link
       linkend='cf-gplazma-plug-inconfig-vorolemap'>gplazmalite-vorole-mapping
       plugin</link>. To this end you need to edit the
@@ -385,19 +392,34 @@ gplazmalite-vorole-mapping-priority="1"
   <section id="intouch-sec-dcache">
     <title>How to work with secured &dcache;</title>
 
+    <para>
+      If you want to copy files into &dcache; with &gsidcap;, &srm; or
+      &webdav; with certificates you need to follow the instructions
+      in the section <link
+      linkend="intouch-certificates">above</link>.
+    </para>
+
     <section id="intouch-client-gsidcap">
       <title>&gsidcap;</title>
 
       <para>
-	To be able to use &gsidcap; you need to have
-	<systemitem>libdcap-tunnel-gsi</systemitem> installed, which
-	is contained in the &glite;-UI.
+	To use &gsidcap; you must run a &gsidcap; door. This is
+	achieved by including the &serv-gsidcap; service in your
+	layout file on the machine you wish to host the door.
+      </para>
+      <programlisting>[gsidcapDomain]
+[gsidcapDomain/gsidcap]</programlisting>
+
+      <para>
+	In addition, you need to have
+	<package>libdcap-tunnel-gsi</package> installed on your
+	worker node, which is contained in the &glite;-UI.
       </para>
 
       <note>
 	<para>
 	  As ScientificLinux 5  32bit is not supported by &glite; there is no
-	  <systemitem>libdcap-tunnel-gsi</systemitem> for SL5 32bit.
+	  <package>libdcap-tunnel-gsi</package> for SL5 32bit.
 	</para>
       </note>
 
@@ -444,10 +466,17 @@ gplazmalite-vorole-mapping-priority="1"
 	<title>&srm;</title>
 
 	<para>
-	  Or we let the &srm; negotiate the protocol.  To this end
-	  install the <systemitem>dcache-srmclient</systemitem> which
-	  is contained in the &glite;-UI and set the
-	  <envar>PATH</envar> environment variable.
+	  To use the &srm; you need to define the &serv-srm; service
+	  in your layout file.
+	</para>
+	<programlisting>[srmDomain]
+[srmDomain/srm]</programlisting>
+
+	<para>
+	  In addition, the user needs to install an &srm; client for
+	  example the <systemitem>dcache-srmclient</systemitem>, which
+	  is contained in the &glite;-UI, on the worker node and set
+	  the <envar>PATH</envar> environment variable.
 	</para>
 	<screen>&prompt-root; <userinput>yum install dcache-srmclient</userinput>
 &prompt-root; <userinput>export PATH=/opt/d-cache/srm/bin/:$PATH</userinput></screen>
