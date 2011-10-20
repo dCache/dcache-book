@@ -105,8 +105,8 @@
         <listitem>
           <para>
             &psql; must be installed and running. See <xref
-            linkend="cb-postgres-install"/> for more details. It is
-            strongly recommended to use version 8.3 or higher.
+            linkend="cb-postgres-install"/> for more details. &psql;
+            version 8.3 or later is required.
           </para>
         </listitem>
       </itemizedlist>
