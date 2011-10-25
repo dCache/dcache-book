@@ -674,7 +674,7 @@ cClass0<replaceable>CacheClass</replaceable>;hsm=<replaceable>StorageType</repla
 	  Admin Interface and run the following commands:
 	</para>
 	  <programlisting>[example.dcache.org] &dc-prompt-local; cd &cell-poolmngr;
-[example.dcache.org] &dc-prompt-pm; rc set stage on
+[example.dcache.org] &dc-prompt-pm; pm set -stage-allowed=yes
 [example.dcache.org] &dc-prompt-pm; save</programlisting>
         <para>
           A restart of the &domain-dcache; is not necessary in this case.
@@ -682,11 +682,12 @@ cClass0<replaceable>CacheClass</replaceable>;hsm=<replaceable>StorageType</repla
 
 	 <para>
 	   Alternatively, if the file
-	   <filename>&path-odc-ed;/PoolManager.conf</filename>
-	   does already exist you can add the entry
-	   <programlisting>rc set stage on</programlisting>
-	   and restart the
-	   &domain-dcache;.
+	   <filename>&path-odc-ed;/PoolManager.conf</filename> already
+	   exists then you can add the entry
+	 </para>
+	 <programlisting>pm set -stage allowed=yes</programlisting>
+	 <para>
+	   and restart the &domain-dcache;.
 	 </para>
 
 	 <warning>
