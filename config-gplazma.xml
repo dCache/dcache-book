@@ -233,19 +233,38 @@ saml-vo-mapping-cache-lifetime="60"</programlisting>
         <title>Configuring &voms; Attribute Validation</title>
 
         <para>
-          &voms; attribute validation in &cell-gplazma1; does not require
-          &voms; server certificates.  Instead the signature of an attribute is
-          checked against the CA Certificate that signed the &voms; server
-          certificate. To have &cell-gplazma1; validate the proxy attributes in
-          &dcache;, write configuration directories and <filename>*.lsc</filename>
-          files in <filename>/etc/grid-security/vomsdir</filename> for each
+          &voms; attribute validation in &cell-gplazma1; does not
+          require &voms; server certificates.  Instead the signature
+          of an attribute is checked against the CA Certificate that
+          signed the &voms; server certificate. To have
+          &cell-gplazma1; validate the proxy attributes in &dcache;,
+          write configuration directories and
+          <filename>*.lsc</filename> files in
+          <filename>/etc/grid-security/vomsdir</filename> for each
           authorized &voms; server according to <ulink
-              url="https://twiki.cern.ch/twiki/bin/view/LCG/VomsFAQforServiceManagers">
-            these instructions</ulink> and set the <varname>vomsValidation</varname>
-          in <filename>&path-ode-ed;/dcachesrm-gplazma.policy</filename> to
-          <literal>true</literal>.
+          url="https://twiki.cern.ch/twiki/bin/view/LCG/VomsFAQforServiceManagers">
+          these instructions</ulink> and set the
+          <varname>vomsValidation</varname> in
+          <filename>&path-ode-ed;/dcachesrm-gplazma.policy</filename>
+          to <literal>true</literal>.
         </para>
-
+	<note>
+	  <para>
+	    The legacy method of using <filename>*.pem</filename>
+	    files which contain the &voms; server certificates is
+	    still supported. To achieve this add the
+	    <filename>*.pem</filename> file which contains the
+	    certificate of the &voms; server to the directory
+	    <filename
+	    class='directory'>/etc/grid-security/vomsdir/</filename>.
+	  </para>
+	  <para>
+	    Note that it is recommended to use the
+	    <filename>*.lsc</filename> files for the &voms; attribute
+	    validation as with this method you don't need to keep the
+	    &voms; server certificate up to date.
+	  </para>
+	</note>
         <para>
           The default is to validate the attributes. In both cases there must
           be a non-empty <filename
