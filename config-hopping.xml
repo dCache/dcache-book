@@ -339,64 +339,21 @@ psu set link ocean-copy-link -p2ppref=100 -readpref=100 -writepref=0 -cachepref=
     </section>
 
     <section>
-      <title>File Hopping managed by the HoppingManager</title>
+      <title>File Hopping managed by the &cell-hopmngr;</title>
 
       <section>
 	<title>Starting the FileHopping Manager service</title>
 
 	<para>
-	  The &cell-hopmngr; is not automatically started in
-	  1.7.0. Please perform the following steps to get it started
-	  :
+	  Add the &serv-hopping; service to a domain in your layout
+	  file.
 	</para>
+	<programlisting>[anyDomain]
+[anyDomain/hopping]</programlisting>
 
-	<itemizedlist>
-	  <listitem>
-	    <!-- FIXME: don't create batch files -->
-	    <para>
-	      Create a file <filename>hopping.batch</filename> in the
-	      <filename>&path-ods-usd;/services</filename> directory with
-	      the following content :
-	    </para>
-
-	    <screen>    set printout default 3
-    set printout CellGlue none
-    onerror shutdown
-    #
-    check -strong setupFile
-    #
-    copy file:${setupFile} context:setupContext
-    #
-    #  import the variables into our $context.
-    #  don't overwrite already existing variables.
-    #
-    import context -c setupContext
-    #
-    #   Make sure we got what we need.
-    #
-    check -strong serviceLocatorPort serviceLocatorHost
-    #
-    create dmg.cells.services.RoutingManager  RoutingMgr
-    #
-    #   The LocationManager Part
-    #
-    create dmg.cells.services.LocationManager lm \
-           "${serviceLocatorHost} ${serviceLocatorPort}"
-    #
-    #
-    create diskCacheV111.services.FileHoppingManager HoppingManager \
-         "${config}/HoppingManager.conf -export"
-    #</screen>
-
-	  </listitem>
-
-	  <listitem>
-	    <para>
-	      Add the <literal>hopping</literal> service to a domain
-	      and restart the domain.
-	    </para>
-	  </listitem>
-	</itemizedlist>
+        <para>
+	  Restart the domain.
+	</para>
 
 	<para>
 	  Initially no rules are configured for the hopping
