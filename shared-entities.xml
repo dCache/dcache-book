@@ -130,6 +130,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY serv-gridftp         "<literal>gridftp</literal>">
 <!ENTITY serv-gsidcap         "<literal>gsidcap</literal>">
 <!ENTITY serv-gsi-pam         "<literal>gsi-pam</literal>">
+<!ENTITY serv-hopping         "<literal>hopping</literal>">
 <!ENTITY serv-httpd           "<literal>httpd</literal>">
 <!ENTITY serv-info            "<literal>info</literal>">
 <!ENTITY serv-kerbdcap        "<literal>kerberosdcap</literal>">
