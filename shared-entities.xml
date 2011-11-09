@@ -170,6 +170,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY xrootd   "<systemitem class='protocol'>xrootd</systemitem>">
 <!ENTITY nfs3     "<systemitem class='protocol'>NFSv3</systemitem>">
 <!ENTITY nfs4     "<systemitem class='protocol'>NFSv4.1</systemitem>">
+<!ENTITY nfs4-pnfs     "<systemitem class='protocol'>NFSv4.1/pNFS</systemitem>">
 <!ENTITY nfs      "<systemitem class='protocol'>NFS</systemitem>">
 <!ENTITY webdav   "<systemitem class='protocol'>WebDAV</systemitem>">
 <!ENTITY kerberos "<systemitem class='protocol'>Kerberos</systemitem>">
@@ -182,6 +183,11 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY rpm      "<acronym>RPM</acronym>">
 <!ENTITY p12      "<acronym>PKCS12</acronym>">
 
+<!-- Standard and rfc -->
+<!ENTITY posix      "<acronym>POSIX</acronym>">
+<!ENTITY rpcsec_gss "<acronym>RPCSEC_GSS</acronym>">
+
+
 <!-- Other network concepts -->
 <!ENTITY url      "<acronym>URL</acronym>">
 <!ENTITY surl     "<acronym>SURL</acronym>">
@@ -192,6 +198,9 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY true       "<emphasis>True</emphasis>">
 <!ENTITY false      "<emphasis>False</emphasis>">
 <!ENTITY no-default "<emphasis>Not set</emphasis>">
+<!ENTITY none       "<emphasis>NONE</emphasis>">
+<!ENTITY integrity  "<emphasis>INTEGRITY</emphasis>">
+<!ENTITY privacy    "<emphasis>PRIVACY</emphasis>">
 
 
 
@@ -213,6 +222,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY door-dcap     "<literal>&dcap; door</literal>">
 <!ENTITY door-gridftp  "<literal>&gridftp; door</literal>">
 <!ENTITY door-xrootd   "<literal>&xrootd; door</literal>">
+<!ENTITY door-nfs4     "<literal>&nfs4; door</literal>">
 
 
 <!-- Prompts when using the administrative interface -->

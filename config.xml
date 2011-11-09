@@ -32,6 +32,7 @@
   <!--  <xi:include href="config-central-flushing.xml"/> -->
   <xi:include href="config-gplazma.xml"/>
   <xi:include href="config-xrootd.xml"/>
+  <xi:include href="config-nfs.xml"/>
   <xi:include href="config-SRM.xml"/>
   <xi:include href="config-web-dcache.xml"/>
   <xi:include href="config-webadmin.xml"/>
