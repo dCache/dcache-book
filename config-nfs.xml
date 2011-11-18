@@ -133,8 +133,8 @@
       </para>
 
       <para>
-          All clients, pool nodes and node running &door-nfs; must have a valid kerberos
-          configuration. Each clients, pool node and node running &door-nfs; must
+          All clients, pool nodes and node running &door-nfs4; must have a valid kerberos
+          configuration. Each clients, pool node and node running &door-nfs4; must
           have a <filename>/etc/krb5.keytab</filename> with <literal>nfs</literal>
           service principal:
             <programlisting>nfs/host.domain@<replaceable>YOUR.REALM</replaceable></programlisting>
