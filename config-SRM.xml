@@ -162,7 +162,7 @@ srm://srm.cern.ch:8443/castor/cern.ch/cms/store/cmsfile23</programlisting>
 
       </section>
 
-      <section>
+      <section id="cf-srm-intro-spaceReservation">
 	<title>Space Management functions</title>
 
 	<para>
