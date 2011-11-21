@@ -3,7 +3,6 @@
                          "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
 <!ENTITY % sharedents SYSTEM "shared-entities.xml" >
 %sharedents;
-<!ENTITY x509 "X.509">
 
 <!ENTITY gp1-vorolemap "<literal>gplazmalite-vorole-mapping</literal> plug-in">
 <!ENTITY gp1-gridmap "<literal>grid-mapfile</literal> plug-in">
@@ -16,7 +15,7 @@
 <!ENTITY gp2-gridmap "<literal>gridmap</literal> plug-in">
 <!ENTITY gp2-argus "<literal>argus</literal> plug-in">
 <!ENTITY gp2-kpwd "<literal>kpwd</literal> plug-in">
-<!ENTITY gp2-x509 "<literal>x509</literal> plug-in">
+<!ENTITY gp2-x509 "&x509; plug-in">
 <!ENTITY gp2-voms "<literal>voms</literal> plug-in">
 
 <!ENTITY auth "<literal>auth</literal>">
