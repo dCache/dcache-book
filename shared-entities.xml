@@ -181,6 +181,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY ldif     "<acronym>LDIF</acronym>">
 <!ENTITY rpm      "<acronym>RPM</acronym>">
 <!ENTITY p12      "<acronym>PKCS12</acronym>">
+<!ENTITY x509     "<literal>X.509</literal>">
 
 <!-- Other network concepts -->
 <!ENTITY url      "<acronym>URL</acronym>">
