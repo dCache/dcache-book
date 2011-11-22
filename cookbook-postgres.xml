@@ -3,8 +3,9 @@
                          "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
 <!ENTITY % sharedents SYSTEM "shared-entities.xml" >
 %sharedents;
+<!ENTITY prompt-postgres   "<prompt>[postgres] #</prompt>">
 ]>
-    
+
 <chapter id="cb-postgres">
 
   <title>&psql; and &dcache;</title>
@@ -124,18 +125,16 @@ host    all         all         127.0.0.1/32      md5
 host    all         all         ::1/128           md5
 host    all         all         <replaceable>HostIP</replaceable>/32          md5</programlisting>
 
-      The server is made aware of this with
+      To make the server aware of this you need to reload the
+      configuration file as the user <literal>postgres</literal> by:
 
-<screen>&prompt-root; <userinput>pg_ctl reload</userinput></screen>
+<screen>&prompt-root; <userinput>su - postgres</userinput>
+&prompt-postgres; <userinput>pg_ctl reload</userinput></screen>
 
-      It can still be configured with the user <literal>postgres</literal>:
-
-<screen>&prompt-root; <userinput>su - postgres</userinput></screen>
-      
       And the password for e.g. the user <literal>pnfsserver</literal> can be
       set with
 
-<screen>&prompt-user; <userinput>psql template1 -c "ALTER USER pnfsserver WITH PASSWORD '<replaceable>yourPassword</replaceable>'"</userinput></screen>
+<screen>&prompt-postgres; <userinput>psql template1 -c "ALTER USER pnfsserver WITH PASSWORD '<replaceable>yourPassword</replaceable>'"</userinput></screen>
 
       The &pnfs; server is made aware of this password by changing the variable
       <varname>dbConnectString</varname> in the file
