@@ -213,7 +213,7 @@ saml-vo-mapping-priority="1"
 kpwd-priority="3"
 
 # dcache.kpwd
-kpwdPath="&path-ode-ed;/dcache.kpwd"
+kpwdPath="&path-ode-eg;/dcache.kpwd"
 
 # SAML-based grid VO role mapping
 mappingServiceUrl="https://fledgling09.fnal.gov:8443/gums/services/GUMSAuthorizationServicePort"
@@ -686,7 +686,7 @@ session requisite authzdb</programlisting>
                 <row>
                   <entry><varname>pwdfile</varname></entry>
                   <entry>Path to <filename>dcache.kpwd</filename></entry>
-                  <entry><filename>&path-ode-ed;/dcache.kpwd</filename></entry>
+                  <entry><filename>&path-ode-eg;/dcache.kpwd</filename></entry>
                 </row>
               </tbody>
             </tgroup>
@@ -1395,7 +1395,7 @@ authorize cms823 read-write 10823 7000 / /data/cms823 /</programlisting>
 
         <informalexample>
           <programlisting># dcache.kpwd
-kpwdPath="&path-ode-ed;/dcache.kpwd"</programlisting>
+kpwdPath="&path-ode-eg;/dcache.kpwd"</programlisting>
         </informalexample>
         <para>
           To maintain only one such file, make sure that this is the same
@@ -1753,7 +1753,7 @@ webdavBasicAuthentication=true</programlisting>
 map requisite kpwd
 session requisite kpwd</programlisting>
         <para>
-            The <filename>&path-ode-ed;/dcache.kpwd</filename> file is the place where you can specify the username/password record. It should contain the username and the password hash, as well as &uid;, &gid;, access mode and the home, root and fsroot directories:
+            The <filename>&path-ode-eg;/dcache.kpwd</filename> file is the place where you can specify the username/password record. It should contain the username and the password hash, as well as &uid;, &gid;, access mode and the home, root and fsroot directories:
         </para>
             <programlisting># set passwd
 passwd tanja 6a4cd089 read-write 500 100 / / /</programlisting>
@@ -1799,12 +1799,12 @@ gplazmalite-vorole-mapping-priority="2"
 # A valid path is required if corresponding switch is ON.
 
 # dcache.kpwd
-kpwdPath="&path-ode-ed;/dcache.kpwd"
+kpwdPath="&path-ode-eg;/dcache.kpwd"
 
 # #################################################################################
 # END</programlisting>
         <para>
-          The <filename>&path-ode-ed;/dcache.kpwd</filename> file would look like this:
+          The <filename>&path-ode-eg;/dcache.kpwd</filename> file would look like this:
         </para>
         <programlisting>version 2.1
 
