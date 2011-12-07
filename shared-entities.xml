@@ -289,6 +289,7 @@ Rules / Guidelines / Suggestions for adding new entities:
      are written as '&path-odl-usd;/chimera/sql/create.sql'
 -->
 <!ENTITY path-ode-ed "<phrase layout='opt'>/opt/d-cache/etc</phrase><phrase layout='fhs'>/etc/dcache</phrase>">
+<!ENTITY path-ode-eg "<phrase layout='opt'>/opt/d-cache/etc</phrase><phrase layout='fhs'>/etc/grid-security</phrase>">
 <!ENTITY path-ods-usd "<phrase layout='opt'>/opt/d-cache/share</phrase><phrase layout='fhs'>/usr/share/dcache</phrase>">
 <!ENTITY path-odl-usd "<phrase layout='opt'>/opt/d-cache/libexec</phrase><phrase layout='fhs'>/usr/share/dcache</phrase>">
 <!ENTITY path-odc-ed "<phrase layout='opt'>/opt/d-cache/config</phrase><phrase layout='fhs'>/etc/dcache</phrase>">
