@@ -43,7 +43,6 @@
 <!ENTITY nis "<literal>NIS</literal>">
 <!ENTITY ldap "<systemitem class='protocol'>LDAP</systemitem>">
 
-<!ENTITY voms "<productname>VOMS</productname>">
 <!ENTITY argus "<productname>ARGUS</productname>">
 <!ENTITY scas "<productname>SCAS</productname>">
 <!ENTITY gums  "<productname>GUMS</productname>">

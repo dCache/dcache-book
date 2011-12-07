@@ -65,6 +65,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY sunjvm       "<productname>Sun JVM</productname>">
 <!ENTITY glite        "<productname>gLite</productname>">
 <!ENTITY netty        "<productname>Netty</productname>">
+<!ENTITY voms "<productname>VOMS</productname>">
 
 <!-- Various domains -->
 <!ENTITY domain-http      "<literal>httpDomain</literal>">
@@ -298,6 +299,7 @@ Rules / Guidelines / Suggestions for adding new entities:
      are written as '&path-odl-usd;/chimera/sql/create.sql'
 -->
 <!ENTITY path-ode-ed "<phrase layout='opt'>/opt/d-cache/etc</phrase><phrase layout='fhs'>/etc/dcache</phrase>">
+
 <!ENTITY path-ods-usd "<phrase layout='opt'>/opt/d-cache/share</phrase><phrase layout='fhs'>/usr/share/dcache</phrase>">
 <!ENTITY path-odl-usd "<phrase layout='opt'>/opt/d-cache/libexec</phrase><phrase layout='fhs'>/usr/share/dcache</phrase>">
 <!ENTITY path-odc-ed "<phrase layout='opt'>/opt/d-cache/config</phrase><phrase layout='fhs'>/etc/dcache</phrase>">
