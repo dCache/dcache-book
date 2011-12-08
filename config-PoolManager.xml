@@ -280,7 +280,7 @@ This needs to be explained in the section on the Admin Interface:
        least one of the units is matched.
       </para>
 
-      <section>
+      <section id='cf-pm-links-units'>
 	<title>Types of Units</title>
 	<para>
 	  There are four types of units: network
