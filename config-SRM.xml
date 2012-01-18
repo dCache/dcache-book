@@ -9,34 +9,7 @@
 
   <title>&dcache; Storage Resource Manager </title>
 
-  <chapterinfo>
-    <authorgroup>
-      <author>
-	<firstname>Gerd</firstname>
-	<surname>Behrmann</surname>
-      </author>
-      <author>
-	<firstname>Dmitry</firstname>
-	<surname>Litvintsev</surname>
-      </author>
 
-      <author>
-	<firstname>Timur</firstname>
-	<surname>Perelmutov</surname>
-      </author>
-
-      <author>
-	<firstname>Vladimir</firstname>
-	<surname>Podstavkov</surname>
-      </author>
-    </authorgroup>
-  </chapterinfo>
-
-  <!--
-  <para>(We assume a basic knowledge of the functionality and terminology of
-  dCache. Pool, domain, cell, how to log into a cell, and execute
-  commands)</para>
-  -->
   <!--
      ##############################################################
      #            Introduction                                    #
@@ -50,530 +23,38 @@
       middleware components whose function is to provide dynamic space
       allocation and file management on shared storage components on
       the Grid. &srm;s support protocol negotiation and a reliable
-      replication mechanism. The &srm; specification standardizes the
-      interface, thus allowing for a uniform access to heterogeneous
-      storage elements.
+      replication mechanism. The <ulink
+      url="https://sdm.lbl.gov/srm-wg/doc/SRM.v2.2.html">&srm;
+      specification</ulink> standardizes the interface, thus allowing
+      for a uniform access to heterogeneous storage elements.
     </para>
 
-    <section>
-      <title>General &srm; Concepts </title>
+    <para>
+      The &srm; utilizes the Grid Security Infrastructure (&gsi;) for
+      authentication. The &srm; is a Web Service implementing a
+      published <acronym>WSDL</acronym> document. Please visit the
+      <ulink url="http://sdm.lbl.gov/srm-wg/"> &srm; Working Group
+      Page</ulink> to see the &srm; Version 1.1 and &srm; Version 2.2
+      protocol specification documents.
+    </para>
 
-      <para>
-	The &srm; interface consists of the five categories of functions:
-	Space Management, Data Transfer, Request Status, Directory and
-	Permission Functions. &srm; interface utilizes Grid Security
-	Infrastructure (&gsi;) for authentications. &srm; service is a
-	Web Service implementation of a published WSDL
-	document. Please visit the <ulink
-	url="http://sdm.lbl.gov/srm-wg/"> SRM Working Group
-	Page</ulink> to see the &srm; Version 1.1 and &srm; Version
-	2.2 protocol specification documents.
-      </para>
-
-      <section>
-	<title>&surl;s</title>
-
-	<para>
-	  &srm; defines a protocol name &srm;, and introduces a way to
-	  address the files stored in the &srm; managed storage by
-	  Site &url; of the format
-	  <literal>srm://&lt;host&gt;:&lt;port&gt;/[&lt;web service
-	  path&gt;?SFN=]&lt;path&gt;</literal>. Examples of the Site
-	  &url;s a.k.a. &srm; &url;s are:
-	</para>
-
-	<programlisting>srm://fapl110.fnal.gov:8443/srm/managerv2?SFN=//pnfs/fnal.gov/data/test/file1,
-srm://fapl110.fnal.gov:8443/srm/managerv1?SFN=/pnfs/fnal.gov/data/test/file2
-srm://srm.cern.ch:8443/castor/cern.ch/cms/store/cmsfile23</programlisting>
+    <para>
+      The &srm; protocol uses &http; over &gsi; as a transport.  The
+      &dcache; &srm; implementation added &https; as a transport
+      layer option. The main benefits of using &https; rather than &http;
+      over &gsi; is that &https; is a standard protocol and has
+      support for sessions, improving latency in case a client needs
+      to connect to the same server multiple times. The current
+      implementation does not offer a delegation service. Hence
+      <function>srmCopy</function> will not work with &srm; over
+      &https;. A separate delegation service will be added in a later
+      release.
+    </para>
 
 
-        <para>
-	  All &srm; functions that operate on files use Site &url;s
-	  (&surl;s) for file references.
-	</para>
-      </section>
 
-      <section>
-	<title>Data Transfer functions </title>
-
-	<para>
-	  There are three functions for performing data transfers in
-	  &srm;, namely srmPrepareToGet, srmPrepareToPut and
-	  srmCopy. These are &srm; Version 2.2 names, in &srm; Version
-	  1.1 they were called get, put and copy, but their roles were
-	  essentially the same. These functions take list of
-	  sources(srmPrepareToGet), destinations(srmPrepareToPut) or
-	  both (srmCopy). The role of the srmPrepareToGet function is
-	  to prepare the system for the receipt of the data into the
-	  given file names, to make sure that the system has enough
-	  space to store the files, that the user has sufficient
-	  privileges to create the files in the paths designated by
-	  the &surl;s. The purpose of the srmPrepareToPut function is
-	  to prepare the data stored in files, designated by the given
-	  &surl;s , that are already a part of the system for the
-	  network access; &srm; needs again to check that the user has
-	  sufficient privileges to access the files in the paths
-	  designated by the &surl;s.  One of the features of
-	  thesrmPrepareToGet and srmPrepareToPut functions is that
-	  they both support transfer protocol negotiation. This means
-	  that in case of both of these functions client supplies a
-	  list of supported transfer protocols and &srm; server
-	  computes the Transfer &url; in the first protocol from the
-	  list that it supports. Depending on the implementation the
-	  real action in the Storage System performed in response to
-	  this invocation may range from simple &surl; to &turl;
-	  translation to a Stage from Tape to Disk Cache and dynamic
-	  selection of the transfer host and transfer protocol
-	  depending on the protocol availability and current load on
-	  each of the transfer server load. It is a responsibility of
-	  the client to perform the transfer and to notify the &srm;
-	  that it is done with the files.  srmCopy function performs a
-	  copy between a local and a remote storage system, it is
-	  given a list of source – destination &url; pairs. At least one
-	  of the &url;s in each pair must be an &surl; of file in the
-	  &srm; system contacted with the srmCopy request. Second &url;
-	  can be a local or remote &surl; or &url; in some other
-	  transfer protocol. In case of srmCopy the &srm; system
-	  performs data transfer itself, without data ever flowing
-	  though the client’s computer.
-	</para>
-
-	<para>
-	  The Data Transfer functions are asynchronous, initial &srm;
-	  call leads to the start of the execution of the client’s
-	  request, and the functions return the request statuses, that
-	  contain unique request tokens, that can be used in
-	  subsequent calls for periodic polling of the status of the
-	  request. Once the &srm; completes the requests, and clients
-	  are done with the data transfers, clients notify the system
-	  that they are done with the files and are ready to release
-	  the associated resources, the client notifies the system by
-	  execution of the srmReleaseFiles in case of srmPrepareToGet
-	  or srmPutDone in case of srmPrepareToPut. In case of
-	  srmCopy, system knows when the transfer is competed and
-	  resources can be released, so it requires no special
-	  function at the end.
-	</para>
-
-	<para>
-	  Clients are free to cancel the requests at any time by
-	  execution of the srmAbortFiles or srmAbortRequest.
-	</para>
-
-      </section>
-
-      <section id="cf-srm-intro-spaceReservation">
-	<title>Space Management functions</title>
-
-	<para>
-	  &srm; Version 2.2 introduces a concept of space
-	  reservation. Space reservation is a promise by the storage
-	  system to make certain amount of storage space of certain
-	  type available for usage for a specified period of
-	  time. Space reservation is made using srmReserveSpace
-	  function. In case of successful reservation, a unique name,
-	  called space token is assigned to the reservation. Space
-	  token can be used during the transfer operations to tell the
-	  system to put the files being manipulated or transferred
-	  into an associated space reservation . A storage system
-	  ensures that the reserved amount of the disk space is indeed
-	  available, thus providing a guarantee that a client does not
-	  run out of space until all space promised by the reservation
-	  has been used. When files are deleted, the space is returned
-	  to the space reservation.
-	</para>
-
-	<para>
-	  A space reservation has a property called retention
-	  policy. Possible values of retention policy are Replica,
-	  Output and Custodial. The retention policy describes the
-	  quality of the storage service that will be provided for the
-	  data (files) stored in this space reservation. Replica
-	  corresponds to the lowest quality of the service, usually
-	  associated with storing a single copy of each file on the
-	  disk. Custodial is the highest quality service, usually
-	  interpreted as storage of the data on Tape. WLCG has decided
-	  not to use Output retention policy in its data grid. Output
-	  is an intermediate retention policy is stronger than Replica
-	  and weaker than Custodial, and in &dcache; Output retention
-	  policy will possibly be used for files managed by Resilient
-	  Manager, which will make several internal copies of each
-	  file, distributed on distinct instances of hardware. Once a
-	  file is written into a given space reservation, it inherits
-	  the reservation's retention policy.
-	</para>
-
-	<para>
-	  Another property of the space reservation is called access
-	  latency. The two values allowed are Nearline and
-	  Online. Nearline means that the data stored in this
-	  reservation are allowed to be stored in such a way that
-	  retrieving them might require storage system to perform
-	  additional preparatory steps (staging data from tape to a
-	  disk cache for example). Online means that data is readily
-	  available and it will not take long to start reading the
-	  date. In case of &dcache; Online means that there will always
-	  be a copy of the file on disk, while Nearline does not
-	  provide such guarantee. As with retention policy, once a
-	  file is written into a given space reservation, it inherits
-	  the reservation's access latency.
-	</para>
-
-	<para>
-	  DCache however only manages write space, i.e. only space on
-	  disk can be reserved and only for write operations. Once
-	  files are migrated to tape, and if no copy is required on
-	  disk, space used by these files is returned back into space
-	  reservation. When files are read back from tape and cached
-	  on disk, they are not counted as part of any space.  &srm;
-	  Space reservation can be assigned a non-unique description,
-	  then the description cab be used in the future to discover
-	  all space reservation with a given description.
-	</para>
-
-	<para>
-	  Properties of the &srm; Space Reservations can be discovered
-	  using SrmGetSpaceMetadata function. Space Reservations might
-	  be released with srmReleaseSpace. For a complete description
-	  of the available functions please see <ulink
-	  url="http://sdm.lbl.gov/srm-wg/doc/SRM.v2.2.html"> SRM
-	  Version 2.2 Specification</ulink>.
-	</para>
-
-      </section>
-
-
-      <section>
-	<title>Utilization of the Space Reservations for Data Storage </title>
-
-	<para>
-	  &srm; Version 2.2 srmPrepareToPut and srmCopy pull mode
-	  transfers allow the user to specify a space reservation
-	  token or a retention policy and an access latency. In the
-	  protocol, any of these values are optional, and it is up to
-	  the implementation to decide what to do, if these properties
-	  are not specified. The specification does however require
-	  that if a space reservation is given, then any access
-	  latency or retention policy specified must match the same
-	  properties of the space reservation.
-	</para>
-      </section>
-
-      <section>
-	<title>Directory functions</title>
-	<para>
-	  Starting from &srm; Version 2.2, interface provides a
-	  complete set of the directory management functions. These
-	  are srmLs, srmRm, srmMkDir, srmRmDir and srmMv.
-	</para>
-      </section>
-
-      <section>
-	<title>Permission functions </title>
-	<para>
-	  &srm; Version 2.2 support the following three space
-	  permission functions, srmGetPermission, srmCheckPermission
-	  and srmSetPermission. &dcache; contains a rudimentary
-	  implementation of these functions that mostly allow setting
-	  and checking of the Unix file permission.
-	</para>
-      </section>
-    </section>
-
-    <section>
-      <title>The &cell-srm; service</title>
-
-      <para>
-	&dcache; &cell-srm; is implemented as a Web Service Interface running
-	on a &jetty; application server and an
-	<productname>Axis</productname> Web Services
-	engine. The &jetty; server is executed as a cell,
-	embedded in &dcache; and started automatically by the &cell-srm; service.
-	Other cells started automatically by &cell-srm; are for instance
-	&cell-spacemngr;, &cell-pinmngr; and &cell-remotegsitransfermngr;.
-	Of these services only &cell-srm; and &cell-spacemngr; require special
-	configuration.
-      </para>
-    </section>
-
-    <section>
-      <title>&dcache; specific concepts </title>
-
-      <section>
-	<title>Link Groups</title>
-
-	<para>
-	  &dcache; 1.8 &cell-poolmngr; supports new type of objects
-	  called <firstterm>LinkGroups</firstterm>. Each link group corresponds to
-	  a number of &dcache; pools in the following way: A LinkGroup is a
-	  collection of Links, each of which is a collection of
-	  the PoolGroups associated (Linked, hence a name <quote>Link</quote>) with
-	  a set of the Pool Selection Units or PSUs. Each link group
-	  knows about its available size, which is a sum of all
-	  available sizes in all the pools included in this link
-	  group. In addition link group has 5 boolean properties
-	  called replicaAllowed, outputAllowed, custodialAllowed,
-	  onlineAllowed and nearlineAllowed, the values of these
-	  properties (true or false) can be configured in
-	  <filename>PoolManager.conf</filename>.
-         </para>
-      </section>
-
-      <section>
-	<title>Space Reservations </title>
-
-	<para>
-	  In &dcache; 1.8 each &srm; Space Reservation is made against
-	  the total available disk space of a particular link
-	  group. The total space in &dcache; that can be reserved is the
-	  sum of the available sizes of all Link Groups. If &dcache; is
-	  configured correctly each byte of disk space, that can be
-	  reserved, belongs to one and only one Link Group. Therefore
-	  it is important to make sure that no pool belongs to more
-	  than one pool group, no Pool Group belongs to more than one
-	  Link and no Link belongs to more than one LinkGroup.
-	</para>
-
-	<para>
-	  Files written into a space made within a particular link
-	  group will end up on one of the pools referred to by this
-	  link group.  The difference between the Link Group's
-	  available space and the sum of all the current space
-	  reservation sizes is the available space in the link group.
-	</para>
-      </section>
-
-      <section>
-	<title>Explicit and Implicit Space Reservations for Data Storage in &dcache; </title>
-
-	<para>
-	  In &dcache;, if a space reservation is specified, the file
-	  will be stored in it (assuming the user has permission to do
-	  so in the name space).
-	</para>
-
-	<para>
-	  If the reservation token is not specified, and implicit
-	  space reservation is enabled, then a space reservation will
-	  be performed implicitly for each &srm; v1.1 and &srm; 2.2
-	  srmPrepareToPut or srmCopy in pull mode. If an Access
-	  Latency and a Retention Policy are specified, the user
-	  defined retention policy and default access latency. If the
-	  user has not specified Access Latency or Retention Policy
-	  (or if &srm; v1.1 is used) , the system will attempt to
-	  extract special tags (not surprisingly called
-	  <quote>AccessLatency</quote> and <quote>RetentionPolicy</quote>) from PNFS namespace
-	  from the directory to which file is being written. If the
-	  tags are present, then their values will determine the
-	  default Access Latency or Retention Policy that will be used
-	  for implicit space reservations. If the tags are not
-	  present, then system wide defaults will be used. If no
-	  implicit space reservation can be made, the transfer will
-	  fail. (Note: some clients also have default values, which
-	  are used when not explicitly specified by the user. I this
-	  case server side defaults will have no effect. )
-	</para>
-
-	<para>
-	  If the implicit space reservation is not enabled in &dcache;
-	  1.8 the pools in the link groups will be excluded from
-	  consideration and only the remaining pools will be
-	  considered to be the candidates for storing the incoming
-	  data, and classical pool selection mechanism will be
-	  used. If the space reservation is not used and no LinkGroups
-	  are specified, the system behavior will be exactly the same
-	  as in &dcache; 1.7.
-	</para>
-      </section>
-
-      <section>
-	<title>&cell-spacemngr; access control</title>
-
-	<para>
-	  When &srm; Space Reservation request is executed, its
-	  parameters, such as reservation size, lifetime, access
-	  latency and retention policy as well as user's Virtual
-	  Organization (VO) membership information is forwarded to the
-	  &srm; &cell-spacemngr;.
-	</para>
-
-	<para>
-	  &cell-spacemngr; uses a special file for listing all the
-	  Virtual Organizations (VOs) and all the VO Roles that are
-	  permitted to make reservations in the given link group. List
-	  of the allowed VOs and VO Roles, together with the total
-	  available space and replicaAllowed, outputAllowed,
-	  custodialAllowed, onlineAllowed and nearlineAllowed
-	  properties of the group is than matched against the
-	  information from the user request in order to determine if a
-	  given space reservation can be made in particular link
-	  group.  Once a space reservation is created, no access
-	  control is performed, any user can attempt to store the
-	  files in this space reservation, provided he or she knows
-	  the exact space token.
-	</para>
-      </section>
-    </section>
   </section>
 
-  <!--
-     ##############################################################
-     #            Choosing The right hardware                     #
-     ##############################################################
-   -->
-
-  <section id="cf-srm-hrd-os">
-    <title>Choosing The right hardware and OS for the &srm; node</title>
-
-    <section>
-      <title>Hardware</title>
-
-      <para>
-	We recommend to install &dcache; &srm; server on a separate node
-	with sufficient memory and a fast disk optimized for database
-	application.  For example Fermilab US-CMS T1 site uses the
-	following hardware for &srm; node.  Dual Intel Xeon Duo, 4 GB
-	RAM, 3ware raid disk array.
-      </para>
-    </section>
-
-    <section>
-      <title>Operating System</title>
-
-      <para>
-	Latest Scientific Linux or RHEL would do.
-      </para>
-
-      <para>
-	The kernel.shmmax=1073741824 and kernel.shmall=1073741824  kernel parameters
-	should be set for a 4GB RAM Machine. This can be accomplished by running:
-      </para>
-
-      <screen>&prompt-root; <userinput>echo 'kernel.shmmax=1073741824' >>  /etc/sysctl.conf</userinput>
-&prompt-root; <userinput>echo 'kernel.shmall=1073741824' >>  /etc/sysctl.conf</userinput>
-&prompt-root; <userinput>/bin/sysctl -p</userinput></screen>
-
-      <para>
-	The exact content of US-CMS T1 &srm;
-	<filename>sysctl.conf</filename> is:
-      </para>
-
-      <programlisting>kernel.core_uses_pid = 1
-kernel.sysrq = 1
-kernel.panic = 60
-fs.file-max = 131072
-net.ipv4.ip_forward = 0
-vm.vfs_cache_pressure = 10000
-# Keep this amount of memory free for emergency, IRQ and atomic allocations.
-vm.min_free_kbytes = 65535
-# Network tune parameters
-net.ipv4.tcp_timestamps = 0
-net.ipv4.tcp_sack = 0
-net.ipv4.tcp_window_scaling = 1
-kernel.shmmax=1073741824
-kernel.shmall=1073741824</programlisting>
-
-    </section>
-  </section>
-
-  <!--
-     ##############################################################
-     #            Configuring Postgres Database                   #
-     ##############################################################
-   -->
-
-  <section id="cf-srm-psql">
-    <title>Configuring the Postgres Database</title>
-
-    <para>
-      Install the latest &psql; database from <ulink
-      url="http://www.postgresql.org/download/">PostgreSQL web
-      site</ulink>.  While some like RPMs, others find that they have
-      100% guarantee of compatibility of the software only if they
-      build it locally from sources. In later case source rpms or
-      archive of sources are available.
-    </para>
-
-    <para>
-      We highly recommend to make sure that &psql; database files are
-      stored on a separate disk that is not used for anything else
-      (not even &psql; logging).  BNL Atlas Tier one observed a great
-      improvement in srm-database communication performance after they
-      deployed postgres on a separate dedicated machine.
-    </para>
-
-    <para>
-      To provide seamless local access to the database please make the
-      following modifications:
-    </para>
-
-    <para>
-      The file <filename>/var/lib/pgsql/data/pg_hba.conf</filename>
-      should contain the following lines
-    </para>
-
-    <programlisting>local   all         all                        trust
-host    all         all         127.0.0.1/32   trust
-host    all         all         ::1/128        trust</programlisting>
-
-    <para>
-      If &srm; or srm monitoring is going to be installed on a
-      separate node, you need to add entry for this node as well:
-    </para>
-
-    <programlisting>host    all         all       <replaceable>monitoring node</replaceable>    trust
-host    all         all       <replaceable>srm node</replaceable>    trust</programlisting>
-
-    <para>
-     The <filename>postgresql.conf</filename> should contain the following:
-    </para>
-
-    <programlisting>#to enable network connection on the default port
-max_connections = 100
-port = 5432
-...
-shared_buffers = 114688
-...
-work_mem = 10240
-...
-#to enable autovacuuming
-stats_row_level = on
-autovacuum = on
-autovacuum_vacuum_threshold = 500  # min # of tuple updates before
-                                   # vacuum
-autovacuum_analyze_threshold = 250      # min # of tuple updates before
-                                        # analyze
-autovacuum_vacuum_scale_factor = 0.2    # fraction of rel size before
-                                        # vacuum
-autovacuum_analyze_scale_factor = 0.1   # fraction of rel size before
-#
-# setting vacuum_cost_delay might be useful to avoid
-# autovacuum penalize general performance
-# it is not set in US-CMS T1 at Fermilab
-#
-# In IN2P3 add_missing_from = on
-# In Fermilab it is commented out
-
-# - Free Space Map -
-max_fsm_pages = 500000
-
-# - Planner Cost Constants -
-effective_cache_size = 16384            # typically 8KB each</programlisting>
-
-     <para>
-       To enable &dcache; &srm; components access to the database
-       server with the user <database class='user'>srmdcache</database>:
-     </para>
-
-     <screen>&prompt-root; createuser -U postgres --no-superuser --no-createrole --createdb --pwprompt srmdcache</screen>
-
-     <para>
-       &srm; will use the database <database>dcache</database> for
-       storing its state information:
-     </para>
-
-     <screen>&prompt-root; createdb -U srmdcache dcache</screen>
-  </section>
 
   <!--
      ##############################################################
@@ -582,79 +63,1145 @@ effective_cache_size = 16384            # typically 8KB each</programlisting>
    -->
 
   <section id="cf-srm-srm">
-    <title>Configuring the &cell-srm; service</title>
-
-    <para>
-    Like other services, he &cell-srm; service can be enabled in the layout-file of
-    your &dcache; installation. For an overview of the layout file
-    format, please see <xref linkend="in-install-layout" />.
-    </para>
-
-    <informalexample>
-
-    <para>
-    For instance, to enable a &srm; door in a separate
-    <replaceable>srm-${host.name}Domain</replaceable> in &dcache;,
-    add the following lines to your layout file:
-    </para>
-
-    <programlisting>[<replaceable>srm-${host.name}Domain</replaceable>]
-[<replaceable>srm-${host.name}Domain</replaceable>/srm]</programlisting>
-    </informalexample>
+    <title>Configuring the &serv-srm; service</title>
 
     <section>
-    <title>Important &cell-srm; configuration options</title>
+      <title>The Basic Setup</title>
 
       <para>
-      The defaults for the configuration parameters for the &cell-srm; service can be found in
-      <filename>&path-ods-usd;/defauls/dcache.properties</filename>.
+	Like other services, the &serv-srm; service can be enabled in
+	the layout file
+	<filename>&path-ode-ed;/layouts/<replaceable>mylayout</replaceable></filename>
+	of your &dcache; installation. For an overview of the layout
+	file format, please see <xref linkend="in-install-layout" />.
+      </para>
 
-      If you want to modify parameters, copy them to
-      <filename>&path-ode-ed;/dcache.conf</filename>
-      and update their value.
+      <informalexample>
+
+	<para>
+	  To enable &srm; in a separate
+	  <replaceable>srm-${host.name}Domain</replaceable> in
+	  &dcache;, add the following lines to your layout file:
+	</para>
+
+	<programlisting>[<replaceable>srm-${host.name}Domain</replaceable>]
+[<replaceable>srm-${host.name}Domain</replaceable>/srm]</programlisting>
+      </informalexample>
+
+      <para>
+	The use of the &serv-srm; service requires an authentication
+	setup, see <xref linkend='cf-gplazma' /> for a general
+	description or <xref linkend='intouch-certificates' /> for an
+	example setup with &x509; certificates.
+      </para>
+
+        <para>
+	  You can now copy a file into your &dcache; using the &srm;,
+	</para>
+
+	<note>
+	  <para>
+	    Please make sure to use latest srmcp client otherwise you
+	    will need to specify <literal>-2</literal> in order to use
+	    the right version.
+	  </para>
+	</note>
+
+	<screen>&prompt-user; <userinput>srmcp file:////bin/sh srm://<replaceable>dcache.example.org</replaceable>:<replaceable>8443</replaceable>/data/world-writable/srm-test-file</userinput></screen>
+	<para>
+	  copy it back
+	</para>
+	<screen>&prompt-user; <userinput>srmcp srm://<replaceable>dcache.example.org</replaceable>:<replaceable>8443</replaceable>/data/world-writable/srm-test-file file:////tmp/srmtestfile.tmp</userinput></screen>
+
+	<para>
+	  and delete it
+	</para>
+
+	<screen>&prompt-user; <userinput>srmrm srm://<replaceable>dcache.example.org</replaceable>:<replaceable>8443</replaceable>/data/world-writable/srm-test-file</userinput></screen>
+
+    </section>
+
+
+    <section>
+    <title>Important &serv-srm; configuration options</title>
+
+      <para>
+	The defaults for the following configuration parameters can be
+	found in the <filename>.properties</filename> files in the
+	directory <filename
+	class='directory'>&path-ods-usd;/defaults</filename>.
       </para>
 
       <para>
-        This section explains the most important &cell-srm; configuration parameters
-        in detail.
+	If you want to modify parameters, copy them to
+	<filename>&path-ode-ed;/dcache.conf</filename> or to your
+	layout file
+	<filename>&path-ode-ed;/layouts/<replaceable>mylayout</replaceable></filename>
+	and update their value.
       </para>
 
-      <programlisting>srmVacuum=false
+      <informalexample>
+	<para>
+	  Change the value for <literal>srmDatabaseHost=localhost</literal> in
+	  the layout file.
+	</para>
+
+	<programlisting>[<replaceable>srm-${host.name}Domain</replaceable>]
+[<replaceable>srm-${host.name}Domain</replaceable>/srm]
+srmDatabaseHost=hostname</programlisting>
+      </informalexample>
+
+      <para>
+	In the file
+	<filename>&path-ods-usd;/defaults/srm.properties</filename>
+	you will find the default values
+      </para>
+
+      <programlisting># ---- Database name
 srmDbName=dcache
+
+# ---- Database user name
 srmDbUser=srmdcache</programlisting>
 
       <para>
-	Make sure that both <varname>srmCopyReqThreadPoolSize</varname> and
-	<varname>remoteGsiftpMaxTransfers</varname> are set to the same values and the
-	common value should be the roughly equal to the maximum number
-	of the &srm; - to -&srm; copies your system can sustain.  So
-	if you think about 3 gridftp transfer per pool and you have 30
-	pools than the number should be 3x30=90.
+	The defaults for the configuration parameters for the
+	&cell-srm; service can be found in
+	<filename>&path-ods-usd;/defaults/dcache.properties</filename>.
       </para>
+
+      <programlisting>srmCopyReqThreadPoolSize=250
+remoteGsiftpMaxTransfers=${srmCopyReqThreadPoolSize}</programlisting>
+
+      <para>
+	If you want to modify these values make sure that both
+	<varname>srmCopyReqThreadPoolSize</varname> and
+	<varname>remoteGsiftpMaxTransfers</varname> are set to the
+	same values.  The common value should be the roughly equal to
+	the maximum number of the &srm; - to -&srm; copies your system
+	can sustain.
+      </para>
+      <informalexample>
+	<para>
+	  So if you think about 3 gridftp transfers per pool and you
+	  have 30 pools then the number should be 3x30=90.
+	</para>
 
       <programlisting>srmCopyReqThreadPoolSize=90
 remoteGsiftpMaxTransfers=90</programlisting>
+      </informalexample>
 
-      <para>
-	Note US-CMS T1 has:
-      </para>
+      <informalexample>
+	<para>
+	  US-CMS T1 has:
+	</para>
 
-      <programlisting>srmCopyReqThreadPoolSize=2000
+	<programlisting>srmCopyReqThreadPoolSize=2000
 remoteGsiftpMaxTransfers=2000</programlisting>
+      </informalexample>
 
      <note>
         <para>
-        &cell-srm; might produce a lot of log entries, especially if it run in
-        debug mode. The need to run &cell-srm; in debug mode is greatly
-        reduced if &srm; monitoring is installed. It is recommended to
-        make sure that logs are redirected into a file on large
+        &cell-srm; might produce a lot of log entries, especially if
+        it runs in debug mode. The need to run &cell-srm; in debug
+        mode is greatly reduced if <link linkend="cf-srm-monitor">
+        &srm; monitoring</link> is installed. It is recommended to
+        make sure that logs are redirected into a file on a large
         disk.
         </para>
-    </note>
+     </note>
+    </section>
+
+  </section>
+
+
+      <section>
+	<title>Utilization of Space Reservations for Data Storage</title>
+
+	<para>
+	  &srm; version 2.2 introduced a concept of space
+	  reservation. Space reservation guarantees that the requested
+	  amount of storage space of a specified type is made
+	  available by the storage system for a specified amount of
+	  time.
+	</para>
+
+	<para>
+	  The &dcache; administrator can make space reservations for
+	  VOs (see <xref linkend='cf-srm-space' />. Each space
+	  reservation has an associated ID (or space token). VOs then
+	  can copy directly into space tokens assigned to them by the
+	  dcache administrator.
+	</para>
+	<para>
+	  When a file is about to be transferred to a storage system,
+	  the space available in the space reservation is checked if
+	  it can accomodate the entire file. If yes, this chunk of
+	  space is marked as allocated, so that it can not be taken by
+	  another, concurrently transferred file. If the file is
+	  transferred successfully the allocated space becomes used
+	  space within the space reservation, else the allocated space
+	  is released back to the space reservation.
+	</para>
+	<para>
+	  &srm; space reservation can be assigned a non-unique
+	  description which can be used to query the system for space
+	  reservations with a given description.
+	</para>
+
+	<para>
+	  &dcache; only manages write space, i.e. space on disk can be
+	  reserved only for write operations. Once files are migrated
+	  to tape, and if no copy is required on disk, space used by
+	  these files is returned back into space reservation. When
+	  files are read back from tape and cached on disk, they are
+	  not counted as part of any space.
+	</para>
+
+      <section id="cf-srm-intro-spaceReservation">
+	<title>Properties of Space Reservation</title>
+
+	<para>
+	  The administrator can specify a
+	  <firstterm><literal>RetentionPolicy</literal></firstterm>
+	  and an
+	  <firstterm><literal>AccessLatency</literal></firstterm> for
+	  the space reservation.
+	</para>
+	<para>
+	  <literal>RetentionPolicy</literal> describes the quality of
+	  the storage service that will be provided for the data
+	  (files) stored in this space reservation and
+	  <literal>AccessLatency</literal> describes the availability
+	  of this data. The specification requires that if a space
+	  reservation is given, then the specified
+	  <literal>RetentionPolicy</literal> or
+	  <literal>AccessLatency</literal> must match those of the
+	  space reservation.
+	</para>
+
+	<para>
+	  The default values for the
+	  <literal>RetentionPolicy</literal> and
+	  <literal>AccessLatency</literal> can be changed in the file
+	  <filename>&path-ode-ed;/dcache.conf</filename>.
+	</para>
+
+
+	<variablelist>
+	  <varlistentry><term><literal>RetentionPolicy</literal></term>
+	  <listitem>
+
+	    <para>
+	      The values of <literal>RetentionPolicy</literal>
+	      used in &dcache; are <literal>REPLICA</literal> and
+	      <literal>CUSTODIAL</literal>.
+	    </para>
+
+	    <itemizedlist>
+	      <listitem>
+		<para>
+		  <literal>REPLICA</literal> corresponds to the lowest
+		  quality of the service, usually associated with
+		  storing a single copy of each file on the disk.
+		</para>
+	      </listitem>
+
+	      <listitem>
+		<para>
+		  <literal>CUSTODIAL</literal> is the highest quality
+		  service, usually interpreted as storage of the data
+		  on tape.
+		</para>
+	      </listitem>
+	    </itemizedlist>
+
+	    <para>
+	      Once a file is written
+              into a given space reservation, it inherits the
+              reservation's <literal>RetentionPolicy</literal>.
+	    </para>
+
+	    <para>
+	      If the space reservation request does not specify a
+	      retention policy we will assign
+	      <varname>DefaultRetentionPolicy</varname> a retention
+	      policy by default. The default value is
+	      <literal>CUSTODIAL</literal>.
+	    </para>
+	    <para>
+	      Edit the file
+	      <filename>&path-ode-ed;/dcache.conf</filename> to change
+	      the default value.
+	    </para>
+
+	    <informalexample>
+	      <para>
+		Change the default value to
+		<literal>REPLICA</literal>.
+	      </para>
+	      <programlisting>DefaultRetentionPolicy=REPLICA</programlisting>
+	    </informalexample>
+
+	  </listitem>
+	  </varlistentry>
+
+	  <varlistentry><term><literal>AccessLatency</literal></term>
+	  <listitem>
+	  <para>
+	    The two values allowed for
+	    <literal>AccessLatency</literal> are
+	    <literal>NEARLINE</literal> and <literal>ONLINE</literal>.
+	  </para>
+
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+		<literal>NEARLINE</literal> means that data stored in
+		this reservation is allowed to migrate to permanent
+		media. Retrieving these data may result in delays
+		associated with preparatory steps that the storage
+		system has to perform to make these data available for
+		the user I/O (e.g., staging data from tape to a disk
+		cache).
+	      </para>
+	    </listitem>
+
+	    <listitem>
+	      <para>
+		<literal>ONLINE</literal> means that data is readily
+		available allowing for faster access.
+	      </para>
+	    </listitem>
+	  </itemizedlist>
+
+	  <para>
+	    In case of &dcache; <literal>ONLINE</literal> means that
+	    there will always be a copy of the file on disk, while
+	    <literal>NEARLINE</literal> does not provide such
+	    guarantee. As with <literal>RetentionPolicy</literal>,
+	    once a file is written into a given space reservation, it
+	    inherits the reservation's
+	    <literal>AccessLatency</literal>.
+	  </para>
+
+	    <para>
+	      If a space reservation request does not specify an
+	      access latency we will assign
+	      <varname>SpaceManagerDefaultAccessLatency</varname> an
+	      access latency by default. The default value is
+	      <literal>NEARLINE</literal>.
+	    </para>
+
+	    <para>
+	      Edit the file
+	      <filename>&path-ode-ed;/dcache.conf</filename> to change
+	      the default value.
+	    </para>
+
+	    <informalexample>
+	      <para>
+		Change the default value to <literal>ONLINE</literal>.
+	      </para>
+	      <programlisting>SpaceManagerDefaultAccessLatency=ONLINE</programlisting>
+	    </informalexample>
+
+	  </listitem>
+	  </varlistentry>
+	</variablelist>
+
+	<important>
+	  Please make sure to use capital letters for
+	  <literal>REPLICA</literal>, <literal>CUSTODIAL</literal>,
+	  <literal>ONLINE</literal> and <literal>NEARLINE</literal>
+	  otherwise you will receive an error message.
+	</important>
+
+      </section>
 
     </section>
 
+
+
+    <section>
+      <title>&dcache; specific concepts </title>
+
+
+    <section>
+      <title>Activating &srm; &cell-spacemngr;</title>
+
+      <para>
+	In order to enable the &srm; &cell-spacemngr; you need to add
+	the &serv-spacemngr; service to your layout file
+      </para>
+
+      <programlisting>[<replaceable>srm-${host.name}Domain</replaceable>]
+[<replaceable>srm-${host.name}Domain</replaceable>/srm]
+[<replaceable>srm-${host.name}Domain</replaceable>/spacemanager]</programlisting>
+
+
+      <para>
+	and add (uncomment) the following definition in the file
+	<filename>&path-ode-ed;/dcache.conf</filename>
+      </para>
+
+      <programlisting>srmSpaceManagerEnabled=yes</programlisting>
+
     </section>
+
+      <section>
+	<title>Explicit and Implicit Space Reservations for Data
+	Storage in &dcache;</title>
+
+	<section>
+	  <title>Explicit Space Reservations</title>
+
+	  <para>
+	    Each &srm; space reservation is made against the total
+	    available disk space of a particular link group.  If
+	    &dcache; is configured correctly each byte of disk space,
+	    that can be reserved, belongs to one and only one link
+	    group. See <xref linkend='cf-srm-space'/> for a detailed
+	    description.
+	  </para>
+	  <important>
+	    <para>
+	      Make sure that no pool belongs to more than one pool
+	      group, no pool group belongs to more than one link and
+	      no link belongs to more than one link group.
+	    </para>
+	  </important>
+	  <para>
+	    If a space reservation is specified, the file will be
+	    stored in it (assuming the user has permission to do so in
+	    the name space).
+	  </para>
+
+	  <para>
+	    Files written into a space made within a particular link
+	    group will end up on one of the pools belonging to this
+	    link group. The difference between the link group's
+	    available space and the sum of all the current space
+	    reservation sizes is the available space in the link
+	    group.
+	  </para>
+	  <para>
+	    The total space in &dcache; that can be reserved is the
+	    sum of the available spaces of all link groups.
+	  </para>
+
+	</section>
+
+	<section>
+	  <title>Implicit Space Reservations</title>
+
+	  <para>
+	    &dcache; can perform implicit space reservations for
+	    non-&srm; transfers, &srm; Version 1 transfers and
+	    for &srm; Version 2.2 data transfers that are not given
+	    the space token explicitly. The parameter that enables
+	    this behavior is
+	    <varname>srmImplicitSpaceManagerEnabled</varname>, which
+	    is described in <xref linkend="cf-srm-expert-config"/>.
+	    If no implicit space reservation can be made, the transfer
+	    will fail.
+	  </para>
+	  <para>
+	    In case of &srm; version 1.1 data transfers, when the
+	    access latency and retention policy cannot be specified,
+	    and in case of &srm; V2.2 clients, when the access latency
+	    and retention policy are not specified, the default values
+	    will be used. First &srm; will attempt to use the values
+	    of <literal>AccessLatency</literal> and
+	    <literal>RetentionPolicy</literal> tags from the directory
+	    to which a file is being written. If the tags are present,
+	    then the <literal>AccessLatency</literal> and
+	    <literal>RetentionPolicy</literal> will be set on basis of
+	    the system wide defaults, which are controlled by
+	    <varname>SpaceManagerDefaultRetentionPolicy</varname> and
+	    <varname>SpaceManagerDefaultAccessLatency</varname>
+	    variables in
+	    <filename>&path-ode-ed;/dcache.conf</filename>.
+	  </para>
+
+	  <para>
+	    You can check if the <varname>AccessLatency</varname> and
+	    <varname>RetentionPolicy</varname> tags are present by
+	    using the following commands:
+	  </para>
+
+	  <screen>&prompt-root; <userinput>&path-odb-n-s;chimera-cli.sh lstag /path/to/directory</userinput>
+Total: numberOfTags
+tag1
+tag2
+..
+AccessLatency
+RetentionPolicy</screen>
+
+          <para>
+	    If the output contains the lines
+	    <literal>AccessLatency</literal> and
+	    <literal>RetentionPolicy</literal> then the tags are
+	    already present and you can get the actual values of these
+	    tags by executing the following commands, which are shown
+	    together with example outputs:
+	  </para>
+
+	  <informalexample>
+	    <screen>&prompt-root; <userinput>&path-odb-n-s;chimera-cli.sh readtag /data/experiment-a AccessLatency</userinput>
+ONLINE
+&prompt-root; <userinput>&path-odb-n-s;chimera-cli.sh readtag /data/experiment-a RetentionPolicy</userinput>
+CUSTODIAL</screen>
+	  </informalexample>
+
+	  <para>
+	    The valid <literal>AccessLatency</literal> values are
+	    <literal>ONLINE</literal> and <literal>NEARLINE</literal>,
+	    valid <literal>RetentionPolicy</literal> values are
+	    <literal>REPLICA</literal> and
+	    <literal>CUSTODIAL</literal>.
+	  </para>
+
+	  <para>
+	    To create/change the values of the tags, please execute :
+	  </para>
+
+	  <screen>&prompt-root; <userinput>&path-odb-n-s;chimera-cli.sh writetag /path/to/directory AccessLatency "<replaceable>New AccessLatency</replaceable>"</userinput>
+&prompt-root; <userinput>&path-odb-n-s;chimera-cli.sh writetag /path/to/directory RetentionPolicy "<replaceable>New RetentionPolicy</replaceable>"</userinput></screen>
+
+          <note>
+	    <para>
+	      Some clients also have default values, which are used
+	      when not explicitly specified by the user. I this case
+	      server side defaults will have no effect.
+	    </para>
+	  </note>
+
+	  <note>
+	    <para>
+	      If the implicit space reservation is not enabled the
+	      pools in the link groups will be excluded from
+	      consideration and only the remaining pools will be
+	      considered for storing the incoming data, and classical
+	      pool selection mechanism will be used.
+	    </para>
+	  </note>
+	</section>
+
+      </section>
+
+</section>
+
+
+  <!--
+     ##############################################################
+     #            SRM Space Manager configuration                 #
+     ##############################################################
+   -->
+
+  <section id="cf-srm-space">
+    <title>&cell-spacemngr; configuration for Explicit Space Reservations</title>
+
+    <section id='cf-srm-space-linkgroups'>
+      <title>&srm; &cell-spacemngr; and Link Groups</title>
+
+      <para>
+	&cell-spacemngr; is making reservations against free space
+	available in <link linkend='cf-pm-linkgroups'> link
+	groups</link>. The total free space in the given link
+	group is the sum of available spaces in all links. The
+	available space in each link is the sum of all sizes of
+	available space in all pools assinged to a given
+	link. Therefore for the space reservation to work correctly it
+	is essential that each pool belongs to one and only one link,
+	and each link belongs to only one link group. Link groups are
+	assigned several parameters that determine what kind of space
+	the link group corresponds to and who can make reservations
+	against this space.
+      </para>
+    </section>
+
+
+
+    <section>
+      <title>Making a Space Reservation</title>
+      <para>
+	Now that the &srm; &cell-spacemngr; is activated you can make
+	a space reservation. As mentioned above you need link groups to
+	make a space reservation.
+      </para>
+
+      <section id='cf-srm-spaceres-prereq'>
+	<title>Prerequisites for Space Reservations</title>
+	<para>
+	  Login to the <link linkend='intouch-admin'>admin
+	  interface</link> and <command>cd</command> to the cell
+	  <literal>SrmSpaceManager</literal>.
+	</para>
+	<screen>&prompt-user; <userinput>ssh -c blowfish -p 22223 -l admin headnode.example.org</userinput>
+&dc-prompt-local; <userinput>cd SrmSpaceManager</userinput></screen>
+        <para>
+	  Type <command>ls</command> to get information about
+	  reservations and link groups.
+	</para>
+	<screen>&dc-prompt-spacemngr; <userinput>ls</userinput>
+Reservations:
+total number of reservations: 0
+total number of bytes reserved: 0
+
+LinkGroups:
+total number of linkGroups: 0
+total number of bytes reservable: 0
+total number of bytes reserved  : 0
+last time all link groups were updated: Tue Sep 20 11:15:19 CEST 2011(1316510119634)</screen>
+       <para>
+	 This output tells you that there are no reservations yet and
+	 no link groups. As there are no link groups no space can be
+	 reserved.
+       </para>
+
+       <section id='cf-srm-linkgroups'>
+	 <title>The Link Groups</title>
+
+	 <para>
+	   For a general introduction about link groups see <xref
+	   linkend='cf-pm-linkgroups' />.
+	 </para>
+	 <informalexample>
+	   <para>
+	     In this example we will create a link group for the VO
+	     <literal>desy</literal>. In order to do so we need to
+	     have a pool, a pool group and a link. Moreover, we define
+	     unit groups named <literal>any-store</literal>,
+	     <literal>world-net</literal> and
+	     <literal>any-protocol</literal>. (See <xref
+	     linkend='cf-pm-links-units'/>.)
+	   </para>
+	 <para>
+	  Define a pool in your layout file, add it to your pool
+	  directory and restart the <literal>poolDomain</literal>.
+	</para>
+	<programlisting>[poolDomain]
+[poolDomain/pool]
+path=/srv/dcache/spacemanager-pool
+name=spacemanager-pool</programlisting>
+<screen>&prompt-root; <userinput>mkdir -p /srv/dcache/spacemanager-pool</userinput>
+&prompt-root; <userinput>&path-odb-ub;dcache restart</userinput></screen>
+	<para>
+	  In the Admin Interface <command>cd</command> to the
+	  &cell-poolmngr; and create a pool group, a link and a link
+	  group.
+	</para>
+	<screen>&dc-prompt-spacemngr; <userinput>..</userinput>
+&dc-prompt-local; <userinput>cd PoolManager</userinput>
+&dc-prompt-pm; <userinput>psu create pgroup spacemanager_poolGroup</userinput>
+&dc-prompt-pm; <userinput>psu addto pgroup spacemanager_poolGroup spacemanager-pool</userinput>
+&dc-prompt-pm; <userinput>psu removefrom pgroup default spacemanager-pool</userinput>
+&dc-prompt-pm; <userinput>psu create link spacemanager_WriteLink any-store world-net any-protocol</userinput>
+&dc-prompt-pm; <userinput>psu set link spacemanager_WriteLink -readpref=10 -writepref=10 -cachepref=0 -p2ppref=-1</userinput>
+&dc-prompt-pm; <userinput>psu add link spacemanager_WriteLink  spacemanager_poolGroup</userinput>
+&dc-prompt-pm; <userinput>psu create linkGroup spacemanager_WriteLinkGroup</userinput>
+&dc-prompt-pm; <userinput>psu set linkGroup custodialAllowed spacemanager_WriteLinkGroup true</userinput>
+&dc-prompt-pm; <userinput>psu set linkGroup replicaAllowed spacemanager_WriteLinkGroup true</userinput>
+&dc-prompt-pm; <userinput>psu set linkGroup nearlineAllowed spacemanager_WriteLinkGroup true</userinput>
+&dc-prompt-pm; <userinput>psu set linkGroup onlineAllowed spacemanager_WriteLinkGroup true</userinput>
+&dc-prompt-pm; <userinput>psu addto linkGroup spacemanager_WriteLinkGroup spacemanager_WriteLink</userinput>
+&dc-prompt-pm; <userinput>save</userinput>
+&dc-prompt-pm; <userinput>..</userinput>
+	</screen>
+	<para>
+	  Check whether the link group is available.
+	</para>
+	<screen>&dc-prompt-local; <userinput>cd SrmSpaceManager</userinput>
+&dc-prompt-spacemngr; <userinput>ls</userinput>
+Reservations:
+total number of reservations: 0
+total number of bytes reserved: 0
+
+LinkGroups:
+0 Name:spacemanager_WriteLinkGroup FreeSpace:7278624768 ReservedSpace:0 AvailableSpace:7278624768 VOs: onlineAllowed:true nearlineAllowed:false replicaAllowed:true custodialAllowed:true UpdateTime:Mon Nov 28 12:12:51 CET 2011(1322478771030)
+total number of linkGroups: 1
+total number of bytes reservable: 7278624768
+total number of bytes reserved  : 0
+last time all link groups were updated: Mon Nov 28 12:12:51 CET 2011(1322478771030)</screen>
+	<para>
+	  The link group
+	  <literal>spacemanager_WriteLinkGroup</literal> was created
+	  and has the id <literal>0</literal>.
+	</para>
+       </informalexample>
+
+
+       </section>
+
+      <section id='cf-srm-linkgroupauthfile'>
+	<title>The <literal>SpaceManagerLinkGroupAuthorizationFile</literal></title>
+
+
+	<para>
+	  Now you need to edit the
+	  <filename>LinkGroupAuthorization.conf</filename> file. This
+	  file contains a list of the link groups and all the VOs and
+	  the VO Roles that are permitted to make reservations in a
+	  given link group.
+	</para>
+	<para>
+	  Specify the location of the
+	  <filename>LinkGroupAuthorization.conf</filename> file in the
+	  <filename>&path-ode-ed;/dcache.conf</filename> file.
+	</para>
+
+	<programlisting>SpaceManagerLinkGroupAuthorizationFileName=/path/to/LinkGroupAuthorization.conf</programlisting>
+
+	<para>
+	  The file <filename>LinkGroupAuthorization.conf</filename>
+	  has following syntax:
+	</para>
+
+	<para>
+	  LinkGroup <replaceable>NameOfLinkGroup</replaceable>
+	  followed by the list of the Fully Qualified Attribute Names
+	  (FQANs). Each FQAN on a separate line, followed by an empty
+	  line, which is used as a record separator, or by the end of
+	  the file.
+	</para>
+	<para>
+	  FQAN is usually a string of the form
+	  <replaceable>VO</replaceable>/Role=<replaceable>VORole</replaceable>. Both
+	  <replaceable>VO</replaceable> and
+	  <replaceable>VORole</replaceable> could be set to
+	  <literal>*</literal>, in this case all VOs or VO Roles will
+	  be allowed to make reservations in this link group. Any line
+	  that starts with # is a comment and may appear anywhere.
+	</para>
+
+	<programlisting>#SpaceManagerLinkGroupAuthorizationFile
+
+LinkGroup <replaceable>NameOfLinkGroup</replaceable>
+/<replaceable>VO</replaceable>/Role=<replaceable>VORole</replaceable></programlisting>
+
+	<note>
+	  <para>
+	    You do not need to restart the &domain-srm; or &dcache;
+	    after changing the
+	    <filename>LinkGroupAuthorization.conf</filename> file. The
+	    changes will be applied automatically after a few minutes.
+	  </para>
+	  <para>
+	    Use <command>update link groups</command> to be sure that
+	    the <filename>LinkGroupAuthorization.conf</filename> file
+	    and the link groups have been updated.
+	  </para>
+	  <screen>&dc-prompt-spacemngr; <userinput>update link groups</userinput>
+update started</screen>
+	</note>
+
+
+
+	<informalexample>
+	  <para>
+	    In the example above you created the link group
+	    <literal>spacemanager_WriteLinkGroup</literal>.  Now you
+	    want to allow members of the VO <literal>desy</literal>
+	    with the role <literal>production</literal> to make a
+	    space reservation in this link group.
+	  </para>
+
+	  <programlisting>#SpaceManagerLinkGroupAuthorizationFile
+# this is comment and is ignored
+
+LinkGroup spacemanager_WriteLinkGroup
+#
+/desy/Role=production</programlisting>
+	</informalexample>
+
+
+        <informalexample>
+	  <para>
+	    In this more general example for a
+	    <literal>SpaceManagerLinkGroupAuthorizationFile</literal>
+	    members of the VO <literal>desy</literal> with role
+	    <literal>test</literal> get the right to make a space
+	    reservation in a link group called
+	    <literal>desy-test-LinkGroup</literal>. Moreover, all
+	    members of the VO <literal>desy</literal> get the right to
+	    make a reservation in the link group called
+	    <literal>desy-anyone-LinkGroup</literal> and anyone will
+	    get the right to make a space reservation in the link
+	    group called <literal>default-LinkGroup</literal>.
+	  </para>
+	  <programlisting>#SpaceManagerLinkGroupAuthorizationFile
+# this is comment and is ignored
+
+LinkGroup desy-test-LinkGroup
+/desy/Role=/test
+
+LinkGroup desy-anyone-LinkGroup
+/desy/Role=*
+
+LinkGroup default-LinkGroup
+# allow anyone :-)
+*/Role=*</programlisting>
+	</informalexample>
+
+
+      </section>
+
+      </section>
+
+      <section id='cf-srm-reservation'>
+	<title>Making and Releasing a Space Reservation as &dcache; Administrator</title>
+
+	<section id='cf-srm-make-res'>
+	  <title>Making a Space Reservation</title>
+	<informalexample>
+	  <para>
+	    Now you can make a space reservation for the VO <literal>desy</literal>.
+	  </para>
+
+	  <screen>&dc-prompt-spacemngr; <userinput>reserve -vog=/desy -vor=production -desc=DESY_TEST 5000000 10000</userinput>
+110000 voGroup:/desy voRole:production retentionPolicy:CUSTODIAL accessLatency:NEARLINE linkGroupId:0 size:5000000 created:Fri Dec 09 12:43:48 CET 2011 lifetime:10000000ms expiration:Fri Dec 09 15:30:28 CET 2011 description:DESY_TEST state:RESERVED used:0 allocated:0</screen>
+	<para>
+	  The id of the space token is <literal>110000</literal>.
+	</para>
+	<para>
+	  Check the status of the reservation by
+	</para>
+	<screen>&dc-prompt-spacemngr; <userinput>ls</userinput>
+Reservations:
+110000 voGroup:/desy voRole:production retentionPolicy:CUSTODIAL accessLatency:NEARLINE linkGroupId:0 size:5000000 created:Fri Dec 09 12:43:48 CET 2011 lifetime:10000000ms expiration:Fri Dec 09 15:30:28 CET 2011 description:DESY_TEST state:RESERVED used:0 allocated:0
+total number of reservations: 1
+total number of bytes reserved: 5000000
+
+LinkGroups:
+0 Name:spacemanager_WriteLinkGroup FreeSpace:23747563520 ReservedSpace:5000000 AvailableSpace:23742563520 VOs:{/desy:*} onlineAllowed:true nearlineAllowed:true replicaAllowed:true custodialAllowed:true UpdateTime:Fri Dec 09 12:49:29 CET 2011(1323431369046)
+total number of linkGroups: 1
+total number of bytes reservable: 23742563520
+total number of bytes reserved  : 5000000
+last time all link groups were updated: Fri Dec 09 12:49:29 CET 2011(1323431369046)</screen>
+
+
+	<para>
+	  You can now copy a file into that space token.
+	</para>
+	<screen>&prompt-user; <userinput>srmcp file:////bin/sh srm://<replaceable>dcache.example.org</replaceable>:8443/data/world-writable/space-token-test-file -space_token=110000</userinput></screen>
+	<para>
+	  Now you can check via the <link
+	  linkend='cf-webadmin'>Webadmin Interface</link> or the <link
+	  linkend='intouch-web'>Web Interface</link> that the
+	  file has been copied to the pool
+	  <literal>spacemanager-pool</literal>.
+	</para>
+      </informalexample>
+
+      <para>
+	There are several parameters to be specified for a space reservation.
+      </para>
+      <screen>&dc-prompt-spacemngr; <userinput>reserve [-vog=voGroup] [-vor=voRole] [-acclat=AccessLatency] \
+[-retpol=RetentionPolicy] [-desc=Description] [-lgid=LinkGroupId] [-lg=LinkGroupName] \
+<replaceable>sizeInBytes</replaceable> <replaceable>lifetimeInSecs</replaceable></userinput></screen>
+
+      <variablelist>
+	<varlistentry><term>[-vog=voGroup]</term>
+	<listitem>
+	  <para>
+	    <literal>voGroup</literal> should match the VO you
+	    specified in the
+	    <filename>LinkGroupAuthorization.conf</filename> file. If
+	    you do not want to make a space reservation for a certain VO then
+	    the entry in the
+	    <filename>LinkGroupAuthorization.conf</filename> should
+	    read
+	  </para>
+	  <programlisting>LinkGroup NameOfLinkGroup
+*/Role=*</programlisting>
+	</listitem>
+	</varlistentry>
+	<varlistentry><term>[-vor=voRole]</term>
+	<listitem>
+	  <para>
+	    <literal>voRole</literal> can be specified if it is used in the
+	    <filename>LinkGroupAuthorization.conf</filename> file.
+	  </para>
+	</listitem>
+	</varlistentry>
+	<varlistentry><term>[-acclat=AccessLatency]</term>
+	<listitem>
+	  <para>
+	    <literal>AccessLatency</literal> needs to match one of the access
+	    latencies allowed for the link group.
+	  </para>
+	</listitem>
+	</varlistentry>
+	<varlistentry><term>[-retpol=RetentionPolicy]</term>
+	<listitem>
+	  <para>
+	    <literal>RetentionPolicy</literal> needs to match one of the
+	    retention policies allowed for the link group.
+	  </para>
+	</listitem>
+	</varlistentry>
+	<varlistentry><term>[-desc=Description]</term>
+	<listitem>
+	  <para>
+	    You can chose a value to describe your space
+	    reservation.
+	  </para>
+	</listitem>
+	</varlistentry>
+	<varlistentry><term>[-lgid=LinkGroupId]</term>
+	<listitem>
+	  <para>
+	    You can either use the <literal>LinkGroupId</literal> to make a space reservation or
+	  </para>
+	</listitem>
+	</varlistentry>
+	<varlistentry><term>[-lg=LinkGroupName]</term>
+	<listitem>
+	  <para>
+	    you use the <literal>LinkGroupName</literal> to make a space reservation.
+	  </para>
+	</listitem>
+	</varlistentry>
+	<varlistentry><term><replaceable>sizeInBytes</replaceable></term>
+	<listitem>
+	  <para>
+	    The size of the space reservation should be specified in bytes.
+	  </para>
+	</listitem>
+	</varlistentry>
+	<varlistentry><term><replaceable>lifetimeInSecs</replaceable></term>
+	<listitem>
+	  <para>
+	    The life time of the space reservation should be specified
+	    in seconds. Choose <literal>"-1"</literal> for a space
+	    reservation that will never expire (use quotes around the
+	    negative <literal>one</literal>).
+	  </para>
+	</listitem>
+	</varlistentry>
+      </variablelist>
+
+	</section>
+
+      <section id="cf-srm-release-spaceres">
+	<title>Releasing a Space Reservation</title>
+
+      <para>
+	If a space reservation is not needet anymore it can be released with
+      </para>
+      <screen>&dc-prompt-spacemngr; <userinput>release <replaceable>spaceTokenId</replaceable></userinput></screen>
+      <informalexample>
+	<screen>&dc-prompt-spacemngr; <userinput>reserve -vog=/desy -vor=production -desc=DESY_TEST 5000000 600</userinput>
+110042 voGroup:/desy voRole:production retentionPolicy:CUSTODIAL accessLatency:NEARLINE linkGroupId:0 size:5000000 created:Thu Dec 15 12:00:35 CET 2011 lifetime:600000ms expiration:Thu Dec 15 12:10:35 CET 2011 description:DESY_TEST state:RESERVED used:0 allocated:0
+&dc-prompt-spacemngr; <userinput>release 110042</userinput>
+110042 voGroup:/desy voRole:production retentionPolicy:CUSTODIAL accessLatency:NEARLINE linkGroupId:0 size:5000000 created:Thu Dec 15 12:00:35 CET 2011 lifetime:600000ms expiration:Thu Dec 15 12:10:35 CET 2011 description:DESY_TEST state:RELEASED used:0 allocated:0</screen>
+         <para>
+	   You can see that the value for <literal>state</literal> has
+	   changed from <literal>RESERVED</literal> to
+	   <literal>RELEASED</literal>
+	 </para>
+
+      </informalexample>
+
+      </section>
+      </section>
+
+
+  <!--
+     ##############################################################
+     #            SRM Space Manager VO bases Access control      #
+     ##############################################################
+   -->
+
+  <section id="cf-srm-spaceres-VO">
+    <title>Making and Releasing a Space Reservation as a User</title>
+
+    <para>
+      A user who has been given the right to make a space reservation
+      can make a space reservation. To achieve this the right entry in
+      the <filename>LinkGroupAuthorization.conf</filename> file is
+      required.
+    </para>
+
+    <section>
+      <title>VO based Authorization Prerequisites</title>
+
+      <para>
+	In order to be able to take advantage of the virtual
+	organization (VO) infrastructure and VO based authorization
+	and VO based access control to the space in &dcache;, certain
+	things need to be in place:
+      </para>
+
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    User needs to be registered with the VO.
+	  </para>
+	</listitem>
+
+	<listitem>
+	  <para>
+	    User needs to use <link
+	    linkend="cf-gplazma-certificates-voms-proxy-init"><command>voms-proxy-init</command></link>
+	    to create a VO proxy.
+	  </para>
+	</listitem>
+
+	<listitem>
+	  <para>
+	    &dcache; needs to use &cell-gplazma; with modules that
+	    extract VO attributes from the user's proxy. (See <xref
+	    linkend="cf-gplazma"/>, have a look at
+	    <literal>gplazmalite-vorole-mapping</literal> plugin and
+	    see <xref linkend='intouch-certificates'/> for an example
+	    with <literal>gplazmalite-vorole-mapping</literal>.
+	  </para>
+	</listitem>
+      </itemizedlist>
+
+      <para>
+	Only if these 3 conditions are satisfied the VO based
+	authorization of the &cell-spacemngr; will work.
+      </para>
+
+    </section>
+
+    <section>
+      <title>VO based Access Control
+      Configuration</title>
+
+      <para>
+	As mentioned <link
+	linkend='cf-srm-space-linkgroups'>above</link> &dcache; space
+	reservation functionality access control is currently
+	performed at the level of the link groups. Access to making
+	reservations in each link group is controlled by the <link
+	linkend='cf-srm-linkgroupauthfile'>
+	<varname>SpaceManagerLinkGroupAuthorizationFile</varname></link>.
+      </para>
+      <para>
+	This file contains a list of the link groups and all the
+	VOs and the
+	VO Roles that are permitted to make
+	reservations in a given link group.
+      </para>
+
+      <para>
+	When a &srm; Space Reservation request is executed, its
+	parameters, such as reservation size, lifetime,
+	<literal>AccessLatency</literal>and
+	<literal>RetentionPolicy</literal> as well as user's VO
+	membership information is forwarded to the &srm;
+	&cell-spacemngr;.
+      </para>
+
+      <para>
+	Once a space reservation is created, no access control is
+	performed, any user can store the files in this space
+	reservation, provided he or she knows the exact space token.
+      </para>
+ 
+    </section>
+
+    <section id='cf-srm-spaceres-client'>
+      <title>Making and Releasing a Space Reservation</title>
+
+    <para>
+      A user who is given the rights in the
+      <literal>SpaceManagerLinkGroupAuthorizationFile</literal> can
+      make a space reservation by
+    </para>
+    <screen>&prompt-user; <userinput>srm-reserve-space -retention_policy=<replaceable>RetentionPolicy</replaceable> -lifetime=<replaceable>lifetimeInSecs</replaceable> -desired_size=<replaceable>sizeInBytes</replaceable> -guaranteed_size=<replaceable>sizeInBytes</replaceable>  srm://<replaceable>example.org</replaceable>:8443</userinput>
+Space token =SpaceTokenId</screen>
+
+    <para>
+      and release it by
+    </para>
+    <screen>&prompt-user; <userinput>srm-release-space srm://<replaceable>example.org</replaceable>:8443 -space_token=SpaceTokenId</userinput></screen>
+
+	<note>
+	  <para>
+	    Please note that it is obligatory to specify the retention
+	    policy while it is optional to specify the access latency.
+	  </para>
+	</note>
+
+
+    <informalexample>
+      <screen>&prompt-user; <userinput>srm-reserve-space -retention_policy=REPLICA -lifetime=300 -desired_size=5500000 -guaranteed_size=5500000  srm://srm.example.org:8443</userinput>
+Space token =110044</screen>
+
+
+     <para>
+       The space reservation can be released by:
+     </para>
+
+
+      <screen>&prompt-user; <userinput>srm-release-space srm://srm.example.org:8443 -space_token=110044</userinput></screen>
+
+    </informalexample>
+
+    </section>
+
+    <section>
+      <title>Space Reservation without VOMS certificate</title>
+
+      <para>
+	If a client uses a regular grid proxy, created with
+	<command>grid-proxy-init</command>, and not a VO proxy, which
+	is created with the <command>voms-proxy-init</command>, when
+	it is communicating with &srm; server in &dcache;, then the VO
+	attributes can not be extracted from its credential. In this
+	case the name of the user is extracted from the Distinguished
+	Name (DN) to use name mapping. For the purposes of the space
+	reservation the name of the user as mapped by &serv-gplazma;
+	is used as its VO Group name, and the VO Role is left
+	empty. The entry in the
+	<literal>SpaceManagerLinkGroupAuthorizationFile</literal>
+	should be:
+      </para>
+
+      <programlisting>#LinkGroupAuthorizationFile
+#
+<replaceable>userName</replaceable></programlisting>
+
+    </section>
+
+    <section>
+      <title>Space Reservation for non &srm; Transfers</title>
+
+
+
+      <para>
+	Edit the file <filename>&path-ode-ed;/dcache.conf</filename> to enable space
+	reservation for non &srm; transfers.
+      </para>
+      <programlisting>SpaceManagerReserveSpaceForNonSRMTransfers=true</programlisting>
+
+	<para>
+	  If the &serv-spacemngr; is enabled,
+	  <varname>SpaceManagerReserveSpaceForNonSRMTransfers</varname>
+	  is set to <literal>true</literal>, and if the transfer
+	  request comes from a door, and there was no prior space
+	  reservation made for this file, the &cell-spacemngr; will
+	  try to reserve space before satisfying the request.
+	</para>
+
+	<para>
+	  Possible values are <literal>true</literal> or
+	  <literal>false</literal> and the default value is
+	  <literal>false</literal>.
+	</para>
+
+    </section>
+
+  </section>
+  </section>
+
+
+
+
 
   <!--
      ##############################################################
@@ -665,8 +1212,11 @@ remoteGsiftpMaxTransfers=2000</programlisting>
   <section id="cf-srm-expert-config">
     <title>&cell-srm; configuration for experts</title>
 
+
+
     <para>
-      There are a few parameters in <filename>dcache.properties</filename>
+      There are a few parameters in
+      <filename>&path-ods-usd;/defaults/*.properties</filename>
       that you might find useful for nontrivial &cell-srm; deployment.
     </para>
 
@@ -679,7 +1229,8 @@ remoteGsiftpMaxTransfers=2000</programlisting>
       </para>
 
       <para>
-	Possible values are <literal>yes</literal> and <literal>no</literal>. Default is <literal>yes</literal>.
+	Possible values are <literal>yes</literal> and
+	<literal>no</literal>. Default is <literal>yes</literal>.
       </para>
 
       <para>
@@ -701,8 +1252,8 @@ remoteGsiftpMaxTransfers=2000</programlisting>
 
       <para>
 	Possible values are <literal>yes</literal> and
-	<literal>no</literal>. This is enabled by default, disabled if
-	<varname>srmSpaceManagerEnabled</varname> is set to
+	<literal>no</literal>. This is enabled by default. It has no
+	effect if <varname>srmSpaceManagerEnabled</varname> is set to
 	<literal>no</literal>.
       </para>
 
@@ -764,8 +1315,7 @@ remoteGsiftpMaxTransfers=2000</programlisting>
 
       <para>
 	<varname>srmDatabaseHost</varname> tells &cell-srm; which
-	database host to connect to. Do not change unless you know
-	what you are doing.
+	database host to connect to.
       </para>
 
       <para>
@@ -784,8 +1334,7 @@ remoteGsiftpMaxTransfers=2000</programlisting>
 
       <para>
 	<varname>spaceManagerDatabaseHost</varname> tells &cell-spacemngr;
-	which database host to connect to. Do not change
-	unless you know what you are doing.
+	which database host to connect to.
       </para>
 
       <para>
@@ -800,11 +1349,10 @@ remoteGsiftpMaxTransfers=2000</programlisting>
     </section>
 
     <section>
-      <title>pinManagerDatabaseHost</title>
+      <title>pinManagerDbHost</title>
       <para>
-	<varname>pinManagerDatabaseHost</varname> tells &cell-pinmngr;
-    which database host to connect to. Do not change
-	unless you know what you are doing.
+	<varname>pinManagerDbHost</varname> tells &cell-pinmngr;
+    which database host to connect to.
       </para>
 
       <para>
@@ -815,7 +1363,7 @@ remoteGsiftpMaxTransfers=2000</programlisting>
 	Usage example:
       </para>
 
-      <programlisting>pinManagerDatabaseHost=database-host.example.org</programlisting>
+      <programlisting>pinManagerDbHost=database-host.example.org</programlisting>
     </section>
 
     <section>
@@ -823,8 +1371,7 @@ remoteGsiftpMaxTransfers=2000</programlisting>
 
       <para>
 	<varname>srmDbName</varname> tells &cell-srm; which database
-	to connect to. Do not change unless you know what you are
-	doing.
+	to connect to.
       </para>
 
       <para>
@@ -862,9 +1409,9 @@ remoteGsiftpMaxTransfers=2000</programlisting>
       <title>srmDbPassword</title>
 
       <para>
-	<varname>srmDbPassword</varname> tells &cell-srm; which database
-	password to use when connecting to database. Do not change
-	unless you know what you are doing.
+	<varname>srmDbPassword</varname> tells &cell-srm; which
+	database password to use when connecting to database. The
+	default value is <literal>srmdcache</literal>.
       </para>
 
       <para>
@@ -902,15 +1449,17 @@ remoteGsiftpMaxTransfers=2000</programlisting>
     </section>
 
     <section>
-      <title>srmJdbcMonitoringLogEnabled</title>
+      <title>srmRequestHistoryDatabaseEnabled</title>
 
       <para>
-	<varname>srmJdbsMonitoringLogEnabled</varname> tells &cell-srm;
-	to store the history of the &srm; request executions in the
-	database. This option is useful if you are using SRMWatch web
-	monitoring tool. Activation of this option might lead to the
-	increase of the database activity, so if the &psql; load
-	generated by &cell-srm; is excessive, disable it.
+	<varname>srmRequestHistoryDatabaseEnabled</varname> enables
+	logging of the transition history of the &srm; request in the
+	database. The request transitions can be examined through the
+	command line interface or through the <link
+	linkend="cf-srm-monitor"> &srm;Watch</link> web monitoring
+	tool. Activation of this option might lead to the increase of
+	the database activity, so if the &psql; load generated by
+	&cell-srm; is excessive, disable it.
       </para>
 
       <para>
@@ -922,19 +1471,20 @@ remoteGsiftpMaxTransfers=2000</programlisting>
 	Usage example:
       </para>
 
-      <programlisting>srmJdbsMonitoringLogEnabled=false</programlisting>
+      <programlisting>srmRequestHistoryDatabaseEnabled=true</programlisting>
     </section>
 
     <section>
       <title>srmDbLogEnabled</title>
 
       <para>
-	<varname>srmDbLogEnabled</varname> tells &cell-srm; to store the
-	information about the remote (copy, srmCopy) transfer details
-	in the database. This option is useful if you are using
-	SRMWatch web monitoring tool. Activation of this option might
-	lead to the increase of the database activity, so if the
-	&psql; load generated by &cell-srm; is excessive, disable it.
+	<varname>srmDbLogEnabled</varname> tells &cell-srm; to store
+	the information about the remote (copy, srmCopy) transfer
+	details in the database. This option is useful if you are
+	using the <link linkend="cf-srm-monitor"> &srm;Watch</link>
+	web monitoring tool.  Activation of this option might lead to
+	the increase of the database activity, so if the &psql; load
+	generated by &cell-srm; is excessive, disable it.
       </para>
 
       <para>
@@ -1278,396 +1828,13 @@ remoteGsiftpMaxTransfers=260</programlisting>
     </section>
 
 
-  </section>
-
-  <!--
-     ##############################################################
-     #            SRM Space Manager configuration                 #
-     ##############################################################
-   -->
-
-  <section id="cf-srm-space">
-    <title>&cell-spacemngr; configuration</title>
-
-    <section>
-      <title>&srm; &cell-spacemngr; and LinkGroups</title>
-
-      <para>
-	&cell-spacemngr; is making reservations agains space in
-	<firstterm>LinkGroups</firstterm>, LinkGroup is an object created by the
-	&cell-poolmngr;, that consists of several Links. The total
-	space available in the given LinkGroup is a sum of available
-	spaces in all links. The available space in each link is a sum
-	of the available spaces in all pools assinged to a given
-	link. Therefore for the space reservation to work correctly it
-	is essential that each pool belongs to one and only one link,
-	and each link belongs to only one LinkGroup. LinkGroups are
-	assigned several parameters that determine what kind of space
-	the LinkGroup correspond to and who can make reservation
-	against this space.
-      </para>
     </section>
 
-    <section>
-      <title>Definition of the LinkGroups in the PoolManager.conf</title>
-
-      <para>
-	To configure &cell-poolmngr; to create the new LinkGroup (a new
-	reservable entity in &dcache;), please use following example
-	(given in the &cell-poolmngr;). Here we assume that write-link
-	link already exists:
-      </para>
-
-      <screen>&dc-prompt-pm; <userinput>psu create linkGroup write-link-group</userinput>
-&dc-prompt-pm; <userinput>psu addto linkGroup  write-link-group write-link</userinput></screen>
-
-      <para>
-	To tell &cell-spacemngr; if the LinkGroup will be able to store
-	files with given AccessLatency and RetentionPolicy,
-  LinkGroups have 5 attributes: <varname>custodialAllowed</varname>,
-  <varname>outputAllowed</varname>, <varname>replicaAllowed</varname>,
-  <varname>onlineAllowed</varname> and <varname>nearlineAllowed</varname>.
-  These attributes can be specified with the following commands:
-      </para>
-
-      <screen>&dc-prompt-pm; <userinput>psu set linkGroup custodialAllowed &lt;group name&gt; &lt;true|false&gt;</userinput>
-&dc-prompt-pm; <userinput>psu set linkGroup outputAllowed &lt;group name&gt; &lt;true|false&gt;</userinput>
-&dc-prompt-pm; <userinput>psu set linkGroup replicaAllowed &lt;group name&gt; &lt;true|false&gt;</userinput>
-&dc-prompt-pm; <userinput>psu set linkGroup onlineAllowed &lt;group name&gt; &lt;true|false&gt;</userinput>
-&dc-prompt-pm; <userinput>psu set linkGroup nearlineAllowed &lt;group name&gt; &lt;true|false&gt;</userinput></screen>
-
-       <para>
-	 Please note that that it is up to administrators that the
-	 link groups attributes are specified correctly. For example
-	 dcache will not complain if the LinkGroup that does not
-	 support tape backend will be declared as one that supports
-	 custodial.
-      </para>
-    </section>
-
-    <section>
-      <title>Activating &srm; &cell-spacemngr;</title>
-
-      <para>
-	In order to enable the new space reservation: add (uncomment)
-	the following definition in <filename>dcache.conf</filename>
-      </para>
-
-      <programlisting>srmSpaceManagerEnabled=yes</programlisting>
-    </section>
-
-    <section id="cf-srm-spaceman-params">
-      <title>&srm; &cell-spacemngr; parameters in <filename>dcache.conf</filename></title>
-
-      <section>
-	<title>SpaceManagerDefaultRetentionPolicy</title>
-
-	<para>
-	  If space reservation request does not specify a retention
-	  policy we will assign
-	  <varname>SpaceManagerDefaultRetentionPolicy</varname>
-	  retention policy by default.
-	</para>
-
-	<para>
-	  Possible values are <literal>REPLICA</literal>,
-	  <literal>OUTPUT</literal> and <literal>CUSTODIAL</literal>.
-	</para>
-
-	<informalexample>
-	  <programlisting>SpaceManagerDefaultRetentionPolicy=CUSTODIAL</programlisting>
-	</informalexample>
-      </section>
-
-      <section>
-	<title>SpaceManagerDefaultAccessLatency</title>
-
-	<para>
-	  If a space reservation request does not specify an access latency
-	  we will assign
-	  <varname>SpaceManagerDefaultAccessLatency</varname> this
-	  access latency by default.
-	</para>
-
-	<para>
-	  Possible values are <literal>ONLINE</literal> and
-	  <literal>NEARLINE</literal>.
-	</para>
-
-	<informalexample>
-	  <programlisting>SpaceManagerDefaultAccessLatency=NEARLINE</programlisting>
-	</informalexample>
-      </section>
-
-	<important>
-	  Please make sure to use capital letters for
-	  <literal>REPLICA</literal>, <literal>OUTPUT</literal>,
-	  <literal>CUSTODIAL</literal>, <literal>ONLINE</literal> and
-	  <literal>NEARLINE</literal> otherwise you will receive an error message.
-	</important>
-
-      <section>
-	<title>SpaceManagerReserveSpaceForNonSRMTransfers</title>
-	<para>
-	  If
-	  <varname>SpaceManagerReserveSpaceForNonSRMTransfers</varname>
-	  is set to <literal>true</literal>, and if the transfer
-	  request comes from the door, and there was no prior space
-	  reservation made for this file, &cell-spacemngr; will try to
-	  reserve space before satisfying the request.
-	</para>
-
-	<para>
-	  Possible values are <literal>true</literal> and
-	  <literal>false</literal>.
-	</para>
-	<informalexample>
-	  <programlisting>SpaceManagerReserveSpaceForNonSRMTransfers=false</programlisting>
-	</informalexample>
-      </section>
-
-      <section>
-	<title>SpaceManagerLinkGroupAuthorizationFileName</title>
-
-	<para>
-	  <varname>SpaceManagerLinkGroupAuthorizationFileName</varname>
-	  specifies a file that contains the list of FQANs that are
-	  allowed to make space reservations in a given link
-	  group. The file syntax is described in the next section.
-	</para>
-
-	<para>
-	  This parameter is not set by default.
-	</para>
-
-	<informalexample>
-	  <programlisting>SpaceManagerLinkGroupAuthorizationFileName=&path-ode-ed;/LinkGroupAuthorization.conf</programlisting>
-	</informalexample>
-      </section>
-
-    </section>
-
-   <section>
-     <title>Implicit Space Reservations</title>
-
-      <para>
-	As it was described in <xref linkend="cf-srm-intro"/>,
-	&dcache; can perform implicit space reservations for &srm;
-	Version 1 data transfers and for &srm; Version 2.2 data
-	transfers that are not given the space token explicitly. The
-	parameter that enables this behavior is
-	<varname>srmImplicitSpaceManagerEnabled</varname>, which is
-	described in <xref linkend="cf-srm-expert-config"/>. In case
-	of &srm; version 1.1 data transfers, when the Access Latency
-	and Retention Policy cannot be specified, and in case of &srm;
-	V2.2 clients, when Access Latency and Retention Policy are not
-	specified, the default values will be used. First &srm; will
-	attempt to use the values of <literal>AccessLatency</literal>
-	and <literal>RetentionPolicy</literal> tags from the directory
-	to which a file is being written. If the tags are present,
-	then the Access Latency and Retention Policy will be set on
-	basis of the system wide defaults, which are controlled by
-	<varname>SpaceManagerDefaultRetentionPolicy</varname> and
-	<varname>SpaceManagerDefaultAccessLatency</varname> variables
-	in <filename>dcache.conf</filename>; these variable are described in details in
-    <xref linkend="cf-srm-spaceman-params" />.
-      </para>
-
-      <para>
-	If you have a direct access to the namespace, you can check if
-	the <varname>AccessLatency</varname> and <varname>RetentionPolicy</varname>
-	tags are present by using the following commands:
-      </para>
-
-      <screen>&prompt-root; <userinput>cd <replaceable>pnfsDir</replaceable></userinput>
-&prompt-root; <userinput>cat ".(tags)()"</userinput>
-.(tag)(OSMTemplate)
-.(tag)(file_family)
-.(tag)(storage_group)
-.(tag)(AccessLatency)
-.(tag)(RetentionPolicy)</screen>
-
-      <para>
-	If the output contains the lines saying
-	<literal>(tag)(AccessLatency)</literal> and
-	<literal>.(tag)(RetentionPolicy)</literal> than the tags are
-	already present and you can get the actual values of these
-	tags by executing the following commands, which are shown
-	together with example outputs:
-      </para>
-
-      <screen>&prompt-root; <userinput>cat ".(tag)(AccessLatency)" ONLINE</userinput>
-&prompt-root; <userinput>cat ".(tag)(RetentionPolicy)" CUSTODIAL</userinput></screen>
-
-      <para>
-	To create/change the values of the tags, please execute :
-      </para>
-
-      <screen>&prompt-root; <userinput>echo <replaceable>"New Access Latency"</replaceable> > ".(tag)(AccessLatency)"</userinput>
-&prompt-root; <userinput>echo  <replaceable>"New Retention Policy"</replaceable> > ".(tag)(RetentionPolicy)"</userinput></screen>
-
-      <para>
-	The valid <literal>AccessLatency</literal> values are
-	<literal>ONLINE</literal> and <literal>NEARLINE</literal>,
-	valid <literal>RetentionLatency</literal> values are
-	<literal>REPLICA</literal>, <literal>OUTPUT</literal> and
-	<literal>CUSTODIAL</literal>.
-      </para>
-
-      <para>
-	Below are the reals examples of these commands:
-      </para>
-
-      <screen>&prompt-root; <userinput>echo "ONLINE" > ".(tag)(AccessLatency)"</userinput>
-&prompt-root; <userinput>echo "REPLICA" > ".(tag)(RetentionPolicy)"</userinput></screen>
-   </section>
+  
 
  </section>
 
 
-  <!--
-     ##############################################################
-     #            SRM Space Manager VO bases Access control      #
-     ##############################################################
-   -->
-
-    <section id="cf-srm-space-ac">
-    <title>&srm; &cell-spacemngr; Virtual Organization based access control configuration</title>
-
-    <section>
-      <title>VO based Authorization Prerequisites</title>
-
-      <para>
-	In order to be able to take advantage of the Virtual
-	Organization (VO) infrastructure and VO based authorization
-	and VO Based Access Control to the Space in &dcache;, certain
-	things need to be in place:
-      </para>
-
-      <itemizedlist>
-	<listitem>
-	  <para>
-	    User needs to be registered with the VO.
-	  </para>
-	</listitem>
-
-	<listitem>
-	  <para>
-	    User needs to use <link
-	    linkend="cf-gplazma-certificates-voms-proxy-init"><command>voms-proxy-init</command></link>
-	    to create a vo proxy.
-	  </para>
-	</listitem>
-
-	<listitem>
-	  <para>
-	    &dcache; needs to use &cell-gplazma; and not
-	    &cell-gplazma; with <literal>dcache.kpwd</literal> plugin,
-	    but other modules that know how to extract VO attributes
-	    from the proxy. (see <xref linkend="cf-gplazma"/>, have a
-	    look at <literal>gplazmalite-vorole-mapping</literal>
-	    plugin.
-	  </para>
-	</listitem>
-      </itemizedlist>
-
-      <para>
-	Only if these 3 conditions are satisfied the VO based
-	authorization of the &cell-spacemngr; can work.
-      </para>
-
-      <para>
-	If a client uses a regular grid proxy, created with
-	<command>grid-proxy-init</command>, and not a Virtual
-	Organization (VO) proxy, which is created with the
-	<command>voms-proxy-init</command>, when he is communicating
-	with &srm; server in &dcache;, then the VO attributes can not
-	be extracted its
-	credential. <command>voms-proxy-init</command> adds a Fully
-	Qualified Attribute Name (FQAN) section(s) to the grid proxy,
-	which contains information about the user's VO membership, in
-	particular it contains the VO Group name and the VO Role that the
-	client intends to play at this time. In this case the name of
-	the user is extracted on basis of the direct Distinguished
-	Name (DN) to use name mapping. For the purposes of the space
-	reservation the name of the user is used as its VO Group name,
-	and the VO Role is left empty.
-      </para>
-    </section>
-
-    <section>
-      <title>VO based Access Control configuration</title>
-
-      <para>
-	&dcache; Space Reservation Functionality Access Control is
-	currently performed at the level of the LinkGroups. Access
-	to making reservations in each LinkGroup is controlled by the
-	<varname>SpaceManagerLinkGroupAuthorizationFile</varname>
-	property.
-      </para>
-
-      <section>
-	<title>SpaceManagerLinkGroupAuthorizationFile syntax </title>
-
-	<para>
-	  The file described by
-	  <varname>SpaceManagerLinkGroupAuthorizationFile</varname>
-	  has following syntax:
-	</para>
-
-	<para>
-	  LinkGroup Name followed by the list of the Fully Qualified
-	  Attribute Names (FQANs), each FQAN on separate line,
-	  followed by an empty line, which is used as a record
-	  separator, or by the end of file. FQAN is usually a string
-	  of the form &lt;VO&gt;/Role=&lt;VORole&gt;. Both &lt;VO&gt;
-	  and &lt;VORole&gt; could be set to <literal>*</literal>, in
-	  this case all VOs or VO Roles will be allowed to make
-	  reservations in this LinkGroup. Any line that starts with #
-	  is a comment and may appear anywhere.
-	</para>
-
-	<para>
-	  The file location is specified by defining
-	</para>
-
-	<programlisting>SpaceManagerLinkGroupAuthorizationFileName=<replaceable>FILENAME</replaceable></programlisting>
-
-	<para>
-	  in <filename>dcache.conf</filename>.
-	</para>
-
-      </section>
-
-      <section>
-	<title>Example of the SpaceManagerLinkGroupAuthorizationFile </title>
-
-	<programlisting># this is comment and is ignored
-
-LinkGroup LFSOnly-LinkGroup
-/atlas/Role=/atlas/role1
-
-LinkGroup CMS-LinkGroup
-/cms/Role=*
-#/dteam/Role=/tester
-
-LinkGroup default-LinkGroup
-#allow anyone :-)
-*/Role=*
-#/dteam/Role=/tester</programlisting>
-
-        <para>
-	  Successful VO and Experiment specific examples of &dcache;
-	  &srm; &cell-spacemngr; configurations are or will be published
-	  at <ulink
-	  url="http://trac.dcache.org/trac.cgi/wiki/manuals/index">
-	  &dcache; WIKI documentation pages </ulink>.
-	</para>
-      </section>
-
-    </section>
-
-    </section>
 
 
 
@@ -1723,7 +1890,7 @@ LinkGroup default-LinkGroup
 	<listitem>
 	  <para>
 	    Edit configuration file
-	    <filename>/opt/d-cache/srmwatch-1.0/WEB-INF/web.xml</filename>
+	    <filename>/opt/d-cache/srmwatch-1.1-2/WEB-INF/web.xml</filename>
 	    in the line saying:
 	  </para>
 
@@ -1762,43 +1929,515 @@ LinkGroup default-LinkGroup
       </itemizedlist>
     </section>
 
+   </section>
+
+
+
+
+
+<!--
+     ##############################################################
+     #            Configuring Postgres Database                   #
+     ##############################################################
+   -->
+
+  <section id="cf-srm-psql">
+    <title>Configuring the &psql; Database</title>
+
+    <para>
+      We highly recommend to make sure that &psql; database files are
+      stored on a separate disk that is not used for anything else
+      (not even &psql; logging).  BNL Atlas Tier 1 observed a great
+      improvement in srm-database communication performance after they
+      deployed &psql; on a separate dedicated machine.
+    </para>
 
     <section>
-      <title>Same Node Installation</title>
+      <title>&srm; or srm monitoring on a separate node</title>
 
+    <para>
+      If &srm; or srm monitoring is going to be installed on a
+      separate node, you need to add an entry in the file
+      <filename>/var/lib/pgsql/data/pg_hba.conf</filename> for this
+      node as well:
+    </para>
+
+    <programlisting>host    all         all       <replaceable>monitoring node</replaceable>    trust
+host    all         all       <replaceable>srm node</replaceable>    trust</programlisting>
+
+    <para>
+     The file <filename>postgresql.conf</filename> should contain the following:
+    </para>
+
+    <programlisting>#to enable network connection on the default port
+max_connections = 100
+port = 5432
+...
+shared_buffers = 114688
+...
+work_mem = 10240
+...
+#to enable autovacuuming
+stats_row_level = on
+autovacuum = on
+autovacuum_vacuum_threshold = 500  # min # of tuple updates before
+                                   # vacuum
+autovacuum_analyze_threshold = 250      # min # of tuple updates before
+                                        # analyze
+autovacuum_vacuum_scale_factor = 0.2    # fraction of rel size before
+                                        # vacuum
+autovacuum_analyze_scale_factor = 0.1   # fraction of rel size before
+#
+# setting vacuum_cost_delay might be useful to avoid
+# autovacuum penalize general performance
+# it is not set in US-CMS T1 at Fermilab
+#
+# In IN2P3 add_missing_from = on
+# In Fermilab it is commented out
+
+# - Free Space Map -
+max_fsm_pages = 500000
+
+# - Planner Cost Constants -
+effective_cache_size = 16384            # typically 8KB each</programlisting>
+
+    </section>
+  </section>
+
+
+
+
+
+
+
+
+
+  <!--
+     ##############################################################
+     #            Choosing The right hardware                     #
+     ##############################################################
+   -->
+
+  <section id="cf-srm-hrd-os">
+    <title>Choosing The right hardware and OS for the &srm; node</title>
+
+    <section>
+      <title>Hardware</title>
+
+      <para>
+	The &dcache; &srm; server requires a &psql; database for request
+	persistency and link group space accounting. It is recommended
+	to run &srm; on a dedicated node, preferably with a &psql;
+	database running on a separate host. The &srm; server has to have
+	sufficient memory to hold request queues and CPU resources
+	mainly for &gsi; key pair generation. The database host has to
+	have sufficient I/O and memory resources for optimal database
+	performance. As a reference Fermilab US-CMS T1 site uses two
+	dual quad core Intel(R) Xeon(R) CPU E5430 @ 2.66GHz and 32 GB
+	RAM nodes for &srm; and &srm; database respectively.
+      </para>
+    </section>
+
+    <section>
+      <title>Operating System</title>
+
+      <para>
+	Latest Scientific Linux or RHEL would do.
+      </para>
+
+      <para>
+	The kernel.shmmax=1073741824 and kernel.shmall=1073741824  kernel parameters
+	should be set for a 4GB RAM Machine. This can be accomplished by running:
+      </para>
+
+      <screen>&prompt-root; <userinput>echo 'kernel.shmmax=1073741824' >>  /etc/sysctl.conf</userinput>
+&prompt-root; <userinput>echo 'kernel.shmall=1073741824' >>  /etc/sysctl.conf</userinput>
+&prompt-root; <userinput>/bin/sysctl -p</userinput></screen>
+
+      <para>
+	The exact content of US-CMS T1 &srm;
+	<filename>sysctl.conf</filename> is:
+      </para>
+
+      <programlisting>kernel.core_uses_pid = 1
+kernel.sysrq = 1
+kernel.panic = 60
+fs.file-max = 131072
+net.ipv4.ip_forward = 0
+vm.vfs_cache_pressure = 10000
+# Keep this amount of memory free for emergency, IRQ and atomic allocations.
+vm.min_free_kbytes = 65535
+# Network tune parameters
+net.ipv4.tcp_timestamps = 0
+net.ipv4.tcp_sack = 0
+net.ipv4.tcp_window_scaling = 1
+kernel.shmmax=1073741824
+kernel.shmall=1073741824</programlisting>
+
+    </section>
+  </section>
+
+    <section>
+      <title>General &srm; Concepts (for developers)</title>
+
+    <section>
+      <title>The &cell-srm; service</title>
+
+      <para>
+	&dcache; &cell-srm; is implemented as a Web Service running
+	in a &jetty; servlet container and an
+	<productname>Axis</productname> Web Services
+	engine. The &jetty; server is executed as a cell,
+	embedded in &dcache; and started automatically by the &cell-srm; service.
+	Other cells started automatically by &cell-srm; are
+	&cell-spacemngr;, &cell-pinmngr; and &cell-remotegsitransfermngr;.
+	Of these services only &cell-srm; and &cell-spacemngr; require special
+	configuration.
+      </para>
+    </section>
+
+      <para>
+	The &srm; consists of the five categories of functions:
+      </para>
       <itemizedlist>
 	<listitem>
-	  <para>
-	    Download srmwatch rpm from <ulink
-	    url="http://www.dcache.org>"/>.
-	  </para>
+	  <link linkend='cf-srm-intro-spaceManagementFunct'>Space
+	  Management Functions</link>
 	</listitem>
-
 	<listitem>
-	  <para>
-	    Install rpm after srm server is installed and running,
-	    with <filename>/opt/d-cache/etc/srm_setup.env</filename>
-	    containing before the installation
-	  </para>
-
-	  <programlisting>TOMCAT_HTTP_ENABLED=true</programlisting>
-
-	  <para>
-	    RPM installation can be performed using this command:
-	  </para>
-
-	  <screen>&prompt-root; <userinput>rpm -Uvh srmwatch-1.0-0.i386.rpm</userinput></screen>
+	  <link linkend='cf-srm-intro-dataTransferFunct'>Data Transfer
+	  Functions</link>
 	</listitem>
-
 	<listitem>
-	  <para>
-	    &srm; Monitoring page should be visible at
-	    http://<replaceable>srmnode</replaceable>:8080/srmwatch/
-	  </para>
+	  <link linkend='cf-srm-intro-requestStatusFunct'>Request Status Functions</link>
+	</listitem>
+	<listitem>
+	  <link linkend='cf-srm-intro-directoryFunct'>Directory Functions</link>
+	</listitem>
+	<listitem>
+	  <link linkend='cf-srm-intro-permissionFunct'>Permission Functions</link>
 	</listitem>
       </itemizedlist>
+
+      <section id='cf-srm-intro-spaceManagementFunct'>
+	<title>Space Management Functions</title>
+
+	<para>
+	  &srm; version 2.2 introduces a concept of space
+	  reservation. Space reservation guarantees that the requested
+	  amount of storage space of a specified type is made
+	  available by the storage system for a specified amount of
+	  time.
+	</para>
+	<para>
+	  We use three functions for space management:
+	</para>
+	<itemizedlist>
+	  <listitem>
+	    <function>srmReserveSpace</function>
+	  </listitem>
+	  <listitem>
+	    <function>SrmGetSpaceMetadata</function>
+	  </listitem>
+	  <listitem>
+	    <function>srmReleaseSpace</function>
+	  </listitem>
+	</itemizedlist>
+
+	<para>
+	  Space reservation is made using the
+	  <function>srmReserveSpace</function> function. In case of
+	  successful reservation, a unique name, called
+	  <firstterm>space token</firstterm> is assigned to the
+	  reservation. A space token can be used during the transfer
+	  operations to tell the system to put the files being
+	  manipulated or transferred into an associated space
+	  reservation. A storage system ensures that the reserved
+	  amount of the disk space is indeed available, thus providing
+	  a guarantee that a client does not run out of space until
+	  all space promised by the reservation has been used. When
+	  files are deleted, the space is returned to the space
+	  reservation.
+	</para>
+
+	<para>
+	  &dcache; only manages write space, i.e. space on disk can be
+	  reserved only for write operations. Once files are migrated
+	  to tape, and if no copy is required on disk, space used by
+	  these files is returned back into space reservation. When
+	  files are read back from tape and cached on disk, they are
+	  not counted as part of any space. &srm; space reservation
+	  can be assigned a non-unique description that can be used to
+	  query the system for space reservations with a given
+	  description.
+	</para>
+
+	<para>
+	  <link linkend="cf-srm-intro-spaceReservation">Properties of
+	  the &srm; space reservations</link> can be discovered using
+	  the <function>SrmGetSpaceMetadata</function> function.
+	</para>
+	<para>
+	  Space Reservations might be released with the function
+	  <function>srmReleaseSpace</function>.
+	</para>
+	<para>
+	  For a complete description of the available space management
+	  functions please see the <ulink
+	  url="http://sdm.lbl.gov/srm-wg/doc/SRM.v2.2.html#_Toc241633085">&srm;
+	  Version 2.2 Specification</ulink>.
+	  </para>
+
+      </section>
+
+      <section id='cf-srm-intro-dataTransferFunct'>
+	<title>Data Transfer Functions</title>
+      <section>
+	<title>&surl;s and &turl;s</title>
+
+	<para>
+	  &srm; defines a protocol named &srm;, and introduces a way
+	  to address the files stored in the &srm; managed storage by
+	  site &url; (<firstterm>&surl;</firstterm> of the format
+	  <literal>srm://&lt;host&gt;:&lt;port&gt;/[&lt;web service
+	  path&gt;?SFN=]&lt;path&gt;</literal>.
+	</para>
+	  <informalexample>
+	    <para>
+	      Examples of the &surl;s a.k.a. &srm; &url;s are:
+	    </para>
+	    <screen>srm://fapl110.fnal.gov:8443/srm/managerv2?SFN=//pnfs/fnal.gov/data/test/file1
+srm://fapl110.fnal.gov:8443/srm/managerv1?SFN=/pnfs/fnal.gov/data/test/file2
+srm://srm.cern.ch:8443/castor/cern.ch/cms/store/cmsfile23</screen>
+	  </informalexample>
+	  <para>
+	    A transfer &url; (<firstterm>&turl;</firstterm>) encodes
+	    the file transport protocol in the &url;.
+	  </para>
+	  <informalexample>
+	    <screen>gsiftp://gridftpdoor.fnal.gov:2811/data/test/file1</screen>
+	  </informalexample>
+
+      </section>
+
+	<para>
+	  &srm; version 2.2 provides three functions for performing
+	  data transfers:
+	</para>
+	<itemizedlist>
+	  <listitem>
+	    <function>srmPrepareToGet</function>
+	  </listitem>
+	  <listitem>
+	    <function>srmPrepareToPut</function>
+	  </listitem>
+	  <listitem>
+	    <function>srmCopy</function>
+	  </listitem>
+	</itemizedlist>
+	<para>
+	  (in &srm; version 1.1 these
+	  functions were called <function>get</function>,
+	  <function>put</function> and <function>copy</function>).
+	</para>
+	<para>
+	  All three functions accept lists of &surl;s as
+	  parameters. All data transfer functions perform
+	  file/directory access verification and
+	  <function>srmPrepareToPut</function> and
+	  <function>srmCopy</function> check if the receiving storage
+	  element has sufficient space to store the files.
+	</para>
+	<para>
+	  <function>srmPrepareToGet</function> prepares files for
+	  read. These files are specified as a list of source &surl;s,
+	  which are stored in an &srm; managed storage
+	  element. <function>srmPrepareToGet</function> is used to
+	  bring source files online and assigns transfer &url;s
+	  (&turl;s) that are used for actual data transfer.
+	</para>
+
+	<para>
+	  <function>srmPrepareToPut</function> prepares an &srm;
+	  managed storage element to receive data into the list of
+	  destination &surl;s. It prepares a list of &turl;s where the
+	  client can write data into.
+	</para>
+
+	<para>
+	  Both functions support transfer protocol negotiation. A
+	  client supplies a list of transfer protocols and the &srm;
+	  server computes the &turl; using the first protocol from the list
+	  that it supports. Function invocation on the Storage Element
+	  depends on implementation and may range from simple &surl; to
+	  &turl; translation to stage from tape to disk cache and
+	  dynamic selection of transfer host and transfer protocol
+	  depending on the protocol availability and current load on
+	  each of the transfer server load.
+	</para>
+
+	<para>
+	  The function <function>srmCopy</function> is used to copy
+	  files between &srm; managed storage elements. If both source
+	  and target are local to the &srm;, it performes a local
+	  copy. There are two modes of remote copies:
+	</para>
+
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+		 PULL mode : The target &srm; initiates an
+		 <function>srmCopy</function> request. Upon the
+		 client\u0411\u2500\u2265s
+		 <function>srmCopy</function> request, the target
+		 &srm; makes a space at the target storage, executes
+		 <function>srmPrepareToGet</function> on the source
+		 &srm;. When the &turl; is ready at the source &srm;,
+		 the target &srm; transfers the file from the source
+		 &turl; into the prepared target storage. After the
+		 file transfer completes,
+		 <function>srmReleaseFiles</function> is issued to the
+		 source &srm;.
+	      </para>
+	    </listitem>
+
+	    <listitem>
+	      <para>
+		 PUSH mode : The source &srm; initiates an
+		 <function>srmCopy</function> request. Upon the
+		 client\u0411\u2500\u2265s
+		 <function>srmCopy</function> request, the source
+		 &srm; prepares a file to be transferred out to the
+		 target &srm;, executes
+		 <function>srmPrepareToPut</function> on the target
+		 &srm;. When the &turl; is ready at the target &srm;,
+		 the source &srm; transfers the file from the prepared
+		 source into the prepared target &turl;. After the
+		 file transfer completes,
+		 <function>srmPutDone</function> is issued to the
+		 target &srm;.
+	      </para>
+	    </listitem>
+	  </itemizedlist>
+
+	  <para>
+	    When a specified target space token is provided, the files
+	    will be located in the space associated with the space
+	    token.
+	  </para>
+	<para>
+	  &srm; Version 2.2 <function>srmPrepareToPut</function> and
+	  <function>srmCopy</function> PULL mode transfers allow the
+	  user to specify a space reservation token or a
+	  <literal>RetentionPolicy</literal> and
+	  <literal>AccessLatency</literal>. Any of these parameters
+	  are optional, and it is up to the implementation to decide
+	  what to do, if these properties are not specified. The
+	  specification requires that if a space reservation is given,
+	  then the specified <literal>AccessLatency</literal> or
+	  <literal>RetentionPolicy</literal> must match those of
+	  the space reservation.
+	</para>
+
+	  <para>
+	    The Data Transfer Functions are asynchronous, an initial
+	    &srm; call starts a request execution on the server side
+	    and returns a request status that contains a unique
+	    request token. The status of request is polled
+	    periodically by &srm; get request status functions. Once a
+	    request is completed and the client receives the &turl;s
+	    the data transfers are initiated. When the transfers are
+	    completed the client notifies the &srm; server by
+	    executing <function>srmReleaseFiles</function> in case of
+	    <function>srmPrepareToGet</function> or
+	    <function>srmPutDone</function> in case of
+	    <function>srmPrepareToPut</function>. In case of
+	    <function>srmCopy</function>, the system knows when the
+	    transfers are completed and resources can be released, so
+	    it requires no special function at the end.
+	  </para>
+
+	<para>
+	  Clients are free to cancel the requests at any time by
+	  execution of <function>srmAbortFiles</function> or
+	  <function>srmAbortRequest</function>.
+	</para>
+
+      </section>
+      <section id='cf-srm-intro-requestStatusFunct'>
+	<title>Request Status Functions</title>
+	<para>
+	  The functions for checking the request status are:
+	</para>
+	<itemizedlist>
+	  <listitem>
+	    <function>srmStatusOfReserveSpaceRequest</function>
+	  </listitem>
+	  <listitem>
+	    <function>srmStatusOfUpdateSpaceRequest</function>
+	  </listitem>
+	  <listitem>
+	    <function>srmStatusOfChangeSpaceForFilesRequest</function>
+	  </listitem>
+	  <listitem>
+	    <function>srmStatusOfChangeSpaceForFilesRequest</function>
+	  </listitem>
+	  <listitem>
+	    <function>srmStatusOfBringOnlineRequest</function>
+	  </listitem>
+	  <listitem>
+	    <function>srmStatusOfPutRequest</function>
+	  </listitem>
+	  <listitem>
+	    <function>srmStatusOfCopyRequest</function>
+	  </listitem>
+	</itemizedlist>
+
+      </section>
+
+      <section id='cf-srm-intro-directoryFunct'>
+	<title>Directory Functions</title>
+	<para>
+	  &srm; Version 2.2, interface provides a complete set of
+	  directory management functions. These are
+	<itemizedlist>
+	  <listitem>
+	    <function>srmLs</function>, <function>srmRm</function>
+	  </listitem>
+	  <listitem>
+	    <function>srmMkDir</function>, <function>srmRmDir</function>
+	  </listitem>
+	  <listitem>
+	    <function>srmMv</function>
+	  </listitem>
+	</itemizedlist>
+	</para>
+      </section>
+
+      <section id='cf-srm-intro-permissionFunct'>
+	<title>Permission functions </title>
+	<para>
+	  &srm; Version 2.2 supports the following three file
+	  permission functions:
+	</para>
+	<itemizedlist>
+	  <listitem>
+	    <function>srmGetPermission</function>
+	  </listitem>
+	  <listitem>
+	    <function>srmCheckPermission</function> and
+	  </listitem>
+	  <listitem>
+	    <function>srmSetPermission</function>
+	  </listitem>
+	</itemizedlist>
+	<para>
+	  &dcache; contains an implementation of these functions that
+	  allows setting and checking of Unix file permissions.
+	</para>
+      </section>
     </section>
-   </section>
+
 </chapter>
 <!-- </namespacewrapper> -->
 
