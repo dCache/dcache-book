@@ -1412,7 +1412,7 @@ kpwdPath="&path-ode-eg;/dcache.kpwd"</programlisting>
           To be able to alter entries in the <filename>dcache.kpwd</filename> file conveniantly
 	  the dcache script offers support for doing this.
           <informalexample>
-		 <programlisting>&prompt-user;dcache kpwd dcuseradd testuser -u 12345 -g 1000 -h / -f / -w read-write -p password</programlisting>
+		 <programlisting>&prompt-user;dcache kpwd dcuseradd testuser -u 12345 -g 1000 -h / -r / -f / -w read-write -p password</programlisting>
 
 		adds this to the kpwd file:
 
