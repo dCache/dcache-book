@@ -1066,7 +1066,21 @@ pool_2={Tag={{hostname=example.org}};size=0;SC=2.7939677238464355E-4;CC=0.0;}</s
 &dc-prompt-acm; <userinput>set passwd -user=&simple-new-user; <replaceable>newPasswd</replaceable> <replaceable>newPasswd</replaceable></userinput></screen>
 
       <para>
-	Give him/her access to a particular cell:
+	For the new created users there will be an entry in the
+	directory <filename
+	class='directory'>&path-ode-eda;/users/meta</filename>.
+      </para>
+      <note>
+	<para>
+	  As the initial user <literal>admin</literal> has not been
+	  created with the above command you will not find him in the
+	  directory <filename
+	  class='directory'>&path-ode-eda;/users/meta</filename>.
+	</para>
+      </note>
+
+      <para>
+	Give the new user access to a particular cell:
       </para>
 
       <screen>&dc-prompt-acm; <userinput>create acl cell.<replaceable>cellName</replaceable>.execute</userinput>
@@ -1079,7 +1093,6 @@ pool_2={Tag={{hostname=example.org}};size=0;SC=2.7939677238464355E-4;CC=0.0;}</s
 	</para>
 	<screen>&dc-prompt-acm; <userinput>create acl cell.PnfsManager.execute</userinput>
 &dc-prompt-acm; <userinput>add access -allowed cell.PnfsManager.execute &simple-new-user;</userinput></screen>
-
 
      <para>
       Now you can check the permissions by:
