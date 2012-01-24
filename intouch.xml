@@ -769,7 +769,7 @@ webdavProtocol=https</programlisting>
       </para>
     </important>
 
-    <section>
+    <section id='intouch-admin-first-steps'>
       <title>First steps</title>
 
       <note>
@@ -786,53 +786,266 @@ Connection closed by 192.0.2.11</screen>
 
 
       <para>
-	&dcache; has a powerful administration interface. It is
-	accessed with the &ssh; protocol. The server is part of the
-	&domain-adminDoor; domain. Connect to it with
+	&dcache; has a powerful administration interface. It can be
+	accessed with the &ssh1; or with the &ssh2; protocol. The
+	server is part of the &domain-adminDoor; domain.
+      </para>
+
+      <para>
+	The admin interface used to be available using &ssh1;, which
+	is insecure and therefore discouraged.
+      </para>
+
+      <para>
+	The property <varname>sshVersion</varname> controls which
+	version to start.  Valid values are <literal>ssh1</literal> to
+	start only the &ssh1; interface, <literal>ssh2</literal> to
+	start the &ssh2; interface and <literal>both</literal> to
+	start both &ssh1; and &ssh2; interfaces. Specify the &ssh;
+	version in the file
+	<filename>&path-ode-ed;/dcache.conf</filename>.
+
+      </para>
+      <informalexample>
+	<para>
+	  Set <varname>sshVersion</varname>=<literal>&ssh2;</literal>
+	  and restart &dcache;.
+	</para>
+	<programlisting># This is the main configuration file of dCache.
+#
+...
+
+# use ssh2
+sshVersion=ssh2</programlisting>
+
+	<screen>&prompt-root; <userinput>&path-odb-n-s;dcache restart</userinput>
+Stopping dCacheDomain 0 1 2 3 4 done
+Starting dCacheDomain done</screen>
+</informalexample>
+    </section>
+    <section id='intouch-admin-ssh1'>
+      <title>Access with &ssh1;</title>
+
+      <para>
+	Connect to the server using &ssh1; with:
       </para>
 
       <screen>&prompt-user; <userinput>ssh -c blowfish -p 22223 -l admin headnode.example.org</userinput></screen>
 
-    <para>
-      The initial password is
-      <quote><literal>dickerelch</literal></quote> (which is German
-      for <quote>fat elk</quote>) and you will be greeted by the
-      prompt
-    </para>
+      <para>
+	The initial password is
+	<quote><literal>dickerelch</literal></quote> (which is German
+	for <quote>fat elk</quote>) and you will be greeted by the
+	prompt
+      </para>
 
-    <screen>   dCache Admin (VII) (user=admin)
+      <screen>   dCache Admin (VII) (user=admin)
 
 
 &dc-prompt-local;</screen>
 
-    <para>
-      The password can now be changed with
-    </para>
+      <para>
+	The password can now be changed with
+      </para>
 
-    <screen>&dc-prompt-local; <userinput>cd acm</userinput>
+      <screen>&dc-prompt-local; <userinput>cd acm</userinput>
 &dc-prompt-acm; <userinput>create user admin</userinput>
 &dc-prompt-acm; <userinput>set passwd -user=admin <replaceable>newPasswd</replaceable> <replaceable>newPasswd</replaceable></userinput>
 &dc-prompt-acm; <userinput>..</userinput>
 &dc-prompt-local; <userinput>logoff</userinput></screen>
 
+    </section>
+
+    <section id='intouch-admin-ssh2'>
+      <title>Access with &ssh2;</title>
+
+      <para>
+	There are two ways of authorizing administrators to access the
+	&dcache; &ssh2; admin interface. The preferred method
+	authorizes users through their public key. The second method
+	employs &cell-gplazma2; and the <filename>dcache.kpwd</filename>
+	file. Thereby authorization mechanisms can be added later by
+	deploying another &cell-gplazma2; plugin. The configuration of both
+	authorization mechanisms is described in the following.
+      </para>
+
+	<note>
+	  <para>
+	    All configurable values of the &ssh2; admin interface can
+	    be found in the
+	    <filename>&path-ods-usd;/defaults/admin.properties</filename>
+	    file. Please do NOT change any value in this file. Instead
+	    enter the key value combination in the
+	    <filename>&path-ode-ed;/dcache.conf</filename>.
+	  </para>
+	</note>
+
+      <section>
+	<title>Public Key Authorization</title>
+	<para>
+	  To authorize administrators through their public key just
+	  insert it into the file
+	  <filename>authorized_keys2</filename> which should by
+	  default be in the directory <filename
+	  class='directory'>&path-ods-usd;/defaults</filename> as
+	  specified in the file
+	  <filename>&path-ods-usd;/defaults/admin.properties</filename>
+	  under <literal>admin.authorizedKey2=</literal>. Keys have to
+	  be in one line and should have a standard format, such as:
+	</para>
+	<screen>ssh-dss AAAAB3....GWvM= /Users/JohnDoe/.ssh/id_dsa</screen>
+	<important>
+	  <para>
+	    Please make sure that the copied key is still in one
+	    line. Any line-break will prevent the key from being read.
+	  </para>
+	</important>
+
+
+	<note>
+	  <para>
+	    You may omit the part behind the equal sign as it is just
+	    a comment and not used by &dcache;.
+	  </para>
+	</note>
+
+	<para>
+	  Key-based authorization will always be the default. In case
+	  the user key can not be found in the file
+	  <filename>authorized_keys2</filename> or the file does not
+	  exist, ssh2Admin will fall back to authorizing the user via
+	  &cell-gplazma2; and the <filename>dcache.kpwd</filename>
+	  file.
+	</para>
+
+	<para>
+	  Now you can login to the admin interface by
+	</para>
+	<screen>&prompt-user; <userinput>ssh -l admin -p 22224 headnode.example.org</userinput>
+
+    dCache Admin (VII) (user=admin)
+
+
+(local) admin ></screen>
+      </section>
+
+      <section>
+	<title>Access via &cell-gplazma2; and the <filename>dcache.kpwd</filename> File</title>
+	<para>
+	  To use &cell-gplazma; make sure that you defined a
+	  &domain-gplazma; in your layout file.
+	</para>
+	<informalexample>
+	  Part of the layout file in <filename
+	  class="directory">&path-ode-ed;/layouts</filename>:
+	  <programlisting>[<replaceable>gplazma-${host.name}</replaceable>Domain]
+[<replaceable>gplazma-${host.name}</replaceable>Domain/gplazma]</programlisting>
+	</informalexample>
+
+	<para>
+	  To use &cell-gplazma2; you need to specify it in the
+	  <filename>&path-ode-ed;/dcache.conf</filename> file:
+	</para>
+	<programlisting># This is the main configuration file of dCache.
+#
+...
+#
+# use gPlazma2
+gplazma.version=2</programlisting>
+
+        <para>
+	  Moreover, you need to create the file
+	  <filename>&path-ode-ed;/gplazma.conf</filename> with the content
+	</para>
+<programlisting>auth optional kpwd "kpwd=&path-ode-ed;/dcache.kpwd"
+map optional kpwd "kpwd=&path-ode-ed;/dcache.kpwd"
+session optional kpwd "kpwd=&path-ode-ed;/dcache.kpwd"</programlisting>
+        <para>
+	  and add the user <literal>admin</literal> to the
+	  <filename>&path-ode-ed;/dcache.kpwd</filename> file using
+	  the <literal>dcache</literal> script.
+	</para>
+	<informalexample>
+	  <screen>&prompt-user; <userinput>dcache kpwd dcuseradd admin -u 12345 -g 1000 -h / -r / -f / -w read-write -p password</userinput>
+writing to /etc/dcache/dcache.kpwd :
+
+done writing to /etc/dcache/dcache.kpwd :
+
+&prompt-user;</screen>
+	  <para>
+	    adds this to the <filename>&path-ode-ed;/dcache.kpwd</filename> file:
+	  </para>
+	  <programlisting># set pwd
+passwd admin 4091aba7 read-write 12345 1000 / /</programlisting>
+	</informalexample>
+
+	<para>
+	  Edit the file
+	  <filename>&path-ode-ed;/dcachesrm-gplazma.policy</filename>
+	  to switch on the <literal>kpwd-plugin</literal>. For more
+	  information about &cell-gplazma; see <xref
+	  linkend='cf-gplazma'/>.
+	</para>
+
+	<para>
+	  Now the user <literal>admin</literal> can login to the admin
+	  interface with his password <literal>password</literal> by:
+	</para>
+	<screen>&prompt-user; <userinput>ssh -l admin -p 22224 headnode.example.org</userinput>
+admin@headnode.example.org's password:
+
+    dCache Admin (VII) (user=admin)
+
+
+(local) admin > </screen>
+
+        <para>
+	  To allow other users access to the admin interface add them
+	  to the <filename>&path-ode-ed;/dcache.kpwd</filename> file
+	  as described above.
+	</para>
+
+
+	<para>
+	  Just adding a user in the <filename>dcache.kpwd</filename>
+	  file is not sufficient. The generated user also needs access
+	  rights that can only be set within the admin interface
+	  itself.
+	</para>
+
+        <para>
+	  See <xref linkend='intouch-admin-new-user'/> to learn how to
+	  create the user in the admin interface and set the rights.
+	</para>
+      </section>
+    </section>
+
+
+    <section>
+      <title>How to use the Admin Interface</title>
+
     <para>
-      This already illustrates how to navigate within the
-      administration interface:
+      The command <command>help</command> lists all commands the cell
+      knows and their parameters. However, many of the commands are
+      only used for debugging and development purposes.
     </para>
+
+    <warning>
+      <para>
+	Some commands are dangerous. Executing
+	them without understanding what they do may lead to data
+	loss.
+      </para>
+    </warning>
+
     <para>
       Starting from the local prompt (&dc-prompt-local;) the command
       <command>cd</command> takes you to the specified <glossterm
-      linkend="gl-cell">cell</glossterm> (here &cell-acm;, the access
-      control manager). There two commands are executed. The escape
-      sequence <command>..</command> takes you back to the local
-      prompt and <command>logoff</command> exits the admin shell.
+      linkend="gl-cell">cell</glossterm>. In general the address of a
+      cell is a concatenation of cell name <literal>@</literal> symbol
+      and the domain name. <command>cd</command> to a cell by:
     </para>
-
-    <para>
-      There also is the command <command>help</command> for listing all
-      commands the cell knows and their parameters. However, many of the
-      commands are only used for debugging and development purposes.
-    </para>
+<screen>&dc-prompt-local; <userinput>cd <literal><replaceable>cellName</replaceable>@<replaceable>domainName</replaceable></literal></userinput></screen>
 
     <note>
       <para>
@@ -850,7 +1063,24 @@ Connection closed by 192.0.2.11</screen>
       can be used to obtain the list of domains the following way:
     </para>
 
+    <note>
+      <para>
+        The &cell-topo; cell rescans every five minutes which domains
+        are running, so it can take some time until
+        <command>ls</command> displays the full domain list.
+      </para>
+    </note>
+
     <informalexample>
+      <para>
+	As the &cell-topo; cell is a <literal>well-known</literal>
+	cell you can <command>cd</command> to it directly by
+	<literal><command>cd</command> topo</literal>.
+      </para>
+      <para>
+	Use the command <command>ls</command> to see which domains are
+	running.
+      </para>
       <screen>&dc-prompt-local; <userinput>cd topo</userinput>
 &dc-prompt-topo; <userinput>ls</userinput>
 adminDoorDomain
@@ -864,15 +1094,22 @@ srmDomain
 dCacheDomain
 httpdDomain
 namespaceDomain
-poolDomain</screen>
+poolDomain
+&dc-prompt-topo; <userinput>..</userinput>
+&dc-prompt-local;</screen>
     </informalexample>
-    <note>
-      <para>
-        The &cell-topo; cell rescans periodically which domains are
-        running, so it can take some time until <command>ls</command>
-        displays the full domain list.
-      </para>
-    </note>
+
+
+    <para>
+      The escape sequence <command>..</command> takes you back to the
+      local prompt.
+    </para>
+
+    <para>
+      The command <command>logoff</command> exits the admin shell.
+    </para>
+
+
 
     <para>
        If you want to find out which cells are running on a certain
@@ -888,8 +1125,7 @@ poolDomain</screen>
 	command.
       </para>
 
-      <screen>&dc-prompt-topo; <userinput>..</userinput>
-&dc-prompt-local; <userinput>cd System@poolDomain</userinput>
+      <screen>&dc-prompt-local; <userinput>cd System@poolDomain</userinput>
 &dc-prompt-pooldomain; <userinput>ps</userinput>
   Cell List
 ------------------
@@ -1053,19 +1289,32 @@ pool_2={Tag={{hostname=example.org}};size=0;SC=2.7939677238464355E-4;CC=0.0;}</s
 
     </section>
 
-    <section>
+    <section id='intouch-admin-new-user'>
       <title>Create a new user</title>
       <para>
-	To create a new user, &new-user;, set a new password and to
-	give him/her an access to a particular cell (for example to
-	the &cell-poolmngr;) run following command sequence:
+	To create a new user, &new-user; and set a new password for
+	the user <command>cd</command> from the local prompt
+	(&dc-prompt-local;) to the &cell-acm;, the access control
+	manager, and run following command sequence:
       </para>
-
       <screen>&dc-prompt-local; <userinput>cd acm</userinput>
 &dc-prompt-acm; <userinput>create user &simple-new-user;</userinput>
-&dc-prompt-acm; <userinput>set passwd -user=&simple-new-user; <replaceable>newPasswd</replaceable> <replaceable>newPasswd</replaceable></userinput>
-&dc-prompt-acm; <userinput>create acl cell.PoolManager.execute</userinput>
-&dc-prompt-acm; <userinput>add access -allowed cell.PnfsManager.execute </userinput></screen>
+&dc-prompt-acm; <userinput>set passwd -user=&simple-new-user; <replaceable>newPasswd</replaceable> <replaceable>newPasswd</replaceable></userinput></screen>
+
+      <para>
+	Give him/her access to a particular cell:
+      </para>
+
+      <screen>&dc-prompt-acm; <userinput>create acl cell.<replaceable>cellName</replaceable>.execute</userinput>
+&dc-prompt-acm; <userinput>add access -allowed cell.<replaceable>cellName</replaceable>.execute &simple-new-user;</userinput></screen>
+
+
+      <informalexample>
+	<para>
+	  Give the new user access to the &cell-pnfsmngr;.
+	</para>
+	<screen>&dc-prompt-acm; <userinput>create acl cell.PnfsManager.execute</userinput>
+&dc-prompt-acm; <userinput>add access -allowed cell.PnfsManager.execute &simple-new-user;</userinput></screen>
 
 
      <para>
@@ -1074,20 +1323,22 @@ pool_2={Tag={{hostname=example.org}};size=0;SC=2.7939677238464355E-4;CC=0.0;}</s
 
      <screen>&dc-prompt-acm; <userinput>check cell.PnfsManager.execute &simple-new-user;</userinput>
 Allowed
-&dc-prompt-acm; <userinput>show acl cell.PnfsManager.execute &simple-new-user;</userinput>
+&dc-prompt-acm; <userinput>show acl cell.PnfsManager.execute</userinput>
 &lt;noinheritance&gt;
 &lt;new-user&gt; -&gt; true</screen>
+      </informalexample>
 
+      <para>
+	The following commands allow access to every cell for a user
+	&simple-new-user;:
+      </para>
 
-     <para>
-      Following commands allow to a particular user an access to every cell:
-     </para>
-
-     <screen>&dc-prompt-acm; <userinput> create acl cell.*.execute</userinput>
+      <screen>&dc-prompt-acm; <userinput>create acl cell.*.execute</userinput>
 &dc-prompt-acm; <userinput>add access -allowed cell.*.execute &simple-new-user;</userinput></screen>
 
      <para>
-      To make an user as powerful as &admin; (&dcache;'s equivalent to the &root; user):
+      The following command makes a user as powerful as &admin;
+      (&dcache;'s equivalent to the &root; user):
      </para>
 
      <screen>&dc-prompt-acm; <userinput>create acl *.*.*</userinput>
