@@ -65,7 +65,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY sunjvm       "<productname>Sun JVM</productname>">
 <!ENTITY glite        "<productname>gLite</productname>">
 <!ENTITY netty        "<productname>Netty</productname>">
-<!ENTITY voms "<productname>VOMS</productname>">
+<!ENTITY voms         "<productname>VOMS</productname>">
 
 <!-- Various domains -->
 <!ENTITY domain-http      "<literal>httpDomain</literal>">
@@ -81,10 +81,10 @@ Rules / Guidelines / Suggestions for adding new entities:
 
 
 <!-- Various cells -->
-<!ENTITY cell-poolmngr "<literal>PoolManager</literal>">
-<!ENTITY cell-acm      "<literal>acm</literal>">
-<!ENTITY cell-pnfsmngr "<literal>PnfsManager</literal>">
-<!ENTITY cell-pool-eg  "<literal><replaceable>poolHostname</replaceable>_1</literal>">
+<!ENTITY cell-poolmngr  "<literal>PoolManager</literal>">
+<!ENTITY cell-acm       "<literal>acm</literal>">
+<!ENTITY cell-pnfsmngr  "<literal>PnfsManager</literal>">
+<!ENTITY cell-pool-eg   "<literal><replaceable>poolHostname</replaceable>_1</literal>">
 <!ENTITY cell-billing   "<literal>billing</literal>">
 <!ENTITY cell-spacemngr "<literal>SpaceManager</literal>">
 <!ENTITY cell-cleaner   "<literal>Cleaner</literal>">
@@ -163,6 +163,8 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY gridftp  "<systemitem class='protocol'>GridFTP</systemitem>">
 <!ENTITY srm      "<systemitem class='protocol'>SRM</systemitem>">
 <!ENTITY ssh      "<systemitem class='protocol'>ssh</systemitem>">
+<!ENTITY ssh1      "<systemitem class='protocol'>ssh1</systemitem>">
+<!ENTITY ssh2      "<systemitem class='protocol'>ssh2</systemitem>">
 <!ENTITY ftp      "<systemitem class='protocol'>FTP</systemitem>">
 <!ENTITY tcp      "<systemitem class='protocol'>TCP</systemitem>">
 <!ENTITY ip       "<systemitem class='protocol'>IP</systemitem>">
@@ -290,6 +292,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 -->
 <!ENTITY path-ode-ed "<phrase layout='opt'>/opt/d-cache/etc</phrase><phrase layout='fhs'>/etc/dcache</phrase>">
 <!ENTITY path-ode-eg "<phrase layout='opt'>/opt/d-cache/etc</phrase><phrase layout='fhs'>/etc/grid-security</phrase>">
+<!ENTITY path-ode-eda "<phrase layout='opt'>/opt/d-cache/etc</phrase><phrase layout='fhs'>/etc/dcache/admin</phrase>">
 <!ENTITY path-ods-usd "<phrase layout='opt'>/opt/d-cache/share</phrase><phrase layout='fhs'>/usr/share/dcache</phrase>">
 <!ENTITY path-odl-usd "<phrase layout='opt'>/opt/d-cache/libexec</phrase><phrase layout='fhs'>/usr/share/dcache</phrase>">
 <!ENTITY path-odc-ed "<phrase layout='opt'>/opt/d-cache/config</phrase><phrase layout='fhs'>/etc/dcache</phrase>">
