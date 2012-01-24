@@ -1053,19 +1053,32 @@ pool_2={Tag={{hostname=example.org}};size=0;SC=2.7939677238464355E-4;CC=0.0;}</s
 
     </section>
 
-    <section>
+    <section id='intouch-admin-new-user'>
       <title>Create a new user</title>
       <para>
-	To create a new user, &new-user;, set a new password and to
-	give him/her an access to a particular cell (for example to
-	the &cell-poolmngr;) run following command sequence:
+	To create a new user, &new-user; and set a new password for
+	the user <command>cd</command> from the local prompt
+	(&dc-prompt-local;) to the &cell-acm;, the access control
+	manager, and run following command sequence:
       </para>
-
       <screen>&dc-prompt-local; <userinput>cd acm</userinput>
 &dc-prompt-acm; <userinput>create user &simple-new-user;</userinput>
-&dc-prompt-acm; <userinput>set passwd -user=&simple-new-user; <replaceable>newPasswd</replaceable> <replaceable>newPasswd</replaceable></userinput>
-&dc-prompt-acm; <userinput>create acl cell.PoolManager.execute</userinput>
-&dc-prompt-acm; <userinput>add access -allowed cell.PnfsManager.execute </userinput></screen>
+&dc-prompt-acm; <userinput>set passwd -user=&simple-new-user; <replaceable>newPasswd</replaceable> <replaceable>newPasswd</replaceable></userinput></screen>
+
+      <para>
+	Give him/her access to a particular cell:
+      </para>
+
+      <screen>&dc-prompt-acm; <userinput>create acl cell.<replaceable>cellName</replaceable>.execute</userinput>
+&dc-prompt-acm; <userinput>add access -allowed cell.<replaceable>cellName</replaceable>.execute &simple-new-user;</userinput></screen>
+
+
+      <informalexample>
+	<para>
+	  Give the new user access to the &cell-pnfsmngr;.
+	</para>
+	<screen>&dc-prompt-acm; <userinput>create acl cell.PnfsManager.execute</userinput>
+&dc-prompt-acm; <userinput>add access -allowed cell.PnfsManager.execute &simple-new-user;</userinput></screen>
 
 
      <para>
@@ -1074,20 +1087,22 @@ pool_2={Tag={{hostname=example.org}};size=0;SC=2.7939677238464355E-4;CC=0.0;}</s
 
      <screen>&dc-prompt-acm; <userinput>check cell.PnfsManager.execute &simple-new-user;</userinput>
 Allowed
-&dc-prompt-acm; <userinput>show acl cell.PnfsManager.execute &simple-new-user;</userinput>
+&dc-prompt-acm; <userinput>show acl cell.PnfsManager.execute</userinput>
 &lt;noinheritance&gt;
 &lt;new-user&gt; -&gt; true</screen>
+      </informalexample>
 
+      <para>
+	The following commands allow access to every cell for a user
+	&simple-new-user;:
+      </para>
 
-     <para>
-      Following commands allow to a particular user an access to every cell:
-     </para>
-
-     <screen>&dc-prompt-acm; <userinput> create acl cell.*.execute</userinput>
+      <screen>&dc-prompt-acm; <userinput>create acl cell.*.execute</userinput>
 &dc-prompt-acm; <userinput>add access -allowed cell.*.execute &simple-new-user;</userinput></screen>
 
      <para>
-      To make an user as powerful as &admin; (&dcache;'s equivalent to the &root; user):
+      The following command makes a user as powerful as &admin;
+      (&dcache;'s equivalent to the &root; user):
      </para>
 
      <screen>&dc-prompt-acm; <userinput>create acl *.*.*</userinput>
