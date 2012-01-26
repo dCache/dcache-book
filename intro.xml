@@ -206,11 +206,11 @@
     <title>The &dcache; Layer Model</title>
     <mediaobject>
       <imageobject role="fo">
-	<imagedata fileref="images/test2.svg" format="SVG" align="center" contentwidth="16cm"/> 
+	<imagedata fileref="images/test2.svg" format="SVG" align="center" contentwidth="16cm"/>
                             <!-- width="100%" scalefit="1" contentdepth="100%" should scale optimal, but fop doesnt like it -->
       </imageobject>
       <imageobject role="html">
-	<imagedata fileref="images/test.png" format="PNG" align="center"/>
+	<imagedata fileref="../images/test.png" format="PNG" align="center"/>
       </imageobject>
     </mediaobject>
   </figure>
