@@ -1,6 +1,9 @@
 ######## Configuration
 #
 
+#
+#  This is the 2-digit dCache version for this book.
+#
 DCACHE_VERSION=2.1
 
 #
@@ -123,11 +126,11 @@ all: pdf html txt man epub
 #
 #  Converting generic book into flavour-specific book
 
-%-fhs.xml: %.xml
-	$(XSLTPROC) $(XSLT_FLAGS) --stringparam  profile.layout fhs -o $@ xsl/profile.xsl $<
+%-fhs.xml: %.xml dcache-version.xml
+	$(XSLTPROC) $(XSLT_FLAGS) --stringparam profile.layout fhs -o $@ xsl/profile.xsl $<
 
-%-opt.xml: %.xml
-	$(XSLTPROC) $(XSLT_FLAGS) --stringparam  profile.layout opt -o $@ xsl/profile.xsl $<
+%-opt.xml: %.xml dcache-version.xml
+	$(XSLTPROC) $(XSLT_FLAGS) --stringparam profile.layout opt -o $@ xsl/profile.xsl $<
 
 
 ###### HTML targets
@@ -140,19 +143,30 @@ html:  html-single html-chunk
 html-single: $(HTML_SINGLE_FILES)
 html-chunk: $(HTML_CHUNK_FILES)
 
-
-%.$(HTML_EXT): %-opt.xml $(STYLESHEETS_HTML) shared-entities.xml
-	$(XSLTPROC) $(XSLT_FLAGS) --stringparam html.ext ".$(HTML_EXT)" --stringparam layout opt -o $@ xsl/html-single.xsl $<
-
-%/index.$(HTML_EXT): %-opt.xml $(STYLESHEETS_CHUNK) shared-entities.xml
-	$(XSLTPROC) $(XSLT_FLAGS) --stringparam html.ext ".$(HTML_EXT)" --stringparam layout opt --stringparam base.dir $(@:%/index.$(HTML_EXT)=%)/ --stringparam comments.enabled false xsl/html-chunk.xsl $<
-
+#
+#  Build single-page version(s)
+#
+#      NB. The order matters: more specific must come first
+#
 
 %-fhs.$(HTML_EXT): %-fhs.xml $(STYLESHEETS_HTML) shared-entities.xml
 	$(XSLTPROC) $(XSLT_FLAGS) --stringparam html.ext ".$(HTML_EXT)" --stringparam layout fhs -o $@ xsl/html-single.xsl $<
 
+%.$(HTML_EXT): %-opt.xml $(STYLESHEETS_HTML) shared-entities.xml
+	$(XSLTPROC) $(XSLT_FLAGS) --stringparam html.ext ".$(HTML_EXT)" --stringparam layout opt -o $@ xsl/html-single.xsl $<
+
+#
+#  Build chunked version
+#
+#    NB. The order matters: more specific (index-fhs) must come first
+#
+
 %/index-fhs.$(HTML_EXT): %-fhs.xml $(STYLESHEETS_CHUNK) shared-entities.xml
 	$(XSLTPROC) $(XSLT_FLAGS) --stringparam html.ext "-fhs.$(HTML_EXT)" --stringparam layout fhs --stringparam base.dir $(@:%/index-fhs.$(HTML_EXT)=%)/ --stringparam comments.enabled false xsl/html-chunk.xsl $<
+
+
+%/index.$(HTML_EXT): %-opt.xml $(STYLESHEETS_CHUNK) shared-entities.xml
+	$(XSLTPROC) $(XSLT_FLAGS) --stringparam html.ext ".$(HTML_EXT)" --stringparam layout opt --stringparam base.dir $(@:%/index.$(HTML_EXT)=%)/ --stringparam comments.enabled false xsl/html-chunk.xsl $<
 
 
 #  Commented chunked HTML
@@ -200,18 +214,21 @@ man-fhs: Book-fhs.xml $(STYLESHEETS_MAN) shared-entities.xml
 ## TODO: we should autogenerate dependencies, like with other targets
 epub: $(EPUB_FILES)
 
-%.epub: %-opt.xml $(STYLESHEETS_EPUB) shared-entities.xml
-	$(XSLTPROC) $(XSLT_FLAGS) xsl/epub.xsl $<
-	echo application/epub+zip > mimetype
-	zip -rn mimetype $@ mimetype META-INF OEBPS
-	rm -rf mimetype META-INF OEBPS
-
+#  NB. The order of these two rules is important.  The more specific
+#  one (-fhs.epub) must go first
 
 %-fhs.epub: %-fhs.xml $(STYLESHEETS_EPUB) shared-entities.xml
 	$(XSLTPROC) $(XSLT_FLAGS) xsl/epub.xsl $<
 	echo application/epub+zip > mimetype
 	zip -rn mimetype $@ mimetype META-INF OEBPS
 	rm -rf mimetype META-INF OEBPS
+
+%.epub: %-opt.xml $(STYLESHEETS_EPUB) shared-entities.xml
+	$(XSLTPROC) $(XSLT_FLAGS) xsl/epub.xsl $<
+	echo application/epub+zip > mimetype
+	zip -rn mimetype $@ mimetype META-INF OEBPS
+	rm -rf mimetype META-INF OEBPS
+
 
 ###### FO-based targets
 #
@@ -293,33 +310,41 @@ distclean: clean
 
 ###### Create (dynamic) Makefile dependencies
 #
+#  N.B.  The order of these rules is important.  The more specific rule must
+#        go first; for example, the rule to make .%-fhs-letter.fo.d must come
+#        before the rule to make .%-letter.fo.d .%-a4.fo.d.  This is because
+#        the rule for generating .Book-fhs-letter.fo.d has two possible
+#        routes.  In this situation, make will select the first rule in
+#        definition order.
+#
 
 .%-fhs.xml.d .%-opt.xml.d: %.xml
 	$(XSLTPROC) --nonet -stringparam output-file $(@:.%.d=%) --stringparam initial-file $< --stringparam graphics SVG --stringparam dep-file $@ dependency.xsl $< > $@
 
-.%-letter.fo.d .%-a4.fo.d: %-opt.xml
-	$(XSLTPROC) --nonet -stringparam output-file $(@:.%.d=%) --stringparam initial-file $< --stringparam graphics SVG  --stringparam dep-file $@ dependency.xsl $< > $@
-
 .%-fhs-letter.fo.d .%-fhs-a4.fo.d: %-fhs.xml
 	$(XSLTPROC) --nonet -stringparam output-file $(@:.%.d=%) --stringparam initial-file $< --stringparam graphics SVG  --stringparam dep-file $@ dependency.xsl $< > $@
 
-.%.$(HTML_EXT).d: %-opt.xml
-	$(XSLTPROC) --nonet -stringparam output-file $(@:.%.d=%) --stringparam initial-file $< --stringparam graphics none --stringparam dep-file $@ dependency.xsl $< > $@
+.%-letter.fo.d .%-a4.fo.d: %-opt.xml
+	$(XSLTPROC) --nonet -stringparam output-file $(@:.%.d=%) --stringparam initial-file $< --stringparam graphics SVG  --stringparam dep-file $@ dependency.xsl $< > $@
 
 .%-fhs.$(HTML_EXT).d: %-fhs.xml
 	$(XSLTPROC) --nonet -stringparam output-file $(@:.%.d=%) --stringparam initial-file $< --stringparam graphics none --stringparam dep-file $@ dependency.xsl $< > $@
 
-.%-chunk.d: %-opt.xml
-	$(XSLTPROC) --nonet -stringparam output-file $(@:.%.xml=%/index.$(HTML_EXT)) --stringparam initial-file $< --stringparam graphics none --stringparam dep-file $@ dependency.xsl $< > $@
+.%.$(HTML_EXT).d: %-opt.xml
+	$(XSLTPROC) --nonet -stringparam output-file $(@:.%.d=%) --stringparam initial-file $< --stringparam graphics none --stringparam dep-file $@ dependency.xsl $< > $@
 
 .%-fhs-chunk.d: %-fhs.xml
 	$(XSLTPROC) --nonet -stringparam output-file $(@:.%-fhs-chunk.d=%/index-fhs.$(HTML_EXT)) --stringparam initial-file $< --stringparam graphics none --stringparam dep-file $@ dependency.xsl $< > $@
 
-.%-comments.d: %-opt.xml
-	$(XSLTPROC) --nonet -stringparam output-file $(@:.%-comments.d=%/index-comments.$(HTML_EXT)) --stringparam initial-file $< --stringparam graphics none --stringparam dep-file $@ dependency.xsl $< > $@
+.%-chunk.d: %-opt.xml
+	$(XSLTPROC) --nonet -stringparam output-file $(@:.%.xml=%/index.$(HTML_EXT)) --stringparam initial-file $< --stringparam graphics none --stringparam dep-file $@ dependency.xsl $< > $@
 
 .%-fhs-comments.d: %-fhs.xml
 	$(XSLTPROC) --nonet -stringparam output-file $(@:.%-fhs-comments.d=%/index-fhs-comments.$(HTML_EXT)) --stringparam initial-file $< --stringparam graphics none --stringparam dep-file $@ dependency.xsl $< > $@
+
+.%-comments.d: %-opt.xml
+	$(XSLTPROC) --nonet -stringparam output-file $(@:.%-comments.d=%/index-comments.$(HTML_EXT)) --stringparam initial-file $< --stringparam graphics none --stringparam dep-file $@ dependency.xsl $< > $@
+
 
 .PHONY:	all pdf html html-single html-chunked
 .PHONY: clean distclean
