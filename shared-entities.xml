@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
 
+<!-- Include defn of dcache-version from 'dcache-version.xml' file.
+     This is the two-digit version number from Makefile. -->
+<!ENTITY % dcache-version-defn SYSTEM "dcache-version.xml" >
+%dcache-version-defn;
+
+
 <!--
 This file contains entities.  These representing commonly typed
 text and provide a simple method of expansing to the
@@ -16,8 +22,17 @@ Rules / Guidelines / Suggestions for adding new entities:
   4.  Go through whole document and switch existing usage to new entity.
 -->
 
-<!-- dCache-version -->
-<!ENTITY dcache-version          "2.1">
+<!-- An *example* dCache 3-digit version.  This includes the patch-level number.
+     For example: "2.0.1" -->
+<!ENTITY dcache-patch-version          "&dcache-version;.1">
+
+<!-- An *example* dCache 3-digit version; this is the next patch-level release
+     from &dcache-patch-version; -->
+<!ENTITY dcache-next-patch-version     "&dcache-version;.2">
+
+<!-- An *example* dCache version that includes a packaging number.
+     This is useful when referring to RPM files -->
+<!ENTITY dcache-package-version  "&dcache-patch-version;-1">
 
 <!-- dCache packages files in one of two different layouts.  These are
      profiled in the documentation using the 'layout' attribute.  The

@@ -413,7 +413,7 @@ GlueSEStatus: Production
 GlueSEUniqueID: &example-fqdn;
 GlueSEImplementationName: dCache
 GlueSEArchitecture: multidisk
-GlueSEImplementationVersion: &dcache-version;-3 (ns=Chimera)
+GlueSEImplementationVersion: &dcache-patch-version; (ns=Chimera)
 GlueSESizeTotal: 86</screen>
 
     <para>

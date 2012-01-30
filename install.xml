@@ -132,8 +132,8 @@
 
        <para>
        The actual sources lie at <ulink url="http://www.dcache.org/downloads.shtml"/>.
-       To install for example Version &dcache-version;-1 of the server you would use this:
-        <screen>&prompt-root; <userinput>rpm -ivh http://www.dcache.org/downloads/1.9/dcache-server-&dcache-version;-1.noarch.rpm</userinput></screen>
+       To install for example Version &dcache-package-version; of the server you would use this:
+        <screen>&prompt-root; <userinput>rpm -ivh http://www.dcache.org/downloads/1.9/dcache-server-&dcache-package-version;.noarch.rpm</userinput></screen>
         The client can be found in the download-section of the above url, too.
         </para>
 
@@ -838,7 +838,7 @@ Starting srmDomain  Done (pid=8081)</screen>
 
   <para>
     Upgrading to bugfix releases within one supported branch (e.g. from
-    &dcache-version;-1 to  &dcache-version;-2) may be done by
+    &dcache-patch-version; to  &dcache-next-patch-version;) may be done by
     upgrading the packages with
 
     <screen>&prompt-root; <userinput>rpm -Uvh <replaceable>packageName</replaceable></userinput></screen>

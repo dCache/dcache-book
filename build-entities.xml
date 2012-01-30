@@ -1,3 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 
+<!-- Include defn of 'dcache-version' entity from 'dcache-version.xml' file.
+     This is the two-digit version number from Makefile. -->
+<!ENTITY % dcache-version-defn SYSTEM "dcache-version.xml" >
+%dcache-version-defn;
+
 <!ENTITY location-frag-footer  "/template/frags/footer.shtml">
