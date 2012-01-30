@@ -53,7 +53,7 @@ div.toc span.section {
 }
 
 code.literal, pre.programlisting, pre.screen {
-    font-size: 10pt;
+    font-size: 85%;
     font-family: monospace;
     overflow: auto;
 }
