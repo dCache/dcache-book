@@ -219,12 +219,12 @@ txt: $(TXT_FILES)
 man: man-opt man-fhs
 
 man-opt: Book-opt.xml $(STYLESHEETS_MAN) shared-entities.xml
-	@[ ! -d man ] && mkdir man || :
-	$(XSLTPROC) $(XSLT_FLAGS) --output man-opt/ xsl/man.xsl $<
+	@[ ! -d $@ ] && mkdir $@ || :
+	$(XSLTPROC) $(XSLT_FLAGS) --output $@/ xsl/man.xsl $<
 
 man-fhs: Book-fhs.xml $(STYLESHEETS_MAN) shared-entities.xml
-	@[ ! -d man ] && mkdir man || :
-	$(XSLTPROC) $(XSLT_FLAGS) --output man-fhs/ xsl/man.xsl $<
+	@[ ! -d $@ ] && mkdir $@ || :
+	$(XSLTPROC) $(XSLT_FLAGS) --output $@/ xsl/man.xsl $<
 
 
 ###### EPUB targets
