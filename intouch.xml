@@ -887,8 +887,8 @@ Starting dCacheDomain done</screen>
 	  insert it into the file
 	  <filename>authorized_keys2</filename> which should by
 	  default be in the directory <filename
-	  class='directory'>&path-ods-usd;/defaults</filename> as
-	  specified in the file
+	  class='directory'>&path-ode-eda;</filename> as specified in
+	  the file
 	  <filename>&path-ods-usd;/defaults/admin.properties</filename>
 	  under <literal>admin.authorizedKey2=</literal>. Keys have to
 	  be in one line and should have a standard format, such as:
