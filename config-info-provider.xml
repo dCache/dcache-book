@@ -46,6 +46,10 @@
     &yaim;.
   </para>
 
+  <note>
+    Be sure you have at least v2.0.8 of glue-schema RPM installed on
+    the node running the info-provider.
+  </note>
   <para>
     This chapter describes how to enable and test the
     &dcache;-internal collection of information needed by the
