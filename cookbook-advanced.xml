@@ -8,29 +8,27 @@
 <chapter id="cb-tuning">
 
   <title>Advanced Tuning</title>
-  
+
   <para>
     The use cases described in this chapter are only relevant for
     large-scale &dcache; instances which require special tuning
     according to a longer experience with client behaviour.
   </para>
-  
+
   <section id="cb-adv-multi-mover-queues">
     <title>Multiple Queues for Movers in each Pool</title>
-    
-    
+
     <section id="cb-adv-multi-mover-queues-d">
       <title>Description</title>
-      
+
       <para>
         Client requests to a &dcache; system may have rather diverse
-        bahaviour. Sometimes it is possible to classify them into
+        behaviour. Sometimes it is possible to classify them into
         several typical usage patterns. An example are the following
-        two usage patterns:
+        two concurrent usage patterns:
       </para>
 
-      <example>
-	<title>To Concurrent Usage Patterns</title>
+      <informalexample>
 
 	<para>
 	  Data is copied with a high transfer rate to the &dcache;
@@ -42,10 +40,9 @@
 	  read a few bytes, do a few hours of calculations, and
 	  finally read some more data.
 	</para>
-      </example>
 
       <para>
-        As long as the number of active requests do not exceed the
+        As long as the number of active requests does not exceed the
         maximum number of allowed active requests, the two types of
         requests are processed concurrently. The &gridftp; transfers
         complete at a high rate while the processing jobs take hours
@@ -63,7 +60,8 @@
         a higher value, then in turn &gridftp; request would put a
         very high load on the pool host.
       </para>
-      
+      </informalexample>
+
       <para>
         The above example is pretty realistic: As a rule of thumb,
         &gridftp; requests are fastest, &dcap; requests with the
@@ -74,22 +72,21 @@
       </para>
 
     </section>
-    
+
     <section id="cb-adv-multi-mover-queues-s">
       <title>Solution</title>
-      
+
       <para>
         Use separate queues for the movers, depending on the door
         initiating them. This easily allows for a separation of
-        requests of separate protocols. Up to 10 mover queues for
-        client transfers are available since &dcache; version
-        1.6.6. Earlier versions support only one queue. (Transfers
-        from an to a <glossterm linkend="gl-tape_backend">tape
+        requests of separate protocols.
+        (Transfers
+        from and to a <glossterm linkend="gl-tape_backend">tape
         backend</glossterm> and <glossterm
         linkend="gl-p2p">pool-to-pool transfers</glossterm> are
         handled by separate queues, one for each of these transfers.)
       </para>
-      
+
       <para>
         A finer grained queue selection mechanism based on, e.g. the
         &ip; address of the client or the file which has been
@@ -98,7 +95,7 @@
         (PSU)</glossterm> may provide a separation onto separate pools
         using those criteria.
       </para>
-      
+
       <para>
         In the above example, two separate queues for fast &gridftp;
         transfers and slow &dcap; library access would solve the
@@ -109,134 +106,124 @@
       </para>
 
     </section>
-    
+
     <section id="cb-adv-multi-mover-queues-c">
       <title>Configuration</title>
-      
+
       <para>
 	For a multi mover queue setup, the pools have to be told to
 	start several queues and the doors have to be configured to
 	use one of these. It makes sense to create the same queues on
-	all pools. This is done by the following change to the
-	<filename>config/pool.batch</filename> file:
+	all pools. This is done by the following change to the file
+	<filename>&path-ode-ed;/dcache.conf</filename>:
       </para>
-        
-      <example>
-	<title>Modified <filename>config/pool.batch</filename> file
-	for multiple mover queues</title>
-          
-	<programlisting>...
-define context startPools endDefine
-  create diskCacheV111.pools.MultiProtocolPool2 ${0} \
-         "!MoverMap \
-         ${1} \
-         <emphasis>-io-queues=<replaceable>queueName-1</replaceable>[,<replaceable>queueName-2</replaceable>[,...,<replaceable>queueName-10</replaceable>]] \</emphasis>
-         -recover-control=yes \
-         -version=4 \
-         -sticky=allowed \
-         -sendHitInfoMessages=yes \
-         -${2} -${3} -${4} -${5} -${6} -${7} -${8} \
-         "
-endDefine
-...</programlisting>
+      <programlisting>poolIoQueue=queueA,queueB</programlisting>
 
-      </example>
-
-      <para>        
-        The same can be achived by appending
-        <literal>-io-queues=<replaceable>queueName-1</replaceable>,...,<replaceable>queueName-n</replaceable></literal>
-        to each line in the <glossterm
-        linkend="gl-poollist-file"><literal>poollist</literal>
-        file</glossterm>. However, this only makes sense if the pools
-        should not all have the same queues.
-      </para>
-      
-      <para>
-        The first in this list of queues
-        (<literal><replaceable>queueName-1</replaceable></literal>) is
-        the <glossterm linkend="gl-default-mover-queue">default mover
-        queue</glossterm>. Transfers not requesting a particular mover
-        queue or requesting a mover queue not existing on the selected
-        pool, are handled by this default queue.
-      </para>
-      
-      <para>
-	The pool cell commands <xref
-	linkend="cmd-mover_ls"/> and <xref
-	linkend="cmd-mover_set_max_active"/> have an
-	<option>-queue</option> option to select the mover queue to
-	operate on. Without this option, <xref
-	linkend="cmd-mover_set_max_active"/> will act on the default
-	queue while <xref linkend="cmd-mover_ls"/> will list
-	the requests of all pools for backward compatibility.
-      </para>
-      
       <para>
 	Each door may be configured to use a particular mover
-	queue. The pool, selected for this request, doesn't depend on
+	queue. The pool, selected for this request, does not depend on
 	the selected mover queue. So a request may go to a pool which
-	doesn't have the particular mover queue configured and will
+	does not have the particular mover queue configured and will
 	consequently end up in the default mover queue of that pool.
       </para>
-      
+      <programlisting>gsiftpIoQueue=queueA
+dcapIoQueue=queueB</programlisting>
+      <para>
+        All requests send from this kind of door will ask to be
+        scheduled to the given mover queue. The selection of the pool
+        is not affected.
+      </para>
+
       <para>
 	The doors are configured to use a particular mover queue as in
 	the following example:
       </para>
 
-      <example>
-	<title>Batch file for a GridFTP door using a mover
-	queue</title>
-          
-<programlisting>...
-create dmg.cells.services.login.LoginManager GFTP \
-       "<replaceable>portName</replaceable> \
-       diskCacheV111.doors.GsiFtpDoorV1 \
-       <emphasis>-io-queue=<replaceable>queueName</replaceable> \</emphasis>
-       ... \
-"</programlisting>
-          
-      </example>
+      <informalexample>
+	<para>
+	  Create the queues <literal>queueA</literal> and
+	  <literal>queueB</literal>, where <literal>queueA</literal>
+	  shall be the queue for the &gridftp; transfers and
+	  <literal>queueB</literal> for &dcap;.
+	</para>
+
+      <programlisting>poolIoQueue=queueA,queueB
+gsiftpIoQueue=queueA
+dcapIoQueue=queueB</programlisting>
+      </informalexample>
 
       <para>
-        All requests send from this door will ask to be scheduled to
-        the given mover queue. The selection of the pool is not
-        affected.
+	If the pools should not all have the same queues you can
+	define queues for pools in the layout file. Here you might as
+	well define that a specific door is using a specific queue.
+      </para>
+      <informalexample>
+	<para>
+	 In this example <literal>queueC</literal>is defined for
+	 <literal>pool1</literal> and <literal>queueD</literal> is
+	 defined for <literal>pool2</literal>. The &gridftp; door
+	 running in the domain <literal>myDoors</literal> is using the
+	 queue <literal>queueB</literal>.
+	</para>
+
+	<programlisting>[myPools]
+[myPools/pool1]
+poolIoQueue=queueC
+[myPools/pool2]
+poolIoQueue=queueD
+
+[myDoors]
+[myDoors/dcap]
+dcapIoQueue=queueC
+[myDoors/gridftp]
+gsiftpIoQueue=queueD</programlisting>
+      </informalexample>
+
+      <para>
+	There is always a default queue called
+	<literal>regular</literal>. Transfers not requesting a
+	particular mover queue or requesting a mover queue not
+	existing on the selected pool, are handled by the
+	<literal>regular</literal> queue.
       </para>
 
       <para>
-        For the &dcap; protocol, the corresponding door may be
-        configured to allow the client to determine the mover queue
-        name. In that case the client may use the extra option
-        facility to specify a mover queue. Whether the the &dcap; door
-        allows the client to request a particular mover queue or not
-        is configured with the
-        <option>-io-queue={allowed|denied}</option> option as in the
-        following example:
+	The pool cell commands <xref linkend="cmd-mover_ls"/> and
+	<xref linkend="cmd-mover_set_max_active"/> have a
+	<option>-queue</option> option to select the mover queue to
+	operate on. Without this option, <xref
+	linkend="cmd-mover_set_max_active"/> will act on the default
+	queue while <xref linkend="cmd-mover_ls"/> will list all
+	active and waiting client transfer requests.
       </para>
-      
-      <example>
-	<title>Batch file for a dCap door for allowing the client to select
-the mover queue</title>
-  
-        <programlisting>...
-create dmg.cells.services.login.LoginManager DCap \
-       "${dCapPort} \
-       diskCacheV111.doors.DCapDoor \
-       -io-queue=<replaceable>queueName</replaceable> \
-       <emphasis>-io-queue-overwrite=allowed \</emphasis>
-       ... \
-"</programlisting>
 
-      </example>
-     
+      <para>
+        For the &dcap; protocol, it is possible to allow the client to
+        choose another queue name than the one defined in the file
+        <filename>dcache.conf</filename>. To achieve this
+        the property <varname>dcapIoQueueOverwrite</varname> needs to
+        be set to <literal>allowed</literal>.
+      </para>
+
+      <informalexample>
+	<para>
+	  Create the queues <literal>queueA</literal> and
+	  <literal>queue_dccp</literal>, where <literal>queueA</literal>
+	  shall be the queue for &dcap;.
+	</para>
+	<programlisting>poolIoQueue=queueA,queue_dccp
+dcapIoQueue=queueA
+dcapIoQueueOverwrite=allowed</programlisting>
+
+
       <para>
 	With the &prog-dccp; command the queue can now be specified as
 	follows:
       </para>
-        
-      <screen>&prompt-user; <userinput>dccp -X-io-queue=queueName <replaceable>source</replaceable> <replaceable>destination</replaceable></userinput></screen>
 
+      <screen>&prompt-user; <userinput>dccp -X-io-queue=queue_dccp <replaceable>source</replaceable> <replaceable>destination</replaceable></userinput></screen>
+
+      </informalexample>
       <para>
         Since &prog-dccp; requests may be quite different from other
         requests with the &dcap; protocol, this feature may be used to
@@ -245,28 +232,106 @@ create dmg.cells.services.login.LoginManager DCap \
         changed in future releases to request a special
         <command>dccp</command>-queue by default.
       </para>
-      
+
     </section>
-    
-  </section>
+  <section id="cb-adv-multi-mover-queues-t">
+    <title>Tunable Properties for Multiple Queues</title>
 
-
-  <section id="cb-tuning-parameters">
-    <title>Tunable Parameters</title>
-        
-    <section id="cb-tuning-parameters-dcap">
-      <title>gridftp</title>
-      
-      <table tabstyle="small">
-	<title>Variable Overview</title>
+      <informaltable tabstyle="small">
 
 	<tgroup cols="3" align="center">
-	  <colspec colnum="1" colname="Variable" colwidth="*" align="left"/>
+	  <colspec colnum="1" colname="Property" colwidth="*" align="left"/>
 	  <colspec colnum="2" colname="Default Value" colwidth="*"/>
 	  <colspec colnum="3" colname="Description" colwidth="2*" align="left"/>
 	  <thead>
 	    <row>
-	      <entry align="center">Variable</entry>
+	      <entry align="center">Property</entry>
+	      <entry>Default Value</entry>
+	      <entry align="center">Description</entry>
+	    </row>
+	  </thead>
+          <tbody>
+            <row>
+	      <entry>poolIoQueue</entry>
+	      <entry>&no-default;</entry>
+	      <entry> I/O queue name</entry>
+	    </row>
+            <row>
+	      <entry>dcapIoQueue</entry>
+	      <entry>&no-default;</entry>
+	      <entry>Insecure &dcap; I/O queue name</entry>
+	    </row>
+	    <row>
+	      <entry>gsidcapIoQueue</entry>
+	      <entry>&no-default;</entry>
+	      <entry>&gsidcap; I/O queue name</entry>
+	    </row>
+            <row>
+	      <entry>dcapIoQueueOverwrite</entry>
+	      <entry>denied</entry>
+	      <entry>Controls whether an application is allowed to overwrite a queue name</entry>
+	    </row>
+            <row>
+	      <entry>gsidcapIoQueueOverwrite</entry>
+	      <entry>denied</entry>
+	      <entry>Controls whether an application is allowed to overwrite a queue name</entry>
+	    </row>
+            <row>
+	      <entry>kerberosdcapIoQueueOverwrite</entry>
+	      <entry>denied</entry>
+	      <entry>Controls whether an application is allowed to overwrite a queue name</entry>
+	    </row>
+            <row>
+	      <entry>gsiftpIoQueue</entry>
+	      <entry>&no-default;</entry>
+	      <entry>&gsiftp; I/O queue name</entry>
+	    </row>
+            <row>
+	      <entry>nfsIoQueue</entry>
+	      <entry>&no-default;</entry>
+	      <entry>&nfs; I/O queue name</entry>
+	    </row>
+            <row>
+	      <entry>remoteGsiftpIoQueue</entry>
+	      <entry>&no-default;</entry>
+	      <entry>queue used for SRM third-party transfers (i.e. the srmCopy command)</entry>
+	    </row>
+            <row>
+	      <entry>webdavIoQueue</entry>
+	      <entry>&no-default;</entry>
+	      <entry>&webdav; and &http; I/O queue name</entry>
+	    </row>
+            <row>
+	      <entry>xrootdIoQueue</entry>
+	      <entry>&no-default;</entry>
+	      <entry>&xrootd; I/O queue name</entry>
+	    </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+      <!-- Dirty hack to introduce a potential page-break -->
+      <para/>
+
+    </section>
+  </section>
+
+
+  <section id="cb-tuning-parameters">
+    <title>Tunable Properties</title>
+
+    <section id="cb-tuning-parameters-dcap">
+      <title>&dcap;</title>
+
+      <table tabstyle="small">
+	<title>Property Overview</title>
+
+	<tgroup cols="3" align="center">
+	  <colspec colnum="1" colname="Property" colwidth="*" align="left"/>
+	  <colspec colnum="2" colname="Default Value" colwidth="*"/>
+	  <colspec colnum="3" colname="Description" colwidth="2*" align="left"/>
+	  <thead>
+	    <row>
+	      <entry align="center">Property</entry>
 	      <entry>Default Value</entry>
 	      <entry align="center">Description</entry>
 	    </row>
@@ -305,15 +370,15 @@ create dmg.cells.services.login.LoginManager DCap \
       <title>&gridftp;</title>
 
       <table tabstyle="small">
-	<title>Variable Overview</title>
+	<title>Property Overview</title>
 
 	<tgroup cols="3" align="center">
-          <colspec colnum="1" colname="Variable" colwidth="*" align="left"/>
+          <colspec colnum="1" colname="Property" colwidth="*" align="left"/>
           <colspec colnum="2" colname="Default Value" colwidth="*"/>
           <colspec colnum="3" colname="Description" colwidth="2*" align="left"/>
 	  <thead>
              <row>
-	       <entry align="center">Variable</entry>
+	       <entry align="center">Property</entry>
 	       <entry>Default Value</entry>
 	       <entry align="center">Description</entry>
 	     </row>
@@ -417,15 +482,15 @@ create dmg.cells.services.login.LoginManager DCap \
       <title>&srm;</title>
 
       <table tabstyle="small">
-        <title>Variable Overview</title>
+        <title>Property Overview</title>
 
         <tgroup cols="3" align="center">
-          <colspec colnum="1" colname="Variable" colwidth="3*" align="left"/>
+          <colspec colnum="1" colname="Property" colwidth="3*" align="left"/>
           <colspec colnum="2" colname="Default Value" colwidth="2*"/>
           <colspec colnum="3" colname="Description" colwidth="3*" align="left"/>
 	  <thead>
 	    <row>
-	      <entry align="center">Variable</entry>
+	      <entry align="center">Property</entry>
 	      <entry>Default Value</entry>
 	      <entry align="center">Description</entry>
 	    </row>
