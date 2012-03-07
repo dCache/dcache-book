@@ -7,11 +7,16 @@
 
 <chapter id="cf-pnfs">
 
-  <title>Configuration in &pnfs;</title>
-  
+  <title>&pnfs;</title>
+
+  <important>
+    This chapter is for existing installations.
+    New installations should use <link
+    linkend="cf-chimera">&chimera;</link> and not &pnfs;.
+  </important>
   <para>
-    This chapter gives background information about &pnfs;, the
-    filesystem, &dcache; is based on. Only the aspects of &pnfs;
+    This chapter gives background information about &pnfs;. &pnfs; is the
+    filesystem, &dcache; used to be based on. Only the aspects of &pnfs;
     relevant to &dcache; will be explained here.  A complete set of
     documentation is available from <ulink
     url="http://www-pnfs.desy.de/">the &pnfs; homepage</ulink>.
