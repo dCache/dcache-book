@@ -734,10 +734,18 @@ Running tasks:
 &dc-prompt-pool; <userinput>st jobs ls</userinput>
 &dc-prompt-pool; <userinput>rh jobs ls</userinput></screen>
 
-      Now the files on the pools have to be unregistered on the &pnfs;
-      server with
+      Now the files on the pools have to be unregistered on the
+      namespace server with
 
 <screen>&dc-prompt-pool; <userinput>pnfs unregister</userinput></screen>
+
+      <note>
+	Do not get confused that the commands <command>pnfs
+	unregister</command> and <command>pnfs register</command>
+	contain <literal>pnfs</literal> in their names. They also
+	apply to &dcache; instances with &chimera; and are named like
+	that for legacy reasons.
+      </note>
 
       Even if the pool contains precious files, this is no problem, since
       we will register them again in a moment. The files might not be available
@@ -785,6 +793,10 @@ path=/pool/</programlisting>
       </para>
       </warning>
 
+      Start the domain running the pool:
+<screen>&prompt-root; <userinput>&path-odb-n-s;dcache start <replaceable>poolDomain</replaceable></userinput>
+Starting poolDomain done
+&prompt-root;</screen>
 
 
       Register the files on the pool with
