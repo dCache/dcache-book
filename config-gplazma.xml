@@ -804,6 +804,61 @@ session requisite nsswitch #5</programlisting>
         </informalexample>
             </para>
         </section>
+        <section id="cf-gplazma-gp2-configuration-plugins-nis">
+            <title>nis</title>
+            <para>
+              The &gp2-nis; is a &map;, &identity; and &session; plug-in
+              which talks to configured &nis; to provide user mapping as well
+              as user and group forward and reverse map.
+            </para>
+          <informaltable frame='all'>
+            <tgroup cols='3' align='left' colsep='1' rowsep='1'>
+              <colspec colname='parameter' colwidth='*'/>
+              <colspec colname='meaning' colwidth='1.5*'/>
+              <colspec colname='default' colwidth='3.0*'/>
+              <thead>
+                <row>
+                  <entry>Parameter</entry>
+                  <entry>Meaning</entry>
+                  <entry>Default</entry>
+                </row>
+              </thead>
+              <tbody>
+                <row>
+                  <entry><varname>server</varname></entry>
+                  <entry>&nis; server host</entry>
+                  <entry>No default value provided</entry>
+                </row>
+                <row>
+                  <entry><varname>domain</varname></entry>
+                  <entry>&nis; domain</entry>
+                  <entry>No default value provided</entry>
+                </row>
+              </tbody>
+            </tgroup>
+          </informaltable>
+
+            <para>The result of &gp2-nis; can be used by other plug-ins:
+                <informalexample>
+                    <programlisting># Map grid or kerberos users to local accounts
+auth    optional  x509 #1
+auth    optional  voms #2
+map     requisite vorolemap #3
+map     optional  krb5 #4
+map     optional  nis #5
+session requisite nis #6</programlisting>
+                </informalexample>
+                <para>
+                  In this example two access methods are considered: grid based and
+                  kerberos based. If user comes with grid certificate and VOMS role:
+                  extract user's DN (1), extract and verify VOMS attributes (2),
+                  map DN+Role to a local  account (3). If user comes with &kerberos;
+                  ticket: extract local account (4). After this point in both cases
+                  we talk to &nis; to get uid and gids for a local account (5) and,
+                  finally, adding users home directory (6).
+                </para>
+            </para>
+        </section>
       </section>
     </section>
   </section>
