@@ -307,8 +307,15 @@ CREATE TRIGGER
       <title>Generating &ssh;-keys</title>
 
       <para>
-	In order to use the Admin Interface of &dcache; (see <xref
-	linkend="intouch-admin"/>) you will need to generate &ssh;-keys.
+	The Admin Interface of &dcache; (see <xref
+	linkend="intouch-admin"/>) of &dcache; needs &ssh; keys and
+	therefore &dcache; will only start after the &ssh; keys have
+	been generated.  The Admin Interface may be accessed via
+	&ssh1; and &ssh2;.
+      </para>
+      <para>
+	The following procedure describes how to generate RSA keys,
+	which are needed for &ssh1; access.
       </para>
 
       <screen>&prompt-root; <userinput>ssh-keygen -b 768 -t rsa1 -f &path-ode-ed;/server_key -N ""</userinput>
@@ -323,6 +330,31 @@ Your identification has been saved in &path-ode-ed;/host_key.
 Your public key has been saved in &path-ode-ed;/host_key.pub.
 The key fingerprint is:
 75:a4:2b:24:cc:75:ad:b7:bd:8b:dd:1a:3e:96:3f:9d root@example.org</screen>
+
+      <para>
+	The following procedure describes how to generate DSA keys,
+	which are needed for &ssh2; access.
+      </para>
+
+      <screen>&prompt-root; <userinput>ssh-keygen -t dsa -f &path-ode-ed;/ssh_host_dsa_key -N ""</userinput>
+Generating public/private dsa key pair.
+Your identification has been saved in &path-ode-ed;/ssh_host_dsa_key.
+Your public key has been saved in &path-ode-ed;/ssh_host_dsa_key.pub.
+The key fingerprint is:
+7e:c9:26:bc:ee:bb:cd:62:51:5e:c2:2e:89:3a:84:56 root@example.org
+The key's randomart image is:
++--[ DSA 1024]----+
+|                 |
+|                 |
+|         .       |
+|    E     + .    |
+|   o   .S= o     |
+|  o . .o+.o.     |
+| . . .  +o=      |
+|    o   oB       |
+|     . +*+o      |
++-----------------+</screen>
+
       <para>
 	Now you can start &dcache;.
       </para>
@@ -331,7 +363,7 @@ The key fingerprint is:
 Starting dCacheDomain done</screen>
 
      <para>
-       So far, no configuration is done, so only one predefined domain is started.
+       So far, no configuration is done, so only the predefined domain is started.
      </para>
 
     </section>
