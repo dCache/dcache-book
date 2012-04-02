@@ -615,92 +615,6 @@ maxDiskSpace=2T</programlisting>
 
       </section>
 
-      <section id="in-install-non-root">
-	<title>Running &dcache; as a non-&user-root; user</title>
-	<para>
-	  For security reasons you might want to run &dcache; as a
-	  non-&user-root; user. This needs to be configured in
-	  <filename>&path-ode-ed;/dcache.conf</filename> and the
-	  ownership of the pools and the billing directories need to
-	  be changed.
-	</para>
-	<informalexample>
-	  <para>
-	    In this example we explain how to configure &dcache; to
-	    run as user &user-dcache;.
-	  </para>
-	  <para>
-	    First of all create the user &user-dcache; and a new
-	    directory <filename
-	    class="directory">/var/log/dcache</filename>, owned by
-	    &user-dcache;
-	  </para>
-
-	    <screen>&prompt-root;<userinput>useradd dcache</userinput>
-&prompt-root;<userinput>mkdir /var/log/dcache</userinput>
-&prompt-root;<userinput>chown dcache /var/log/dcache</userinput></screen>
-	    <para>
-	      and add two lines to
-	      <filename>&path-ode-ed;/dcache.conf</filename>.
-	  </para>
-	  <programlisting>dcache.user=dcache
-dcache.paths.billing=/var/log/dcache</programlisting>
-	  <para>
-	    In the layout file
-	    <filename>&path-ode-ed;/layouts/mylayout.conf</filename>
-	    a pool was defined.
-	  </para>
-	  <programlisting>[${host.name}Domain/pool]
-name=pool1
-path=/path/to/pool1
-maxDiskSpace=2T</programlisting>
-          <para>
-	    Change the ownership of the directory of the pool.
-	  </para>
-	  <screen>&prompt-root;<userinput>chown -R dcache /path/to/pool1</userinput></screen>
-	  <para>
-	    Moreover, if &dcache; has been running as &user-root; the
-	    files <filename>/tmp/createDDL.jdbc</filename> and
-	    <filename>/tmp/dropDDL.jdbc</filename> need to be removed
-	    as they are owned by the user &user-root;.
-	  </para>
-	  <screen>&prompt-root;<userinput>rm -f /tmp/createDDL.jdbc /tmp/dropDDL.jdbc</userinput></screen>
-
-	<important>
-	  <para>
-	    If you switched the portmap daemon off the domain in which
-	    the &nfs; server is running needs to be running as
-	    &user-root;. This needs to be set in the layout file.
-	  </para>
-	<programlisting>[namespaceDomain]
-dcache.user=root
-[namespaceDomain/pnfsmanager]
-[namespaceDomain/cleaner]
-[namespaceDomain/acl]
-[namespaceDomain/nfsv3]</programlisting>
-	</important>
-
-          <para>
-	    Now you can start &dcache; as user &user-dcache;
-	  </para>
-	  <screen>&prompt-root;<userinput>&path-odb-n-s;dcache start</userinput>
-Starting dCacheDomain done
-Starting namespaceDomain done
-Starting gPlazmaDomain done
-Starting srmDomain done</screen>
-          <para>
-            and verifiy that &dcache; is running as &user-dcache; and
-            the &nfs; server is running as &user-root;.
-	  </para>
-	  <screen>&prompt-root;<userinput>&path-odb-n-s;dcache status</userinput>
-DOMAIN          STATUS  PID   USER
-dCacheDomain    running 11040 dcache
-namespaceDomain running 11117 root
-gPlazmaDomain   running 11125 dcache
-srmDomain       running 11182 dcache</screen>
-	</informalexample>
-      </section>
-
       <section id="in-install-configure-java">
 	<title>&java; heap size</title>
 
@@ -778,6 +692,100 @@ Starting srmDomain  Done (pid=8081)</screen>
       </para>
 
   </section>
+
+      <section id="in-install-non-root">
+	<title>Running &dcache; as a non-&user-root; user</title>
+	<para>
+	  For security reasons you might want to run &dcache; as a
+	  non-&user-root; user. This needs to be configured in
+	  <filename>&path-ode-ed;/dcache.conf</filename> and the
+	  ownership of the pools and the billing directories need to
+	  be changed.
+	</para>
+	<informalexample>
+	  <para>
+	    In this example we explain how to configure &dcache; to
+	    run as user &user-dcache;.
+	  </para>
+	  <para>
+	    First of all create the user &user-dcache; and a new
+	    directory <filename
+	    class="directory">/var/log/dcache</filename>, owned by
+	    &user-dcache;
+	  </para>
+
+	    <screen>&prompt-root;<userinput>useradd dcache</userinput>
+&prompt-root;<userinput>mkdir /var/log/dcache</userinput>
+&prompt-root;<userinput>chown dcache /var/log/dcache</userinput></screen>
+	    <para>
+	      and add two lines to
+	      <filename>&path-ode-ed;/dcache.conf</filename>.
+	  </para>
+	  <programlisting>dcache.user=dcache
+dcache.paths.billing=/var/log/dcache</programlisting>
+          <para>
+	    Change the ownership of the files
+	    <filename>/etc/grid-security/hostcert.pem</filename> and
+	    <filename>/etc/grid-security/hostkey.pem</filename>
+	  </para>
+<screen>&prompt-root;<userinput>chown dcache /etc/grid-security/hostcert.pem</userinput>
+&prompt-root;<userinput>chown dcache /etc/grid-security/hostkey.pem</userinput></screen>
+
+	  <para>
+	    In the layout file
+	    <filename>&path-ode-ed;/layouts/mylayout.conf</filename>
+	    a pool was defined.
+	  </para>
+	  <programlisting>[${host.name}Domain/pool]
+name=pool1
+path=/path/to/pool1
+maxDiskSpace=2T</programlisting>
+          <para>
+	    Change the ownership of the directory of the pool.
+	  </para>
+	  <screen>&prompt-root;<userinput>chown -R dcache /path/to/pool1</userinput></screen>
+	  <para>
+	    Moreover, if &dcache; has been running as &user-root; the
+	    files <filename>/tmp/createDDL.jdbc</filename> and
+	    <filename>/tmp/dropDDL.jdbc</filename> need to be removed
+	    as they are owned by the user &user-root;.
+	  </para>
+	  <screen>&prompt-root;<userinput>rm -f /tmp/createDDL.jdbc /tmp/dropDDL.jdbc</userinput></screen>
+
+	<important>
+	  <para>
+	    If you switched the portmap daemon off the domain in which
+	    the &nfs; server is running needs to be running as
+	    &user-root;. This needs to be set in the layout file.
+	  </para>
+	<programlisting>[namespaceDomain]
+dcache.user=root
+[namespaceDomain/pnfsmanager]
+[namespaceDomain/cleaner]
+[namespaceDomain/acl]
+[namespaceDomain/nfsv3]</programlisting>
+	</important>
+
+          <para>
+	    Now you can start &dcache; as user &user-dcache;
+	  </para>
+	  <screen>&prompt-root;<userinput>&path-odb-n-s;dcache start</userinput>
+Starting dCacheDomain done
+Starting namespaceDomain done
+Starting gPlazmaDomain done
+Starting srmDomain done</screen>
+          <para>
+            and verifiy that &dcache; is running as &user-dcache; and
+            the &nfs; server is running as &user-root;.
+	  </para>
+	  <screen>&prompt-root;<userinput>&path-odb-n-s;dcache status</userinput>
+DOMAIN          STATUS  PID   USER
+dCacheDomain    running 11040 dcache
+namespaceDomain running 11117 root
+gPlazmaDomain   running 11125 dcache
+srmDomain       running 11182 dcache</screen>
+	</informalexample>
+      </section>
 
   <section id="in-install-multinode">
     <title>Installing &dcache; on several nodes</title>
