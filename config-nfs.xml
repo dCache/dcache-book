@@ -15,6 +15,13 @@
     &posix; IO using standard &nfs4; clients.
   </para>
 
+  <important>
+    <para>
+      The <systemitem>pNFS</systemitem> mentioned in this chapter is
+      the protocol &nfs4-pnfs; and not the namespace &pnfs;.
+    </para>
+  </important>
+
   <section id="cf-nfs4-setup">
     <title>Setting up</title>
 
