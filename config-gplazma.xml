@@ -750,8 +750,8 @@ session requisite authzdb</programlisting>
               <tbody>
                 <row>
                   <entry><varname>vorolemap</varname></entry>
-                  <entry>Path to <filename>vorolemap</filename></entry>
-                  <entry><filename>/etc/grid-security/vorolemap</filename></entry>
+                  <entry>Path to <filename>grid-vorolemap</filename></entry>
+                  <entry><filename>/etc/grid-security/grid-vorolemap</filename></entry>
                 </row>
               </tbody>
             </tgroup>
