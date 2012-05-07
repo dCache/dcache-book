@@ -59,16 +59,33 @@
       this step.
     </para>
     <para>
-You can enable the &cell-webadmin; interface by adding the service (&cell-webadmin;) to a domain;
-for example:
+      You can enable the &cell-webadmin; interface by adding the service (&cell-webadmin;) to a domain.
+    </para>
+    <informalexample>
       <programlisting>[webadminDomain]
 [webadminDomain/webadmin]
-webadminHttpsPort=8443
-webadminHttpPort=8080
 webadminDCacheInstanceName=coolName
 webadminAuthenticated=true
 webadminAdminGid=1000</programlisting>
-	</para>
+    </informalexample>
+
+    <para>
+      The default value for the <varname>webadminHttpsPort</varname>
+      is <literal>8444</literal> and for the
+      <varname>webadminHttpPort</varname> it is
+      <literal>8080</literal>. Have a look at the following example to
+      see how to modify these values.
+    </para>
+    <informalexample>
+      <programlisting>[webadminDomain]
+[webadminDomain/webadmin]
+webadminHttpsPort=8445
+webadminHttpPort=8081
+webadminDCacheInstanceName=coolName
+webadminAuthenticated=true
+webadminAdminGid=1000</programlisting>
+    </informalexample>
+
 	<para>
 	  The most important value is <varname>webadminAdminGid</varname>, because it configures who is allowed to
 	  alter dCache behaviour, which certainly should not be everyone:
