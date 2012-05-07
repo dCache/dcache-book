@@ -61,10 +61,6 @@
 &prompt-root;<userinput> wget http://grid-deployment.web.cern.ch/grid-deployment/glite/repos/3.2/glite-UI.repo</userinput>
 &prompt-root; <userinput>yum install dcap</userinput></screen>
 
-	<para>
-	  Now set the <envar>PATH</envar> environment variable.
-	</para>
-	<screen>&prompt-root; <userinput>export PATH=/opt/d-cache/dcap/bin/:$PATH</userinput></screen>
 	<section id="dcap-unmounted">
 	  <title>&dcap; without mounted namespace</title>
 	  <para>
@@ -288,15 +284,12 @@ passwd: all authentication tokens updated successfully.
     <screen>&prompt-root; <userinput>yum install glite-security-voms-clients</userinput></screen>
 
     <para>
-      Set the <envar>PATH</envar> and <envar>LD_LIBRARY_PATH</envar>
-      environment variables and generate a proxy certificate using the
-      command <command>voms-proxy-init</command><!--(see <xref
+      Generate a proxy certificate using the command
+      <command>voms-proxy-init</command><!--(see <xref
       linkend="cb-voms-proxy"/>)-->.
     </para>
     <informalexample>
-    <screen>&prompt-user; <userinput>export PATH=$PATH:/opt/glite/bin/</userinput>
-&prompt-user; <userinput>export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/d-cache/dcap/lib64</userinput>
-&prompt-user; <userinput>voms-proxy-init</userinput>
+    <screen>&prompt-user; <userinput>voms-proxy-init</userinput>
 Enter GRID pass phrase:
 Your identity: /C=DE/O=GermanGrid/OU=DESY/CN=John Doe
 
@@ -312,7 +305,7 @@ Your proxy is valid until Mon Mar  7 22:06:15 2011</screen>
      the proxy. These attributes are signed by the user's VOMS server
      when the proxy is created. For the <command>voms-proxy-init -voms
      </command> command you need to have the file
-     <filename>/opt/glite/etc/vomses</filename> which contains entries
+     <filename>/etc/vomses</filename> which contains entries
      about the VOMS servers like
     </para>
 
@@ -435,13 +428,6 @@ gplazmalite-vorole-mapping-priority="1"
       </informalexample>
 
       <para>
-	In order to use the shared libraries, you need to set the
-	<envar>LD_LIBRARY_PATH</envar> environment variable.
-      </para>
-
-      <screen>&prompt-user; <userinput>export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/globus/lib</userinput></screen>
-
-      <para>
 	The machine running the &gsidcap; door needs to have a host
 	certificate and you need to have a valid user
 	certificate. In addition, you should have created a <link
@@ -478,8 +464,7 @@ gplazmalite-vorole-mapping-priority="1"
 	  is contained in the &glite;-UI, on the worker node and set
 	  the <envar>PATH</envar> environment variable.
 	</para>
-	<screen>&prompt-root; <userinput>yum install dcache-srmclient</userinput>
-&prompt-root; <userinput>export PATH=/opt/d-cache/srm/bin/:$PATH</userinput></screen>
+	<screen>&prompt-root; <userinput>yum install dcache-srmclient</userinput></screen>
 
         <para>
 	  You can now copy a file into your &dcache; using the &srm;,
@@ -682,46 +667,6 @@ webdavProtocol=https</programlisting>
 }</programlisting>
 
 <!-- TODO new config -->
-    <para>
-      The files
-      <filename>config/<replaceable>domainName</replaceable>Setup</filename>
-      contain configuration parameters for the domain. These files are
-      typically symbolic links to
-      <filename>config/dCacheSetup</filename>. This is the primary
-      configuration file of &dcache;.
-    </para>
-
-    <para>
-      The only files which are different for each domain are
-      <filename>config/<replaceable>domainName</replaceable>.batch</filename>.
-      They describe which <glossterm
-      linkend="gl-cell">cells</glossterm> are started in the
-      <glossterm linkend="gl-domain">domains</glossterm>. Normally,
-      changes in these files should not be necessary. However, if you
-      need to change something, consider the following:
-    </para>
-
-    <para>
-      Since the standard
-      <filename>config/<replaceable>domainName</replaceable>.batch</filename>
-      files will be overwritten when updating to a newer version of
-      &dcache; (e.g. with RPM), it is a good idea to modify only
-      private copies of them.  When choosing a name like
-      <filename>config/<replaceable>newDomainName</replaceable>.batch</filename>
-      you give the domain the name
-      <replaceable>newDomainName</replaceable>. The necessary links
-      can be created with
-    </para>
-
-    <screen>&prompt-root; <userinput>cd /opt/d-cache/config/</userinput>
-&prompt-root; <userinput>../jobs/initPackage.sh</userinput></screen>
-
-    <para>
-      Then the old domain can be stopped and the new one started:
-    </para>
-
-    <screen>&prompt-root; <userinput>/opt/d-cache/bin/dache stop <replaceable>domainName</replaceable></userinput>
-&prompt-root; <userinput>/opt/d-cache/bin/dcache start <replaceable>newDomainName</replaceable></userinput></screen>
 
     <para>
       More details about domains and cells can be found in <xref
@@ -733,10 +678,8 @@ webdavProtocol=https</programlisting>
       &cell-poolmngr; cell. It reads additional configuration
       information from the file
       <filename>config/PoolManager.conf</filename> at
-      start-up. However, in contrast to the
-      <filename>config/<replaceable>domainName</replaceable>Setup</filename>
-      files, it is not necessary to restart the domain when changing
-      the file. We will see an example of this below.
+      start-up. However, it is not necessary to restart the domain
+      when changing the file. We will see an example of this below.
     </para>
 
     <para>
@@ -755,8 +698,6 @@ webdavProtocol=https</programlisting>
         </para>
       -->
   </section>
-
-
 
   <section id="intouch-admin">
     <title>The Admin Interface</title>
