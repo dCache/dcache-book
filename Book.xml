@@ -27,24 +27,6 @@
 	glossary and a parameter and command reference.
       </para>
 
-      <para>
-	Each release of &dcache; is available in two file layouts:
-	&layout-fhs; and &layout-opt;.  The &layout-fhs;
-	layout has files located according to the <ulink
-	url='http://www.pathname.com/fhs/'>Filesystem Hierarchy
-	Standard</ulink>.  Most modern distributions have adopted the
-	FHS, so we recommend that fresh installations of &dcache; used
-	this layout.
-      </para>
-
-      <para>
-	The &layout-opt; layout places all the files in <filename
-	class="directory">/opt/d-cache</filename> directory.  This is
-	where previous versions of &dcache; located all the packaged
-	files.  The &layout-opt; layout is provided for backwards
-	compatibility and to satisfy those sites that cannot use the
-	&layout-fhs; layout.
-      </para>
     </abstract>
 
     <mediaobject>
