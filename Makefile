@@ -17,7 +17,7 @@ DCACHE_VERSION=2.3
 #
 #  SOURCES must end ".xml" and must be DocBook files.
 #
-SOURCES = Book.xml dcache-whitepaper-light.xml
+SOURCES = Book.xml
 
 #  The extension for all HTML output (e.g. html or shtml).  Must NOT
 #  start with a dot.
