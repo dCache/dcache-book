@@ -54,12 +54,25 @@
       </imageobject>
     </mediaobject>
 
-   <mediaobject>
+    <mediaobject>
       <imageobject role="fo">
 	<imagedata fileref="images/logos-emi-helmholtz.svg"
 		   format="SVG" align="center" contentwidth="13cm"/>
       </imageobject>
-    </mediaobject>
+      <textobject role="fo">
+	<phrase>EMI</phrase>
+      </textobject>
+      <caption role="fo">
+	<para>
+	  This work is co-funded by the European Commission as part of
+	  the EMI project under Grant Agreement INFSO-RI-261611.
+	</para>
+	<para>
+	  EMI-Product: dCache-server; Version: &dcache-version;
+	</para>
+      </caption>
+
+   </mediaobject>
 
   </bookinfo>
 
