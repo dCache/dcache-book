@@ -65,6 +65,7 @@
   <xsl:param name="page.margin.outer" select="'2.5cm'"/>
   <xsl:param name="body.font.master" select="11"/>
   <xsl:param name="shade.verbatim" select="1"/>
+  <xsl:param name="variablelist.as.blocks" select="1"/>
 
   <xsl:param name="fop1.extensions" select="1"/>
 
