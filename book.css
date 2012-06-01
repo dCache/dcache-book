@@ -190,8 +190,6 @@ div.note p, div.tip p, div.warning p, div.caution p, div.important p {
 div.tip, div.note {
     background-color: #f9fff9;
     border-color: #80c080;
-    width: 25em;
-    float: right;
 }
 
 /* Likewise, warning and caution have some common properties */
