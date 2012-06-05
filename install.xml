@@ -128,12 +128,12 @@
         The RPM packages may be installed right away, for example
         using the command:
       </para>
-      <screen>&prompt-root; <userinput>rpm -ivh dcache-server-<replaceable>version</replaceable>.noarch.rpm</userinput></screen>
+      <screen>&prompt-root; <userinput>rpm -ivh dcache-<replaceable>version</replaceable>.noarch.rpm</userinput></screen>
 
        <para>
-       The actual sources lie at <ulink url="http://www.dcache.org/downloads.shtml"/>.
-       To install for example Version &dcache-package-version; of the server you would use this:
-        <screen>&prompt-root; <userinput>rpm -ivh http://www.dcache.org/downloads/1.9/dcache-server-&dcache-package-version;.noarch.rpm</userinput></screen>
+       The actual sources lie at <ulink url="http://www.dcache.org/downloads/IAgree.shtml"/>.
+       To install for example Version &dcache-package-version; you would use this:
+        <screen>&prompt-root; <userinput>rpm -ivh http://www.dcache.org/downloads/1.9/dcache-&dcache-package-version;.noarch.rpm</userinput></screen>
         The client can be found in the download-section of the above url, too.
         </para>
 
