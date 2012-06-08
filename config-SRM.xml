@@ -444,7 +444,7 @@ remoteGsiftpMaxTransfers=2000</programlisting>
 	<filename>&path-ode-ed;/dcache.conf</filename>
       </para>
 
-      <programlisting>srmSpaceManagerEnabled=yes</programlisting>
+      <programlisting>srmSpaceManagerEnabled=true</programlisting>
 
     </section>
 
@@ -1229,15 +1229,15 @@ Space token =110044</screen>
       </para>
 
       <para>
-	Possible values are <literal>yes</literal> and
-	<literal>no</literal>. Default is <literal>yes</literal>.
+	Possible values are <literal>true</literal> and
+	<literal>false</literal>. Default is <literal>true</literal>.
       </para>
 
       <para>
 	Usage example:
       </para>
 
-      <programlisting>srmSpaceManagerEnabled=yes</programlisting>
+      <programlisting>srmSpaceManagerEnabled=true</programlisting>
     </section>
 
     <section>
@@ -1251,17 +1251,17 @@ Space token =110044</screen>
       </para>
 
       <para>
-	Possible values are <literal>yes</literal> and
-	<literal>no</literal>. This is enabled by default. It has no
+	Possible values are <literal>true</literal> and
+	<literal>false</literal>. This is enabled by default. It has no
 	effect if <varname>srmSpaceManagerEnabled</varname> is set to
-	<literal>no</literal>.
+	<literal>true</literal>.
       </para>
 
       <para>
 	Usage example:
       </para>
 
-      <programlisting>srmImplicitSpaceManagerEnabled=yes</programlisting>
+      <programlisting>srmImplicitSpaceManagerEnabled=true</programlisting>
     </section>
 
     <section>
@@ -1274,15 +1274,15 @@ Space token =110044</screen>
       </para>
 
       <para>
-	Possible values are <literal>yes</literal> and
-	<literal>no</literal>. Default is <literal>no</literal>.
+	Possible values are <literal>true</literal> and
+	<literal>false</literal>. Default is <literal>false</literal>.
       </para>
 
       <para>
 	Usage example:
       </para>
 
-      <programlisting>overwriteEnabled=yes</programlisting>
+      <programlisting>overwriteEnabled=true</programlisting>
     </section>
 
     <section>
@@ -1295,7 +1295,7 @@ Space token =110044</screen>
 	when client does not specify desired overwrite mode. This
 	option will be considered only if
 	<varname>overwriteEnabled</varname> is set to
-	<literal>yes</literal>.
+	<literal>true</literal>.
       </para>
 
       <para>
