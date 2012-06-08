@@ -521,7 +521,6 @@ Starting dCacheDomain done</screen>
 	</para>
 	<programlisting>[dCacheDomain]
 [dCacheDomain/poolmanager]
-[dCacheDomain/dummy-prestager]
 [dCacheDomain/broadcast]
 [dCacheDomain/loginbroker]
 #[dCacheDomain/topo]
