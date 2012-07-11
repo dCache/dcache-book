@@ -254,7 +254,7 @@ session requisite authzdb</programlisting>
                   Path to <filename>dcache.kpwd</filename>
                 </para>
                 <para>
-                  Default: <filename>&path-ode-eg;/dcache.kpwd</filename>
+                  Default: <filename>&path-ode-ed;/dcache.kpwd</filename>
                 </para>
               </listitem>
             </varlistentry>
@@ -321,7 +321,7 @@ session requisite authzdb</programlisting>
                   Path to <filename>dcache.kpwd</filename>
                 </para>
                 <para>
-                  Default: <filename>&path-ode-eg;/dcache.kpwd</filename>
+                  Default: <filename>&path-ode-ed;/dcache.kpwd</filename>
                 </para>
               </listitem>
             </varlistentry>
@@ -572,7 +572,7 @@ session requisite nis #6</programlisting>
                   Path to <filename>dcache.kpwd</filename>
                 </para>
                 <para>
-                  Default: <filename>&path-ode-eg;/dcache.kpwd</filename>
+                  Default: <filename>&path-ode-ed;/dcache.kpwd</filename>
                 </para>
               </listitem>
             </varlistentry>
@@ -817,7 +817,7 @@ saml-vo-mapping-priority="1"
 kpwd-priority="3"
 
 # dcache.kpwd
-kpwdPath="&path-ode-eg;/dcache.kpwd"
+kpwdPath="&path-ode-ed;/dcache.kpwd"
 
 # SAML-based grid VO role mapping
 mappingServiceUrl="https://fledgling09.fnal.gov:8443/gums/services/GUMSAuthorizationServicePort"
@@ -1552,7 +1552,7 @@ authorize cms823 read-write 10823 7000 / /data/cms823 /</programlisting>
 
       <informalexample>
         <programlisting># dcache.kpwd
-kpwdPath="&path-ode-eg;/dcache.kpwd"</programlisting>
+kpwdPath="&path-ode-ed;/dcache.kpwd"</programlisting>
       </informalexample>
       <para>
         To maintain only one such file, make sure that this is the same
@@ -1916,7 +1916,7 @@ webdavBasicAuthentication=true</programlisting>
 map requisite kpwd
 session requisite kpwd</programlisting>
         <para>
-          The <filename>&path-ode-eg;/dcache.kpwd</filename> file is the place
+          The <filename>&path-ode-ed;/dcache.kpwd</filename> file is the place
           where you can specify the username/password record. It should contain
           the username and the password hash, as well as &uid;, &gid;, access
           mode and the home, root and fsroot directories:
@@ -1953,7 +1953,7 @@ auth requisite kpwd
 map  requisite kpwd
 session required kpwd</programlisting>
         <para>
-          The <filename>&path-ode-eg;/dcache.kpwd</filename> file would look
+          The <filename>&path-ode-ed;/dcache.kpwd</filename> file would look
           like this:
         </para>
         <programlisting>version 2.1
