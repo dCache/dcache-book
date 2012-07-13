@@ -396,7 +396,7 @@ Starting dCacheDomain done</screen>
       </important>
 
       <para>
-	As the files in <filename class="directory">share/defaults/</filename> do serve
+	As the files in <filename class="directory">&path-ods-usd;/defaults/</filename> do serve
 	as succinct documentation for all available configuration parameters and their
 	default values it is quite useful to have a look at them.
       </para>
@@ -515,69 +515,43 @@ Starting dCacheDomain done</screen>
       <para>
 	&dcache; will need to write the files it keeps in pools.
 	These pools are defined as services within &dcache;. Hence, they are added
-	to the layout file of your &dcache; instance, like all other services. To create a
-	pool, you will have to create a directory in which the pool will be stored and
-	define the pool in the layout file. The files and subdirectories of the pool are
-	created automatically when &dcache; is started.
+	to the layout file of your &dcache; instance, like all other services.
       </para>
+      <para>
+      The best way to create a pool, is to use the <literal>dcache</literal> script and restart the domain the pool runs in. The pool will be added to your layout file.
+      </para>
+      <programlisting>[<replaceable>domainname</replaceable>/pool]
+name=<replaceable>poolname</replaceable>
+path=/path/to/pool
+waitForFiles=${path}/data</programlisting>
 
-      <informalexample>
-      <para>
-	Consider the following example for adding a pool to a &dcache; layout file.
-      </para>
-      <para>
-	Create the directory in which the pool will be stored.
-      </para>
-      <screen>&prompt-root; <userinput>mkdir -p /srv/dcache/pool1</userinput></screen>
-      <para>
-	and define the pool in the layout file.
-      </para>
-	<programlisting>[${host.name}Domain]
-[${host.name}Domain/pool]
-name=pool1
-path=/srv/dcache/pool1
-maxDiskSpace=2T</programlisting>
-
-        <para>
-	  You can name the domain the pool is running on after the
-	  host on which the pool is located.  The only required
-	  properties are <varname>name</varname> and
-	  <varname>path</varname>.  The <varname>path</varname>
-	  property defines in which directory files are to be stored.
-	  The <varname>name</varname> defines the name of the
-	  pool. With this name, the pool can also be addressed from
-	  administrative components (see <xref
-	  linkend="intouch-admin"/> or <xref linkend="intouch-web"
-	  />).
-	</para>
 	<para>
 	  The property <varname>waitForFiles</varname> instructs the
 	  pool not to start up until the specified file or directory
-	  is available.  This is recommended as it prevents problems
-	  should the underlying storage be unavailable (e.g., if a
-	  RAID device is offline).  The property
-	  <varname>maxDiskSpace</varname> defines the maximum disk
-	  usage for the pool.
+	  is available.  This prevents problems should the underlying storage be unavailable (e.g., if a
+	  RAID device is offline).
 	</para>
+    <note>
+       <para>
+          Please restart &dcache; if your pool is created in a domain that did not exist before.
+       </para>
+    </note>
 
-	 <para>
-	   In the example above the name of the pool is
-	   <literal>pool1</literal> and the pool has 2 Tebibytes.
-	 </para>
-
-<!--	 TODO: Find a place where to put this info
-         <para>
-	   <programlisting>waitForFiles=${path}/data</programlisting>
-	   The example pool waits for the data directory (<filename
-	   class='directory'>${path}/data</filename>) to become
-	   available.  The <literal>${path}</literal> will expand to
-	   the value of the <varname>path</varname> property, so the
-	   example <varname>waitForFiles</varname> value is always
-	   correct.
-	 </para>
--->
-
+      <informalexample>
+        <screen>&prompt-root; <userinput>&path-odb-n-s;dcache pool create /srv/dcache/p1 pool1 poolDomain</userinput>
+Created a pool in /srv/dcache/p1. The pool was added to poolDomain in
+file:/etc/dcache/layouts/mylayout.conf.</screen>
+	<para>
+	In this example we create a pool called pool1 in the directory <filename class='directory'>/srv/dcache/p1</filename>.
+	The created pool will be running in the domain <literal>poolDomain</literal>.
+	</para>
+	<para>
+	Now you need to change the ownership of the directories where your data is to be stored to the user running &dcache; which by default is &user-dcache;.
+	</para>
+	<screen>&prompt-root; <userinput>chown -R dcache /srv/dcache/p1</userinput></screen>
       </informalexample>
+
+
 
        <note>
         <title>Mind the Gap!</title>
@@ -588,7 +562,7 @@ maxDiskSpace=2T</programlisting>
 	  below.  See also <xref linkend="intouch-admin"/>.
 	</para>
 
-	<screen>&dc-prompt-local; <userinput>cd <replaceable>poolName</replaceable></userinput>
+	<screen>&dc-prompt-local; <userinput>cd <replaceable>poolname</replaceable></userinput>
 &dc-prompt-pool; <userinput>set gap 2G</userinput>
 &dc-prompt-pool; <userinput>save</userinput></screen>
        </note>
@@ -597,21 +571,6 @@ maxDiskSpace=2T</programlisting>
 	Adding a pool to a configuration does not modify the pool or
 	the data in it and can thus safely be undone or repeated.
       </para>
-
-      <informalexample>
-	<para>
-	  This is an example of a layout file which defines two pools.
-	</para>
-	<programlisting>[${host.name}Domain]
-[${host.name}Domain/pool]
-name=pool1
-path=/srv/dcache/pool1
-maxDiskSpace=2T
-[${host.name}Domain/pool]
-name=pool2
-path=/srv/dcache/pool2
-maxDiskSpace=2T</programlisting>
-      </informalexample>
 
       </section>
 
