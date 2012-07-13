@@ -278,7 +278,7 @@ Stopping portmap: portmap</screen>
       </para>
 
     <screen>&prompt-user; <userinput>cat /example.org/data/'.(id)(examplefile)'</userinput>
-0004000000000000002320B8</screen>
+0000917F4A82369F4BA98E38DBC5687A031D</screen>
     </informalexample>
 
 
@@ -293,13 +293,13 @@ Stopping portmap: portmap</screen>
     </para>
 
 <screen>&prompt-user; <userinput>cd /example.org/data/</userinput>
-&prompt-user; <userinput>cat '.(nameof)(0004000000000000002320B8)'</userinput>
+&prompt-user; <userinput>cat '.(nameof)(0000917F4A82369F4BA98E38DBC5687A031D)'</userinput>
 examplefile</screen>
     <para>
       And the ID of the directory it resides in is obtained by:
     </para>
-<screen>&prompt-user; <userinput>cat '.(parent)(0004000000000000002320B8)'</userinput>
-0004000000000000001DC9E8</screen>
+<screen>&prompt-user; <userinput>cat '.(parent)(0000917F4A82369F4BA98E38DBC5687A031D)'</userinput>
+0000595ABA40B31A469C87754CD79E0C08F2</screen>
     </informalexample>
 
     <para>
