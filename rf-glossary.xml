@@ -527,7 +527,7 @@
 
 	  <para>
 	    More details on directory tags are given in <xref
-	    linkend="cf-pnfs-tags"/>.
+	    linkend="chimera-tags"/>.
 	  </para>
 	</glossdef>
       </glossentry>
@@ -543,10 +543,6 @@
 	    component is located.
 	  </para>
 
-	  <para>
-	    More details on &pnfs; IDs are given in <xref
-	    linkend="cf-pnfs-ids"/>.
-	  </para>
 	</glossdef>
       </glossentry>
 
@@ -615,10 +611,6 @@
 	    directory(e.g., using the <command>ls</command> command).
 	  </para>
 
-	  <para>
-	    More details on wormholes are given in <xref
-	    linkend="cf-pnfs-wormholes"/>.
-	  </para>
 	</glossdef>
       </glossentry>
 
