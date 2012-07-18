@@ -23,7 +23,6 @@
   </partintro>
 
   <xi:include href="config-chimera.xml"/>
-  <xi:include href="config-pnfs.xml"/>
   <xi:include href="config-cellpackage.xml"/>
   <xi:include href="config-ReplicaManager.xml"/>
   <xi:include href="config-PoolManager.xml"/>
@@ -39,6 +38,10 @@
   <xi:include href="config-acl.xml"/>
   <xi:include href="config-info-provider.xml"/>
   <xi:include href="config-stage-protection.xml"/>
-
+<!--
+  <xi:include href="config-webdav.xml"/>
+  <xi:include href="config-ftp.xml"/>
+  <xi:include href="config-xrootd.new.xml"/>
+-->
 </part>
 
