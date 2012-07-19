@@ -387,7 +387,7 @@ remoteGsiftpMaxTransfers=2000</programlisting>
 	    <para>
 	      If a space reservation request does not specify an
 	      access latency we will assign
-	      <varname>SpaceManagerDefaultAccessLatency</varname> an
+	      <varname>DefaultAccessLatencyForSpaceReservation</varname> an
 	      access latency by default. The default value is
 	      <literal>NEARLINE</literal>.
 	    </para>
@@ -402,7 +402,7 @@ remoteGsiftpMaxTransfers=2000</programlisting>
 	      <para>
 		Change the default value to <literal>ONLINE</literal>.
 	      </para>
-	      <programlisting>SpaceManagerDefaultAccessLatency=ONLINE</programlisting>
+	      <programlisting>DefaultAccessLatencyForSpaceReservation=ONLINE</programlisting>
 	    </informalexample>
 
 	  </listitem>
@@ -517,8 +517,8 @@ remoteGsiftpMaxTransfers=2000</programlisting>
 	    then the <literal>AccessLatency</literal> and
 	    <literal>RetentionPolicy</literal> will be set on basis of
 	    the system wide defaults, which are controlled by
-	    <varname>SpaceManagerDefaultRetentionPolicy</varname> and
-	    <varname>SpaceManagerDefaultAccessLatency</varname>
+	    <varname>DefaultRetentionPolicy</varname> and
+	    <varname>DefaultAccessLatencyForSpaceReservation</varname>
 	    variables in
 	    <filename>&path-ode-ed;/dcache.conf</filename>.
 	  </para>
