@@ -388,17 +388,17 @@ This needs to be explained in the section on the Admin Interface:
       <para>
 	The conditions for the <emphasis>type of transfer</emphasis>
 	are not specified with units. Instead, each link contains four
-	attributes <quote><literal>-readpref</literal></quote>,
-	<quote><literal>-writepref</literal></quote>,
-	<quote><literal>-p2ppref</literal></quote> and
-	<quote><literal>-cachepref</literal></quote>, which specify a
+	attributes <literal>-readpref</literal>,
+	<literal>-writepref</literal>,
+	<literal>-p2ppref</literal> and
+	<literal>-cachepref</literal>, which specify a
 	preference value for the respective types of transfer. If all
 	the unit groups in the link are matched, the corresponding
 	preference is assigned to each pool the link points to. Since
 	we are ignoring different preference values at the moment, a
 	preference of <literal>0</literal> stands for
-	<quote>no</quote> and a non-zero preference stands for
-	<quote>yes</quote>.
+	<literal>no</literal> and a non-zero preference stands for
+	<literal>yes</literal>. A negative value for <literal>-p2ppref</literal> means, that the value for <literal>-p2ppref</literal> should equal the one for the <literal>-readpref</literal>.
       </para>
 
       <section>
@@ -411,9 +411,9 @@ This needs to be explained in the section on the Admin Interface:
 	    preference values are the same. If you want to try
 	    configuring the pool manager right now without bothering
 	    about the preferences, you should only use
-	    <literal>0</literal> (for <quote>no</quote>) and, say,
-	    <literal>10</literal> (for <quote>yes</quote>) as
-	    preferences. The first examples below are of this type.
+	    <literal>0</literal> (for <literal>no</literal>) and, say,
+	    <literal>10</literal> (for <literal>yes</literal>) as
+	    preferences. You can choose <literal>-p2ppref=-1</literal> if it should match the value for <literal>-readpref</literal>. The first examples below are of this type.
 	  </para>
 	</note>
 
