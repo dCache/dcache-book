@@ -361,12 +361,16 @@ Starting dCacheDomain done</screen>
         to the file <filename>&path-ode-ed;/dcache.conf</filename>, which initially is
 	empty and update the value.
 	  </para>
+	<note>
 	  <para>
-	Layouts describe which domains to run on a host and which services to run in each
-	domain.
-	For the customized configuration of your &dcache; you will create a
-	<filename>mylayout.conf</filename> file in
-	<filename class="directory">&path-ode-ed;/layouts</filename>.
+	    In this first installation of &dcache; your &dcache; will not be connected to a tape sytem. Therefore please change the values for <literal>DefaultRetentionPolicy</literal> and <literal>DefaultAccessLatency</literal> in the file <filename>&path-ode-ed;/dcache.conf</filename>.
+	    <programlisting>DefaultRetentionPolicy=REPLICA
+DefaultAccessLatency=ONLINE</programlisting>
+	    </para>
+      </note>
+
+      <para>
+        Layouts describe which domains to run on a host and which services to run in each domain. For the customized configuration of your &dcache; you will create a <filename>mylayout.conf</filename> file in <filename class="directory">&path-ode-ed;/layouts</filename>.
 	  </para>
 	</section>
 
