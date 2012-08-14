@@ -457,7 +457,7 @@ DefaultAccessLatency=ONLINE</programlisting>
 
       <informalexample>
 	These are the first lines of <filename>&path-ode-ed;/layouts/single.conf</filename>:
-	<programlisting>messageBroker=none
+	<programlisting>broker.scheme=none
 
 [dCacheDomain]
 [dCacheDomain/admin]
