@@ -529,7 +529,7 @@ remoteGsiftpMaxTransfers=2000</programlisting>
 	    using the following commands:
 	  </para>
 
-	  <screen>&prompt-root; <userinput>&path-odb-n-s;chimera-cli.sh lstag /path/to/directory</userinput>
+	  <screen>&prompt-root; <userinput>&chimera-cli; lstag /path/to/directory</userinput>
 Total: numberOfTags
 tag1
 tag2
@@ -547,9 +547,9 @@ RetentionPolicy</screen>
 	  </para>
 
 	  <informalexample>
-	    <screen>&prompt-root; <userinput>&path-odb-n-s;chimera-cli.sh readtag /data/experiment-a AccessLatency</userinput>
+	    <screen>&prompt-root; <userinput>&chimera-cli; readtag /data/experiment-a AccessLatency</userinput>
 ONLINE
-&prompt-root; <userinput>&path-odb-n-s;chimera-cli.sh readtag /data/experiment-a RetentionPolicy</userinput>
+&prompt-root; <userinput>&chimera-cli; readtag /data/experiment-a RetentionPolicy</userinput>
 CUSTODIAL</screen>
 	  </informalexample>
 
@@ -565,8 +565,8 @@ CUSTODIAL</screen>
 	    To create/change the values of the tags, please execute :
 	  </para>
 
-	  <screen>&prompt-root; <userinput>&path-odb-n-s;chimera-cli.sh writetag /path/to/directory AccessLatency "<replaceable>New AccessLatency</replaceable>"</userinput>
-&prompt-root; <userinput>&path-odb-n-s;chimera-cli.sh writetag /path/to/directory RetentionPolicy "<replaceable>New RetentionPolicy</replaceable>"</userinput></screen>
+	  <screen>&prompt-root; <userinput>&chimera-cli; writetag /path/to/directory AccessLatency "<replaceable>New AccessLatency</replaceable>"</userinput>
+&prompt-root; <userinput>&chimera-cli; writetag /path/to/directory RetentionPolicy "<replaceable>New RetentionPolicy</replaceable>"</userinput></screen>
 
           <note>
 	    <para>
