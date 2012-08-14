@@ -475,7 +475,6 @@ DefaultAccessLatency=ONLINE</programlisting>
 [namespaceDomain/pnfsmanager]
 [namespaceDomain/cleaner]
 [namespaceDomain/acl]
-[namespaceDomain/nfsv3]
 
 [gPlazmaDomain]
 [gPlazmaDomain/gplazma]
