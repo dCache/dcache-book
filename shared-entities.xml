@@ -338,6 +338,11 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY path-odb-ub "<phrase layout='opt'>/opt/d-cache/bin/</phrase><phrase layout='fhs'>/usr/bin/</phrase>">
 <!ENTITY path-odb-us "<phrase layout='opt'>/opt/d-cache/bin/</phrase><phrase layout='fhs'>/usr/sbin/</phrase>">
 
+<!-- scripts -->
+
+<!ENTITY chimera-cli  "<phrase layout='opt'>/opt/d-cache/bin/chimera-cli.sh</phrase><phrase layout='fhs'>/usr/bin/chimera-cli</phrase>">
+
+
 
 <!-- <!ENTITY ndash "&#x2013;"> -->
 
