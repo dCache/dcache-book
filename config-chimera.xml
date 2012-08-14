@@ -3,7 +3,7 @@
                          "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
 <!ENTITY % sharedents SYSTEM "shared-entities.xml" >
 %sharedents;
-<!ENTITY chimera-cli  "&path-odb-n-s;chimera-cli.sh">
+
 ]>
 <chapter id="cf-chimera">
   <title>&chimera;</title>
@@ -640,8 +640,8 @@ sGroup</screen>
 	directories of <literal>experiment-a</literal> and
 	<literal>experiment-b</literal> can be tagged.
       </para>
-      <screen>&prompt-user; <userinput>echo "StoreName exp-a" | /opt/d-cache/bin/chimera-cli.sh writetag /data/experiment-a OSMTemplate</userinput>
-&prompt-user; <userinput>echo "StoreName exp-b" | /opt/d-cache/bin/chimera-cli.sh writetag /data/experiment-b OSMTemplate</userinput></screen>
+      <screen>&prompt-user; <userinput>echo "StoreName exp-a" | &chimera-cli; writetag /data/experiment-a OSMTemplate</userinput>
+&prompt-user; <userinput>echo "StoreName exp-b" | &chimera-cli; writetag /data/experiment-b OSMTemplate</userinput></screen>
       <para>
 	Data from <literal>experiment-a</literal> taken in 2010 shall
 	be written into the directory <filename
@@ -653,9 +653,9 @@ sGroup</screen>
 	<filename class='directory'>/data/experiment-b</filename>. Tag
 	the directories correspondingly.
       </para>
-      <screen>&prompt-user; <userinput>echo "run2010" | /opt/d-cache/bin/chimera-cli.sh writetag /data/experiment-a/2010 sGroup</userinput>
-&prompt-user; <userinput>echo "run2011" | /opt/d-cache/bin/chimera-cli.sh writetag /data/experiment-a/2011 sGroup</userinput>
-&prompt-user; <userinput>echo "alldata" | /opt/d-cache/bin/chimera-cli.sh writetag /data/experiment-b sGroup</userinput></screen>
+      <screen>&prompt-user; <userinput>echo "run2010" | &chimera-cli; writetag /data/experiment-a/2010 sGroup</userinput>
+&prompt-user; <userinput>echo "run2011" | &chimera-cli; writetag /data/experiment-a/2011 sGroup</userinput>
+&prompt-user; <userinput>echo "alldata" | &chimera-cli; writetag /data/experiment-b sGroup</userinput></screen>
 
       <para>
 	List the content of the tags by

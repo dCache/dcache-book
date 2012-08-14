@@ -513,13 +513,13 @@ This needs to be explained in the section on the Admin Interface:
       </para>
 
       <informalexample>
-	<screen>&prompt-root; <userinput>&path-odb-n-s;chimera-cli.sh lstag /data/experiment-a</userinput>
+	<screen>&prompt-root; <userinput>&chimera-cli; lstag /data/experiment-a</userinput>
 Total: 2
 OSMTemplate
 sGroup
-&prompt-root; <userinput>&path-odb-n-s;chimera-cli.sh readtag /data/experiment-a OSMTemplate</userinput>
+&prompt-root; <userinput>&chimera-cli; readtag /data/experiment-a OSMTemplate</userinput>
 StoreName myStore
-&prompt-root; <userinput>&path-odb-n-s;chimera-cli.sh readtag /data/experiment-a sGroup</userinput>
+&prompt-root; <userinput>&chimera-cli; readtag /data/experiment-a sGroup</userinput>
 STRING</screen>
 
        <para>
@@ -528,8 +528,8 @@ STRING</screen>
 	 <literal>myStore:STRING@osm</literal>. An adjustment to more
 	 sensible values will look like
        </para>
-<screen>&prompt-root; <userinput>&path-odb-n-s;chimera-cli.sh writetag /data/experiment-a OSMTemplate "StoreName exp-a"</userinput>
-&prompt-root; <userinput>&path-odb-n-s;chimera-cli.sh writetag /data/experiment-a sGroup "run2010"</userinput></screen>
+<screen>&prompt-root; <userinput>&chimera-cli; writetag /data/experiment-a OSMTemplate "StoreName exp-a"</userinput>
+&prompt-root; <userinput>&chimera-cli; writetag /data/experiment-a sGroup "run2010"</userinput></screen>
 
       <para>
 	and will result in the storage class
@@ -577,7 +577,7 @@ STRING</screen>
       </para>
 
       <informalexample>
-      <screen>&prompt-root; <userinput>&path-odb-n-s;chimera-cli.sh writetag /data/experiment-a cacheClass "metaData"</userinput></screen>
+      <screen>&prompt-root; <userinput>&chimera-cli; writetag /data/experiment-a cacheClass "metaData"</userinput></screen>
       <para>
 	In this example the meta-data is stored in directories which
 	are tagged in this way.
@@ -587,12 +587,12 @@ STRING</screen>
 	<para>
 	  Check the existing tags of a directory and their content by:
 	</para>
-	<screen>&prompt-root; <userinput>&path-odb-n-s;chimera-cli.sh lstag /path/to/directory</userinput>
+	<screen>&prompt-root; <userinput>&chimera-cli; lstag /path/to/directory</userinput>
 Total: numberOfTags
 tag1
 tag2
 ...
-&prompt-root; <userinput>&path-odb-n-s;chimera-cli.sh readtag /path/to/directory tag1</userinput>
+&prompt-root; <userinput>&chimera-cli; readtag /path/to/directory tag1</userinput>
 contentOfTag1</screen>
 
 	<note>
