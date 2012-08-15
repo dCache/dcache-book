@@ -768,6 +768,10 @@ srmDomain       running 11182 dcache</screen>
 
     <important>
       <para>
+	You must configure a domain called &domain-dcache; but the
+	other domain names can be chosen freely.
+      </para>
+      <para>
 	Please make sure that the domain names that you choose are
 	unique. Having the same domain names in different layout files
 	on different nodes may result in an error.
@@ -775,9 +779,9 @@ srmDomain       running 11182 dcache</screen>
     </important>
 
     <para>
-      On any other nodes than the head node,
-      <varname>broker.host</varname> has to be added to
-      <filename>&path-ode-ed;/dcache.conf</filename>.
+      On any other nodes than the head node, the property
+      <varname>broker.host</varname> has to be added to the file
+      <filename>&path-ode-ed;/dcache.conf</filename>. 
       <varname>broker.host</varname> should point to the host running
       your &dcache; broker. Usually that is the host containing the
       special domain &domain-dcache;, because that domain acts
