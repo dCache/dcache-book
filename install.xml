@@ -394,7 +394,7 @@ DefaultAccessLatency=ONLINE</programlisting>
 
       <important>
       <para>
-        Do not update configuration values in the files in the default folders,
+        Do not update configuration values in the files in the defaults folder,
         since changes to these files will be overwritten by updates.
       </para>
       </important>
