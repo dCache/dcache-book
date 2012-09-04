@@ -28,6 +28,25 @@
   <xsl:param name="glossary.as.blocks" select="1" />
 
 
+  <!-- change default text from 'Draft' to 'Outdated' -->
+  <xsl:template name="draft.text">
+    <xsl:choose>
+      <xsl:when test="$draft.mode = 'yes'">
+      Outdated
+      </xsl:when>
+      <xsl:when test="$draft.mode = 'no'">
+	<!-- nop -->
+      </xsl:when>
+      <xsl:when test="ancestor-or-self::*[@status][1]/@status = 'draft'">
+      Outdated
+      </xsl:when>
+      <xsl:otherwise>
+	<!-- nop -->
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+
   <!-- format lineoutput better -->
   <xsl:attribute-set name="monospace.verbatim.properties"
                      use-attribute-sets="verbatim.properties">

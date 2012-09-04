@@ -5,10 +5,10 @@
 %sharedents;
 ]>
 
-<chapter id="cb-stat-module">
+<chapter id="cb-stat-module" status="draft">
 
   <title>Statistics Module for pre 1.6.7 releases</title>
-  
+
 
   <chapterinfo>
     <author>

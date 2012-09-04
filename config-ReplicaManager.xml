@@ -5,10 +5,10 @@
 %sharedents;
 ]>
 
-<chapter id="cf-repman">
+<chapter id="cf-repman" status="draft">
 
   <title>Resilience with the Replica Manager</title>
-
+<!--
   <chapterinfo>
     <author>
       <firstname>Alex</firstname>
@@ -26,7 +26,7 @@
       </affiliation>
     </author>
   </chapterinfo>
-
+-->
 
   <para>
     If no <glossterm linkend="gl-tss">tertiary storage
