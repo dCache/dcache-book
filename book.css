@@ -46,10 +46,14 @@ div.toc p {
   margin: 10px 0px 10px 10px;
 }
 
-
 /* Section entries within TOC */
 div.toc span.section {
   margin-left: 0px;
+}
+
+/* background image for outdated chapters and sections */
+div.draft {
+    background-image: url(images/bg-outdated.svg);
 }
 
 code.literal, pre.programlisting, pre.screen {

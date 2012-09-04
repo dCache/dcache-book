@@ -5,10 +5,10 @@
 %sharedents;
 ]>
 
-<chapter id="cb-net">
+<chapter id="cb-net" status="draft">
 
   <title>Complex Network Configuration</title>
-  
+
   <para>
     This chapter contains solutions for several non-trivial network
     configurations. The first section discusses the interoperation of

@@ -1844,7 +1844,7 @@ remoteGsiftpMaxTransfers=260</programlisting>
      ##############################################################
    -->
 
-   <section id="cf-srm-monitor">
+   <section id="cf-srm-monitor" status="draft">
     <title>SRMWatch, &srm; Monitoring Tool</title>
 
     <para>
@@ -2018,7 +2018,7 @@ effective_cache_size = 16384            # typically 8KB each</programlisting>
      ##############################################################
    -->
 
-  <section id="cf-srm-hrd-os">
+  <section id="cf-srm-hrd-os" status="draft">
     <title>Choosing The right hardware and OS for the &srm; node</title>
 
     <section>

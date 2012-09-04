@@ -5,10 +5,10 @@
 %sharedents;
 ]>
 
-<chapter id="cb-accounting">
+<chapter id="cb-accounting" status="draft">
 
   <title>Accounting</title>
-  
+
   <!--
     TODO: There are a few loose ends in this chapter. A meta-intro might
     also be in order.

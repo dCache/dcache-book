@@ -6,10 +6,10 @@
 ]>
 
 
-<chapter id="cf-webmon">  
-  
+<chapter id="cf-webmon"  status="draft">
+
   <title>&dcache; Web Monitoring</title>
-  
+
   <chapterinfo>
     <author>
       <firstname>Vladimir</firstname>
