@@ -60,7 +60,7 @@ PROFILED_DEPS = $(PROFILED_SOURCES:%.xml=.%.xml.d)
 
 EPUB_FILES = $(SOURCES:%.xml=%.epub) $(SOURCES:%.xml=%-fhs.epub)
 
-GFX_FILES = images/important.png images/warning.png images/caution.png images/note.png images/tip.png
+GFX_FILES = images/important.png images/warning.png images/caution.png images/note.png images/tip.png images/bg-outdated.svg
 
 # Used by deploy target
 ALL = $(HTML_SINGLE_FILES) $(PDF_FILES) $(HTML_ALL_CHUNK_FILES) $(EPUB_FILES) book.css $(GFX_FILES)
