@@ -53,7 +53,7 @@ div.toc span.section {
 
 /* background image for outdated chapters and sections */
 div.draft {
-    background-image: url(images/bg-outdated.svg);
+    background-image: url(bg-outdated.svg);
 }
 
 code.literal, pre.programlisting, pre.screen {
