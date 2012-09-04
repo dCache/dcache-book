@@ -15,9 +15,9 @@
   <xsl:param name="refentry.xref.manvolnum" select="0"/>
 
   <xsl:param name="generate.section.toc.level" select="0"/>
- 
-  <xsl:param name="draft.mode" select="'no'"/>
-  <xsl:param name="draft.watermark.image" select="''"/>
+
+  <xsl:param name="draft.mode" select="'maybe'"/>
+  <xsl:param name="draft.watermark.image" select="'images/bg-outdated.svg'"/>
 
 
   <!-- Convert typed "straight" apostrophes to the "curly" type if in a para or title -->

@@ -32,7 +32,7 @@
   </section>
   -->
 
-  <section id="cb-pool-checksumming">
+  <section id="cb-pool-checksumming" status="draft">
     <title>Enabling checksums</title>
 
     <section id="cb-pool-checksumming-enable">
@@ -145,7 +145,7 @@
   </section>
 
 
-  <section id="cb-pool-advancedChecksumming">
+  <section id="cb-pool-advancedChecksumming" status="draft">
     <title>Checksums in detail</title>
 
     <section id="cb-pool-advancedChecksumming-overview">
@@ -446,7 +446,7 @@
     </section>
   </section>
 
-  <section id="cb-pool-migration">
+  <section id="cb-pool-migration" status="draft">
     <title>Migration Module</title>
 
     <para>
