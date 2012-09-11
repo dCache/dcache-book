@@ -1012,9 +1012,7 @@ Couldn't find a valid proxy.</screen>
       In this section we explain the format of the the
       <filename>storage-authzdb</filename>, <filename>kpwd</filename> and
       <filename>vorolemap</filename> files. They are used by the &gp2-authzdb;,
-      &gp2-vorolemap;,and &gp2-kpwd;. If you are using the &cell-gplazma1; you
-      may also need these files (depending on your &cell-gplazma1; configuration
-      in <filename>dcachesrm.conf</filename>).
+      &gp2-vorolemap;,and &gp2-kpwd;.
     </para>
     <section id="cf-gplazma-plug-inconfig-authzdb">
       <title><filename>storage-authzdb</filename></title>
@@ -1117,15 +1115,6 @@ Couldn't find a valid proxy.</screen>
 
     <section id="cf-gplazma-plug-inconfig-vorolemap">
       <title>The gplazmalite-vorole-mapping plug-in</title>
-      <para>
-        The &cell-gplazma; policy file
-        <filename>&path-ode-ed;/dcachesrm-gplazma.policy</filename> contains
-        two lines for this plug-in.
-      </para>
-
-      <programlisting># Built-in gPLAZMAlite grid VO role mapping
-gridVoRolemapPath="/etc/grid-security/grid-vorolemap"
-gridVoRoleStorageAuthzPath="/etc/grid-security/storage-authzdb" </programlisting>
 
       <para>
         The second is the <filename>storage-authzdb</filename> used in other
@@ -1394,44 +1383,12 @@ storageAuthzPath="/etc/grid-security/storage-authzdb"</programlisting>
     </para>
 
     <para>
-      Refer to the file <filename>gPlazma.properties</filename> for a full list
-      of properties for &cell-gplazma; The following table shows the most
-      commonly used ones:
+      Refer to the file <filename>gplazma.properties</filename> for a full list
+      of properties for &cell-gplazma; One commonly used property is 
+      <varname>gPlazmaNumberOfSimultaneousRequests</varname>, which is used to 
+      set the maximum number of concurrent requests to &cell-gplazma;. The default
+      value is <literal>30</literal>.
     </para>
-
-    <variablelist>
-      <title>Properties</title>
-      <varlistentry><term><varname role="dcache.property">gPlazmaNumberOfSimultaneousRequests</varname></term>
-        <listitem>
-          <para>
-            The number of concurrent requests
-          </para>
-          <para>
-            Default: <literal>30</literal>
-          </para>
-        </listitem>
-      </varlistentry>
-      <varlistentry><term><varname role="dcache.property">useGPlazmaAuthorizationModule</varname></term>
-        <listitem>
-          <para>
-            Run &cell-gplazma; local for each door
-          </para>
-          <para>
-            Default: &false;
-          </para>
-        </listitem>
-      </varlistentry>
-      <varlistentry><term><varname role="dcache.property">useGPlazmaAuthorizationCell</varname></term>
-        <listitem>
-          <para>
-            Run a central &cell-gplazma; instance.
-          </para>
-          <para>
-            Default: &true;
-          </para>
-        </listitem>
-      </varlistentry>
-    </variablelist>
 
     <para>
       Setting the value for
@@ -1439,19 +1396,6 @@ storageAuthzPath="/etc/grid-security/storage-authzdb"</programlisting>
       result in large spikes of CPU activity and the potential to run out of
       memory. Setting the number too low results in potentially slow login
       activity.
-    </para>
-
-    <para>
-      The default mode for &cell-gplazma; is to run centralised in one instance.
-      It is however possible to specify to use &cell-gplazma1; as module running
-      locally to the doors. Set this property to &true; in the
-      domain you wish to run the module in.
-    </para>
-
-    <para>
-      If you decide to run &cell-gplazma1; as a module you can switch off the
-      centralised by setting <varname>useGPlazmaAuthorizationCell</varname> to
-      &false;. Note that is also possible to mix both modes.
     </para>
 
     <section id="cf-gplazma-username-password-webdav-example">
@@ -1465,7 +1409,6 @@ storageAuthzPath="/etc/grid-security/storage-authzdb"</programlisting>
       </para>
 
       <informalexample>
-        <programlisting>gplazma.version = 2</programlisting>
         <para>
           Check your &webdav; settings: enable the &http; access, disallow the
           anonymous access, disable requesting and requiring the client
