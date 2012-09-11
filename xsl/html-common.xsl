@@ -44,18 +44,6 @@
   </xsl:template>
 
 
-  <!-- Concatenate class value and status -->
-  <xsl:template match="*" mode="class.value">
-	  <xsl:param name="class" select="local-name(.)"/>
-	  <!-- permit customization of class value only -->
-	  <!-- Use element name by default -->
-	  <xsl:value-of select="$class"/>
-	  <xsl:if test="@status">
-		  <xsl:value-of select="concat(' ', @status)"/>
-	  </xsl:if>
-  </xsl:template>
-
-
   <!--  Book-level TOC has only Part- and Chapter- entries,
        whereas Chapters have all sections.
 
