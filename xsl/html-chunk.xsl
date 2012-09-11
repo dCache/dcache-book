@@ -91,6 +91,20 @@
     <xsl:comment>#include virtual="<xsl:value-of select="$location"/>"</xsl:comment>
   </xsl:template>
 
+
+  <!-- Concatenate class value and draft-status -->
+  <xsl:template match="*" mode="class.value">
+    <xsl:param name="class" select="local-name(.)"/>
+    <!-- permit customization of class value only -->
+    <!-- Use element name by default -->
+    <xsl:value-of select="$class"/>
+    <xsl:if test="((($class = 'chapter') or ($class = 'section')) and
+		  (@status = 'draft')) or ((chapter/section) and (../@status = 'draft')) ">
+      <xsl:value-of select="concat(' ','draft')"/>
+    </xsl:if>
+  </xsl:template>
+
+
   <xsl:template name="user.footer.navigation">
     <xsl:if test="$comments.enabled = 'true'">
       <script>
