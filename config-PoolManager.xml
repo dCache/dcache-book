@@ -63,11 +63,11 @@
 
   <para>
     The &serv-poolmngr; can be configured by either directly editing
-    the file <filename>&path-odc-ed;/PoolManager.conf</filename>
+    the file <filename>&file-poolmanager;</filename>
     or via the <link linkend="intouch-admin">Admin
     Interface</link>. Changes made via the Admin Interface will be
     saved in the file
-    <filename>&path-odc-ed;/PoolManager.conf</filename> by the
+    <filename>&file-poolmanager;</filename> by the
     <command>save</command> command. This file will be parsed,
     whenever the &dcache; starts up. It is a simple text file
     containing the corresponding Admin Interface commands. It can
@@ -82,7 +82,7 @@ This needs to be explained in the section on the Admin Interface:
 	while the system is running. The
 	<command>save</command>-command can then be used to save the
 	current configuration to the file
-	<filename>&path-odc-ed;/PoolManager.conf</filename>.
+	<filename>&file-poolmanager;</filename>.
 -->
   </para>
 
@@ -141,7 +141,7 @@ This needs to be explained in the section on the Admin Interface:
 
       <para>
 	A link is defined in the file
-	<filename>&path-odc-ed;/PoolManager.conf</filename> by
+	<filename>&file-poolmanager;</filename> by
       </para>
 
 	<cmdsynopsis>

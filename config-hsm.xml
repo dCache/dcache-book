@@ -633,7 +633,7 @@ cClass0<replaceable>CacheClass</replaceable>;hsm=<replaceable>StorageType</repla
     </para>
     <itemizedlist>
       <listitem>
-	The <filename>PoolManager.conf</filename> file (one per
+	The <filename>&file-poolmanager;</filename> file (one per
 	system)
       </listitem>
       <listitem>
@@ -666,7 +666,7 @@ cClass0<replaceable>CacheClass</replaceable>;hsm=<replaceable>StorageType</repla
       <title>The &dcache; layout files</title>
 
       <section>
-	<title>The <filename>PoolManager.conf</filename> file</title>
+	<title>The <filename>&file-poolmanager;</filename> file</title>
 	<para>
 	  To be able to read a file from the tape in case the cached
 	  file has been deleted from all pools, enable the
@@ -682,7 +682,7 @@ cClass0<replaceable>CacheClass</replaceable>;hsm=<replaceable>StorageType</repla
 
 	 <para>
 	   Alternatively, if the file
-	   <filename>&path-odc-ed;/PoolManager.conf</filename> already
+	   <filename>&file-poolmanager;</filename> already
 	   exists then you can add the entry
 	 </para>
 	 <programlisting>pm set -stage allowed=yes</programlisting>
@@ -692,7 +692,7 @@ cClass0<replaceable>CacheClass</replaceable>;hsm=<replaceable>StorageType</repla
 
 	 <warning>
 	   Do not create the file
-	   <filename>&path-odc-ed;/PoolManager.conf</filename>
+	   <filename>&file-poolmanager;</filename>
 	   with this single entry! This will result in an error.
 	 </warning>
 

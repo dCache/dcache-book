@@ -677,13 +677,13 @@ webdavProtocol=https</programlisting>
       The most central component of a &dcache; instance is the
       &cell-poolmngr; cell. It reads additional configuration
       information from the file
-      <filename>config/PoolManager.conf</filename> at
+      <filename>&file-poolmanager;</filename> at
       start-up. However, it is not necessary to restart the domain
       when changing the file. We will see an example of this below.
     </para>
 
     <para>
-      Similar to <filename>config/PoolManager.conf</filename>,
+      Similar to <filename>&file-poolmanager;</filename>,
       pools read their configuration from
       <filename><replaceable>poolDir</replaceable>/pool/setup</filename>
       at startup.

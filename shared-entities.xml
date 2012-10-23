@@ -307,7 +307,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 
 
 <!ENTITY file-authorized_keys "<filename class='directory'>&path-ode-ed;/authorized_keys</filename>">
-
+<!ENTITY file-poolmanager "<phrase layout='opt'>/opt/d-cache/config/PoolManager.conf</phrase><phrase layout='fhs'>/var/lib/dcache/config/poolmanager.conf</phrase>">
 
 
 <!ENTITY path-odb-ub "<phrase layout='opt'>/opt/d-cache/bin/</phrase><phrase layout='fhs'>/usr/bin/</phrase>">
