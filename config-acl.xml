@@ -17,21 +17,9 @@
     &acl;s in &dcache;
   </title>
 
-  <chapterinfo>
-    <author>
-      <firstname>Irina</firstname>
-      <surname>Kozlova</surname>
-    </author>
-    <author>
-      <firstname>Paul</firstname>
-      <surname>Millar</surname>
-    </author>
-  </chapterinfo>
-
   <para>
-    Starting with the 1.9.3 series, &dcache; includes support for
-    Access Control Lists (&acl;s).  This support is conforming to the
-    <ulink
+    &dcache; includes support for Access Control Lists (&acl;s).  This
+    support is conforming to the <ulink
     url="http://www.nfsv4-editor.org/draft-25/draft-ietf-nfsv4-minorversion1-25.html">NFS
     version 4 Protocol specification</ulink>.
   </para>
@@ -232,7 +220,7 @@
 
     <para>
       Altering &dcache; &acl; behaviour is achieved by connecting to
-      the &cell-acladmin; <glossterm
+      the &cell-pnfsmngr; <glossterm
       linkend="gl-well-known-cell">well-known cell</glossterm> using
       the administrator interface.  For further details about how to
       use the administrator interface, see <xref
@@ -241,7 +229,7 @@
 
     <para>
       The <command>info</command> and <command>help</command> commands
-      are available within &cell-acladmin; and fulfil their usual
+      are available within &cell-pnfsmngr; and fulfil their usual
       functions.
     </para>
 
@@ -940,11 +928,11 @@
 	    class="directory">/pnfs/example.org/data/exampleDir</filename>.
 	  </para>
 
-	  <screen>&dc-prompt-acladmin; <userinput>setfacl /pnfs/example.org/data/exampleDir EVERYONE@:+l USER:3750:D
+	  <screen>&dc-prompt-pnfsmngr; <userinput>setfacl /pnfs/example.org/data/exampleDir EVERYONE@:+l USER:3750:D
     <lineannotation>(...line continues...)</lineannotation>   USER:3750:+d:of</userinput>
-&dc-prompt-acladmin; <userinput>setfacl /pnfs/example.org/data/exampleDir/existingFile1
+&dc-prompt-pnfsmngr; <userinput>setfacl /pnfs/example.org/data/exampleDir/existingFile1
     <lineannotation>(...line continues...)</lineannotation>   USER:3750:+d:f</userinput>
-&dc-prompt-acladmin; <userinput>setfacl /pnfs/example.org/data/exampleDir/existingFile2
+&dc-prompt-pnfsmngr; <userinput>setfacl /pnfs/example.org/data/exampleDir/existingFile2
     <lineannotation>(...line continues...)</lineannotation>   USER:3750:+d:f</userinput></screen>
 
 	  <para>
@@ -977,7 +965,7 @@
 	    can do neither.
 	  </para>
 
-	  <screen>&dc-prompt-acladmin; <userinput>setfacl /pnfs/example.org/data/exampleDir GROUP:2000:-sl
+	  <screen>&dc-prompt-pnfsmngr; <userinput>setfacl /pnfs/example.org/data/exampleDir GROUP:2000:-sl
     <lineannotation>(...line continues...)</lineannotation>    EVERYONE@:+l GROUP:1000:+s</userinput></screen>
 
 	  <para>
@@ -1017,7 +1005,7 @@
 	    the directory.
 	  </para>
 
-	  <screen>&dc-prompt-acladmin; <userinput>setfacl /pnfs/example.org/data/exampleDir USER:3750:+D:d
+	  <screen>&dc-prompt-pnfsmngr; <userinput>setfacl /pnfs/example.org/data/exampleDir USER:3750:+D:d
     <lineannotation>(...line continues...)</lineannotation>    USER:3750:+d:odf</userinput></screen>
 
 	  <para>
@@ -1098,7 +1086,7 @@
       <example>
 	<title>Obtain &acl; information by absolute path</title>
 
-	<screen>&dc-prompt-acladmin; <userinput>getfacl /pnfs/example.org/data/exampleDir</userinput>
+	<screen>&dc-prompt-pnfsmngr; <userinput>getfacl /pnfs/example.org/data/exampleDir</userinput>
 ACL: rsId = 00004EEFE7E59A3441198E7EB744B0D8BA54, rsType = DIR
 order = 0, type = A, accessMsk = lfsD, who = USER, whoID = 12457
 order = 1, type = A, flags = f, accessMsk = lfd, who = USER, whoID = 87552
