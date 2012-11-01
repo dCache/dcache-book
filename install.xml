@@ -84,18 +84,17 @@
         <listitem>
           <para>
             An RPM-based Linux distribution is required for the
-            following procedure. For Debian derived systems the RPM
-            may be converted to a DEB using alien. Solaris is
-            supported using either the Solaris package or the tarball.
+            following procedure. For Debian derived systems we provide
+            Debian packages and for Solaris the Solaris packages or
+            the tarball.
           </para>
         </listitem>
 
         <listitem>
           <para>
-           &dcache; requires Java 1.6 JRE. Please use &sunjvm; at the
-           latest patch-level (at the moment of writing this is
-           1.6.0_25) and check for upgrades frequently. It is
-           recommendet to use JDK as &dcache; scripts can make use of
+           &dcache; requires Java 1.7 JRE. Please use the
+           latest patch-level and check for upgrades frequently. It is
+           recommended to use JDK as &dcache; scripts can make use of
            some extra features that JDK provides to gather more
            diagnostic information (heap-dump, etc). This helps when
            tracking down bugs.
@@ -104,9 +103,9 @@
 
         <listitem>
           <para>
-            &psql; must be installed and running. See <xref
-            linkend="cb-postgres-install"/> for more details.
-	    &psql; version 8.3 or later is required.
+            &psql; must be installed and running.  We recommend the
+            use of &psql; version 9.2 (at least &psql; version 8.3 is
+            required).
 	  </para>
 	    <important>
 	      <para>
@@ -149,6 +148,27 @@
         section describes how to do this.
       </para>
 
+      <section id="in-install-postgres-start">
+	<title>Starting &psql;</title>
+	<para>
+	  Install the &psql; server with the tools of the operating
+	  system.
+	</para>
+
+	<para>
+	  Initialize the database directory (for &psql; version 9.2
+	  this is <filename
+	  class='dir'>/var/lib/pgsql/9.2/data/</filename>) , start the
+	  database server, and make sure that it is started at system
+	  start-up.
+	</para>
+	<screen>&prompt-root; <userinput>service postgresql-9.2 initdb</userinput>
+Initializing database:                                     [  OK  ]
+&prompt-root; <userinput>service postgresql-9.2 start</userinput>
+Starting postgresql-9.2 service:                           [  OK  ]
+&prompt-root; <userinput>chkconfig postgresql-9.2 on</userinput></screen>
+      </section>
+
       <section id="in-install-postgres-trust">
 	<title>Enabling local trust</title>
 
@@ -161,14 +181,20 @@
           <para>
             To allow local users to access &psql; without requiring a
             password, ensure the file
-            <filename>pg_hba.conf</filename>, usually located in
-            <filename class="directory">/var/lib/pgsql/data</filename>,
+            <filename>pg_hba.conf</filename>, which (for &psql;
+            version 9.2) is located in <filename
+            class="directory">/var/lib/pgsql/9.2/data</filename>,
             contains the following lines.
           </para>
 
-          <programlisting>local   all         all                        trust
-host    all         all         127.0.0.1/32   trust
-host    all         all         ::1/128        trust</programlisting>
+          <programlisting># TYPE  DATABASE        USER            ADDRESS                 METHOD
+
+# "local" is for Unix domain socket connections only
+local   all             all                                     trust
+# IPv4 local connections:
+host    all             all             127.0.0.1/32            trust
+# IPv6 local connections:
+host    all             all             ::1/128                 trust</programlisting>
 
           <note>
             <para>
@@ -189,9 +215,9 @@ host    all         all         ::1/128        trust</programlisting>
             the following command:
 	    </para>
 
-	    <screen>&prompt-root; <userinput>/etc/init.d/postgresql restart</userinput>
-Stopping postgresql service:                               [  OK  ]
-Starting postgresql service:                               [  OK  ]</screen>
+	    <screen>&prompt-root; <userinput>service postgresql-9.2 restart</userinput>
+Stopping postgresql-9.2 service:                           [  OK  ]
+Starting postgresql-9.2 service:                           [  OK  ]</screen>
           </important>
         </section>
 
@@ -254,6 +280,8 @@ CREATE TABLE
 CREATE INDEX
 
 &prompt-root; <userinput>createlang -U postgres plpgsql chimera</userinput>
+<lineannotation>superfluous with &psql; version 9.2</lineannotation>
+
 &prompt-root; <userinput>psql -U chimera chimera -f &path-odl-usd;/chimera/sql/pgsql-procedures.sql</userinput>
 CREATE FUNCTION
 CREATE FUNCTION
@@ -337,161 +365,203 @@ Starting dCacheDomain done</screen>
 	  <title>Configuration files</title>
 
 	  <para>
-        In the setup of &dcache;, there are three main places for
-        configuration files:
-	<itemizedlist>
-	  <listitem>
-            <filename class="directory">&path-ods-usd;/defaults</filename>
-	  </listitem>
+	    In the setup of &dcache;, there are three main places for
+	    configuration files:
+	    <itemizedlist>
+	      <listitem>
+		<filename class="directory">&path-ods-usd;/defaults</filename>
+	      </listitem>
 
-	  <listitem>
-	    <filename>&path-ode-ed;/dcache.conf</filename>
-	  </listitem>
+	      <listitem>
+		<filename>&path-ode-ed;/dcache.conf</filename>
+	      </listitem>
 
-	  <listitem>
-	    <filename class="directory">&path-ode-ed;/layouts</filename>
-	  </listitem>
-	</itemizedlist>
-	The folder <filename class="directory">&path-ods-usd;/defaults</filename>
-	contains the default
-	settings of the &dcache;.
-        If one of the default configuration values needs to be changed, copy the default
-	setting of this value from one of the files in
-	<filename class='directory'>&path-ods-usd;/defaults</filename>
-        to the file <filename>&path-ode-ed;/dcache.conf</filename>, which initially is
-	empty and update the value.
+	      <listitem>
+		<filename class="directory">&path-ode-ed;/layouts</filename>
+	      </listitem>
+	    </itemizedlist>
+	    The folder <filename
+	    class="directory">&path-ods-usd;/defaults</filename>
+	    contains the default settings of the &dcache;.  If one of
+	    the default configuration values needs to be changed, copy
+	    the default setting of this value from one of the files in
+	    <filename
+	    class='directory'>&path-ods-usd;/defaults</filename> to
+	    the file <filename>&path-ode-ed;/dcache.conf</filename>,
+	    which initially is empty and update the value.
 	  </para>
-	<note>
-	  <para>
-	    In this first installation of &dcache; your &dcache; will not be connected to a tape sytem. Therefore please change the values for <literal>DefaultRetentionPolicy</literal> and <literal>DefaultAccessLatency</literal> in the file <filename>&path-ode-ed;/dcache.conf</filename>.
+	  <note>
+	    <para>
+	      In this first installation of &dcache; your &dcache;
+	      will not be connected to a tape sytem. Therefore please
+	      change the values for
+	      <literal>DefaultRetentionPolicy</literal> and
+	      <literal>DefaultAccessLatency</literal> in the file
+	      <filename>&path-ode-ed;/dcache.conf</filename>.
+	    </para>
 	    <programlisting>DefaultRetentionPolicy=REPLICA
 DefaultAccessLatency=ONLINE</programlisting>
-	    </para>
-      </note>
+          </note>
 
-      <para>
-        Layouts describe which domains to run on a host and which services to run in each domain. For the customized configuration of your &dcache; you will create a <filename>mylayout.conf</filename> file in <filename class="directory">&path-ode-ed;/layouts</filename>.
+	  <para>
+	    Layouts describe which domains to run on a host and which
+	    services to run in each domain. For the customized
+	    configuration of your &dcache; you will have to create a
+	    layout file in <filename
+	    class="directory">&path-ode-ed;/layouts</filename>. In
+	    this tutorial we will call it the
+	    <filename>mylayout.conf</filename> file.
 	  </para>
 	</section>
 
-      <important>
-      <para>
-        Do not update configuration values in the files in the defaults folder,
-        since changes to these files will be overwritten by updates.
-      </para>
-      </important>
+	<important>
+	  <para>
+	    Do not update configuration values in the files in the
+	    defaults folder, since changes to these files will be
+	    overwritten by updates.
+	  </para>
+	</important>
 
-      <para>
-	As the files in <filename class="directory">&path-ods-usd;/defaults/</filename> do serve
-	as succinct documentation for all available configuration parameters and their
-	default values it is quite useful to have a look at them.
-      </para>
+	<para>
+	  As the files in <filename
+	  class="directory">&path-ods-usd;/defaults/</filename> do
+	  serve as succinct documentation for all available
+	  configuration parameters and their default values it is
+	  quite useful to have a look at them.
+	</para>
 
-    <section id="in-install-layout">
-      <title>Defining domains and services</title>
-      <para>
-	Domains and services are defined in the layout files.
-        Depending on your site, you may have requirements upon the doors that
-        you want to configure and domains within which you want to organise
-        them.
-      </para>
+	<section id="in-install-layout">
+	  <title>Defining domains and services</title>
+	  <para>
+	    Domains and services are defined in the layout files.
+	    Depending on your site, you may have requirements upon the
+	    doors that you want to configure and domains within which
+	    you want to organise them.
+	  </para>
 
-      <para>
-        A domain must be defined if services are to run in that domain.
-	Services will be started in the order in which they are defined.
-      </para>
+	  <para>
+	    A domain must be defined if services are to run in that
+	    domain.  Services will be started in the order in which
+	    they are defined.
+	  </para>
 
-      <para>
-	Every domain is a Java Virtual Machine that can be started and stopped
-	separately. You might want to define several domains for the different
-	services depending on the necessity of restarting the services separately.
-      </para>
+	  <para>
+	    Every domain is a Java Virtual Machine that can be started
+	    and stopped separately. You might want to define several
+	    domains for the different services depending on the
+	    necessity of restarting the services separately.
+	  </para>
 
-      <para>
-	The layout files define which domains to start and which
-	services to put in which domain. Configuration can be done per
-	domain and per service.
-      </para>
+	  <para>
+	    The layout files define which domains to start and which
+	    services to put in which domain. Configuration can be done
+	    per domain and per service.
+	  </para>
 
-      <para>
-	  A name in square brackets, <emphasis>without</emphasis> a
-	  forward-slash (<literal>/</literal>) defines a domain.  A
-	  name in square brackets <emphasis>with</emphasis> a forward
-	  slash defines a service that is to run in a domain.  Lines
-	  starting with a hash-symbol (<literal>#</literal>) are
-	  comments and will be ignored by &dcache;.
-      </para>
+	  <para>
+	    A name in square brackets, <emphasis>without</emphasis> a
+	    forward-slash (<literal>/</literal>) defines a domain.  A
+	    name in square brackets <emphasis>with</emphasis> a
+	    forward slash defines a service that is to run in a
+	    domain.  Lines starting with a hash-symbol
+	    (<literal>#</literal>) are comments and will be ignored by
+	    &dcache;.
+	  </para>
 
-      <para>
-        There may be several layout files in the layout directory, but only one
-	of them is read by &dcache; when starting up. By default it is the
-	<filename>single.conf</filename>.
-	If the &dcache; should be started with another layout file you will have to make
-	this configuration in <filename>&path-ode-ed;/dcache.conf</filename>.
-      </para>
+	  <para>
+	    There may be several layout files in the layout directory,
+	    but only one of them is read by &dcache; when starting
+	    up. By default it is the <filename>single.conf</filename>.
+	    If the &dcache; should be started with another layout file
+	    you will have to make this configuration in
+	    <filename>&path-ode-ed;/dcache.conf</filename>.
+	  </para>
 
-      <informalexample>
-	<programlisting>dcache.layout=mylayout</programlisting>
-	This entry in <filename>&path-ode-ed;/dcache.conf</filename>
-	will instruct &dcache; to read the layout file
-	<filename>&path-ode-ed;/layouts/mylayout.conf</filename> when starting up.
-      </informalexample>
+	  <informalexample>
+	    <programlisting>dcache.layout=mylayout</programlisting>
+	    This entry in
+	    <filename>&path-ode-ed;/dcache.conf</filename> will
+	    instruct &dcache; to read the layout file
+	    <filename>&path-ode-ed;/layouts/mylayout.conf</filename>
+	    when starting up.
+	  </informalexample>
 
-      <informalexample>
-	These are the first lines of <filename>&path-ode-ed;/layouts/single.conf</filename>:
-	<programlisting>broker.scheme=none
+	  <informalexample>
+	    <para>
+	      These are the first lines of
+	      <filename>&path-ode-ed;/layouts/single.conf</filename>:
+	    </para>
+	    <programlisting>broker.scheme=none
 
 [dCacheDomain]
 [dCacheDomain/admin]
 [dCacheDomain/broadcast]
 [dCacheDomain/poolmanager]</programlisting>
 
-	<para>
-	  <literal>[&domain-dcache;]</literal> defines a domain
-	  called &domain-dcache;. In this example only one domain is defined.
-	  All the services are running in that domain. Therefore
-	  no messagebroker is needed, which is the meaning of the entry
-	  <literal>messageBroker=none</literal>.
-	</para>
+ 	    <para>
+	      <literal>[&domain-dcache;]</literal> defines a domain
+	      called &domain-dcache;. In this example only one domain
+	      is defined.  All the services are running in that
+	      domain. Therefore no messagebroker is needed, which is
+	      the meaning of the entry
+	      <literal>messageBroker=none</literal>.
+	    </para>
 
-	<para>
-	  <literal>[&domain-dcache;/&cell-admin;]</literal> declares that
-	  the &cell-admin; service is to be run in the &domain-dcache; domain.
-	</para>
-      </informalexample>
+	    <para>
+	      <literal>[&domain-dcache;/&cell-admin;]</literal>
+	      declares that the &cell-admin; service is to be run in
+	      the &domain-dcache; domain.
+	    </para>
+	  </informalexample>
 
-      <informalexample>
-	<para>
-	  Here is an example for the first lines of the <filename>mylayout.conf</filename>
-	  of a single node &dcache; with several domains.
-	</para>
-	<programlisting>[dCacheDomain]
-[dCacheDomain/poolmanager]
+	  <informalexample>
+	    <para>
+	      This is an example for the <filename>mylayout.conf</filename> file of a single node
+	      &dcache; with several domains.
+	    </para>
+	    <programlisting>[dCacheDomain]
 [dCacheDomain/broadcast]
 [dCacheDomain/loginbroker]
-#[dCacheDomain/topo]
+[dCacheDomain/topo]
+[dCacheDomain/info]
 
 [namespaceDomain]
 [namespaceDomain/pnfsmanager]
 [namespaceDomain/cleaner]
-[namespaceDomain/acl]
+[namespaceDomain/dir]
+[namespaceDomain/nfsv41]
+
+[poolmanagerDomain]
+[poolmanagerDomain/poolmanager]
+
+[adminDoorDomain]
+[adminDoorDomain/admin]
+
+[httpdDomain]
+[httpdDomain/httpd]
+[httpdDomain/billing]
+[httpdDomain/srm-loginbroker]
 
 [gPlazmaDomain]
-[gPlazmaDomain/gplazma]
+[gPlazmaDomain/gplazma]</programlisting>
+	  </informalexample>
 
-[srmDomain]
-[srmDomain/srm]
-[srmDomain/spacemanager]
-[srmDomain/transfermanagers]</programlisting>
-
-      </informalexample>
-	<important>Having defined more than one domain, a messagebroker is needed.
-	This is because the
-	defined domains need to be able to communicate with each other. The default value is
-	<literal>messageBroker=cells</literal>, as defined in the defaults
-	<filename>&path-ods-usd;/defaults/dcache.properties</filename>.
-	</important>
-    </section>
+	  <note>
+	    <para>
+	      If you defined more than one domain, a messagebroker is
+	      needed, because the defined domains need to be able to
+	      communicate with each other. This means that if you use
+	      the file <filename>single.conf</filename> as a template
+	      for a &dcache; with more than one domain you need to
+	      delete the line
+	      <literal>messageBroker=none</literal>. Then the default
+	      value will be used which is
+	      <literal>messageBroker=cells</literal>, as defined in
+	      the defaults
+	      <filename>&path-ods-usd;/defaults/dcache.properties</filename>.
+	    </para>
+	  </note>
+	</section>
 
     <section id="in-install-configure-pools">
       <title>Creating and configuring pools</title>
@@ -529,13 +599,7 @@ file:/etc/dcache/layouts/mylayout.conf.</screen>
 	In this example we create a pool called pool1 in the directory <filename class='directory'>/srv/dcache/p1</filename>.
 	The created pool will be running in the domain <literal>poolDomain</literal>.
 	</para>
-	<para>
-	Now you need to change the ownership of the directories where your data is to be stored to the user running &dcache; which by default is &user-dcache;.
-	</para>
-	<screen>&prompt-root; <userinput>chown -R dcache /srv/dcache/p1</userinput></screen>
       </informalexample>
-
-
 
        <note>
         <title>Mind the Gap!</title>
@@ -564,8 +628,10 @@ file:/etc/dcache/layouts/mylayout.conf.</screen>
       <para>
 	By default the &java; heap size and the maximum direct buffer
 	size are defined as
+	</para>
 	<programlisting>dcache.java.memory.heap=512m
 dcache.java.memory.direct=512m</programlisting>
+	<para>
         Again, these values can be changed in
 	<filename>&path-ode-ed;/dcache.conf</filename>.
       </para>
@@ -613,15 +679,29 @@ dcache.java.memory.direct=16m</programlisting>
       <section id="in-install-configure-starting">
 	<title>Starting &dcache;</title>
 	<para>
-	  All configured components can now be started with
-	  <userinput>&path-odb-n-s;dcache start</userinput>.
+	  Restart &dcache; to start the newly configured components
+	  <userinput>&path-odb-n-s;dcache restart</userinput> and
+	  check the status of &dcache; with
+	  <userinput>&path-odb-n-s;dcache status</userinput>.
 	</para>
 	<informalexample>
-	  <screen>&prompt-root; <userinput>&path-odb-n-s;dcache start</userinput>
-Starting dCacheDomain  Done (pid=7574)
-Starting namespaceDomain  Done (pid=7647)
-Starting gPlazmaDomain  Done (pid=8002)
-Starting srmDomain  Done (pid=8081)</screen>
+	  <screen>&prompt-root; <userinput>&path-odb-n-s;dcache restart</userinput>
+Stopping dCacheDomain 0 1 done
+Starting dCacheDomain done
+Starting namespaceDomain done
+Starting poolmanagerDomain done
+Starting adminDoorDomain done
+Starting httpdDomain done
+Starting gPlazmaDomain done
+Starting poolDomain
+&prompt-root; <userinput>&path-odb-n-s;dcache status</userinput>
+DOMAIN            STATUS  PID  USER   
+dCacheDomain      running 5881 dcache 
+namespaceDomain   running 5930 dcache 
+poolmanagerDomain running 5989 dcache 
+adminDoorDomain   running 6040 dcache 
+httpdDomain       running 6093 dcache 
+gPlazmaDomain     running 6147 dcache</screen>
 	</informalexample>
       </section>
 
