@@ -84,18 +84,17 @@
         <listitem>
           <para>
             An RPM-based Linux distribution is required for the
-            following procedure. For Debian derived systems the RPM
-            may be converted to a DEB using alien. Solaris is
-            supported using either the Solaris package or the tarball.
+            following procedure. For Debian derived systems we provide
+            Debian packages and for Solaris the Solaris packages or
+            the tarball.
           </para>
         </listitem>
 
         <listitem>
           <para>
-           &dcache; requires Java 1.6 JRE. Please use &sunjvm; at the
-           latest patch-level (at the moment of writing this is
-           1.6.0_25) and check for upgrades frequently. It is
-           recommendet to use JDK as &dcache; scripts can make use of
+           &dcache; requires Java 1.7 JRE. Please use the
+           latest patch-level and check for upgrades frequently. It is
+           recommended to use JDK as &dcache; scripts can make use of
            some extra features that JDK provides to gather more
            diagnostic information (heap-dump, etc). This helps when
            tracking down bugs.
@@ -104,9 +103,9 @@
 
         <listitem>
           <para>
-            &psql; must be installed and running. See <xref
-            linkend="cb-postgres-install"/> for more details.
-	    &psql; version 8.3 or later is required.
+            &psql; must be installed and running.  We recommend the
+            use of &psql; version 9.2 (at least &psql; version 8.3 is
+            required).
 	  </para>
 	    <important>
 	      <para>
@@ -149,6 +148,27 @@
         section describes how to do this.
       </para>
 
+      <section id="in-install-postgres-start">
+	<title>Starting &psql;</title>
+	<para>
+	  Install the &psql; server with the tools of the operating
+	  system.
+	</para>
+
+	<para>
+	  Initialize the database directory (for &psql; version 9.2
+	  this is <filename
+	  class='dir'>/var/lib/pgsql/9.2/data/</filename>) , start the
+	  database server, and make sure that it is started at system
+	  start-up.
+	</para>
+	<screen>&prompt-root; <userinput>service postgresql-9.2 initdb</userinput>
+Initializing database:                                     [  OK  ]
+&prompt-root; <userinput>service postgresql-9.2 start</userinput>
+Starting postgresql-9.2 service:                           [  OK  ]
+&prompt-root; <userinput>chkconfig postgresql-9.2 on</userinput></screen>
+      </section>
+
       <section id="in-install-postgres-trust">
 	<title>Enabling local trust</title>
 
@@ -161,14 +181,20 @@
           <para>
             To allow local users to access &psql; without requiring a
             password, ensure the file
-            <filename>pg_hba.conf</filename>, usually located in
-            <filename class="directory">/var/lib/pgsql/data</filename>,
+            <filename>pg_hba.conf</filename>, which (for &psql;
+            version 9.2) is located in <filename
+            class="directory">/var/lib/pgsql/9.2/data</filename>,
             contains the following lines.
           </para>
 
-          <programlisting>local   all         all                        trust
-host    all         all         127.0.0.1/32   trust
-host    all         all         ::1/128        trust</programlisting>
+          <programlisting># TYPE  DATABASE        USER            ADDRESS                 METHOD
+
+# "local" is for Unix domain socket connections only
+local   all             all                                     trust
+# IPv4 local connections:
+host    all             all             127.0.0.1/32            trust
+# IPv6 local connections:
+host    all             all             ::1/128                 trust</programlisting>
 
           <note>
             <para>
@@ -189,9 +215,9 @@ host    all         all         ::1/128        trust</programlisting>
             the following command:
 	    </para>
 
-	    <screen>&prompt-root; <userinput>/etc/init.d/postgresql restart</userinput>
-Stopping postgresql service:                               [  OK  ]
-Starting postgresql service:                               [  OK  ]</screen>
+	    <screen>&prompt-root; <userinput>service postgresql-9.2 restart</userinput>
+Stopping postgresql-9.2 service:                           [  OK  ]
+Starting postgresql-9.2 service:                           [  OK  ]</screen>
           </important>
         </section>
 
@@ -438,8 +464,11 @@ DefaultAccessLatency=ONLINE</programlisting>
       </informalexample>
 
       <informalexample>
-	These are the first lines of <filename>&path-ode-ed;/layouts/single.conf</filename>:
-	<programlisting>broker.scheme=none
+      <para>
+	These are the first lines of
+	<filename>&path-ode-ed;/layouts/single.conf</filename>:
+      </para>
+      <programlisting>broker.scheme=none
 
 [dCacheDomain]
 [dCacheDomain/admin]
@@ -564,8 +593,10 @@ file:/etc/dcache/layouts/mylayout.conf.</screen>
       <para>
 	By default the &java; heap size and the maximum direct buffer
 	size are defined as
+	</para>
 	<programlisting>dcache.java.memory.heap=512m
 dcache.java.memory.direct=512m</programlisting>
+	<para>
         Again, these values can be changed in
 	<filename>&path-ode-ed;/dcache.conf</filename>.
       </para>

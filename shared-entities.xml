@@ -24,11 +24,11 @@ Rules / Guidelines / Suggestions for adding new entities:
 
 <!-- An *example* dCache 3-digit version.  This includes the patch-level number.
      For example: "2.0.1" -->
-<!ENTITY dcache-patch-version          "&dcache-version;.1">
+<!ENTITY dcache-patch-version          "&dcache-version;.0">
 
 <!-- An *example* dCache 3-digit version; this is the next patch-level release
      from &dcache-patch-version; -->
-<!ENTITY dcache-next-patch-version     "&dcache-version;.2">
+<!ENTITY dcache-next-patch-version     "&dcache-version;.1">
 
 <!-- An *example* dCache version that includes a packaging number.
      This is useful when referring to RPM files -->

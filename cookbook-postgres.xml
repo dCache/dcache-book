@@ -9,7 +9,7 @@
 <chapter id="cb-postgres">
 
   <title>&psql; and &dcache;</title>
-
+<!--
   <chapterinfo>
     <author>
       <firstname>Vladimir</firstname>
@@ -26,6 +26,7 @@
       <surname>Radicke</surname>
     </author>
   </chapterinfo>
+-->
 
   <para>
     &psql; is used for various things in a &dcache; system: The
@@ -63,28 +64,19 @@
     <para>
       Install the &psql; server, client and JDBC support with the
       tools of the operating system.
-
     </para>
 
-      <para>
-        Initialize the database directory (usually
-        <filename class="directory">/var/lib/pgsql/data/</filename>),
-        start the database server, and make sure that it is started
-        at system start-up. This may be done with
-
-<screen>&prompt-root; <userinput>/etc/init.d/postgresql start</userinput>
-&prompt-root; <userinput>chkconfig postgresql on</userinput></screen>
-
-        If the start-up script does not perform the initialization
-        automatically, it might have to be done with
-
-<screen>&prompt-root; <userinput>initdb -D <filename class="directory">/var/lib/pgsql/data/</filename></userinput></screen>
-
-        and the server is started manually with
-
-<screen>&prompt-root; <userinput>postmaster -i -D <filename class="directory">/var/lib/pgsql/data/</filename> >logfile 2>&amp;1 &amp;</userinput></screen>
+    <para>
+      Initialize the database directory (for &psql; version 9.2 this
+      is <filename class='dir'>/var/lib/pgsql/9.2/data/</filename>) , start the
+      database server, and make sure that it is started at system
+      start-up.
     </para>
-
+    <screen>&prompt-root; <userinput>service postgresql-9.2 initdb</userinput>
+Initializing database:                                     [  OK  ]
+&prompt-root; <userinput>service postgresql-9.2 start</userinput>
+Starting postgresql-9.2 service:                           [  OK  ]
+&prompt-root; <userinput>chkconfig postgresql-9.2 on</userinput></screen>
 
   </section>
 
