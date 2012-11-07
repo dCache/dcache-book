@@ -105,15 +105,24 @@ chimera.db.password=secret</programlisting>
 # /data *.my.domain(rw)</programlisting>
 
   <para>
-    As any RPC service &chimera; &nfs; requires <systemitem
+    As any RPC service &chimera; &nfs; requires the <systemitem
     class='service'>rpcbind</systemitem> service to run on the
     host. Nevertheless <systemitem
     class='service'>rpcbind</systemitem> has to be configured to
-    accept requests from &chimera; &nfs;. On RHEL6 based systems you
-    need to add <screen>RPCBIND_ARGS="-i"</screen> into
-    <filename>/etc/sysconfig/rpcbind</filename>. Check your OS manual
-    for details.
+    accept requests from &chimera; &nfs;.
   </para>
+  <para>
+    On RHEL6 based systems you need to add
+  </para>
+  <programlisting>RPCBIND_ARGS="-i"</programlisting>
+  <para>
+    into <filename>/etc/sysconfig/rpcbind</filename> and restart
+    <systemitem class='service'>rpcbind</systemitem>. Check your OS
+    manual for details.
+  </para>
+  <screen>&prompt-root; <userinput>service rpcbind restart</userinput>
+Stopping rpcbind:                                          [  OK  ]
+Starting rpcbind:                                          [  OK  ]</screen>
 
   <para>
     If your OS does not provide <systemitem class='service'>rpcbind</systemitem>
@@ -128,7 +137,7 @@ Stopping portmap: portmap</screen>
     and restart the domain in which the &nfs; server is running.
   </para>
   <informalexample>
-    <screen>&prompt-root;<userinput>&path-odb-n-s;dcache restart namespaceDomain</userinput></screen>
+    <screen>&prompt-root; <userinput>&path-odb-n-s;dcache restart namespaceDomain</userinput></screen>
   </informalexample>
 
   <para>
