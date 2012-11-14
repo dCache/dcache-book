@@ -326,7 +326,15 @@ CREATE TRIGGER
 	 </para>
 
 	 <para>
-	   Now the configuration of &psql; is done and &dcache; can be started.
+	   Now the configuration of &psql; is done. Before the first
+	   start of &dcache; replace the file
+	   <filename>&path-ode-ed;/gplazma.conf</filename> with an
+	   empty file.
+	 </para>
+<screen>&prompt-root; <userinput>mv &path-ode-ed;/gplazma.conf &path-ode-ed;/gplazma.conf.bak</userinput>
+&prompt-root; <userinput>touch &path-ode-ed;/gplazma.conf</userinput></screen>
+         <para>
+	   &dcache; can be started now.
 	 </para>
 
 	 <screen>&prompt-root; <userinput>&path-odb-n-s;dcache start</userinput>
@@ -529,7 +537,6 @@ DefaultAccessLatency=ONLINE</programlisting>
 [namespaceDomain/pnfsmanager]
 [namespaceDomain/cleaner]
 [namespaceDomain/dir]
-[namespaceDomain/nfsv41]
 
 [poolmanagerDomain]
 [poolmanagerDomain/poolmanager]
@@ -601,8 +608,8 @@ file:/etc/dcache/layouts/mylayout.conf.</screen>
 	</para>
       </informalexample>
 
-       <note>
-        <title>Mind the Gap!</title>
+      <note>
+	<title>Mind the Gap!</title>
 	<para>
 	  The default gap for poolsizes is 4GiB. This means you should
 	  make a bigger pool than 4GiB otherwise you would have to
@@ -613,7 +620,7 @@ file:/etc/dcache/layouts/mylayout.conf.</screen>
 	<screen>&dc-prompt-local; <userinput>cd <replaceable>poolname</replaceable></userinput>
 &dc-prompt-pool; <userinput>set gap 2G</userinput>
 &dc-prompt-pool; <userinput>save</userinput></screen>
-       </note>
+      </note>
 
       <para>
 	Adding a pool to a configuration does not modify the pool or
@@ -621,6 +628,46 @@ file:/etc/dcache/layouts/mylayout.conf.</screen>
       </para>
 
       </section>
+
+      <section id="in-install-configure-starting">
+	<title>Starting &dcache;</title>
+	<para>
+	  Restart &dcache; to start the newly configured components
+	  <userinput>&path-odb-n-s;dcache restart</userinput> and
+	  check the status of &dcache; with
+	  <userinput>&path-odb-n-s;dcache status</userinput>.
+	</para>
+	<informalexample>
+	  <screen>&prompt-root; <userinput>&path-odb-n-s;dcache restart</userinput>
+Stopping dCacheDomain 0 1 done
+Starting dCacheDomain done
+Starting namespaceDomain done
+Starting poolmanagerDomain done
+Starting adminDoorDomain done
+Starting httpdDomain done
+Starting gPlazmaDomain done
+Starting poolDomain done
+&prompt-root; <userinput>&path-odb-n-s;dcache status</userinput>
+DOMAIN            STATUS  PID   USER
+dCacheDomain      running 17466 dcache
+namespaceDomain   running 17522 dcache
+poolmanagerDomain running 17575 dcache
+adminDoorDomain   running 17625 dcache
+httpdDomain       running 17682 dcache
+gPlazmaDomain     running 17744 dcache
+poolDomain        running 17798 dcache</screen>
+	</informalexample>
+      </section>
+
+      <para>
+	Now you can have a look at your &dcache; via The Web
+	Interface, see <xref linkend="intouch-web">intouch-web</xref>:
+	<uri>http://<replaceable>httpd.example.org</replaceable>:2288/</uri>,
+	where <replaceable>httpd.example.org</replaceable> is the node on which your
+	&cell-httpd; service is running.
+	For a single node &dcache; this is the machine on which your &dcache; is running.
+      </para>
+
 
       <section id="in-install-configure-java">
 	<title>&java; heap size</title>
@@ -675,44 +722,6 @@ dcache.java.memory.direct=16m</programlisting>
       </note>
 
       </section>
-
-      <section id="in-install-configure-starting">
-	<title>Starting &dcache;</title>
-	<para>
-	  Restart &dcache; to start the newly configured components
-	  <userinput>&path-odb-n-s;dcache restart</userinput> and
-	  check the status of &dcache; with
-	  <userinput>&path-odb-n-s;dcache status</userinput>.
-	</para>
-	<informalexample>
-	  <screen>&prompt-root; <userinput>&path-odb-n-s;dcache restart</userinput>
-Stopping dCacheDomain 0 1 done
-Starting dCacheDomain done
-Starting namespaceDomain done
-Starting poolmanagerDomain done
-Starting adminDoorDomain done
-Starting httpdDomain done
-Starting gPlazmaDomain done
-Starting poolDomain
-&prompt-root; <userinput>&path-odb-n-s;dcache status</userinput>
-DOMAIN            STATUS  PID  USER   
-dCacheDomain      running 5881 dcache 
-namespaceDomain   running 5930 dcache 
-poolmanagerDomain running 5989 dcache 
-adminDoorDomain   running 6040 dcache 
-httpdDomain       running 6093 dcache 
-gPlazmaDomain     running 6147 dcache</screen>
-	</informalexample>
-      </section>
-
-      <para>
-	Now you can have a look at your &dcache; via The Web
-	Interface, see <xref linkend="intouch-web">intouch-web</xref>:
-	<uri>http://<replaceable>httpd.example.org</replaceable>:2288/</uri>,
-	where <replaceable>httpd.example.org</replaceable> is the node on which your
-	&cell-httpd; service is running.
-	For a single node &dcache; this is the machine on which your &dcache; is running.
-      </para>
 
   </section>
 
