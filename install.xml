@@ -352,59 +352,72 @@ Starting dCacheDomain done</screen>
 	    <filename class="directory">&path-ode-ed;/layouts</filename>
 	  </listitem>
 	</itemizedlist>
-	The folder <filename class="directory">&path-ods-usd;/defaults</filename>
-	contains the default
-	settings of the &dcache;.
-        If one of the default configuration values needs to be changed, copy the default
-	setting of this value from one of the files in
-	<filename class='directory'>&path-ods-usd;/defaults</filename>
-        to the file <filename>&path-ode-ed;/dcache.conf</filename>, which initially is
-	empty and update the value.
+	The folder <filename
+	class="directory">&path-ods-usd;/defaults</filename> contains
+	the default settings of the &dcache;.  If one of the default
+	configuration values needs to be changed, copy the default
+	setting of this value from one of the files in <filename
+	class='directory'>&path-ods-usd;/defaults</filename> to the
+	file <filename>&path-ode-ed;/dcache.conf</filename>, which
+	initially is empty and update the value.
 	  </para>
 	<note>
 	  <para>
-	    In this first installation of &dcache; your &dcache; will not be connected to a tape sytem. Therefore please change the values for <literal>DefaultRetentionPolicy</literal> and <literal>DefaultAccessLatency</literal> in the file <filename>&path-ode-ed;/dcache.conf</filename>.
+	    In this first installation of &dcache; your &dcache; will
+	    not be connected to a tape sytem. Therefore please change
+	    the values for <literal>DefaultRetentionPolicy</literal>
+	    and <literal>DefaultAccessLatency</literal> in the file
+	    <filename>&path-ode-ed;/dcache.conf</filename>.
 	    <programlisting>DefaultRetentionPolicy=REPLICA
 DefaultAccessLatency=ONLINE</programlisting>
 	    </para>
       </note>
 
       <para>
-        Layouts describe which domains to run on a host and which services to run in each domain. For the customized configuration of your &dcache; you will create a <filename>mylayout.conf</filename> file in <filename class="directory">&path-ode-ed;/layouts</filename>.
+        Layouts describe which domains to run on a host and which
+        services to run in each domain. For the customized
+        configuration of your &dcache; you will create a
+        <filename>mylayout.conf</filename> file in <filename
+        class="directory">&path-ode-ed;/layouts</filename>.
 	  </para>
 	</section>
 
       <important>
       <para>
-        Do not update configuration values in the files in the defaults folder,
-        since changes to these files will be overwritten by updates.
+        Do not update configuration values in the files in the
+        defaults folder, since changes to these files will be
+        overwritten by updates.
       </para>
       </important>
 
       <para>
-	As the files in <filename class="directory">&path-ods-usd;/defaults/</filename> do serve
-	as succinct documentation for all available configuration parameters and their
-	default values it is quite useful to have a look at them.
+	As the files in <filename
+	class="directory">&path-ods-usd;/defaults/</filename> do serve
+	as succinct documentation for all available configuration
+	parameters and their default values it is quite useful to have
+	a look at them.
       </para>
 
     <section id="in-install-layout">
       <title>Defining domains and services</title>
       <para>
 	Domains and services are defined in the layout files.
-        Depending on your site, you may have requirements upon the doors that
-        you want to configure and domains within which you want to organise
-        them.
+	Depending on your site, you may have requirements upon the
+	doors that you want to configure and domains within which you
+	want to organise them.
       </para>
 
       <para>
-        A domain must be defined if services are to run in that domain.
-	Services will be started in the order in which they are defined.
+        A domain must be defined iqf services are to run in that
+        domain.  Services will be started in the order in which they
+        are defined.
       </para>
 
       <para>
-	Every domain is a Java Virtual Machine that can be started and stopped
-	separately. You might want to define several domains for the different
-	services depending on the necessity of restarting the services separately.
+	Every domain is a Java Virtual Machine that can be started and
+	stopped separately. You might want to define several domains
+	for the different services depending on the necessity of
+	restarting the services separately.
       </para>
 
       <para>
@@ -414,12 +427,12 @@ DefaultAccessLatency=ONLINE</programlisting>
       </para>
 
       <para>
-	  A name in square brackets, <emphasis>without</emphasis> a
-	  forward-slash (<literal>/</literal>) defines a domain.  A
-	  name in square brackets <emphasis>with</emphasis> a forward
-	  slash defines a service that is to run in a domain.  Lines
-	  starting with a hash-symbol (<literal>#</literal>) are
-	  comments and will be ignored by &dcache;.
+	A name in square brackets, <emphasis>without</emphasis> a
+	forward-slash (<literal>/</literal>) defines a domain.  A name
+	in square brackets <emphasis>with</emphasis> a forward slash
+	defines a service that is to run in a domain.  Lines starting
+	with a hash-symbol (<literal>#</literal>) are comments and
+	will be ignored by &dcache;.
       </para>
 
       <para>
@@ -455,42 +468,58 @@ DefaultAccessLatency=ONLINE</programlisting>
 	</para>
 
 	<para>
-	  <literal>[&domain-dcache;/&cell-admin;]</literal> declares that
-	  the &cell-admin; service is to be run in the &domain-dcache; domain.
+	  <literal>[&domain-dcache;/&cell-admin;]</literal> declares
+	  that the &cell-admin; service is to be run in the
+	  &domain-dcache; domain.
 	</para>
       </informalexample>
-
       <informalexample>
 	<para>
-	  Here is an example for the first lines of the <filename>mylayout.conf</filename>
-	  of a single node &dcache; with several domains.
+	  This is an example for the
+	  <filename>mylayout.conf</filename> file of a single node
+	  &dcache; with several domains.
 	</para>
 	<programlisting>[dCacheDomain]
-[dCacheDomain/poolmanager]
 [dCacheDomain/broadcast]
 [dCacheDomain/loginbroker]
-#[dCacheDomain/topo]
+[dCacheDomain/topo]
+[dCacheDomain/info]
 
 [namespaceDomain]
 [namespaceDomain/pnfsmanager]
 [namespaceDomain/cleaner]
-[namespaceDomain/acl]
+[namespaceDomain/dir]
+
+[poolmanagerDomain]
+[poolmanagerDomain/poolmanager]
+
+[adminDoorDomain]
+[adminDoorDomain/admin]
+
+[httpdDomain]
+[httpdDomain/httpd]
+[httpdDomain/billing]
+[httpdDomain/srm-loginbroker]
 
 [gPlazmaDomain]
-[gPlazmaDomain/gplazma]
-
-[srmDomain]
-[srmDomain/srm]
-[srmDomain/spacemanager]
-[srmDomain/transfermanagers]</programlisting>
-
+[gPlazmaDomain/gplazma]</programlisting>
       </informalexample>
-	<important>Having defined more than one domain, a messagebroker is needed.
-	This is because the
-	defined domains need to be able to communicate with each other. The default value is
-	<literal>messageBroker=cells</literal>, as defined in the defaults
-	<filename>&path-ods-usd;/defaults/dcache.properties</filename>.
-	</important>
+
+      <note>
+	<para>
+	  If you defined more than one domain, a messagebroker is
+	  needed, because the defined domains need to be able to
+	  communicate with each other. This means that if you use the
+	  file <filename>single.conf</filename> as a template for a
+	  &dcache; with more than one domain you need to delete the
+	  line <literal>messageBroker=none</literal>. Then the default
+	  value will be used which is
+	  <literal>messageBroker=cells</literal>, as defined in the
+	  defaults
+	  <filename>&path-ods-usd;/defaults/dcache.properties</filename>.
+	</para>
+      </note>
+
     </section>
 
     <section id="in-install-configure-pools">
@@ -512,12 +541,13 @@ waitForFiles=${path}/data</programlisting>
 	<para>
 	  The property <varname>waitForFiles</varname> instructs the
 	  pool not to start up until the specified file or directory
-	  is available.  This prevents problems should the underlying storage be unavailable (e.g., if a
-	  RAID device is offline).
+	  is available.  This prevents problems should the underlying
+	  storage be unavailable (e.g., if a RAID device is offline).
 	</para>
     <note>
        <para>
-          Please restart &dcache; if your pool is created in a domain that did not exist before.
+          Please restart &dcache; if your pool is created in a domain
+          that did not exist before.
        </para>
     </note>
 
@@ -534,8 +564,6 @@ file:/etc/dcache/layouts/mylayout.conf.</screen>
 	</para>
 	<screen>&prompt-root; <userinput>chown -R dcache /srv/dcache/p1</userinput></screen>
       </informalexample>
-
-
 
        <note>
         <title>Mind the Gap!</title>
@@ -557,6 +585,47 @@ file:/etc/dcache/layouts/mylayout.conf.</screen>
       </para>
 
       </section>
+
+      <section id="in-install-configure-starting">
+	<title>Starting &dcache;</title>
+	<para>
+	  Restart &dcache; to start the newly configured components
+	  <userinput>&path-odb-n-s;dcache restart</userinput> and
+	  check the status of &dcache; with
+	  <userinput>&path-odb-n-s;dcache status</userinput>.
+	</para>
+
+	<informalexample>
+	  <screen>&prompt-root; <userinput>&path-odb-n-s;dcache restart</userinput>
+Stopping dCacheDomain 0 1 done
+Starting dCacheDomain done
+Starting namespaceDomain done
+Starting poolmanagerDomain done
+Starting adminDoorDomain done
+Starting httpdDomain done
+Starting gPlazmaDomain done
+Starting poolDomain done
+&prompt-root; <userinput>&path-odb-n-s;dcache status</userinput>
+DOMAIN            STATUS  PID   USER
+dCacheDomain      running 17466 dcache
+namespaceDomain   running 17522 dcache
+poolmanagerDomain running 17575 dcache
+adminDoorDomain   running 17625 dcache
+httpdDomain       running 17682 dcache
+gPlazmaDomain     running 17744 dcache
+poolDomain        running 17798 dcache</screen>
+	</informalexample>
+
+      </section>
+
+      <para>
+	Now you can have a look at your &dcache; via The Web
+	Interface, see <xref linkend="intouch-web">intouch-web</xref>:
+	<uri>http://<replaceable>httpd.example.org</replaceable>:2288/</uri>,
+	where <replaceable>httpd.example.org</replaceable> is the node on which your
+	&cell-httpd; service is running.
+	For a single node &dcache; this is the machine on which your &dcache; is running.
+      </para>
 
       <section id="in-install-configure-java">
 	<title>&java; heap size</title>
@@ -609,30 +678,6 @@ dcache.java.memory.direct=16m</programlisting>
       </note>
 
       </section>
-
-      <section id="in-install-configure-starting">
-	<title>Starting &dcache;</title>
-	<para>
-	  All configured components can now be started with
-	  <userinput>&path-odb-n-s;dcache start</userinput>.
-	</para>
-	<informalexample>
-	  <screen>&prompt-root; <userinput>&path-odb-n-s;dcache start</userinput>
-Starting dCacheDomain  Done (pid=7574)
-Starting namespaceDomain  Done (pid=7647)
-Starting gPlazmaDomain  Done (pid=8002)
-Starting srmDomain  Done (pid=8081)</screen>
-	</informalexample>
-      </section>
-
-      <para>
-	Now you can have a look at your &dcache; via The Web
-	Interface, see <xref linkend="intouch-web">intouch-web</xref>:
-	<uri>http://<replaceable>httpd.example.org</replaceable>:2288/</uri>,
-	where <replaceable>httpd.example.org</replaceable> is the node on which your
-	&cell-httpd; service is running.
-	For a single node &dcache; this is the machine on which your &dcache; is running.
-      </para>
 
   </section>
 
