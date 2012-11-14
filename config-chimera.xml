@@ -125,7 +125,7 @@ Stopping rpcbind:                                          [  OK  ]
 Starting rpcbind:                                          [  OK  ]</screen>
 
   <para>
-    If your OS does not provides <systemitem class='service'>rpcbind</systemitem>
+    If your OS does not provide <systemitem class='service'>rpcbind</systemitem>
     &chimera; &nfs; can use an embedded <systemitem class='service'>rpcbind</systemitem>.
     This requires to disable the <systemitem class='service'>portmap</systemitem>
     service if it exists.
@@ -194,6 +194,34 @@ Stopping portmap: portmap</screen>
       can be altered in
       <filename>&path-ode-ed;/dcache.conf</filename>
     </para>
+
+    <para>
+      Create the directory in which the users are going to store their
+      data and change to this directory.
+    </para>
+    <screen>&prompt-root; <userinput>mkdir -p /mnt/data</userinput>
+&prompt-root; <userinput>cd /mnt/data</userinput></screen>
+
+    <para>
+      Now you can copy a file into your &dcache;
+    </para>
+    <screen>&prompt-root; <userinput>dccp /bin/sh test-file</userinput>
+735004 bytes (718 kiB) in 0 seconds</screen>
+
+    <para>
+      and copy the data back using the &prog-dccp; command.
+    </para>
+
+    <screen>&prompt-root; <userinput>dccp test-file /tmp/testfile</userinput>
+735004 bytes (718 kiB) in 0 seconds</screen>
+
+    <para>
+      The file has been transferred succesfully.
+    </para>
+    <para>
+      Now remove the file from the &dcache;.
+    </para>
+    <screen>&prompt-root; <userinput>rm  test-file</userinput></screen>
 
     <para>
       When the configuration is complete you can unmount &chimera;:
