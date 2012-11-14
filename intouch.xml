@@ -37,6 +37,137 @@
       protocol which negotiates the actual data transfer protocol.
     </para>
 
+    <section id="dcache-unmounted">
+      <title>&dcache; without mounted namespace</title>
+      <para>
+	Create the root of the &chimera; namespace and a
+	world-writable directory by
+      </para>
+      <screen>&prompt-root; <userinput>&chimera-cli; mkdir /data</userinput>
+&prompt-root; <userinput>&chimera-cli; mkdir /data/world-writable</userinput>
+&prompt-root; <userinput>&chimera-cli; chmod /data/world-writable 777</userinput></screen>
+    </section>
+
+    <section id="intouch-client-webdav">
+      <title>&webdav;</title>
+      <para>
+	To use &webdav; you need to define a &cell-webDAV; service in
+	your layout file. You can define this service in an extra
+	domain, e.g. <literal>[webdavDomain]</literal> or add it to
+	another domain.
+      </para>
+      <programlisting>[webdavDomain]
+[webdavDomain/webdav]
+webdavAnonymousAccess=FULL</programlisting>
+      <para>
+	to the file <filename>&path-ode-ed;/layouts/mylayout.conf</filename>.
+      </para>
+      <note>
+	<para>
+	  Depending on the client you might need to set
+	  <literal>webdav.redirect.on-read=false</literal> and/or
+	  <literal> webdav.redirect.on-write=false</literal>.
+	</para>
+<programlisting>#  ---- Whether to redirect GET requests to a pool
+#
+#   If true, WebDAV doors will respond with a 302 redirect pointing to
+#   a pool holding the file. This requires that a pool can accept
+#   incoming TCP connections and that the client follows the
+#   redirect. If false, data is relayed through the door. The door
+#   will establish a TCP connection to the pool.
+#
+(one-of?true|false)webdav.redirect.on-read=true
+
+#  ---- Whether to redirect PUT requests to a pool
+#
+#   If true, WebDAV doors will respond with a 307 redirect pointing to
+#   a pool to which to upload the file. This requires that a pool can
+#   accept incoming TCP connections and that the client follows the
+#   redirect. If false, data is relayed through the door. The door
+#   will establish a TCP connection to the pool. Only clients that send
+#   a Expect: 100-Continue header will be redirected - other requests
+#   will always be proxied through the door.
+#
+(one-of?true|false)webdav.redirect.on-write=true</programlisting>
+      </note>
+
+      <para>
+	Now you can start the &webdav; domain
+      </para>
+      <screen>&prompt-root; <userinput>&path-odb-n-s;dcache start webdavDomain</userinput></screen>
+
+      <para>
+	and access your files via
+	<uri>http://<replaceable>webdav-door.example.org</replaceable>:2880</uri>
+	with your browser.
+      </para>
+
+      <para>
+	You can connect the webdav server to your file manager and copy a file into your &dcache;.
+      </para>
+      <para>
+	To use &curl; to copy a file into your &dcache; you will need
+	to set <literal> webdav.redirect.on-write=false</literal>.
+      </para>
+      <informalexample>
+	<para>
+	  Write the file <filename>test.txt</filename>
+	</para>
+      <screen>&prompt-root; <userinput>curl -T test.txt http://webdav-door.example.org:2880/data/world-writable/curl-testfile.txt</userinput></screen>
+      <para>
+	and read it
+      </para>
+      <screen>&prompt-root; <userinput>curl http://webdav-door.example.org:2880/data/world-writable/curl-testfile.txt</userinput></screen>
+      </informalexample>
+    </section>
+
+      <section id="dcache-mounted">
+	<title>Using &dcache; with a mounted filesystem</title>
+	<para>
+	  &dcache; can also be used with a mounted file system.
+	  Before mounting the name space you need to edit the
+	  <filename>/etc/exports</filename> file. Add the lines
+	</para>
+	<programlisting>/ localhost(rw)
+/data</programlisting>
+
+        <para>
+	  stop the portmapper
+	</para>
+	<screen>&prompt-root; <userinput>/etc/init.d/portmap stop</userinput>
+Stopping portmap: portmap</screen>
+
+        <para>
+	  and restart &dcache;.
+	</para>
+	<screen>&prompt-root; <userinput>&path-odb-n-s;dcache restart</userinput></screen>
+
+	<para>
+	  Now you can mount &chimera;.
+	</para>
+	<screen>&prompt-root; <userinput>mount localhost:/ /mnt</userinput></screen>
+
+	<para>
+	  With the root of the namespace mounted you can establish
+	  wormhole files so &dcap; clients can discover the &dcap;
+	  doors.
+<!-- TODO: Add link to section with wormholes as soon as available for chimera -->
+	</para>
+
+	<screen>&prompt-root; <userinput>mkdir /mnt/admin/etc/config/dCache</userinput>
+&prompt-root; <userinput>touch /mnt/admin/etc/config/dCache/dcache.conf</userinput>
+&prompt-root; <userinput>touch /mnt/admin/etc/config/dCache/'.(fset)(dcache.conf)(io)(on)'</userinput>
+&prompt-root; <userinput>echo "<replaceable>dcache.example.org</replaceable>:22125" > /mnt/admin/etc/config/dCache/dcache.conf</userinput></screen>
+
+        <para>
+	  Create the directory in which the users are going to store
+	  their data and change to this directory.
+	</para>
+	<screen>&prompt-root; <userinput>mkdir -p /mnt/data</userinput>
+&prompt-root; <userinput>cd /mnt/data</userinput></screen>
+    </section>
+
+
     <section id="intouch-client-dcap">
       <title>&dcap;</title>
       <para>
@@ -165,39 +296,7 @@ Stopping portmap: portmap</screen>
 
       </section>
 
-      <section id="intouch-client-webdav">
-	<title>&webdav;</title>
-	<para>
-	  To use &webdav; you need to define a &cell-webDAV; service
-	  in your layout file. You can define this service in an extra
-	  domain, e.g. <literal>[webdavDomain]</literal> or add it to another
-	  domain.
-	</para>
-	<programlisting>[webdavDomain]
-[webdavDomain/webdav]
-webdavAnonymousAccess=FULL
-webdavRootPath=/data/world-writable</programlisting>
-	<para>
-	  to the file <filename>&path-ode-ed;/layouts/mylayout.conf</filename>.
-	</para>
 
-        <para>
-	  You can also specifiy the last two lines in
-	  <filename>&path-ode-ed;/dcache.conf</filename>.
-	</para>
-
-        <para>
-	  Now you can start the &webdav; domain
-	</para>
-	<screen>&prompt-root; <userinput>&path-odb-n-s;dcache start webdavDomain</userinput></screen>
-
-        <para>
-	  and access your files via
-	  <uri>http://<replaceable>dcache.example.org</replaceable>:2880</uri>
-	  with your browser.
-	</para>
-
-      </section>
 
   </section>
 
