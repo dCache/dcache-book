@@ -176,6 +176,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY nfs      "<systemitem class='protocol'>NFS</systemitem>">
 <!ENTITY webdav   "<systemitem class='protocol'>WebDAV</systemitem>">
 <!ENTITY kerberos "<systemitem class='protocol'>Kerberos</systemitem>">
+<!ENTITY curl "<systemitem class='protocol'>curl</systemitem>">
 
 
 <!-- Various formats -->
@@ -298,7 +299,6 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY path-odc-ed "<phrase layout='opt'>/opt/d-cache/config</phrase><phrase layout='fhs'>/etc/dcache</phrase>">
 <!ENTITY path-odj-usdl "<phrase layout='opt'>/opt/d-cache/jobs</phrase><phrase layout='fhs'>/usr/share/dcache/lib</phrase>">
 <!ENTITY path-oddl-uld "<phrase layout='opt'>/opt/d-cache/dcap/lib</phrase><phrase layout='fhs'>/usr/lib/dcache</phrase>">
-
 <!ENTITY path-od-vld "<phrase layout='opt'>/opt/d-cache</phrase><phrase layout='fhs'>/var/lib/dcache</phrase>">
 <!ENTITY path-vl-vld "<phrase layout='opt'>/var/log</phrase><phrase layout='fhs'>/var/log/dcache</phrase>">
 
