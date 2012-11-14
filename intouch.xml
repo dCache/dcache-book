@@ -121,52 +121,6 @@ webdavAnonymousAccess=FULL</programlisting>
       </informalexample>
     </section>
 
-      <section id="dcache-mounted">
-	<title>Using &dcache; with a mounted filesystem</title>
-	<para>
-	  &dcache; can also be used with a mounted file system.
-	  Before mounting the name space you need to edit the
-	  <filename>/etc/exports</filename> file. Add the lines
-	</para>
-	<programlisting>/ localhost(rw)
-/data</programlisting>
-
-        <para>
-	  stop the portmapper
-	</para>
-	<screen>&prompt-root; <userinput>/etc/init.d/portmap stop</userinput>
-Stopping portmap: portmap</screen>
-
-        <para>
-	  and restart &dcache;.
-	</para>
-	<screen>&prompt-root; <userinput>&path-odb-n-s;dcache restart</userinput></screen>
-
-	<para>
-	  Now you can mount &chimera;.
-	</para>
-	<screen>&prompt-root; <userinput>mount localhost:/ /mnt</userinput></screen>
-
-	<para>
-	  With the root of the namespace mounted you can establish
-	  wormhole files so &dcap; clients can discover the &dcap;
-	  doors.
-<!-- TODO: Add link to section with wormholes as soon as available for chimera -->
-	</para>
-
-	<screen>&prompt-root; <userinput>mkdir /mnt/admin/etc/config/dCache</userinput>
-&prompt-root; <userinput>touch /mnt/admin/etc/config/dCache/dcache.conf</userinput>
-&prompt-root; <userinput>touch /mnt/admin/etc/config/dCache/'.(fset)(dcache.conf)(io)(on)'</userinput>
-&prompt-root; <userinput>echo "<replaceable>dcache.example.org</replaceable>:22125" > /mnt/admin/etc/config/dCache/dcache.conf</userinput></screen>
-
-        <para>
-	  Create the directory in which the users are going to store
-	  their data and change to this directory.
-	</para>
-	<screen>&prompt-root; <userinput>mkdir -p /mnt/data</userinput>
-&prompt-root; <userinput>cd /mnt/data</userinput></screen>
-    </section>
-
 
     <section id="intouch-client-dcap">
       <title>&dcap;</title>
@@ -192,15 +146,11 @@ Stopping portmap: portmap</screen>
 &prompt-root;<userinput> wget http://grid-deployment.web.cern.ch/grid-deployment/glite/repos/3.2/glite-UI.repo</userinput>
 &prompt-root; <userinput>yum install dcap</userinput></screen>
 
-	<section id="dcap-unmounted">
-	  <title>&dcap; without mounted namespace</title>
 	  <para>
 	    Create the root of the &chimera; namespace and a
-	    world-writable directory for &dcap; to write into by
+	    world-writable directory for &dcap; to write into as described <link linkend="dcache-unmounted">
+above</link>.
 	  </para>
-	  <screen>&prompt-root; <userinput>&chimera-cli; mkdir /data</userinput>
-&prompt-root; <userinput>&chimera-cli; mkdir /data/world-writable</userinput>
-&prompt-root; <userinput>&chimera-cli; chmod /data/world-writable 777</userinput></screen>
 
           <para>
 	   Copy the data (here <filename>/bin/sh</filename> is used as
@@ -224,81 +174,755 @@ Stopping portmap: portmap</screen>
         <para>
 	  To remove the file you will need to mount the namespace.
 	</para>
-	</section>
-
-	<section id="dcap-mounted">
-	  <title>Using &dcap; with a mounted filesystem</title>
-	  <para>
-	    &dcap; can also be used with a mounted file system.
-	    Before mounting the name space you need to edit the
-	    <filename>/etc/exports</filename> file. Add the lines
-	  </para>
-	  <programlisting>/ localhost(rw)
-/data</programlisting>
-
-          <para>
-	    stop the portmapper
-	  </para>
-	  <screen>&prompt-root; <userinput>/etc/init.d/portmap stop</userinput>
-Stopping portmap: portmap</screen>
-
-          <para>
-	    and restart &dcache;.
-	  </para>
-	  <screen>&prompt-root; <userinput>&path-odb-n-s;dcache restart</userinput></screen>
-
-	  <para>
-	    Now you can mount &chimera;.
-	  </para>
-	  <screen>&prompt-root; <userinput>mount localhost:/ /mnt</userinput></screen>
-
-	  <para>
-	    With the root of the namespace mounted you can establish
-	    wormhole files so &dcap; clients can discover the &dcap;
-	    doors.
-<!-- TODO: Add link to section with wormholes as soon as available for chimera -->
-	  </para>
-
-	  <screen>&prompt-root; <userinput>mkdir /mnt/admin/etc/config/dCache</userinput>
-&prompt-root; <userinput>touch /mnt/admin/etc/config/dCache/dcache.conf</userinput>
-&prompt-root; <userinput>touch /mnt/admin/etc/config/dCache/'.(fset)(dcache.conf)(io)(on)'</userinput>
-&prompt-root; <userinput>echo "<replaceable>dcache.example.org</replaceable>:22125" > /mnt/admin/etc/config/dCache/dcache.conf</userinput></screen>
-
-          <para>
-	    Create the directory in which the users are going to
-	    store their data and change to this directory.
-	  </para>
-	  <screen>&prompt-root; <userinput>mkdir -p /mnt/data</userinput>
-&prompt-root; <userinput>cd /mnt/data</userinput></screen>
-
-          <para>
-	    Now you can copy a file into your &dcache;
-	  </para>
-	  <screen>&prompt-root; <userinput>dccp /bin/sh my-test-file-2</userinput>
-735004 bytes (718 kiB) in 0 seconds</screen>
-
-	  <para>
-	    and copy the data back using the &prog-dccp; command.
-	  </para>
-
-	 <screen>&prompt-root; <userinput>dccp my-test-file-2 /tmp/mytestfile2</userinput>
-735004 bytes (718 kiB) in 0 seconds</screen>
-
-         <para>
-	   The file has been transferred succesfully.
-	 </para>
-	 <para>
-	   Now remove the file from the &dcache;.
-	 </para>
-	 <screen>&prompt-root; <userinput>rm  my-test-file-2</userinput></screen>
-
-	</section>
 
       </section>
+  </section>
 
 
+  <section id="intouch-web">
+    <title>The Web Interface for Monitoring &dcache;</title>
+
+    <para>
+      In the standard configuration the &dcache; web interface is
+      started on the head node (meaning that the domain hosting the
+      &cell-httpd; service is running on the head node) and can be
+      reached via port <systemitem
+      class="resource">2288</systemitem>. Point a web browser to
+      <uri>http://<replaceable>head-node.example.org</replaceable>:2288/</uri>
+      to get to the main menu of the &dcache; web interface.  The
+      contents of the web interface are self-explanatory and are the
+      primary source for most monitoring and trouble-shooting tasks.
+    </para>
+
+    <para>
+      The <quote>Cell Services</quote> page displays the status of
+      some important <glossterm linkend="gl-cell">cells</glossterm> of
+      the &dcache; instance.
+    </para>
+
+    <para>
+      The <quote>Pool Usage</quote> page gives a good overview of the
+      current space usage of the whole &dcache; instance. In the
+      graphs, free space is marked yellow, space occupied by
+      <glossterm linkend="gl-cached">cached files</glossterm> (which
+      may be deleted when space is needed) is marked green, and space
+      occupied by <glossterm linkend="gl-precious">precious
+      files</glossterm>, which cannot be deleted is marked red. Other
+      states (e.g., files which are currently written) are marked
+      purple.
+    </para>
+
+    <para>
+      The page <quote>Pool Request Queues</quote> (or <quote>Pool
+      Transfer Queues</quote>) gives information about the number of
+      current requests handled by each pool. <quote>Actions
+      Log</quote> keeps track of all the transfers performed by the
+      pools up to now.
+    </para>
+
+    <para>
+      The remaining pages are only relevant with more advanced
+      configurations: The page <quote>Pools</quote> (or <quote>Pool
+      Attraction Configuration</quote>) can be used to analyze the
+      current configuration of the <glossterm
+      linkend="gl-pm-comp-psu">pool selection unit</glossterm> in the
+      pool manager. The remaining pages are relevant only if a
+      <glossterm linkend="gl-tss">tertiary storage system
+      (HSM)</glossterm> is connected to the &dcache; instance.
+    </para>
+  </section>
+
+
+  <section id="intouch-admin">
+    <title>The Admin Interface</title>
+
+    <important>
+      <title> Just use commands that are documented here</title>
+      <para>
+        Only commands described in this documentation should be used
+	for the administration of a &dcache; system.
+      </para>
+    </important>
+
+    <section id='intouch-admin-first-steps'>
+      <title>First steps</title>
+
+      <para>
+	&dcache; has a powerful administration interface. It can be
+	accessed with the &ssh1; or with the &ssh2; protocol. The
+	server is part of the &domain-adminDoor; domain.
+      </para>
+
+      <para>
+	The admin interface used to be available using &ssh1;, which
+	is insecure and therefore discouraged.
+      </para>
+
+      <para>
+	The property <varname>sshVersion</varname> controls which
+	version to start.  Valid values are <literal>ssh1</literal> to
+	start only the &ssh1; interface, <literal>ssh2</literal> to
+	start the &ssh2; interface and <literal>both</literal> to
+	start both &ssh1; and &ssh2; interfaces. Specify the &ssh;
+	version in the file
+	<filename>&path-ode-ed;/dcache.conf</filename>.
+
+      </para>
+      <informalexample>
+	<para>
+	  Set <varname>sshVersion</varname>=<literal>&ssh2;</literal>
+	  and restart &dcache;.
+	</para>
+	<programlisting># This is the main configuration file of dCache.
+#
+...
+
+# use ssh2
+sshVersion=ssh2</programlisting>
+
+	<screen>&prompt-root; <userinput>&path-odb-n-s;dcache restart</userinput>
+Stopping dCacheDomain 0 1 2 3 4 done
+Starting dCacheDomain done</screen>
+</informalexample>
+    </section>
+    <section id='intouch-admin-ssh1'>
+      <title>Access with &ssh1;</title>
+
+      <para>
+	Connect to the server using &ssh1; with:
+      </para>
+
+      <screen>&prompt-user; <userinput>ssh -c blowfish -p 22223 -l admin headnode.example.org</userinput></screen>
+
+      <para>
+	The initial password is
+	<quote><literal>dickerelch</literal></quote> (which is German
+	for <quote>fat elk</quote>) and you will be greeted by the
+	prompt
+      </para>
+
+      <screen>   dCache Admin (VII) (user=admin)
+
+
+&dc-prompt-local;</screen>
+
+      <para>
+	The password can now be changed with
+      </para>
+
+      <screen>&dc-prompt-local; <userinput>cd acm</userinput>
+&dc-prompt-acm; <userinput>create user admin</userinput>
+&dc-prompt-acm; <userinput>set passwd -user=admin <replaceable>newPasswd</replaceable> <replaceable>newPasswd</replaceable></userinput>
+&dc-prompt-acm; <userinput>..</userinput>
+&dc-prompt-local; <userinput>logoff</userinput></screen>
+
+    </section>
+
+    <section id='intouch-admin-ssh2'>
+      <title>Access with &ssh2;</title>
+
+      <para>
+	There are two ways of authorizing administrators to access the
+	&dcache; &ssh2; admin interface. The preferred method
+	authorizes users through their public key. The second method
+	employs &cell-gplazma2; and the <filename>dcache.kpwd</filename>
+	file. Thereby authorization mechanisms can be added later by
+	deploying another &cell-gplazma2; plugin. The configuration of both
+	authorization mechanisms is described in the following.
+      </para>
+
+	<note>
+	  <para>
+	    All configurable values of the &ssh2; admin interface can
+	    be found in the
+	    <filename>&path-ods-usd;/defaults/admin.properties</filename>
+	    file. Please do NOT change any value in this file. Instead
+	    enter the key value combination in the
+	    <filename>&path-ode-ed;/dcache.conf</filename>.
+	  </para>
+	</note>
+
+      <section>
+	<title>Public Key Authorization</title>
+	<para>
+	  To authorize administrators through their public key just
+	  insert it into the file
+	  <filename>authorized_keys2</filename> which should by
+	  default be in the directory <filename
+	  class='directory'>&path-ode-eda;</filename> as specified in
+	  the file
+	  <filename>&path-ods-usd;/defaults/admin.properties</filename>
+	  under <literal>admin.authorizedKey2=</literal>. Keys have to
+	  be in one line and should have a standard format, such as:
+	</para>
+	<screen>ssh-dss AAAAB3....GWvM= /Users/JohnDoe/.ssh/id_dsa</screen>
+	<important>
+	  <para>
+	    Please make sure that the copied key is still in one
+	    line. Any line-break will prevent the key from being read.
+	  </para>
+	</important>
+
+	<note>
+	  <para>
+	    You may omit the part behind the equal sign as it is just
+	    a comment and not used by &dcache;.
+	  </para>
+	</note>
+
+	<para>
+	  Key-based authorization will always be the default. In case
+	  the user key can not be found in the file
+	  <filename>authorized_keys2</filename> or the file does not
+	  exist, ssh2Admin will fall back to authorizing the user via
+	  &cell-gplazma2; and the <filename>dcache.kpwd</filename>
+	  file.
+	</para>
+
+	<para>
+	  Now you can login to the admin interface by
+	</para>
+	<screen>&prompt-user; <userinput>ssh -l admin -p 22224 headnode.example.org</userinput>
+
+    dCache Admin (VII) (user=admin)
+
+
+(local) admin ></screen>
+      </section>
+
+      <section>
+	<title>Access via &cell-gplazma2; and the <filename>dcache.kpwd</filename> File</title>
+	<para>
+	  To use &cell-gplazma; make sure that you defined a
+	  &domain-gplazma; in your layout file.
+	</para>
+	<informalexample>
+	  Part of the layout file in <filename
+	  class="directory">&path-ode-ed;/layouts</filename>:
+	  <programlisting>[<replaceable>gplazma-${host.name}</replaceable>Domain]
+[<replaceable>gplazma-${host.name}</replaceable>Domain/gplazma]</programlisting>
+	</informalexample>
+
+	<para>
+	  To use &cell-gplazma2; you need to specify it in the
+	  <filename>&path-ode-ed;/dcache.conf</filename> file:
+	</para>
+	<programlisting># This is the main configuration file of dCache.
+#
+...
+#
+# use gPlazma2
+gplazma.version=2</programlisting>
+
+        <para>
+	  Moreover, you need to create the file
+	  <filename>&path-ode-ed;/gplazma.conf</filename> with the content
+	</para>
+<programlisting>auth optional kpwd "kpwd=&path-ode-ed;/dcache.kpwd"
+map optional kpwd "kpwd=&path-ode-ed;/dcache.kpwd"
+session optional kpwd "kpwd=&path-ode-ed;/dcache.kpwd"</programlisting>
+        <para>
+	  and add the user <literal>admin</literal> to the
+	  <filename>&path-ode-ed;/dcache.kpwd</filename> file using
+	  the <literal>dcache</literal> script.
+	</para>
+	<informalexample>
+	  <screen>&prompt-user; <userinput>dcache kpwd dcuseradd admin -u 12345 -g 1000 -h / -r / -f / -w read-write -p password</userinput>
+writing to /etc/dcache/dcache.kpwd :
+
+done writing to /etc/dcache/dcache.kpwd :
+
+&prompt-user;</screen>
+	  <para>
+	    adds this to the <filename>&path-ode-ed;/dcache.kpwd</filename> file:
+	  </para>
+	  <programlisting># set pwd
+passwd admin 4091aba7 read-write 12345 1000 / /</programlisting>
+	</informalexample>
+
+	<para>
+	  Edit the file
+	  <filename>&path-ode-ed;/dcachesrm-gplazma.policy</filename>
+	  to switch on the <literal>kpwd-plugin</literal>. For more
+	  information about &cell-gplazma; see <xref
+	  linkend='cf-gplazma'/>.
+	</para>
+
+	<para>
+	  Now the user <literal>admin</literal> can login to the admin
+	  interface with his password <literal>password</literal> by:
+	</para>
+	<screen>&prompt-user; <userinput>ssh -l admin -p 22224 headnode.example.org</userinput>
+admin@headnode.example.org's password:
+
+    dCache Admin (VII) (user=admin)
+
+
+(local) admin > </screen>
+
+        <para>
+	  To allow other users access to the admin interface add them
+	  to the <filename>&path-ode-ed;/dcache.kpwd</filename> file
+	  as described above.
+	</para>
+
+
+	<para>
+	  Just adding a user in the <filename>dcache.kpwd</filename>
+	  file is not sufficient. The generated user also needs access
+	  rights that can only be set within the admin interface
+	  itself.
+	</para>
+
+        <para>
+	  See <xref linkend='intouch-admin-new-user'/> to learn how to
+	  create the user in the admin interface and set the rights.
+	</para>
+      </section>
+    </section>
+
+    <section>
+      <title>How to use the Admin Interface</title>
+
+    <para>
+      The command <command>help</command> lists all commands the cell
+      knows and their parameters. However, many of the commands are
+      only used for debugging and development purposes.
+    </para>
+
+    <warning>
+      <para>
+	Some commands are dangerous. Executing
+	them without understanding what they do may lead to data
+	loss.
+      </para>
+    </warning>
+
+    <para>
+      Starting from the local prompt (&dc-prompt-local;) the command
+      <command>cd</command> takes you to the specified <glossterm
+      linkend="gl-cell">cell</glossterm>. In general the address of a
+      cell is a concatenation of cell name <literal>@</literal> symbol
+      and the domain name. <command>cd</command> to a cell by:
+    </para>
+<screen>&dc-prompt-local; <userinput>cd <literal><replaceable>cellName</replaceable>@<replaceable>domainName</replaceable></literal></userinput></screen>
+
+    <note>
+      <para>
+	If the cells are <firstterm>well-known</firstterm>, they can
+	be accessed without adding the domain-scope. See <xref
+	linkend="cf-cellpackage" /> for more information.
+      </para>
+    </note>
+
+    <para>
+      The domains that are running on the &dcache;-instance, can be
+      viewed in the layout-configuration (see <xref linkend="in"
+      />). Additionally, there is the &cell-topo; cell, which keeps
+      track of the instance's domain topology. If it is running, it
+      can be used to obtain the list of domains the following way:
+    </para>
+
+    <note>
+      <para>
+        The &cell-topo; cell rescans every five minutes which domains
+        are running, so it can take some time until
+        <command>ls</command> displays the full domain list.
+      </para>
+    </note>
+
+    <informalexample>
+      <para>
+	As the &cell-topo; cell is a <literal>well-known</literal>
+	cell you can <command>cd</command> to it directly by
+	<literal><command>cd</command> topo</literal>.
+      </para>
+      <para>
+	Use the command <command>ls</command> to see which domains are
+	running.
+      </para>
+      <screen>&dc-prompt-local; <userinput>cd topo</userinput>
+&dc-prompt-topo; <userinput>ls</userinput>
+adminDoorDomain
+gsidcapDomain
+dcapDomain
+utilityDomain
+gPlazmaDomain
+webdavDomain
+gridftpDomain
+srmDomain
+dCacheDomain
+httpdDomain
+namespaceDomain
+poolDomain
+&dc-prompt-topo; <userinput>..</userinput>
+&dc-prompt-local;</screen>
+    </informalexample>
+
+    <para>
+      The escape sequence <command>..</command> takes you back to the
+      local prompt.
+    </para>
+
+    <para>
+      The command <command>logoff</command> exits the admin shell.
+    </para>
+
+    <para>
+       If you want to find out which cells are running on a certain
+       domain, you can issue the command <command>ps</command> in the
+       &cell-system; cell of the domain.
+    </para>
+
+    <informalexample>
+      <para>
+	For example, if you want to list the cells running on the
+	<literal>poolDomain</literal>, <command>cd</command> to its
+	&cell-system; cell and issue the <command>ps</command>
+	command.
+      </para>
+
+      <screen>&dc-prompt-local; <userinput>cd System@poolDomain</userinput>
+&dc-prompt-pooldomain; <userinput>ps</userinput>
+  Cell List
+------------------
+c-dCacheDomain-101-102
+System
+pool_2
+c-dCacheDomain-101
+pool_1
+RoutingMgr
+lm</screen>
+    </informalexample>
+
+    <para>
+      The cells in the domain can be accessed using
+      <command>cd</command> together with the cell-name scoped by the
+      domain-name. So first, one has to get back to the local prompt,
+      as the <command>cd</command> command will not work otherwise.
+    </para>
+
+    <note>
+      <para>
+	Note that <command>cd</command> only works from the local
+	prompt. If the cell you are trying to access does not exist,
+	the <command>cd</command> command will complain.
+      </para>
+      <informalexample>
+	<screen>&dc-prompt-local; <userinput>cd nonsense</userinput>
+java.lang.IllegalArgumentException: Cannot cd to this cell as it doesn't exist</screen>
+      </informalexample>
+
+      <para>
+	Type <command>..</command> to return to the &dc-prompt-local;
+	prompt.
+      </para>
+    </note>
+
+    <para>
+      Login to the routing manager of the &domain-dcache; to get a
+      list of all well-known cells you can directly
+      <command>cd</command> to without having to add the domain.
+    </para>
+    <informalexample>
+      <screen>&dc-prompt-pooldomain; <userinput>..</userinput>
+&dc-prompt-local; <userinput>cd RoutingMgr@dCacheDomain</userinput>
+&dc-prompt-routingmgr; <userinput>ls</userinput>
+Our routing knowledge :
+ Local : [PoolManager, topo, broadcast, LoginBroker, info]
+ adminDoorDomain : [pam]
+ gsidcapDomain : [DCap-gsi-example.dcache.org]
+ dcapDomain : [DCap-example.dcache.org]
+ utilityDomain : [gsi-pam, PinManager]
+ gPlazmaDomain : [gPlazma]
+ webdavDomain : [WebDAV-example.dcache.org]
+ gridftpDomain : [GFTP-example.dcache.org]
+ srmDomain : [RemoteTransferManager, CopyManager, SrmSpaceManager, SRM-example.dcache.org]
+ httpdDomain : [billing, srm-LoginBroker, TransferObserver]
+ poolDomain : [pool_2, pool_1]
+ namespaceDomain : [PnfsManager, dirLookupPool, cleaner]</screen>
+    </informalexample>
+
+    <para>
+      All cells know the commands <command>info</command> for general
+      information about the cell and <command>show pinboard</command>
+      for listing the last lines of the <glossterm
+      linkend="gl-pinboard">pinboard</glossterm> of the cell. The
+      output of these commands contains useful information for solving
+      problems.
+    </para>
+    <para>
+      It is a good idea to get aquainted with the normal output in the
+      following cells: &cell-poolmngr;, &cell-pnfsmngr;, and the pool
+      cells (e.g., &cell-pool-eg;).
+    </para>
+
+    <para>
+      The most useful command of the pool cells is <xref
+      linkend="cmd-rep_ls"/>. To execute this command
+      <command>cd</command> into the pool.  It lists the files which
+      are stored in the pool by their &pnfs; IDs:
+    </para>
+
+    <informalexample>
+      <screen>&dc-prompt-routingmgr; <userinput>..</userinput>
+&dc-prompt-pool1; <userinput>rep ls</userinput>
+000100000000000000001120 &lt;-P---------(0)[0]&gt; 485212 si={myStore:STRING}
+000100000000000000001230 &lt;C----------(0)[0]&gt; 1222287360 si={myStore:STRING}</screen>
+
+    <para>
+      Each file in a pool has one of the 4 primary states:
+      <quote>cached</quote> (<literal>&lt;C---</literal>),
+      <quote>precious</quote> (<literal>&lt;-P--</literal>),
+      <quote>from client</quote> (<literal>&lt;--C-</literal>), and
+      <quote>from store</quote> (<literal>&lt;---S</literal>).
+    </para>
+    </informalexample>
+
+    <para>
+      See <xref linkend='cf-tss-pools-admin'/> for more information
+      about <command>rep ls</command>.
+    </para>
+    <para>
+      The most important commands in the &cell-poolmngr; are: <xref
+      linkend="cmd-rc_ls"/> and <command>cm ls -r</command>.
+    </para>
+    <para>
+      <command>rc ls</command> lists the requests currently handled
+      by the &cell-poolmngr;. A typical line of output for a read request
+      with an error condition is (all in one line):
+    </para>
+
+    <informalexample>
+      <screen>&dc-prompt-pool1; <userinput>..</userinput>
+&dc-prompt-local; <userinput>cd PoolManager</userinput>
+&dc-prompt-pm; <userinput>rc ls</userinput>
+000100000000000000001230@0.0.0.0/0.0.0.0 m=1 r=1 [&lt;unknown&gt;]
+[Waiting 08.28 19:14:16]
+{149,No pool candidates available or configured for 'staging'}</screen>
+
+    <para>
+      As the error message at the end of the line indicates, no pool
+      was found containing the file and no pool could be used for
+      staging the file from a tertiary storage system.
+    </para>
+    </informalexample>
+
+    <para>
+      See <xref linkend='cf-tss-monitor-clAdmin'/> for more
+      information about the command <command>rc ls</command>
+    </para>
+
+    <para>
+      Finally, <xref linkend="cmd-cm_ls"/> with the option
+      <option>-r</option> gives the information about the pools
+      currently stored in the cost module of the pool manager. A
+      typical output is:
+    </para>
+
+    <informalexample>
+      <!-- TODO: following is too long, needs breaking up -->
+      <screen>&dc-prompt-pm; <userinput>cm ls <option>-r</option></userinput>
+pool_1={R={a=0;m=2;q=0};S={a=0;m=2;q=0};M={a=0;m=100;q=0};PS={a=0;m=20;q=0};PC={a=0;m=20;q=0};
+    <lineannotation>(...continues...)</lineannotation>   SP={t=2147483648;f=924711076;p=1222772572;r=0;lru=0;{g=20000000;b=0.5}}}
+pool_1={Tag={{hostname=example.org}};size=0;SC=0.16221282938326134;CC=0.0;}
+pool_2={R={a=0;m=2;q=0};S={a=0;m=2;q=0};M={a=0;m=100;q=0};PS={a=0;m=20;q=0};PC={a=0;m=20;q=0};
+    <lineannotation>(...continues...)</lineannotation>   SP={t=2147483648;f=2147483648;p=0;r=0;lru=0;{g=4294967296;b=250.0}}}
+pool_2={Tag={{hostname=example.org}};size=0;SC=2.7939677238464355E-4;CC=0.0;}</screen>
+    </informalexample>
+
+    <para>
+      While the first line for each pool gives the information stored
+      in the cache of the cost module, the second line gives the costs
+      (SC: <glossterm linkend="gl-space_cost">space cost</glossterm>,
+      CC: <glossterm linkend="gl-performance_cost">performance
+      cost</glossterm>) calculated for a (hypothetical) file of zero
+      size. For details on how these are calculated and their meaning,
+      see <xref linkend="cf-pm-classic"/>.
+    </para>
+
+    </section>
+
+    <section id='intouch-admin-new-user'>
+      <title>Create a new user</title>
+      <para>
+	To create a new user, &new-user; and set a new password for
+	the user <command>cd</command> from the local prompt
+	(&dc-prompt-local;) to the &cell-acm;, the access control
+	manager, and run following command sequence:
+      </para>
+      <screen>&dc-prompt-local; <userinput>cd acm</userinput>
+&dc-prompt-acm; <userinput>create user &simple-new-user;</userinput>
+&dc-prompt-acm; <userinput>set passwd -user=&simple-new-user; <replaceable>newPasswd</replaceable> <replaceable>newPasswd</replaceable></userinput></screen>
+
+      <para>
+	For the new created users there will be an entry in the
+	directory <filename
+	class='directory'>&path-ode-eda;/users/meta</filename>.
+      </para>
+      <note>
+	<para>
+	  As the initial user <literal>admin</literal> has not been
+	  created with the above command you will not find him in the
+	  directory <filename
+	  class='directory'>&path-ode-eda;/users/meta</filename>.
+	</para>
+      </note>
+
+      <para>
+	Give the new user access to a particular cell:
+      </para>
+
+      <screen>&dc-prompt-acm; <userinput>create acl cell.<replaceable>cellName</replaceable>.execute</userinput>
+&dc-prompt-acm; <userinput>add access -allowed cell.<replaceable>cellName</replaceable>.execute &simple-new-user;</userinput></screen>
+
+      <informalexample>
+	<para>
+	  Give the new user access to the &cell-pnfsmngr;.
+	</para>
+	<screen>&dc-prompt-acm; <userinput>create acl cell.PnfsManager.execute</userinput>
+&dc-prompt-acm; <userinput>add access -allowed cell.PnfsManager.execute &simple-new-user;</userinput></screen>
+
+     <para>
+      Now you can check the permissions by:
+     </para>
+
+     <screen>&dc-prompt-acm; <userinput>check cell.PnfsManager.execute &simple-new-user;</userinput>
+Allowed
+&dc-prompt-acm; <userinput>show acl cell.PnfsManager.execute</userinput>
+&lt;noinheritance&gt;
+&lt;new-user&gt; -&gt; true</screen>
+      </informalexample>
+
+      <para>
+	The following commands allow access to every cell for a user
+	&simple-new-user;:
+      </para>
+
+      <screen>&dc-prompt-acm; <userinput>create acl cell.*.execute</userinput>
+&dc-prompt-acm; <userinput>add access -allowed cell.*.execute &simple-new-user;</userinput></screen>
+
+     <para>
+      The following command makes a user as powerful as &admin;
+      (&dcache;'s equivalent to the &root; user):
+     </para>
+
+     <screen>&dc-prompt-acm; <userinput>create acl *.*.*</userinput>
+&dc-prompt-acm; <userinput>add access -allowed *.*.* &simple-new-user;</userinput></screen>
+
+    </section>
+
+    <section>
+      <title>Use of the &ssh; Admin Interface by scripts</title>
+
+
+      <para>
+	The &ssh; admin interface can be used non-interactively by
+	scripts. For this the &dcache;-internal &ssh; server uses
+	public/private key pairs.
+    </para>
+
+    <para>
+      The file <filename>&file-authorized_keys;</filename> contains
+      one line per user. The file has the same format as
+      <filename>~/.ssh/authorized_keys</filename> which is used by
+      <command>sshd</command>. The keys in
+      <filename>&file-authorized_keys;</filename> have to be of type
+      RSA1 as &dcache; only supports SSH protocol 1. Such a key is
+      generated with
+    </para>
+
+    <screen>&prompt-user; <userinput>ssh-keygen -t rsa1 -C 'SSH1 key of <replaceable>user</replaceable>'</userinput>
+Generating public/private rsa1 key pair.
+Enter file in which to save the key (/home/<replaceable>user</replaceable>/.ssh/identity):
+Enter passphrase (empty for no passphrase):
+Enter same passphrase again:
+Your identification has been saved in /home/<replaceable>user</replaceable>/.ssh/identity.
+Your public key has been saved in /home/<replaceable>user</replaceable>/.ssh/identity.pub.
+The key fingerprint is:
+c1:95:03:6a:66:21:3c:f3:ee:1b:8d:cb:46:f4:29:6a SSH1 key of <replaceable>user</replaceable></screen>
+
+    <para>
+      The passphrase is used to encrypt the private key (now stored in
+      <filename>/home/<replaceable>user</replaceable>/.ssh/identity</filename>). If
+      you do not want to enter the passphrase every time the private
+      key is used, you can use <command>ssh-add</command> to add it to
+      a running <command>ssh-agent</command>. If no agent is running
+      start it with
+    </para>
+
+    <screen>&prompt-user; <userinput>if [ -S $SSH_AUTH_SOCK ] ; then echo "Already running" ; else eval `ssh-agent` ; fi</userinput></screen>
+
+    <para>
+      and add the key to it with
+    </para>
+
+    <screen>&prompt-user; <userinput>ssh-add</userinput>
+Enter passphrase for SSH1 key of <replaceable>user</replaceable>:
+Identity added: /home/<replaceable>user</replaceable>/.ssh/identity (SSH1 key of <replaceable>user</replaceable>)</screen>
+
+    <para>
+      Now, insert the public key
+      <filename>~/.ssh/identity.pub</filename> as a separate line into
+      <filename>&file-authorized_keys;</filename>. The comment field
+      in this line <quote>SSH1 key of
+      <replaceable>user</replaceable></quote> has to be changed to the
+      &dcache; user name. An example file is:
+    </para>
+
+    <programlisting>1024 35 141939124<lineannotation>(... many more numbers ...)</lineannotation>15331 admin</programlisting>
+
+    <para>
+      Using ssh-add -L >> &file-authorized_keys; will not work, because the line added is not correct.
+      The key manager within &dcache; will read this file every minute.
+    </para>
+
+    <para>
+      Now, the &ssh; program should not ask for a password anymore. This
+      is still quite secure, since the unencrypted private key is only
+      held in the memory of the <command>ssh-agent</command>. It can
+      be removed from it with
+    </para>
+
+    <screen>&prompt-user; <userinput>ssh-add -d</userinput>
+Identity removed: /home/<replaceable>user</replaceable>/.ssh/identity (RSA1 key of <replaceable>user</replaceable>)</screen>
+
+    <para>
+      In scripts, one can use a <quote>Here Document</quote> to list
+      the commands, or supply them to <command>ssh</command> as
+      standard-input (stdin).  The following demonstrates using a Here
+      Document:
+    </para>
+
+      <programlisting>#!/bin/sh
+#
+#  Script to automate dCache administrative activity
+
+outfile=/tmp/$(basename $0).$$.out
+
+ssh -c blowfish -p 22223 admin@<replaceable>adminNode</replaceable> &gt; $outfile &lt;&lt; EOF
+cd PoolManager
+cm ls -r
+<lineannotation>(more commands here)</lineannotation>
+logoff
+EOF</programlisting>
+
+    <para>
+      or, the equivalent as stdin.
+    </para>
+
+    <programlisting>#!/bin/bash
+#
+#   Script to automate dCache administrative activity.
+
+echo -e 'cd <replaceable>pool_1</replaceable>\nrep ls\n<lineannotation>(more commands here)</lineannotation>\nlogoff' \
+  | ssh -c blowfish -p 22223 admin@<replaceable>adminNode</replaceable> \
+  | tr -d '\r' &gt; rep_ls.out</programlisting>
+
+    </section>
 
   </section>
+
 
   <section id="intouch-certificates">
     <title>Authentication and Authorization in &dcache;</title>
@@ -345,7 +969,6 @@ CA
       <filename>usercert.pem</filename> and
       <filename>userkey.pem</filename>.
     </para>
-
 
     <informalexample>
     <para>
@@ -589,7 +1212,6 @@ gplazmalite-vorole-mapping-priority="1"
 
      </section>
 
-
      <section id="intouch-client-https">
        <title>&webdav; with certificates</title>
        <para>
@@ -666,58 +1288,6 @@ webdavProtocol=https</programlisting>
 
      </section>
    </section>
-  <section id="intouch-web">
-    <title>The Web Interface for Monitoring &dcache;</title>
-
-    <para>
-      In the standard configuration the &dcache; web interface is
-      started on the head node (meaning that the domain hosting the
-      &cell-httpd; service is running on the head node) and can be
-      reached via port <systemitem
-      class="resource">2288</systemitem>. Point a web browser to
-      <uri>http://<replaceable>head-node.example.org</replaceable>:2288/</uri>
-      to get to the main menu of the &dcache; web interface.  The
-      contents of the web interface are self-explanatory and are the
-      primary source for most monitoring and trouble-shooting tasks.
-    </para>
-
-    <para>
-      The <quote>Cell Services</quote> page displays the status of
-      some important <glossterm linkend="gl-cell">cells</glossterm> of
-      the &dcache; instance.
-    </para>
-
-    <para>
-      The <quote>Pool Usage</quote> page gives a good overview of the
-      current space usage of the whole &dcache; instance. In the
-      graphs, free space is marked yellow, space occupied by
-      <glossterm linkend="gl-cached">cached files</glossterm> (which
-      may be deleted when space is needed) is marked green, and space
-      occupied by <glossterm linkend="gl-precious">precious
-      files</glossterm>, which cannot be deleted is marked red. Other
-      states (e.g., files which are currently written) are marked
-      purple.
-    </para>
-
-    <para>
-      The page <quote>Pool Request Queues</quote> (or <quote>Pool
-      Transfer Queues</quote>) gives information about the number of
-      current requests handled by each pool. <quote>Actions
-      Log</quote> keeps track of all the transfers performed by the
-      pools up to now.
-    </para>
-
-    <para>
-      The remaining pages are only relevant with more advanced
-      configurations: The page <quote>Pools</quote> (or <quote>Pool
-      Attraction Configuration</quote>) can be used to analyze the
-      current configuration of the <glossterm
-      linkend="gl-pm-comp-psu">pool selection unit</glossterm> in the
-      pool manager. The remaining pages are relevant only if a
-      <glossterm linkend="gl-tss">tertiary storage system
-      (HSM)</glossterm> is connected to the &dcache; instance.
-    </para>
-  </section>
 
 
   <section id="intouch-files">
@@ -798,706 +1368,7 @@ webdavProtocol=https</programlisting>
       -->
   </section>
 
-  <section id="intouch-admin">
-    <title>The Admin Interface</title>
 
-    <important>
-      <title> Just use commands that are documented here</title>
-      <para>
-        Only commands described in this documentation should be used
-	for the administration of a &dcache; system.
-      </para>
-    </important>
-
-    <section id='intouch-admin-first-steps'>
-      <title>First steps</title>
-
-      <para>
-	&dcache; has a powerful administration interface. It can be
-	accessed with the &ssh1; or with the &ssh2; protocol. The
-	server is part of the &domain-adminDoor; domain.
-      </para>
-
-      <para>
-	The admin interface used to be available using &ssh1;, which
-	is insecure and therefore discouraged.
-      </para>
-
-      <para>
-	The property <varname>sshVersion</varname> controls which
-	version to start.  Valid values are <literal>ssh1</literal> to
-	start only the &ssh1; interface, <literal>ssh2</literal> to
-	start the &ssh2; interface and <literal>both</literal> to
-	start both &ssh1; and &ssh2; interfaces. Specify the &ssh;
-	version in the file
-	<filename>&path-ode-ed;/dcache.conf</filename>.
-
-      </para>
-      <informalexample>
-	<para>
-	  Set <varname>sshVersion</varname>=<literal>&ssh2;</literal>
-	  and restart &dcache;.
-	</para>
-	<programlisting># This is the main configuration file of dCache.
-#
-...
-
-# use ssh2
-sshVersion=ssh2</programlisting>
-
-	<screen>&prompt-root; <userinput>&path-odb-n-s;dcache restart</userinput>
-Stopping dCacheDomain 0 1 2 3 4 done
-Starting dCacheDomain done</screen>
-</informalexample>
-    </section>
-    <section id='intouch-admin-ssh1'>
-      <title>Access with &ssh1;</title>
-
-      <para>
-	Connect to the server using &ssh1; with:
-      </para>
-
-      <screen>&prompt-user; <userinput>ssh -c blowfish -p 22223 -l admin headnode.example.org</userinput></screen>
-
-      <para>
-	The initial password is
-	<quote><literal>dickerelch</literal></quote> (which is German
-	for <quote>fat elk</quote>) and you will be greeted by the
-	prompt
-      </para>
-
-      <screen>   dCache Admin (VII) (user=admin)
-
-
-&dc-prompt-local;</screen>
-
-      <para>
-	The password can now be changed with
-      </para>
-
-      <screen>&dc-prompt-local; <userinput>cd acm</userinput>
-&dc-prompt-acm; <userinput>create user admin</userinput>
-&dc-prompt-acm; <userinput>set passwd -user=admin <replaceable>newPasswd</replaceable> <replaceable>newPasswd</replaceable></userinput>
-&dc-prompt-acm; <userinput>..</userinput>
-&dc-prompt-local; <userinput>logoff</userinput></screen>
-
-    </section>
-
-    <section id='intouch-admin-ssh2'>
-      <title>Access with &ssh2;</title>
-
-      <para>
-	There are two ways of authorizing administrators to access the
-	&dcache; &ssh2; admin interface. The preferred method
-	authorizes users through their public key. The second method
-	employs &cell-gplazma2; and the <filename>dcache.kpwd</filename>
-	file. Thereby authorization mechanisms can be added later by
-	deploying another &cell-gplazma2; plugin. The configuration of both
-	authorization mechanisms is described in the following.
-      </para>
-
-	<note>
-	  <para>
-	    All configurable values of the &ssh2; admin interface can
-	    be found in the
-	    <filename>&path-ods-usd;/defaults/admin.properties</filename>
-	    file. Please do NOT change any value in this file. Instead
-	    enter the key value combination in the
-	    <filename>&path-ode-ed;/dcache.conf</filename>.
-	  </para>
-	</note>
-
-      <section>
-	<title>Public Key Authorization</title>
-	<para>
-	  To authorize administrators through their public key just
-	  insert it into the file
-	  <filename>authorized_keys2</filename> which should by
-	  default be in the directory <filename
-	  class='directory'>&path-ode-eda;</filename> as specified in
-	  the file
-	  <filename>&path-ods-usd;/defaults/admin.properties</filename>
-	  under <literal>admin.authorizedKey2=</literal>. Keys have to
-	  be in one line and should have a standard format, such as:
-	</para>
-	<screen>ssh-dss AAAAB3....GWvM= /Users/JohnDoe/.ssh/id_dsa</screen>
-	<important>
-	  <para>
-	    Please make sure that the copied key is still in one
-	    line. Any line-break will prevent the key from being read.
-	  </para>
-	</important>
-
-
-	<note>
-	  <para>
-	    You may omit the part behind the equal sign as it is just
-	    a comment and not used by &dcache;.
-	  </para>
-	</note>
-
-	<para>
-	  Key-based authorization will always be the default. In case
-	  the user key can not be found in the file
-	  <filename>authorized_keys2</filename> or the file does not
-	  exist, ssh2Admin will fall back to authorizing the user via
-	  &cell-gplazma2; and the <filename>dcache.kpwd</filename>
-	  file.
-	</para>
-
-	<para>
-	  Now you can login to the admin interface by
-	</para>
-	<screen>&prompt-user; <userinput>ssh -l admin -p 22224 headnode.example.org</userinput>
-
-    dCache Admin (VII) (user=admin)
-
-
-(local) admin ></screen>
-      </section>
-
-      <section>
-	<title>Access via &cell-gplazma2; and the <filename>dcache.kpwd</filename> File</title>
-	<para>
-	  To use &cell-gplazma; make sure that you defined a
-	  &domain-gplazma; in your layout file.
-	</para>
-	<informalexample>
-	  Part of the layout file in <filename
-	  class="directory">&path-ode-ed;/layouts</filename>:
-	  <programlisting>[<replaceable>gplazma-${host.name}</replaceable>Domain]
-[<replaceable>gplazma-${host.name}</replaceable>Domain/gplazma]</programlisting>
-	</informalexample>
-
-	<para>
-	  To use &cell-gplazma2; you need to specify it in the
-	  <filename>&path-ode-ed;/dcache.conf</filename> file:
-	</para>
-	<programlisting># This is the main configuration file of dCache.
-#
-...
-#
-# use gPlazma2
-gplazma.version=2</programlisting>
-
-        <para>
-	  Moreover, you need to create the file
-	  <filename>&path-ode-ed;/gplazma.conf</filename> with the content
-	</para>
-<programlisting>auth optional kpwd "kpwd=&path-ode-ed;/dcache.kpwd"
-map optional kpwd "kpwd=&path-ode-ed;/dcache.kpwd"
-session optional kpwd "kpwd=&path-ode-ed;/dcache.kpwd"</programlisting>
-        <para>
-	  and add the user <literal>admin</literal> to the
-	  <filename>&path-ode-ed;/dcache.kpwd</filename> file using
-	  the <literal>dcache</literal> script.
-	</para>
-	<informalexample>
-	  <screen>&prompt-user; <userinput>dcache kpwd dcuseradd admin -u 12345 -g 1000 -h / -r / -f / -w read-write -p password</userinput>
-writing to /etc/dcache/dcache.kpwd :
-
-done writing to /etc/dcache/dcache.kpwd :
-
-&prompt-user;</screen>
-	  <para>
-	    adds this to the <filename>&path-ode-ed;/dcache.kpwd</filename> file:
-	  </para>
-	  <programlisting># set pwd
-passwd admin 4091aba7 read-write 12345 1000 / /</programlisting>
-	</informalexample>
-
-	<para>
-	  Edit the file
-	  <filename>&path-ode-ed;/dcachesrm-gplazma.policy</filename>
-	  to switch on the <literal>kpwd-plugin</literal>. For more
-	  information about &cell-gplazma; see <xref
-	  linkend='cf-gplazma'/>.
-	</para>
-
-	<para>
-	  Now the user <literal>admin</literal> can login to the admin
-	  interface with his password <literal>password</literal> by:
-	</para>
-	<screen>&prompt-user; <userinput>ssh -l admin -p 22224 headnode.example.org</userinput>
-admin@headnode.example.org's password:
-
-    dCache Admin (VII) (user=admin)
-
-
-(local) admin > </screen>
-
-        <para>
-	  To allow other users access to the admin interface add them
-	  to the <filename>&path-ode-ed;/dcache.kpwd</filename> file
-	  as described above.
-	</para>
-
-
-	<para>
-	  Just adding a user in the <filename>dcache.kpwd</filename>
-	  file is not sufficient. The generated user also needs access
-	  rights that can only be set within the admin interface
-	  itself.
-	</para>
-
-        <para>
-	  See <xref linkend='intouch-admin-new-user'/> to learn how to
-	  create the user in the admin interface and set the rights.
-	</para>
-      </section>
-    </section>
-
-
-    <section>
-      <title>How to use the Admin Interface</title>
-
-    <para>
-      The command <command>help</command> lists all commands the cell
-      knows and their parameters. However, many of the commands are
-      only used for debugging and development purposes.
-    </para>
-
-    <warning>
-      <para>
-	Some commands are dangerous. Executing
-	them without understanding what they do may lead to data
-	loss.
-      </para>
-    </warning>
-
-    <para>
-      Starting from the local prompt (&dc-prompt-local;) the command
-      <command>cd</command> takes you to the specified <glossterm
-      linkend="gl-cell">cell</glossterm>. In general the address of a
-      cell is a concatenation of cell name <literal>@</literal> symbol
-      and the domain name. <command>cd</command> to a cell by:
-    </para>
-<screen>&dc-prompt-local; <userinput>cd <literal><replaceable>cellName</replaceable>@<replaceable>domainName</replaceable></literal></userinput></screen>
-
-    <note>
-      <para>
-	If the cells are <firstterm>well-known</firstterm>, they can
-	be accessed without adding the domain-scope. See <xref
-	linkend="cf-cellpackage" /> for more information.
-      </para>
-    </note>
-
-    <para>
-      The domains that are running on the &dcache;-instance, can be
-      viewed in the layout-configuration (see <xref linkend="in"
-      />). Additionally, there is the &cell-topo; cell, which keeps
-      track of the instance's domain topology. If it is running, it
-      can be used to obtain the list of domains the following way:
-    </para>
-
-    <note>
-      <para>
-        The &cell-topo; cell rescans every five minutes which domains
-        are running, so it can take some time until
-        <command>ls</command> displays the full domain list.
-      </para>
-    </note>
-
-    <informalexample>
-      <para>
-	As the &cell-topo; cell is a <literal>well-known</literal>
-	cell you can <command>cd</command> to it directly by
-	<literal><command>cd</command> topo</literal>.
-      </para>
-      <para>
-	Use the command <command>ls</command> to see which domains are
-	running.
-      </para>
-      <screen>&dc-prompt-local; <userinput>cd topo</userinput>
-&dc-prompt-topo; <userinput>ls</userinput>
-adminDoorDomain
-gsidcapDomain
-dcapDomain
-utilityDomain
-gPlazmaDomain
-webdavDomain
-gridftpDomain
-srmDomain
-dCacheDomain
-httpdDomain
-namespaceDomain
-poolDomain
-&dc-prompt-topo; <userinput>..</userinput>
-&dc-prompt-local;</screen>
-    </informalexample>
-
-
-    <para>
-      The escape sequence <command>..</command> takes you back to the
-      local prompt.
-    </para>
-
-    <para>
-      The command <command>logoff</command> exits the admin shell.
-    </para>
-
-
-
-    <para>
-       If you want to find out which cells are running on a certain
-       domain, you can issue the command <command>ps</command> in the
-       &cell-system; cell of the domain.
-    </para>
-
-    <informalexample>
-      <para>
-	For example, if you want to list the cells running on the
-	<literal>poolDomain</literal>, <command>cd</command> to its
-	&cell-system; cell and issue the <command>ps</command>
-	command.
-      </para>
-
-      <screen>&dc-prompt-local; <userinput>cd System@poolDomain</userinput>
-&dc-prompt-pooldomain; <userinput>ps</userinput>
-  Cell List
-------------------
-c-dCacheDomain-101-102
-System
-pool_2
-c-dCacheDomain-101
-pool_1
-RoutingMgr
-lm</screen>
-    </informalexample>
-
-
-    <para>
-      The cells in the domain can be accessed using
-      <command>cd</command> together with the cell-name scoped by the
-      domain-name. So first, one has to get back to the local prompt,
-      as the <command>cd</command> command will not work otherwise.
-    </para>
-
-    <note>
-      <para>
-	Note that <command>cd</command> only works from the local
-	prompt. If the cell you are trying to access does not exist,
-	the <command>cd</command> command will complain.
-      </para>
-      <informalexample>
-	<screen>&dc-prompt-local; <userinput>cd nonsense</userinput>
-java.lang.IllegalArgumentException: Cannot cd to this cell as it doesn't exist</screen>
-      </informalexample>
-
-      <para>
-	Type <command>..</command> to return to the &dc-prompt-local;
-	prompt.
-      </para>
-    </note>
-
-    <para>
-      Login to the routing manager of the &domain-dcache; to get a
-      list of all well-known cells you can directly
-      <command>cd</command> to without having to add the domain.
-    </para>
-    <informalexample>
-      <screen>&dc-prompt-pooldomain; <userinput>..</userinput>
-&dc-prompt-local; <userinput>cd RoutingMgr@dCacheDomain</userinput>
-&dc-prompt-routingmgr; <userinput>ls</userinput>
-Our routing knowledge :
- Local : [PoolManager, topo, broadcast, LoginBroker, info]
- adminDoorDomain : [pam]
- gsidcapDomain : [DCap-gsi-example.dcache.org]
- dcapDomain : [DCap-example.dcache.org]
- utilityDomain : [gsi-pam, PinManager]
- gPlazmaDomain : [gPlazma]
- webdavDomain : [WebDAV-example.dcache.org]
- gridftpDomain : [GFTP-example.dcache.org]
- srmDomain : [RemoteTransferManager, CopyManager, SrmSpaceManager, SRM-example.dcache.org]
- httpdDomain : [billing, srm-LoginBroker, TransferObserver]
- poolDomain : [pool_2, pool_1]
- namespaceDomain : [PnfsManager, dirLookupPool, cleaner]</screen>
-    </informalexample>
-
-    <para>
-      All cells know the commands <command>info</command> for general
-      information about the cell and <command>show pinboard</command>
-      for listing the last lines of the <glossterm
-      linkend="gl-pinboard">pinboard</glossterm> of the cell. The
-      output of these commands contains useful information for solving
-      problems.
-    </para>
-    <para>
-      It is a good idea to get aquainted with the normal output in the
-      following cells: &cell-poolmngr;, &cell-pnfsmngr;, and the pool
-      cells (e.g., &cell-pool-eg;).
-    </para>
-
-
-
-    <para>
-      The most useful command of the pool cells is <xref
-      linkend="cmd-rep_ls"/>. To execute this command
-      <command>cd</command> into the pool.  It lists the files which
-      are stored in the pool by their &pnfs; IDs:
-    </para>
-
-    <informalexample>
-      <screen>&dc-prompt-routingmgr; <userinput>..</userinput>
-&dc-prompt-pool1; <userinput>rep ls</userinput>
-000100000000000000001120 &lt;-P---------(0)[0]&gt; 485212 si={myStore:STRING}
-000100000000000000001230 &lt;C----------(0)[0]&gt; 1222287360 si={myStore:STRING}</screen>
-
-    <para>
-      Each file in a pool has one of the 4 primary states:
-      <quote>cached</quote> (<literal>&lt;C---</literal>),
-      <quote>precious</quote> (<literal>&lt;-P--</literal>),
-      <quote>from client</quote> (<literal>&lt;--C-</literal>), and
-      <quote>from store</quote> (<literal>&lt;---S</literal>).
-    </para>
-    </informalexample>
-
-    <para>
-      See <xref linkend='cf-tss-pools-admin'/> for more information
-      about <command>rep ls</command>.
-    </para>
-    <para>
-      The most important commands in the &cell-poolmngr; are: <xref
-      linkend="cmd-rc_ls"/> and <command>cm ls -r</command>.
-    </para>
-    <para>
-      <command>rc ls</command> lists the requests currently handled
-      by the &cell-poolmngr;. A typical line of output for a read request
-      with an error condition is (all in one line):
-    </para>
-
-    <informalexample>
-      <screen>&dc-prompt-pool1; <userinput>..</userinput>
-&dc-prompt-local; <userinput>cd PoolManager</userinput>
-&dc-prompt-pm; <userinput>rc ls</userinput>
-000100000000000000001230@0.0.0.0/0.0.0.0 m=1 r=1 [&lt;unknown&gt;]
-[Waiting 08.28 19:14:16]
-{149,No pool candidates available or configured for 'staging'}</screen>
-
-    <para>
-      As the error message at the end of the line indicates, no pool
-      was found containing the file and no pool could be used for
-      staging the file from a tertiary storage system.
-    </para>
-    </informalexample>
-
-    <para>
-      See <xref linkend='cf-tss-monitor-clAdmin'/> for more
-      information about the command <command>rc ls</command>
-    </para>
-
-    <para>
-      Finally, <xref linkend="cmd-cm_ls"/> with the option
-      <option>-r</option> gives the information about the pools
-      currently stored in the cost module of the pool manager. A
-      typical output is:
-    </para>
-
-    <informalexample>
-      <!-- TODO: following is too long, needs breaking up -->
-      <screen>&dc-prompt-pm; <userinput>cm ls <option>-r</option></userinput>
-pool_1={R={a=0;m=2;q=0};S={a=0;m=2;q=0};M={a=0;m=100;q=0};PS={a=0;m=20;q=0};PC={a=0;m=20;q=0};
-    <lineannotation>(...continues...)</lineannotation>   SP={t=2147483648;f=924711076;p=1222772572;r=0;lru=0;{g=20000000;b=0.5}}}
-pool_1={Tag={{hostname=example.org}};size=0;SC=0.16221282938326134;CC=0.0;}
-pool_2={R={a=0;m=2;q=0};S={a=0;m=2;q=0};M={a=0;m=100;q=0};PS={a=0;m=20;q=0};PC={a=0;m=20;q=0};
-    <lineannotation>(...continues...)</lineannotation>   SP={t=2147483648;f=2147483648;p=0;r=0;lru=0;{g=4294967296;b=250.0}}}
-pool_2={Tag={{hostname=example.org}};size=0;SC=2.7939677238464355E-4;CC=0.0;}</screen>
-    </informalexample>
-
-    <para>
-      While the first line for each pool gives the information stored
-      in the cache of the cost module, the second line gives the costs
-      (SC: <glossterm linkend="gl-space_cost">space cost</glossterm>,
-      CC: <glossterm linkend="gl-performance_cost">performance
-      cost</glossterm>) calculated for a (hypothetical) file of zero
-      size. For details on how these are calculated and their meaning,
-      see <xref linkend="cf-pm-classic"/>.
-    </para>
-
-    </section>
-
-    <section id='intouch-admin-new-user'>
-      <title>Create a new user</title>
-      <para>
-	To create a new user, &new-user; and set a new password for
-	the user <command>cd</command> from the local prompt
-	(&dc-prompt-local;) to the &cell-acm;, the access control
-	manager, and run following command sequence:
-      </para>
-      <screen>&dc-prompt-local; <userinput>cd acm</userinput>
-&dc-prompt-acm; <userinput>create user &simple-new-user;</userinput>
-&dc-prompt-acm; <userinput>set passwd -user=&simple-new-user; <replaceable>newPasswd</replaceable> <replaceable>newPasswd</replaceable></userinput></screen>
-
-      <para>
-	For the new created users there will be an entry in the
-	directory <filename
-	class='directory'>&path-ode-eda;/users/meta</filename>.
-      </para>
-      <note>
-	<para>
-	  As the initial user <literal>admin</literal> has not been
-	  created with the above command you will not find him in the
-	  directory <filename
-	  class='directory'>&path-ode-eda;/users/meta</filename>.
-	</para>
-      </note>
-
-      <para>
-	Give the new user access to a particular cell:
-      </para>
-
-      <screen>&dc-prompt-acm; <userinput>create acl cell.<replaceable>cellName</replaceable>.execute</userinput>
-&dc-prompt-acm; <userinput>add access -allowed cell.<replaceable>cellName</replaceable>.execute &simple-new-user;</userinput></screen>
-
-
-      <informalexample>
-	<para>
-	  Give the new user access to the &cell-pnfsmngr;.
-	</para>
-	<screen>&dc-prompt-acm; <userinput>create acl cell.PnfsManager.execute</userinput>
-&dc-prompt-acm; <userinput>add access -allowed cell.PnfsManager.execute &simple-new-user;</userinput></screen>
-
-     <para>
-      Now you can check the permissions by:
-     </para>
-
-     <screen>&dc-prompt-acm; <userinput>check cell.PnfsManager.execute &simple-new-user;</userinput>
-Allowed
-&dc-prompt-acm; <userinput>show acl cell.PnfsManager.execute</userinput>
-&lt;noinheritance&gt;
-&lt;new-user&gt; -&gt; true</screen>
-      </informalexample>
-
-      <para>
-	The following commands allow access to every cell for a user
-	&simple-new-user;:
-      </para>
-
-      <screen>&dc-prompt-acm; <userinput>create acl cell.*.execute</userinput>
-&dc-prompt-acm; <userinput>add access -allowed cell.*.execute &simple-new-user;</userinput></screen>
-
-     <para>
-      The following command makes a user as powerful as &admin;
-      (&dcache;'s equivalent to the &root; user):
-     </para>
-
-     <screen>&dc-prompt-acm; <userinput>create acl *.*.*</userinput>
-&dc-prompt-acm; <userinput>add access -allowed *.*.* &simple-new-user;</userinput></screen>
-
-    </section>
-
-    <section>
-      <title>Use of the &ssh; Admin Interface by scripts</title>
-
-
-      <para>
-	The &ssh; admin interface can be used non-interactively by
-	scripts. For this the &dcache;-internal &ssh; server uses
-	public/private key pairs.
-    </para>
-
-    <para>
-      The file <filename>&file-authorized_keys;</filename> contains
-      one line per user. The file has the same format as
-      <filename>~/.ssh/authorized_keys</filename> which is used by
-      <command>sshd</command>. The keys in
-      <filename>&file-authorized_keys;</filename> have to be of type
-      RSA1 as &dcache; only supports SSH protocol 1. Such a key is
-      generated with
-    </para>
-
-    <screen>&prompt-user; <userinput>ssh-keygen -t rsa1 -C 'SSH1 key of <replaceable>user</replaceable>'</userinput>
-Generating public/private rsa1 key pair.
-Enter file in which to save the key (/home/<replaceable>user</replaceable>/.ssh/identity):
-Enter passphrase (empty for no passphrase):
-Enter same passphrase again:
-Your identification has been saved in /home/<replaceable>user</replaceable>/.ssh/identity.
-Your public key has been saved in /home/<replaceable>user</replaceable>/.ssh/identity.pub.
-The key fingerprint is:
-c1:95:03:6a:66:21:3c:f3:ee:1b:8d:cb:46:f4:29:6a SSH1 key of <replaceable>user</replaceable></screen>
-
-    <para>
-      The passphrase is used to encrypt the private key (now stored in
-      <filename>/home/<replaceable>user</replaceable>/.ssh/identity</filename>). If
-      you do not want to enter the passphrase every time the private
-      key is used, you can use <command>ssh-add</command> to add it to
-      a running <command>ssh-agent</command>. If no agent is running
-      start it with
-    </para>
-
-    <screen>&prompt-user; <userinput>if [ -S $SSH_AUTH_SOCK ] ; then echo "Already running" ; else eval `ssh-agent` ; fi</userinput></screen>
-
-    <para>
-      and add the key to it with
-    </para>
-
-    <screen>&prompt-user; <userinput>ssh-add</userinput>
-Enter passphrase for SSH1 key of <replaceable>user</replaceable>:
-Identity added: /home/<replaceable>user</replaceable>/.ssh/identity (SSH1 key of <replaceable>user</replaceable>)</screen>
-
-    <para>
-      Now, insert the public key
-      <filename>~/.ssh/identity.pub</filename> as a separate line into
-      <filename>&file-authorized_keys;</filename>. The comment field
-      in this line <quote>SSH1 key of
-      <replaceable>user</replaceable></quote> has to be changed to the
-      &dcache; user name. An example file is:
-    </para>
-
-    <programlisting>1024 35 141939124<lineannotation>(... many more numbers ...)</lineannotation>15331 admin</programlisting>
-
-    <para>
-      Using ssh-add -L >> &file-authorized_keys; will not work, because the line added is not correct.
-      The key manager within &dcache; will read this file every minute.
-    </para>
-
-    <para>
-      Now, the &ssh; program should not ask for a password anymore. This
-      is still quite secure, since the unencrypted private key is only
-      held in the memory of the <command>ssh-agent</command>. It can
-      be removed from it with
-    </para>
-
-    <screen>&prompt-user; <userinput>ssh-add -d</userinput>
-Identity removed: /home/<replaceable>user</replaceable>/.ssh/identity (RSA1 key of <replaceable>user</replaceable>)</screen>
-
-    <para>
-      In scripts, one can use a <quote>Here Document</quote> to list
-      the commands, or supply them to <command>ssh</command> as
-      standard-input (stdin).  The following demonstrates using a Here
-      Document:
-    </para>
-
-      <programlisting>#!/bin/sh
-#
-#  Script to automate dCache administrative activity
-
-outfile=/tmp/$(basename $0).$$.out
-
-ssh -c blowfish -p 22223 admin@<replaceable>adminNode</replaceable> &gt; $outfile &lt;&lt; EOF
-cd PoolManager
-cm ls -r
-<lineannotation>(more commands here)</lineannotation>
-logoff
-EOF</programlisting>
-
-    <para>
-      or, the equivalent as stdin.
-    </para>
-
-    <programlisting>#!/bin/bash
-#
-#   Script to automate dCache administrative activity.
-
-echo -e 'cd <replaceable>pool_1</replaceable>\nrep ls\n<lineannotation>(more commands here)</lineannotation>\nlogoff' \
-  | ssh -c blowfish -p 22223 admin@<replaceable>adminNode</replaceable> \
-  | tr -d '\r' &gt; rep_ls.out</programlisting>
-
-    </section>
-
-
-
-  </section>
 
 
 
