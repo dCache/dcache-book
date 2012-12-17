@@ -68,8 +68,9 @@ ALL_INSTALLED = $(ALL:%=%__INSTALL__)
 ALL_TEST_INSTALLED = $(ALL:%=%__TEST_INSTALL__)
 
 
+WWW_USER = root@
 WWW_SERVER = www.dcache.org
-WWW_SERVER_BASE_DIR = /data/www/dcache.org
+WWW_SERVER_BASE_DIR = /www/www/dcache.org
 WWW_LOCATION = /manuals/Book-$(DCACHE_VERSION)/
 WWW_TEST_LOCATION = /manuals/Book-$(DCACHE_VERSION)-test/
 
@@ -296,24 +297,24 @@ comments-deploy: $(COMMENTS_INSTALLED)
 
 %__INSTALL__: %
 	chmod a+r,g+w $<
-	scp -p $< $(WWW_SERVER):$(WWW_SERVER_BASE_DIR)$(WWW_LOCATION)
+	scp -p $< $(WWW_USER)$(WWW_SERVER):$(WWW_SERVER_BASE_DIR)$(WWW_LOCATION)
 
 %__TEST_INSTALL__: %
 	chmod a+r,g+w $<
-	scp -p $< $(WWW_SERVER):$(WWW_SERVER_BASE_DIR)$(WWW_TEST_LOCATION)
+	scp -p $< $(WWW_USER)$(WWW_SERVER):$(WWW_SERVER_BASE_DIR)$(WWW_TEST_LOCATION)
 
 #  Unfortunately, we need a special case here.
 Book__INSTALL__: $(HTML_CHUNK_FILES)
 	chmod -R a+Xr,g+w Book/*
 	chmod g+s Book
 	find Book -type d -exec chmod g+s \{\} \;
-	scp -pr Book/* $(WWW_SERVER):$(WWW_SERVER_BASE_DIR)$(WWW_LOCATION)
+	scp -pr Book/* $(WWW_USER)$(WWW_SERVER):$(WWW_SERVER_BASE_DIR)$(WWW_LOCATION)
 
 Book__TEST_INSTALL__: $(HTML_CHUNK_FILES)
 	chmod -R a+Xr,g+w Book/*
 	chmod g+s Book
 	find Book -type d -exec chmod g+s \{\} \;
-	scp -pr Book/* $(WWW_SERVER):$(WWW_SERVER_BASE_DIR)$(WWW_TEST_LOCATION)
+	scp -pr Book/* $(WWW_USER)$(WWW_SERVER):$(WWW_SERVER_BASE_DIR)$(WWW_TEST_LOCATION)
 
 
 
