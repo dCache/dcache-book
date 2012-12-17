@@ -9,6 +9,9 @@
                 version="1.0">
 
   <xsl:import href="http://docbook.sourceforge.net/release/xsl/current/html/docbook.xsl"/>
+  <xsl:output method="html"
+            encoding="UTF-8"
+            indent="no"/>
 
   <xsl:include href="common.xsl"/>
   <xsl:include href="html-common.xsl"/>
