@@ -16,7 +16,7 @@
    sodipodi:version="0.32"
    inkscape:version="0.48.3.1 r9886"
    version="1.0"
-   sodipodi:docname="bg-test.svg"
+   sodipodi:docname="bg-outdated-red.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    inkscape:export-filename="/home/tigran/dCache-bg.png"
    inkscape:export-xdpi="49.959999"
@@ -566,14 +566,14 @@
      inkscape:pageopacity="1"
      inkscape:pageshadow="2"
      inkscape:zoom="1"
-     inkscape:cx="302.59835"
+     inkscape:cx="380.76862"
      inkscape:cy="372.32492"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      inkscape:window-width="1257"
      inkscape:window-height="993"
      inkscape:window-x="608"
-     inkscape:window-y="178"
+     inkscape:window-y="155"
      showguides="true"
      inkscape:guide-bbox="true"
      showgrid="false"
@@ -587,6 +587,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -620,7 +621,7 @@
        sodipodi:nodetypes="csccsscscccczsscssssssssccccssccscszssscsscsscczczs" />
     <text
        xml:space="preserve"
-       style="font-size:68.95009613px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;opacity:0.1;fill:#000000;fill-opacity:1;stroke:none;font-family:Delphine;-inkscape-font-specification:Delphine"
+       style="font-size:68.95009613000001991px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;opacity:1;fill:#f60200;fill-opacity:1;stroke:#fc0007;font-family:Delphine;-inkscape-font-specification:Delphine;stroke-opacity:0.97446811000000000"
        x="58.987206"
        y="410.00928"
        id="text4352"
@@ -630,25 +631,25 @@
          id="tspan4374"
          x="58.987206"
          y="410.00928"
-         style="font-size:48px">OUTDATED</tspan></text>
+         style="font-size:48px;stroke:#fc0007;stroke-opacity:0.97446811000000000;fill:#f60200;fill-opacity:1">OUTDATED</tspan></text>
     <text
        sodipodi:linespacing="100%"
        id="text4358"
        y="629.57538"
        x="340.61447"
-       style="font-size:56px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;opacity:0.1;fill:#000000;fill-opacity:1;stroke:none;font-family:Domestic Manners;-inkscape-font-specification:Domestic Manners"
+       style="font-size:56px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;opacity:1;fill:#f60200;fill-opacity:1;stroke:#fc0007;font-family:Domestic Manners;-inkscape-font-specification:Domestic Manners;fill-rule:nonzero;stroke-opacity:0.97446811000000000"
        xml:space="preserve"><tspan
          id="tspan4360"
          sodipodi:role="line"
          x="340.61447"
          y="629.57538"
-         style="font-size:36px">OUTDATED</tspan></text>
+         style="font-size:36px;fill:#f60200;fill-opacity:1;opacity:1;fill-rule:nonzero;stroke:#fc0007;stroke-opacity:0.97446811000000000">OUTDATED</tspan></text>
     <text
        sodipodi:linespacing="100%"
        id="text4366"
        y="206.67812"
        x="433.07321"
-       style="font-size:31.99999809px;font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;opacity:0.1;fill:#000000;fill-opacity:1;stroke:none;font-family:Steve;-inkscape-font-specification:Steve Italic"
+       style="font-size:31.99999808999999829px;font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;opacity:1;fill:#f60200;fill-opacity:1;stroke:none;font-family:Steve;-inkscape-font-specification:Steve Italic"
        xml:space="preserve"
        transform="matrix(0.99595534,0.08984966,-0.08984966,0.99595534,0,0)"><tspan
          id="tspan4368"
