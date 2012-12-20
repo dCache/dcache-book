@@ -773,16 +773,36 @@ dcache.java.memory.direct=16m</programlisting>
 
 <section id="in-upgrade">
   <title>Upgrading a &dcache; Instance</title>
-
+    <important>
+      <para>
+	Always read the release notes carefully before upgrading!
+      </para>
+    </important>
   <para>
     Upgrading to bugfix releases within one supported branch (e.g. from
     &dcache-patch-version; to  &dcache-next-patch-version;) may be done by
     upgrading the packages with
-
-    <screen>&prompt-root; <userinput>rpm -Uvh <replaceable>packageName</replaceable></userinput></screen>
-    Now &dcache; needs to be started again.
-<important>Always read the release notes carefully before upgrading!</important>
   </para>
+    <screen>&prompt-root; <userinput>rpm -Uvh <replaceable>packageName</replaceable></userinput></screen> 
+    <para>
+      Now &dcache; needs to be started again.
+    </para>
+    <para>
+      For major upgrades please
+    </para>
+    <itemizedlist>
+      <listitem>
+	use <ulink url='http://www.dcache.org/manuals/2011/goettingen/upgradeguide/upgrade-guide.html'>The Ultimate Golden Release Upgrade Guide I</ulink> to upgrade from 1.9.5 to 1.9.12.
+      </listitem>
+      <listitem>
+	use the <ulink url='http://www.dcache.org/manuals/upgrade-1.9.12-to-2.2.shtml'>The Ultimate Golden Release Upgrade Guide II</ulink> to upgrade from 1.9.12 to 2.2.
+      </listitem>
+      <listitem>
+	use the <ulink url='http://trac.dcache.org/wiki/optToUsr'>/opt
+	to /usr</ulink> migration guide to migrate from the /opt
+	layout to the fhs-compliant layout.
+      </listitem>
+    </itemizedlist>
 </section>
 
 </chapter>
