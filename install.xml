@@ -802,16 +802,26 @@ srmDomain       running 11182 dcache</screen>
 
 <section id="in-upgrade">
   <title>Upgrading a &dcache; Instance</title>
-
-  <para>
-    Upgrading to bugfix releases within one supported branch (e.g. from
-    &dcache-version;-1 to  &dcache-version;-2) may be done by
-    upgrading the packages with
-
+    <important>
+      <para>
+	Always read the release notes carefully before upgrading!
+      </para>
+    </important>
+    <para>
+      Upgrading to bugfix releases within one supported branch
+      (e.g. from &dcache-version;-1 to &dcache-version;-2) may be done
+      by upgrading the packages with
+    </para>
     <screen>&prompt-root; <userinput>rpm -Uvh <replaceable>packageName</replaceable></userinput></screen>
-    Now &dcache; needs to be started again.
-<important>Always read the release notes carefully before upgrading!</important>
-  </para>
+    <para>
+      Now &dcache; needs to be started again.
+    </para>
+    <para>
+      Please use <ulink
+      url='http://www.dcache.org/manuals/2011/goettingen/upgradeguide/upgrade-guide.html'>The
+      Ultimate Golden Release Upgrade Guide I</ulink> to upgrade from
+      1.9.5 to 1.9.12.
+    </para>
 </section>
 
 </chapter>
