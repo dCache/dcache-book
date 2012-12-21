@@ -30,7 +30,6 @@
   <xi:include href="cookbook-pool.xml"/>
   <xi:include href="cookbook-postgres.xml"/>
   <xi:include href="cookbook-net.xml"/>
-  <xi:include href="cookbook-accounting.xml"/>
   <xi:include href="cookbook-protos.xml" />
   <xi:include href="cookbook-advanced.xml" />
   <xi:include href="cookbook-stat-module.xml" />

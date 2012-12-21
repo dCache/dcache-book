@@ -764,7 +764,7 @@
           linkend="gl-cell">cell</glossterm> usually started in the
           &domain-http; <glossterm
           linkend="gl-domain">domain</glossterm>. This is described in
-          <xref linkend="cb-accounting"/>.
+          <xref linkend="cf-billing"/>.
         </para>
       </glossdef>
     </glossentry>
