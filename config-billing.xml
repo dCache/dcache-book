@@ -520,8 +520,8 @@ INFO 8/23/12 10:35 AM:liquibase: Successfully released change log lock</programl
   </para>
   <screen>&prompt-root; <userinput>psql -U srmdcache billing</userinput>
 
-&prompt-root; <userinput>drop table databasechangelog</userinput>
-&prompt-root; <userinput>drop table databasechangeloglock</userinput></screen>
+billing=> <userinput>drop table databasechangelog</userinput>
+billing=> <userinput>drop table databasechangeloglock</userinput></screen>
   <para>
     and then restarting the domain.
   </para>
