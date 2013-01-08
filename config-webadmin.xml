@@ -11,7 +11,7 @@
   <title>&dcache; Webadmin Interface</title>
 
   <para>
-    This part describes how to configure the &serv-webadmin; service which runs inside the &domain-http;
+    This part describes how to configure the &serv-webadmin; service which runs inside the &domain-httpd;
     and offers additional features to admins like sending admin-commands equal to those of admin interface (CLI) to chosen cells or displaying billing plots.
   </para>
 

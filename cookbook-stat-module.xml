@@ -149,7 +149,7 @@
 
       <para>
 	The statistics module collects parts of its information in
-	memory of cells within the &domain-http; and the
+	memory of cells within the &domain-httpd; and the
 	&domain-stats;.  Consequently this information is lost if one
 	or all of those components are restarted. As a result, the day
 	statistics may be significantly wrong if the restart happens
