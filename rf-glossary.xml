@@ -762,9 +762,9 @@
           Accounting information is either stored in a text file or in
           a PostgreSQL database by the &cell-billing; <glossterm
           linkend="gl-cell">cell</glossterm> usually started in the
-          &domain-http; <glossterm
+          &domain-httpd; <glossterm
           linkend="gl-domain">domain</glossterm>. This is described in
-          <xref linkend="cb-accounting"/>.
+          <xref linkend="cf-billing"/>.
         </para>
       </glossdef>
     </glossentry>
