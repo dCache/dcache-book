@@ -11,85 +11,107 @@
   <title>&dcache; Webadmin Interface</title>
 
   <para>
-    This part describes how to configure the &serv-webadmin; service which runs inside the &domain-httpd;
-    and offers additional features to admins like sending admin-commands equal to those of admin interface (CLI) to chosen cells or displaying billing plots.
+    This part describes how to configure the &serv-webadmin; service
+    which runs inside the &domain-httpd; and offers additional
+    features to admins like sending admin-commands equal to those of
+    admin interface (CLI) to chosen cells or displaying billing plots.
   </para>
 
   <para>
-	For authentication and authorisation it offers usage of username/password (currently the kpwd-Plugin)
-	or grid certificate talking to &cell-gplazma2;. It also offers a non-authenticated read-only mode.
+	For authentication and authorisation it offers usage of
+	username/password (currently the kpwd-Plugin) or grid
+	certificate talking to &cell-gplazma2;. It also offers a
+	non-authenticated read-only mode.
   </para>
 
   <para>
-	If you are logged in as admin it is possible to send a command to multiple pools or
-	a whole	poolgroup in one go. It is even possible to send a command to any &dcache; cell.
-	Also, there is information like their size, their id and used space on linkgroups and spacetokens available.
+	If you are logged in as admin it is possible to send a command
+	to multiple pools or a whole poolgroup in one go. It is even
+	possible to send a command to any &dcache; cell.  Also, there
+	is information like their size, their id and used space on
+	linkgroups and spacetokens available.
   </para>
 
   <para>
-	From the technical point of view the &serv-webadmin; service uses a Jetty-Server which is embedded in an ordinary &cell-httpd; cell.
-	It is using apache-wicket (a webfrontend-framework) and <abbrev>YAML</abbrev> (a CSS-Template Framework).
+	From the technical point of view the &serv-webadmin; service
+	uses a Jetty-Server which is embedded in an ordinary
+	&cell-httpd; cell.  It is using apache-wicket (a
+	webfrontend-framework) and <abbrev>YAML</abbrev> (a
+	CSS-Template Framework).
   </para>
+
+
   <section id="cf-webadmin-install">
     <title>Installation</title>
+
     <para>
       For the authenticated mode a configured &cell-gplazma; is
-      required (see also <xref linkend="cf-gplazma-webadmin-example"/>). The user may either authenticate by presenting his grid certificate or
-      by entering a valid username/password combination. This way it is possible to login even if the user does not have a grid certificate.
-      For a non-authenticated &serv-webadmin; service you just need to start the &cell-httpd; service.
-    </para>
-    <para>
-      For the authenticated mode using a grid certificate the host certificate has to be imported into the &dcache;-keystore.
-      In the grid world host certificates are usually signed by national Grid-CAs. Refer to
-      the documentation provided by the Grid-CA to find out how to request a certificate. To
-      import them into the &dcache;-keystore use this command:
-      <screen>&prompt-root; <userinput>&path-odb-n-s;dcache import hostcert</userinput></screen>
-      Now you have to initialise your truststore (this is the certificate-store used
-      for the SSL connections) by using this command:
-      <screen>&prompt-root; <userinput>&path-odb-n-s;dcache import cacerts</userinput></screen>
-      The &serv-webadmin; service uses the same truststore as &serv-webdav; service, so you can skip this step if you have &serv-webdav; configured with SSL.
+      required (see also <xref
+      linkend="cf-gplazma-webadmin-example"/>). The user may either
+      authenticate by presenting his grid certificate or by entering a
+      valid username/password combination. This way it is possible to
+      login even if the user does not have a grid certificate.  For a
+      non-authenticated &serv-webadmin; service you just need to start
+      the &cell-httpd; service.
     </para>
 
     <para>
-      Since the &serv-webadmin; service runs inside the &serv-httpd; service you need to enable the httpdDomain in your layout file.
+      For the authenticated mode using a grid certificate the host
+      certificate has to be imported into the &dcache;-keystore.  In
+      the grid world host certificates are usually signed by national
+      Grid-CAs. Refer to the documentation provided by the Grid-CA to
+      find out how to request a certificate. To import them into the
+      &dcache;-keystore use this command:
+    </para>
+
+    <screen>&prompt-root; <userinput>&path-odb-n-s;dcache import hostcert</userinput></screen>
+    <para>
+      Now you have to initialise your truststore (this is the
+      certificate-store used for the SSL connections) by using this
+      command:
+    </para>
+    <screen>&prompt-root; <userinput>&path-odb-n-s;dcache import cacerts</userinput></screen>
+    <para>
+      The &serv-webadmin; service uses the same truststore as
+      &serv-webdav; service, so you can skip this step if you have
+      &serv-webdav; configured with SSL.
+    </para>
+
+    <para>
+      The default instance name is the name of the host which runs the
+      httpdDomain and the default http port number is
+      <literal>2288</literal> (this is the default port number of the
+      &serv-httpd; service).  Now you should be able to have a
+      read-only access to the webpage
+      <uri>http://example.com:2288/webadmin</uri>.
+    </para>
+    <para>
+      In the following example we will enable the authenticated mode.
     </para>
     <informalexample>
       <programlisting>[httpdDomain]
-webadminDCacheInstanceName=coolName</programlisting>
-    </informalexample>
-
-    <para>
-      The default instance name is the name of the host which runs the httpdDomain and the default http port number is  <literal>2288</literal> (this is the default port number of the &serv-httpd; service).
-      Now you should be able to have a read-only access to the webpage  <uri>http://example.com:2288/webadmin</uri>.
-
-      The next step will explain setting for the authenticated mode.
-      The default value for the <varname>webadminHttpsPort</varname>
-      is <literal>8444</literal>. In the following example we will enable the authenticated mode and define the  <varname>webadminAdminGid</varname>.
-    </para>
-    <informalexample>
-      <programlisting>[httpdDomain]
-webadminDCacheInstanceName=coolName
-authenticated=true
-webadminAdminGid=1000</programlisting>
+      authenticated=true</programlisting>
     </informalexample>
 
 	<para>
-	  The most important value is <varname>webadminAdminGid</varname>, because it configures who is allowed to
-	  alter &dcache; behaviour, which certainly should not be everyone:
-	  <programlisting>#
-#   When a user has this GID he can become an Admin for the webadmin interface
-#
+	  The most important value is
+	  <varname>webadminAdminGid</varname>, because it configures
+	  who is allowed to alter &dcache; behaviour, which certainly
+	  should not be everyone: 
+	</para>
+	<programlisting># # When a user has this GID he can become an Admin for the webadmin interface #
 webadminAdminGid=1000</programlisting>
-      To see all webadmin specific property values have a look at
-      <filename>&path-ods-usd;/defaults/httpd.properties</filename>.
+	<para>
+	    To see all webadmin specific property values have a look
+	    at
+	    <filename>&path-ods-usd;/defaults/httpd.properties</filename>.
+	</para>
+	<para>
+	  For information on &cell-gplazma; configuration have a look
+	  at <xref linkend="cf-gplazma"/> and for a special example
+	  <xref linkend="cf-gplazma-webadmin-example"/>.
+	</para>
 
-	  For information on &cell-gplazma; configuration have a look at
-      <xref linkend="cf-gplazma"/> and for a special example
-      <xref linkend="cf-gplazma-webadmin-example"/>.
-
-      After startup of the httpdDomain you can reach the Webadmin in authenticated mode by <uri>https://example.com:8444/webadmin</uri>.
-      You will be asked to login as admin.
-    </para>
   </section>
 
 </chapter>
