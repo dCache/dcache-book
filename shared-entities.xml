@@ -83,7 +83,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY voms         "<productname>VOMS</productname>">
 
 <!-- Various domains -->
-<!ENTITY domain-http      "<literal>httpDomain</literal>">
+<!ENTITY domain-httpd     "<literal>httpdDomain</literal>">
 <!ENTITY domain-stats     "<literal>statisticsDomain</literal>">
 <!ENTITY domain-pool      "<literal><replaceable>pool</replaceable>Domain</literal>">
 <!ENTITY domain-adminDoor "<literal>adminDoor</literal>">
