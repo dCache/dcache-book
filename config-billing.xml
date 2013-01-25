@@ -1,0 +1,553 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+%sharedents;
+]>
+
+
+<chapter id="cf-billing">
+
+  <title>The billing service</title>
+
+  <para>
+    &dcache; has built-in monitoring capabilities which provide an
+    overview of the activity and performance of the installation's
+    doors and pools.  There are two options for how this data can be
+    represented and stored:
+  </para>
+  <itemizedlist>
+    <listitem>
+      a set of log files written to a known location
+    </listitem>
+    <listitem>
+      a database (the <database>billing</database> database).
+    </listitem>
+  </itemizedlist>
+  <para>
+    These options can be enabled simultaneously.  If the database
+    option is selected, the data in those tables will also be
+    displayed as a set of histogram plots on the installation's web
+    page.
+  </para>
+
+  <section id="cf-billing-log-files">
+    <title>The billing log files</title>
+
+    <para>
+      If you installed &dcache; following the instructions in the
+      Chapter <link linkend="in">Installing &dcache;</link> you
+      enabled the &serv-billing; in the domain where the &serv-httpd;
+      service is running (see the extract of the layout file).
+    </para>
+    <programlisting>...
+[httpdDomain]
+[httpdDomain/httpd]
+[httpdDomain/billing]
+[httpdDomain/srm-loginbroker]
+...</programlisting>
+
+    <para>
+      Use the property <varname>billingLogsDir</varname> to set the
+      location of the log files and the property
+      <varname>billingDisableTxt</varname> to control whether the
+      plain-text log files are generated.
+    </para>
+
+    <para>
+      By default the log files are located in the directory <filename
+      class="directory">&path-od-vld;/billing</filename>.  Under this
+      directory the log files are organized in a tree data structure
+      based on date (YYYY/MM).  A separate file is generated for
+      errors. The log file and the error file are tagged with the
+      date.
+     <informalexample>
+       <para>
+	 log file:
+	 <filename>&path-od-vld;/billing/2012/09/billing-2012.09.25</filename>
+       </para>
+       <para>
+	 error file:
+	 <filename>&path-od-vld;/billing/2012/09/billing-error-2012.09.25</filename>
+       </para>
+     </informalexample>
+
+   </para>
+
+    <para>
+      The log files may contain information about the time, the pool,
+      the pnfsID and size of the transferred file, the storage class,
+      the actual number of bytes transferred, the number of
+      milliseconds the transfer took, the protocol, the subject (identity
+      of the user given as a collection of principals), the
+      data transfer listen port, the return status and a possible
+      error message. The logged information depends on the protocol.
+    </para>
+
+    <para>
+      A log entry for a write operation has the default format:
+     </para>
+<programlisting><replaceable>MM.dd</replaceable> <replaceable>HH:mm:ss</replaceable> [pool:<replaceable>pool-name</replaceable>:transfer]
+[<replaceable>pnfsId</replaceable>,<replaceable>filesize</replaceable>] [<replaceable>path</replaceable>]
+<replaceable>StoreName</replaceable>:<replaceable>StorageGroup</replaceable>@<replaceable>type-of-storage-system</replaceable>
+<replaceable>transferred-bytes</replaceable>  <replaceable>connectionTime</replaceable> <replaceable>true/false</replaceable> {<replaceable>protocol</replaceable>}
+<replaceable>initiator</replaceable>  {<replaceable>return-status</replaceable>:"<replaceable>error-message</replaceable>"}</programlisting>
+
+    <informalexample>
+      <para>
+	A typical logging entry would look like this for writing. In
+	the log file each entry is in one line. For readability we
+	split it into separate lines in this documentation.:
+      </para>
+      <programlisting>12.10 14:19:42 [pool:pool2@poolDomain-1:transfer]
+[0000062774D07847475BA78AC99C60F2C2FC,10475] [Unknown]
+&lt;Unknown&gt;:&lt;Unknown&gt;@osm 10475 40 true {GFtp-1.0 131.169.72.103 37850}
+[door:WebDAV-example.org@webdavDomain:1355145582248-1355145582485] {0:""}</programlisting>
+
+   </informalexample>
+   <para>
+     The formatting of the log messages can be customized by
+     redefining the
+     <literal><replaceable>billing.format.someInfoMessage</replaceable></literal>
+     properties in the layout configuration, where
+     <replaceable>billing.format.someInfoMessage</replaceable> can be
+     replaced by
+     <itemizedlist>
+       <listitem><varname>billing.format.MoverInfoMessage</varname></listitem>
+       <listitem><varname>billing.format.RemoveFileInfoMessage</varname></listitem>
+       <listitem><varname>billing.format.DoorRequestInfoMessage</varname></listitem>
+       <listitem><varname>billing.format.StorageInfoMessage</varname></listitem>
+     </itemizedlist>
+     A full explanation of the formatting is given in the
+     <filename>&path-ods-usd;/defaults/billing.properties</filename>
+     file. For syntax questions please consult <ulink url='
+     http://www.antlr.org/wiki/display/ST/StringTemplate+3+Documentation'>StringTemplate
+     v3 documentation</ulink> or the <ulink
+     url='http://www.antlr.org/wiki/display/ST/StringTemplate+cheat+sheet'>cheat
+     sheet</ulink>.
+   </para>
+
+    <para>
+      On the web page generated by the &serv-httpd; service (default
+      port 2288), there is a link to <literal>Action
+      Log</literal>. The table which appears there gives a summary
+      overview extracted from the data contained in the billing log
+      files.
+    </para>
+
+  </section>
+
+  <section id="cf-billing-db">
+    <title>The <database>billing</database> database</title>
+    <para>
+      In order to enable the database, the following steps must be taken.
+    </para>
+    <orderedlist>
+      <listitem>
+	<para>
+	  If the "billing" database does not already exist (see
+	  further below on migrating from an existing one), create it
+	  (we assume &psql; here):
+	</para>
+	<screen>&prompt-root; <userinput>createdb -O srmdcache -U postgres billing</userinput></screen>
+	<para>
+	  If you are using a version of &psql; prior to 8.4, you will
+	  also need to do:
+	</para>
+	<screen>&prompt-root; <userinput>createlang -U srmdcache plpgsql billing</userinput></screen>
+	<para>
+	  No further manual preparation is needed, as the necessary
+	  tables, indices, functions and triggers will automatically
+	  be generated when you (re)start the domain with the
+	  <database>billing</database> database logging turned on (see
+	  below).
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  The property <literal>billingToDb</literal> controls whether
+	  the billing cell sends billing messages to the database. By
+	  default the option is disabled. To activate, set the value
+	  to <literal>yes</literal> and restart the domain in which
+	  the &serv-httpd; service is running.
+	</para>
+	<informalexample>
+	  <para>
+	    Extract from the layout file:
+	  <programlisting>[httpdDomain]
+        billingToDb=yes
+[httpdDomain/httpd]
+[httpdDomain/billing]
+...</programlisting>
+          <screen>&prompt-root; <userinput>dcache restart httpdDomain</userinput>
+Stopping httpdDomain 0 1 done
+Starting httpdDomain done</screen>
+	  </para>
+	</informalexample>
+      </listitem>
+    </orderedlist>
+
+    <section id="billing-customize">
+      <title>Customizing the database</title>
+      <para>
+	In most cases, the billing service will be run out-of-the-box;
+	nevertheless, the administrator does have control, if this is
+	desired, over the database configuration.
+      </para>
+
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    Database name, host, user, and password can be easily modified using the properties:
+	  </para>
+
+
+	  <itemizedlist>
+	    <listitem><literal>billingDbName</literal></listitem>
+	    <listitem><literal>billingDbHost</literal></listitem>
+	    <listitem><literal>billingDbUser</literal></listitem>
+	    <listitem><literal>billingDbPass</literal></listitem>
+	  </itemizedlist>
+	  <para>
+	    The current database values can be checked with the
+	    <command>dcache database ls</command> command.
+	  </para>
+	  <informalexample>
+	    <screen># dcache database ls
+DOMAIN          CELL        DATABASE HOST      USER      MANAGEABLE AUTO
+namespaceDomain PnfsManager chimera  localhost chimera   Yes        Yes
+namespaceDomain cleaner     chimera  localhost chimera   No         No
+httpdDomain     billing     billing  localhost srmdcache Yes        Yes</screen>
+	  </informalexample>
+	</listitem>
+
+
+	<listitem>
+	  <para>
+	    Database inserts are batched for performance, and are controlled by the following properties:
+	  </para>
+	  <itemizedlist>
+	    <listitem><literal>billingMaxInsertsBeforeCommit</literal> (defaults to <literal>10000</literal>)</listitem>
+	    <listitem><literal>billingMaxTimeBeforeCommitInSecs</literal> (defaults to <literal>5</literal>)</listitem>
+	  </itemizedlist>
+	  <para>
+	    The default settings should usually be sufficient.
+	  </para>
+	</listitem>
+
+	<listitem>
+	  <para>
+	    Should finer control over the DataNucleus layer (which
+	    talks to the database) be needed, then a new
+	    <filename>datanucleus.properties</filename> file must be
+	    provided.  The path to this file, which will override the
+	    internal settings, should be indicated using:
+	  </para>
+	  <itemizedlist>
+	    <listitem><literal>billingInfoAccessPropertiesFile</literal> (defaults to <literal>""</literal>)</listitem>
+	  </itemizedlist>
+	  <para>
+	    Changing this configuration requires an understanding of
+	    <ulink
+	    url="http://www.datanucleus.org">DataNucleus</ulink> , and
+	    we expect it will be rather uncommon to utilize this
+	    option (it is suggested that the administrator in this
+	    case consult with a member of the &dcache; team).
+	  </para>
+	</listitem>
+
+	<listitem>
+	  <para>
+	    Changing the database type (which defaults to &psql;) to
+	    something else would entail the above-mentioned necessary
+	    modification of the
+	    <filename>datanucleus.properties</filename> as well as
+	    changing the <literal>billingDbDriver</literal> and
+	    <literal>billingDbUrl</literal> properties appropriately.
+	    This is not a recommended procedure, though in certain
+	    exceptional circumstances, it may be desirable or
+	    necessary.  Once again, consultation with the &dcache;
+	    team is suggested in this case.
+	  </para>
+	</listitem>
+      </itemizedlist>
+    </section>
+
+  </section>
+
+  <section id="config-billing-plots">
+    <title>Generating and Displaying Billing Plots</title>
+    <para>
+      If you have selected to store billing messages to the database,
+      it is also possible to generate and display a set of histograms
+      from the data in these tables.  To turn on plot generation, set
+      the property <varname>generatePlots</varname> to
+      <literal>true</literal> and restart the domain in which the
+      &serv-httpd; is running.
+    </para>
+    <informalexample>
+      <para>
+	Extract from the layout file:
+	<programlisting>[httpdDomain]
+        billingToDb=yes
+	generatePlots=true
+[httpdDomain/httpd]
+[httpdDomain/billing]
+...</programlisting>
+       </para>
+    </informalexample>
+
+    <para>
+      The the frequency of plot refreshing and the type of plot
+      produced can be controlled by:
+    </para>
+    <itemizedlist>
+      <listitem>
+	<varname>billingPlotsTimeoutInMins</varname> (defaults to
+	<literal>30</literal>)
+      </listitem>
+      <listitem>
+	<varname>billingPlotsExportType</varname> (defaults to
+	<literal>png</literal> and can be set to <literal>gif</literal>)
+      </listitem>
+    </itemizedlist>
+
+    <para>
+      The plots are linked off of the <literal>/webadmin</literal>
+      page (itself also linked via <literal>New Admin Pages</literal>
+      from the static page created by the &serv-httpd; service). On
+      the menu bar at the top, click <literal>Billing Plots</literal>
+      to view them.  These provide aggregate views of the data for
+      24-hour, 7-day, 30-day and 365-day periods.
+    </para>
+
+    <para>
+      The plot types are:
+
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    (Giga)bytes read and written for both &dcache; and &hsm;
+	    backend (if any)
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    Number of transactions/transfers for both &dcache; and
+	    &hsm; backend (if any)
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    Maximum, minimum and average connection time
+	</para>
+	</listitem>
+	<listitem>
+	  <para>
+	    Cache hits and misses
+	  </para>
+	  <note>
+	    <para>
+	      The data for this last histogram is not automatically
+	      sent, since it contributes significantly to message
+	      traffic between the pool manager and the billing
+	      service.  To store this data (and thus generate the
+	      relevant plots), the
+	      <varname>poolmanager.cache-hit-messages.enabled</varname>
+	      property must be set either in
+	      <filename>dcache.conf</filename> or in the layout file
+	      for the domain where the &serv-poolmngr; runs:
+	    </para>
+	    <programlisting>poolmanager.cache-hit-messages.enabled=true</programlisting>
+	  </note>
+	</listitem>
+      </itemizedlist>
+
+      Each individual plot can be magnified by clicking on it.
+    </para>
+
+<section id="config-billing-plots-custom">
+  <title>Customizing the plots</title>
+  <para>
+    As with the database itself, it is expected that the
+    standard/default set-up for plotting will usually be sufficient.
+    In the case where alteration of the look and feel of the plotting
+    is desired, a new <filename>plot.properties</filename> file needs
+    to be provided.  The path to this file, which will override the
+    internal settings, should be indicated using the property
+    <literal>billingPlotPropertiesFile</literal>.
+  </para>
+  <para>
+    This configuration file contains settings relevant to the <ulink
+    url="http://java.freehep.org"> JAIDA/Freehep</ulink> libraries
+    used to create the graphics. The meaning of most of these
+    properties is rather straightforward. For possible alternatives,
+    it is suggested you consult the <ulink
+    url="http://java.freehep.org/doc/release/v1.2.2/doc/api/overview-summary.html">Freehep
+    reference</ulink> pages (note that the
+    <literal>histogram.factory</literal> property must be included in
+    any custom file but will normally have the same value).
+  </para>
+
+  <para>
+    To view the internal <literal>plot.properties</literal> settings
+    extract the
+    <filename>dcache-core-<replaceable>version</replaceable>.jar</filename>
+    to some temporary directory.
+  </para>
+  <screen>&prompt-root; <userinput>ls /usr/share/dcache/classes/dcache-core*</userinput>
+/usr/share/dcache/classes/dcache-core-<replaceable>version</replaceable>
+&prompt-root; <userinput>cd /tmp</userinput>
+&prompt-root; <userinput>jar xf /usr/share/dcache/classes/dcache-core-<replaceable>version</replaceable>.jar org/dcache/services/billing/plot/plot.properties</userinput>
+&prompt-root; <userinput>less org/dcache/services/billing/plot/plot.properties</userinput></screen>
+
+</section>
+
+</section>
+
+<section id="cf-billing-upgrade">
+  <title>Upgrading a Previous Installation</title>
+  <para>
+    Because it is possible that the newer version may be deployed over
+    an existing installation which already uses the
+    <database>billing</database> database, the Liquibase change-set
+    has been written in such a way as to look for existing tables and
+    to modify them only as necessary.
+  </para>
+
+  <para>
+    If you start the domain containing the &serv-billing; service over
+    a pre-existing installation of the <database>billing</database>
+    database, depending on what was already there, you may observe
+    some messages like the following in the domain log having to do with the logic
+    governing table initialization.
+  </para>
+  <informalexample>
+    <programlisting>INFO 8/23/12 10:35 AM:liquibase: Successfully acquired change log lock
+INFO 8/23/12 10:35 AM:liquibase: Reading from databasechangelog
+INFO 8/23/12 10:35 AM:liquibase: Reading from databasechangelog
+INFO 8/23/12 10:35 AM:liquibase: Successfully released change log lock
+INFO 8/23/12 10:35 AM:liquibase: Successfully released change log lock
+INFO 8/23/12 10:35 AM:liquibase: Successfully acquired change log lock
+INFO 8/23/12 10:35 AM:liquibase: Reading from databasechangelog
+INFO 8/23/12 10:35 AM:liquibase: Reading from databasechangelog
+INFO 8/23/12 10:35 AM:liquibase: ChangeSet org/dcache/services/billing/
+   db/sql/billing.changelog-1.9.13.xml::4.1.7::arossi ran successfully in 264ms
+INFO 8/23/12 10:35 AM:liquibase: Marking ChangeSet: org/dcache/services/
+   billing/db/sql/billing.changelog-1.9.13.xml::4.1.8::arossi::(Checksum:
+   3:faff07731c4ac867864824ca31e8ae81) ran despite precondition failure due
+   to onFail='MARK_RAN': classpath:org/dcache/services/billing/db/sql/
+   billing.changelog-master.xml : SQL Precondition failed. Expected '0' got '1'
+INFO 8/23/12 10:35 AM:liquibase: ChangeSet org/dcache/services/billing/db/sql/
+   billing.changelog-1.9.13.xml::4.1.9::arossi ran successfully in 14ms
+INFO 8/23/12 10:35 AM:liquibase: Successfully released change log lock
+INFO 8/23/12 10:35 AM:liquibase: Successfully released change log lock</programlisting>
+  </informalexample>
+
+  <para>
+    Anything logged at a level lower than <literal>ERROR</literal> is
+    usually entirely normal. Liquibase regularly reports when the
+    preconditions determining whether it needs to do something are not
+    met. All this means is that the update step was not necessary and
+    it will be skipped in the future.
+  </para>
+
+  <para>
+    If, on the other hand, there is an <literal>ERROR</literal> logged
+    by Liquibase, it is possible there may be some other conflict
+    resulting from the upgrade (this should be rare).  Such an error
+    will block the domain from starting.  One remedy which often works
+    in this case is to do a clean re-initialization by dropping the
+    Liquibase tables from the database:
+  </para>
+  <screen>&prompt-root; <userinput>psql -U srmdcache billing</userinput>
+
+billing=> <userinput>drop table databasechangelog</userinput>
+billing=> <userinput>drop table databasechangeloglock</userinput>
+billing-> <userinput>\q</userinput>
+&prompt-root;</screen>
+  <para>
+    and then restarting the domain.
+  </para>
+
+  <note>
+    <para>
+      If the <database>billing</database> database already exists, but
+      contains tables other than the following:
+    </para>
+<screen>&prompt-root; <userinput>psql -U srmdcache billing</userinput>
+billing=> \dt
+                     List of relations
+ Schema	|         Name          | Type  |   Owner
+ -------+-----------------------+-------+-----------
+ public	| billinginfo           | table | srmdcache
+ public	| billinginfo_rd_daily  | table | srmdcache
+ public	| billinginfo_tm_daily  | table | srmdcache
+ public	| billinginfo_wr_daily  | table | srmdcache
+ public	| databasechangelog     | table | srmdcache
+ public	| databasechangeloglock | table | srmdcache
+ public	| doorinfo              | table | srmdcache
+ public	| hitinfo               | table | srmdcache
+ public	| hitinfo_daily         | table | srmdcache
+ public	| storageinfo           | table | srmdcache
+ public	| storageinfo_rd_daily  | table | srmdcache
+ public	| storageinfo_wr_daily  | table | srmdcache
+
+billing-> <userinput>\q</userinput>
+&prompt-root;</screen>
+
+
+  <para>
+    that is, if it has been previously modified by hand or out-of-band
+    to include custom tables not used directly by &dcache;, the
+    existence of such extraneous tables should not impede &dcache;
+    from working correctly, provided those other tables are
+    <literal>READ</literal>-accessible by the database user for
+    billing, which by default is <literal>srmdcache</literal>. This is
+    a requirement imposed by the use of Liquibase.  You thus may need
+    explicitly to grant <literal>READ</literal> privileges to the
+    <database>billing</database> database user on any such tables if
+    they are owned by another database user.
+  </para>
+  </note>
+
+<!-- TODO move to release notes
+  <section>
+    <title>Upgrading over a 1.9.+ <database>billing</database>
+    database</title>
+  <para>
+    If you are upgrading over a 1.9.+ <database>billing</database>
+    database, you will probably want to run a migration script which
+    populates the new aggregate tables (the ones tagged "_daily") from
+    the data in the main tables (otherwise the histograms will not
+    reflect the data recorded prior to the date of upgrade):
+  </para>
+  <screen>&prompt-root; <userinput>psql -U srmdcache -f &path-ods-usd;/migration/migrate_from_messageinfo.sql</userinput></screen>
+  <para>
+    It is highly recommended that you do this while the &serv-billing;
+    service domain is offline, as it may take several hours, depending
+    on the amount of data you already have in the main billing tables.
+  </para>
+
+  </section>
+
+  <section>
+    <title>For Fermilab Users</title>
+    <para>
+      To migrate from <database>billing</database> databases which
+      already have a version of the aggregate tables generated by the
+      stand-alone (Tomcat) billing web application (as described in
+      <ulink
+      url="http://www.dcache.org/manuals/Book-1.9.12/config/cf-webmon-fhs.shtml">
+      dCache Book 1.9.12, Chapter 15, dCache Web Monitoring )</ulink>,
+      use instead:
+    </para>
+    <screen>&prompt-root; <userinput>psql -U srmdcache -f &path-ods-usd;/migration/migrate_from_preexistent.sql</userinput></screen>
+  </section>
+
+-->
+</section>
+
+</chapter>
+
