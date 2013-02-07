@@ -134,7 +134,7 @@
 
     <para>
       &dcache; / &srm; can transparently manage data distributed among
-      dozens of disk storage nodes (sometimes distributes over several countries).
+      dozens of disk storage nodes (sometimes distributed over several countries).
       The system has shown to significantly improve the efficiency of connected tape storage
       systems, by caching, gather and flush and scheduled staging techniques.
       Furthermore, it optimizes the throughput to and from data clients by dynamically
