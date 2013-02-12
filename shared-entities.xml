@@ -68,7 +68,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY voms         "<productname>VOMS</productname>">
 
 <!-- Various domains -->
-<!ENTITY domain-http      "<literal>httpDomain</literal>">
+<!ENTITY domain-httpd      "<literal>httpdDomain</literal>">
 <!ENTITY domain-stats     "<literal>statisticsDomain</literal>">
 <!ENTITY domain-pool      "<literal><replaceable>pool</replaceable>Domain</literal>">
 <!ENTITY domain-adminDoor "<literal>adminDoor</literal>">
@@ -294,6 +294,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY path-ode-ed "<phrase layout='opt'>/opt/d-cache/etc</phrase><phrase layout='fhs'>/etc/dcache</phrase>">
 <!ENTITY path-ode-eg "<phrase layout='opt'>/opt/d-cache/etc</phrase><phrase layout='fhs'>/etc/grid-security</phrase>">
 <!ENTITY path-ode-eda "<phrase layout='opt'>/opt/d-cache/etc</phrase><phrase layout='fhs'>/etc/dcache/admin</phrase>">
+<!ENTITY path-ode-usdr "<phrase layout='opt'>/opt/d-cache/etc</phrase><phrase layout='fhs'>/usr/share/dcache/replica</phrase>">
 <!ENTITY path-ods-usd "<phrase layout='opt'>/opt/d-cache/share</phrase><phrase layout='fhs'>/usr/share/dcache</phrase>">
 <!ENTITY path-odl-usd "<phrase layout='opt'>/opt/d-cache/libexec</phrase><phrase layout='fhs'>/usr/share/dcache</phrase>">
 <!ENTITY path-odc-ed "<phrase layout='opt'>/opt/d-cache/config</phrase><phrase layout='fhs'>/etc/dcache</phrase>">
