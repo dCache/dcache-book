@@ -2,33 +2,17 @@
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
                          "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
 <!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+
 %sharedents;
 ]>
 
-<chapter id="cf-repman" status="draft">
+<chapter id="cf-repman">
 
-  <title>Resilience with the Replica Manager</title>
-<!--
-  <chapterinfo>
-    <author>
-      <firstname>Alex</firstname>
-      <surname>Kulyavtsev</surname>
-      <affiliation>
-	<shortaffil>FNAL</shortaffil>
-      </affiliation>
-    </author>
-
-    <author>
-      <firstname>Mathias</firstname>
-      <surname>de Riese</surname>
-      <affiliation>
-        <shortaffil>DESY</shortaffil>
-      </affiliation>
-    </author>
-  </chapterinfo>
--->
+  <title>The &serv-replica; service (Replica Manager)</title>
 
   <para>
+    The &serv-replica; service (which is also referred to as Replica
+    Manager) controls the number of replicas of a file on the pools.
     If no <glossterm linkend="gl-tss">tertiary storage
     system</glossterm> is connected to a &dcache; instance (i.e., it
     is configured as a <glossterm linkend="gl-lfs">large file
@@ -36,138 +20,182 @@
     disk. (At least the <glossterm linkend="gl-precious">precious
     replica</glossterm>.) If a higher security and/or availability is
     required, the resilience feature of &dcache; can be used: If
-    running in the default configuration, the replica manager will
-    make sure that the number of <glossterm
+    running in the default configuration, the &serv-replica; service
+    will make sure that the number of <glossterm
     linkend="gl-replica">replicas</glossterm> of a file will be at
     least 2 and not more than 3. If only one replica is present it
     will be copied to another pool by a <glossterm
-    linkend="gl-p2p">pool to pool transfer</glossterm>. If 4 or more
+    linkend="gl-p2p">pool to pool transfer</glossterm>. If four or more
     replicas exist, some of them will be deleted.
   </para>
 
-  <section id="cf-repman-install">
-    <title>Installation</title>
+  <section id="cf-repman-basics">
+    <title>The Basic Setup</title>
+    <para>
+      The standard configuration assumes that the database server is
+      installed on the same machine as the &serv-replica; service
+      &mdash; usually the admin node of the &dcache; instance.  If
+      this is not the case you need to set the property
+      <varname>replicaManagerDatabaseHost</varname>.
+    </para>
+    <para>
+      To create and configure the database
+      <firstterm>replicas</firstterm> used by the &serv-replica;
+      service in the database server do:
+    </para>
+
+    <screen>&prompt-root; <userinput>createdb -U srmdcache replicas</userinput>
+&prompt-root; <userinput>psql -U srmdcache -d replicas -f &path-ode-usdr;/psql_install_replicas.sql</userinput></screen>
 
     <para>
-      To activate Replica Manager you need make changes in all 3
-      places:
+      To activate the &serv-replica; service you need to
     </para>
 
     <orderedlist numeration="arabic">
       <listitem>
 	<para>
-           <filename>etc/node_config</filename> on <emphasis>all admin
-           nodes</emphasis> in this &dcache; instance.
-          </para>
+	  Enable the &serv-replica; service in a layout file.
+	</para>
+	<programlisting>[<replaceable>someDomain</replaceable>]
+...
+
+[<replaceable>someDomain</replaceable>/replica]</programlisting>
       </listitem>
 
       <listitem>
 	<para>
-	  <filename>replicaSetup</filename> file on node where replica
-	  manager is runnig
+	 Configure the service in the
+	 <filename>&path-ode-ed;/dcache.conf</filename> file on the
+	 node with the &domain-dcache; and on the node on which the
+	 &serv-pnfsmngr; is running.
 	</para>
+	<programlisting>replicaManager=yes</programlisting>
+	<note>
+	  <para>
+	    It will not work properly if you defined the
+	    &serv-replica; service in one of the layout files and set
+	    this property to <literal>no</literal> on the node with
+	    the &domain-dcache; or on the node on which the
+	    &serv-pnfsmngr; is running.
+	  </para>
+	</note>
       </listitem>
 
       <listitem>
 	<para>
-	  define Resilient pool group(s) in
-	  <filename>PoolManager.conf</filename>
+	  Define a pool group for the resilient pools if necessary.
 	</para>
       </listitem>
-
+      <listitem>
+	  <para>
+	    Start the &serv-replica; service.
+	  </para>
+      </listitem>
     </orderedlist>
 
- <programlisting>#  - - - - Will Replica Manager be started?
-#   Values:  no, yes
-#   Default: no
-#</programlisting>
-
     <para>
-      This has to be set to <quote>yes</quote> on every node, if there
-      is a replica manager in this &dcache; instance. Where the
-      replica manager is started is controlled in
-      <filename>etc/node_config</filename>. If it is not started and
-      this is set to <quote>yes</quote> there will be error messages
-      in <filename>log/dCacheDomain.log</filename>. If this is set to
-      <quote>no</quote> and a replica manager is started somewhere, it
-      will not work properly.
+      In the default configuration, all pools of the &dcache; instance
+      which have been created with the command <command>dcache pool
+      create</command> will be managed.  These pools are in the pool
+      group named <literal>default</literal> which does exist by
+      default.  The &serv-replica; service will keep the number of
+      replicas between 2 and 3 (including). At each restart of the
+      &serv-replica; service the pool configuration in the database will
+      be recreated.
     </para>
 
-<programlisting>#replicaManager=no
 
-#  - - - - Which pool-group will be the group of resilient pools?
-#   Values:  &lt;pool-Group-Name&gt;, a pool-group name existing in the PoolManager.conf
-#   Default: ResilientPools
-#</programlisting>
+    <informalexample>
+
+      <orderedlist numeration="arabic">
+	<para>
+	  This is a simple example to get started with. All your pools
+	  are assumed to be in the pool group
+	  <literal>default</literal>.
+	</para>
+	<listitem>
+	  <para>
+	    In your layout file in the directory <filename
+	    class='dir'>&path-ode-ed;/layouts</filename> define the
+	    &serv-replica; service.
+	  </para>
+
+	  <programlisting>[dCacheDomain]
+...
+
+[replicaDomain]
+[replicaDomain/replica]</programlisting>
+	</listitem>
+	<listitem>
+	  <para>
+	    In the file <filename>&path-ode-ed;/dcache.conf</filename>
+	    set the value for the property
+	    <varname>replicaManager</varname> to
+	    <literal>yes</literal> and the
+	    <literal>resilientGroupName</literal> to
+	    <literal>default</literal>.
+	  </para>
+	  <programlisting>replicaManager=yes
+resilientGroupName=default</programlisting>
+	</listitem>
+	<listitem>
+	  <para>
+	    The pool group <literal>default</literal> exists by
+	    default and does not need to be defined.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    To start the &serv-replica; service restart &dcache;.
+	  </para>
+	  <screen>&prompt-root; <userinput>dcache restart</userinput></screen>
+	</listitem>
+      </orderedlist>
+    </informalexample>
+
+    <section>
+      <title>Define a poolgroup for resilient pools</title>
 
     <para>
-      Only pools defined in pool group ResilientPools in
-      <filename>config/PoolManager.conf</filename> will be managed by
-      ReplicaManager. You shall edit
-      <filename>config/PoolManager.conf</filename> to make replica
-      manager work. To use another pool group defined in
-      <filename>PoolManager.conf</filename> for replication, please
-      specify group name by changing setting :
+      For more complex installations of &dcache; you might want to
+      define a pool group for the resilient pools.
     </para>
 
-<programlisting>
-#resilientGroupName=ResilientPools
-</programlisting>
-
     <para>
-      Please scroll down <quote>replica manager tuning</quote> make
-      this and other changes.
-   </para>
-
-  </section>
-
-  <section id="cf-repman-start">
-    <title>Starting the Replica Manager</title>
-
-    <para>
-      Beginning with version 1.6.6 of &dcache; the replica manager
-      can be started as follows:
+      Define the resilient pool group in the
+      <filename>&file-poolmanager;</filename> file on the host running
+      the &serv-poolmngr; service.  Only pools defined in the resilient
+      pool group will be managed by the &serv-replica; service.
     </para>
 
-    <para>
-      The replica manager will use the same &psql; database and
-      database user <database class="user">srmdcache</database> as the
-      &srm;. The standard configuration assumes that the database
-      server is installed on the same machine as the replica manager
-      &mdash; usually the admin node of the &dcache; instance. To
-      create and configure the database
-      <firstterm>replicas</firstterm> used by the replica manager in
-      the database server do:
-    </para>
+    <informalexample>
+      <para>
+	Login to the admin interface and cd to the &cell-poolmngr;.
+	Define a poolgroup for resilient pools and add pools to that
+	poolgroup.
+      </para>
+      <screen>&dc-prompt-local; <userinput>cd PoolManager</userinput>
+&dc-prompt-pm; <userinput>psu create pgroup ResilientPools</userinput>
+&dc-prompt-pm; <userinput>psu create pool  pool3</userinput>
+&dc-prompt-pm; <userinput>psu create pool  pool4</userinput>
+&dc-prompt-pm; <userinput>psu addto pgroup ResilientPools pool3</userinput>
+&dc-prompt-pm; <userinput>psu addto pgroup ResilientPools pool4</userinput>
+&dc-prompt-pm; <userinput>save</userinput></screen>
+	<para>
+	  By default the pool group named
+	  <varname>ResilientPools</varname> is used for replication.
+	</para>
+    </informalexample>
 
-    <screen>&prompt-root; <userinput>su postgres</userinput>
-&prompt-user; <userinput>createdb -U srmdcache replicas</userinput>
-&prompt-user; <userinput>psql -U srmdcache -d replicas -f &path-ode-ed;/psql_install_replicas.sql</userinput>
-&prompt-user; <userinput>exit</userinput></screen>
+	<para>
+	  To use another pool group defined in
+	  <filename>&file-poolmanager;</filename> for replication,
+	  please specify the group name in the
+	  <filename>etc/dcache.conf</filename> file.
+	</para>
+	<programlisting>resilientGroupName=<replaceable>NameOfResilientPoolGroup</replaceable>.</programlisting>
 
-    <para>
-      The start-up script <filename>bin/dcache-core</filename> already
-      contains the correct lines to start and stop the domain
-      containing the replica manager as comments. Just remove the two
-      hash (<quote>#</quote>) signs and restart the &dcache; instance.
-      The replica manager may also be started separately by
-    </para>
-
-    <screen>&prompt-root; <userinput>/opt/d-cache/jobs/replica -logfile=/opt/d-cache/log/replica.log start</userinput></screen>
-
-    <para>
-      and stopped by
-    </para>
-
-    <screen>&prompt-root; <userinput>/opt/d-cache/jobs/replica stop</userinput></screen>
-
-    <para>
-      In the default configuration, all pools of the &dcache;
-      instance will be managed. The replica manager will keep the
-      number of replicas between 2 and 3 (including). At each restart
-      of the replica manager the pool configuration in the database
-      will be recreated.
-    </para>
+    </section>
   </section>
 
 
@@ -175,15 +203,18 @@
     <title>Operation</title>
 
     <para>
-      When file is transfered into the &dcache; its replica is copied
+      When a file is transfered into &dcache; its replica is copied
       into one of the pools.  Since this is the only replica and
-      normally required range is higher (e.g., (2,3) ), this file will
-      be replicated to other pools.  When some pool goes down the
-      replica count for the files in that pool may fall below the
-      valid range and these files will be replicated.  Replicas of the
-      file with replica count below the valid range and which need
-      replication are called <firstterm>deficient
-      replicas</firstterm>.
+      normally the required range is higher (e.g., by default at least
+      2 and at most 3), this file will be replicated to other pools.
+    </para>
+
+    <para>
+      When some pools go down, the replica count for the files in
+      these pools may fall below the valid range and these files will
+      be replicated.  Replicas of the file with replica count below
+      the valid range and which need replication are called
+      <firstterm>deficient replicas</firstterm>.
     </para>
 
     <para>
@@ -195,21 +226,23 @@
     </para>
 
     <para>
-      Resilience Manager (RM) counts number of replicas for each file
-      in the pools which can be used online (see Pool States below)
-      and keeps number of replicas within the valid range (min, max).
+      The &serv-replica; service counts the number of replicas for
+      each file in the pools which can be used online (see Pool States
+      below) and keeps the number of replicas within the valid range
+      (<literal>replicaMin</literal>, <literal>replicaMax</literal>).
     </para>
 
-    <para>
-      RM keeps information about pool state, list of the replicas (
-      file ID, pool ) and current copy/delete operations in persistent
-      database.
-    </para>
+
+    <section id="cf-repman-op-pool-states">
+    <title>Pool States</title>
 
     <para>
-      For each replica RM keeps list of pools where it can be found.
-      For the pools pool state is kept in DB. There is table which
-      keeps ongoing operations (replication, deletion) for replica.
+      The possible states of a pool are <literal>online</literal>,
+      <literal>down</literal>, <literal>offline</literal>,
+      <literal>offline-prepare</literal> and
+      <literal>drainoff</literal>. They can be set by the admin
+      through the admin interface. (See <xref
+      linkend="cf-repman-op-cmds"/>.)
     </para>
 
     <figure id="resilient_poolstate">
@@ -226,21 +259,17 @@
       </mediaobject>
     </figure>
 
-    <para>
-      This is description of pool states as it is in v1.0 of
-      Risilience Manager. Some of the states and transitions will be
-      changed in the next release.
-    </para>
-
     <variablelist>
       <varlistentry>
 	<term>online</term>
 
 	<listitem>
 	  <para>
-	    normal operation. Replicas in this state are readable and
-	    can be counted. Files can be written (copied) to this
-	    pool.
+	    Normal operation.
+	  </para>
+	  <para>
+	    Replicas in this state are readable and can be
+	    counted. Files can be written (copied) to this pool.
 	  </para>
 	</listitem>
       </varlistentry>
@@ -249,37 +278,48 @@
 	<term>down</term>
 
 	<listitem>
+	<para>
+	  A pool can be <literal>down</literal> because
+	</para>
+	    <itemizedlist>
+	      <listitem>
+		the admin stopped the domain in which the pool was
+		running.
+	      </listitem>
+	      <listitem>
+		the admin set the state value via the admin interface.
+	      </listitem>
+	      <listitem>
+		the pool crashed
+	      </listitem>
+	    </itemizedlist>
+	    <para>
+	      To confirm that it is safe to turn pool down there is
+	      the command <command>ls unique</command> in the admin
+	      interface to check number of files which can be locked
+	      in this pool. (See <xref linkend="cf-repman-op-cmds"/>.)
+	    </para>
 	  <para>
-	    &dcache; pool is stopped by operator or crashed. On
-	    startup, pool comes briefly to the online state, and then
-	    it goes <quote>down</quote> to do pool
-	    <quote>Inventory</quote> &mdash; to cleanup files which
-	    broke when pool crashed during transfer. When pool comes
-	    online again, RM will update list of replicas in the pool
-	    and store it in the DB.
-	  </para>
-
-	  <para>
-	    Replicas in pools which are <quote>down</quote> are not
-	    <quote>counted</quote>, so when pool crashes it reduces
-	    number of <quote>online</quote> replicas for some
-	    files. The crash of the pool (pool departure) may trigger
+	    Replicas in pools which are <literal>down</literal> are
+	    not counted, so when a pool crashes the number of
+	    <literal>online</literal> replicas for some files is
+	    reduced. The crash of a pool (pool departure) may trigger
 	    replication of multiple files.
 	  </para>
-
 	  <para>
-	    Pool recovery (arrival) may rigger massive deletition of
+	    On startup, the pool comes briefly to the
+	    <literal>online</literal> state, and then it goes
+	    <literal>down</literal> to do pool
+	    <quote>Inventory</quote> to cleanup files which broke when
+	    the pool crashed during transfer. When the pool comes
+	    online again, the &serv-replica; service will update the
+	    list of replicas in the pool and store it in the database.
+	  </para>
+	  <para>
+	    Pool recovery (arrival) may trigger massive deletion of
 	    file replicas, not necessarily in this pool.
 	  </para>
 
-	  <para>
-	    There are special situations when operator wants to change
-	    pool state and he/she does not want to trigger massive
-	    replication. Or vice versa he/she wants to take pool
-	    permanently out of operation and wants to make sure that
-	    files in the pool will not be locked out and will be
-	    available later.
-	  </para>
 	</listitem>
       </varlistentry>
 
@@ -288,766 +328,570 @@
 
 	<listitem>
 	  <para>
-	    replicas in this pool are counted whether this pool is up
-	    or down. It does done matter fore replication purpose if
-	    offline pool goes down or up.  Rationale &mdash; operator
-	    wants to bring pool down briefly and he/she knows that
-	    replicas in the pool are safe. This state is introduced to
-	    avoid unnecessary massive replication. When pool comes
-	    online from offline state replicas in the pool will be
-	    inventoried to make sure we know the real list of replicas
-	    in the pool.
+	    The admin can set the pool state to be
+	    <literal>offline</literal>. This state was introduced to
+	    avoid unnecessary massive replication if the operator
+	    wants to bring the pool down briefly without triggering
+	    massive replication.
+	  </para>
+	  <para>
+	    Replicas in this pool are counted, therefore it does not
+	    matter for replication purpose if an
+	    <literal>offline</literal> pool goes down or up.
+	  </para>
+	  <para>
+	    When a pool comes <literal>online</literal> from an
+	    <literal>offline</literal> state replicas in the pool will
+	    be inventoried to make sure we know the real list of
+	    replicas in the pool.
 	  </para>
 	</listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>down</term>
-
+	<term>offline-prepare</term>
 	<listitem>
 	  <para>
-	    operator needs to set pool or set of pools down
-	    permanently and wants to make sure that there no replicas
-	    <quote>locked out</quote> when all known replicas of the
-	    file are in the pools which are unavailable. Thus whether
-	    pool is really up or down replicas in it are not counted.
+	    This is a transient state betweeen
+	    <literal>online</literal> and <literal>offline</literal>.
+	  </para>
+	  <para>
+	    The admin will set the pool state to be
+	    <literal>offline-prepare</literal> if he wants to change
+	    the pool state and does not want to trigger massive
+	    replication.
+	  </para>
+	  <para>
+	    Unique files will be evacuated &mdash; at least one
+	    replica for each unique file will be copied out.  It is
+	    unlikely that a file will be locked out when a single pool
+	    goes down as normally a few replicas are online. But when
+	    several pools go down or set drainoff or offline file
+	    lockout might happen.
+	  </para>
+	  <para>
+	    Now the admin can set the pool state
+	    <literal>offline</literal> and then
+	    <literal>down</literal> and no file replication will be
+	    triggered.
 	  </para>
 	</listitem>
       </varlistentry>
 
       <varlistentry>
 	<term>drainoff</term>
-	<term>offline-prepare</term>
-
 	<listitem>
 	  <para>
-	    transient states between online and down or offline states
-	    respectively.  If there are files which can be
-	    <quote>locked out</quote> in down or offline states, they
-	    will be evacuated &mdash; at least one replica for each
-	    locked file will be copied out. It is unlikely that file
-	    will be locked out when singly pool goes down &mdash;
-	    normally few replicas are online. When several pools go
-	    down or set drainoff or offline file lockout may happens.
+	    This is a transient state betweeen
+	    <literal>online</literal> and <literal>down</literal>.
+	  </para>
+	  <para>
+	    The admin will set the pool state to be
+	    <literal>drainoff</literal> if he needs to set a pool or a
+	    set of pools permanently out of operation and wants to
+	    make sure that there are no replicas <quote>locked
+	    out</quote>.
+	  </para>
+	  <para>
+	    Unique files will be evacuated &mdash; at least one
+	    replica for each unique file will be copied out.  It is
+	    unlikely that a file will be locked out when a single pool
+	    goes down as normally a few replicas are online. But when
+	    several pools go down or set drainoff or offline file
+	    lockout might happen.
+	  </para>
+	  <para>
+	    Now the admin can set the pool state down. Files from
+	    other pools might be replicated now, depending on the
+	    values of <literal>replicaMin</literal> and
+	    <literal>replicaMax</literal>.
 	  </para>
 	</listitem>
       </varlistentry>
+
     </variablelist>
 
 
-    <note>
-      <para>
-	Currently replicas counted separately in groups of
-	offline-prepare and drainoff pools.
-	</para>
-    </note>
 
-    <para>
-      RM needs the single copy of the replica to be copied out and
-      then you can turn pool down, the other replicas will be made
-      from the replica available online. To confirm that it is safe to
-      turn pool down there is command to check number of files which
-      can be locked in this pool.
-    </para>
-
-    <para>
-      v1.0 &mdash; these states called <quote>transient</quote> but
-      pool does not automatically turned down
-    </para>
+</section>
 
     <section id="cf-repman-op-start">
       <title>Startup</title>
 
       <para>
-	The number of the pools in the system may be large and it may
-	be inconvenient to keep configuration of the system predefined
-	in some file. On startup complete configuration is unknown and
-	RM tries to keep number of replicas in the valid range as
-	pools arrive and departure and files are copied in. On the
-	other hand when groups of pools arrive or departure it leads
-	to massive replica cloning or reduction. It is beneficial to
-	suspend ajustments until system arrives to more or less stable
-	configuration.
+	When the &serv-replica; service starts it cleans up the
+	database. Then it waits for some time to give a chance to most
+	of the pools in the system to connect. Otherwise unnecessary
+	massive replication would start. Currently this is implemented
+	by some delay to start adjustments to give the pools a chance
+	to connect.
       </para>
 
+      <section>
+	<title>Cold Start</title>
+	<para>
+	  Normally (during Cold Start) all information in the database
+	  is cleaned up and recreated again by polling pools which are
+	  <literal>online</literal> shortly after some minimum delay
+	  after the &serv-replica; service starts. The &serv-replica;
+	  service starts to track the pools' state (pool up/down
+	  messages and polling list of online pools) and updates the
+	  list of replicas in the pools which came online. This
+	  process lasts for about 10-15 minutes to make sure all pools
+	  came up online and/or got connected. Pools which once get
+	  connected to the &serv-replica; service are in online or
+	  down state.
+	</para>
+	<para>
+	  It can be annoying to wait for some large period of time
+	  until all known <quote>good</quote> pools get
+	  connected. There is a <quote>Hot Restart</quote> option to
+	  accelerate the restart of the system after the crash of the
+	  head node.
+	</para>
+      </section>
+      <section>
+	<title>Hot Restart</title>
+
+	<para>
+	  On Hot Restart the &serv-replica; service retrieves
+	  information about the pools' states before the crash from
+	  the database and saves the pools' states to some internal
+	  structure. When a pool gets connected the &serv-replica;
+	  service checks the old pool state and registers the old
+	  pool's state in the database again if the state was
+	  <literal>offline</literal>,
+	  <literal>offline-prepare</literal> or
+	  <literal>drainoff</literal> state. The &serv-replica;
+	  service also checks if the pool was
+	  <literal>online</literal> before the crash. When all pools
+	  which were <literal>online</literal> get connected once, the
+	  &serv-replica; service supposes it recovered its old
+	  configuration and the &serv-replica; service starts
+	  adjustments.  If some pools went down during the connection
+	  process they were already accounted and adjustment would
+	  take care of it.
+	</para>
+
+	<informalexample>
+	  <para>
+	    Suppose we have ten pools in the system, where eight pools
+	    were <literal>online</literal> and two were
+	    <literal>offline</literal> before a crash.  The
+	    &serv-replica; service does not care about the two
+	    <literal>offline</literal> pools to get connected to start
+	    adjustments. For the other eight pools which were
+	    <literal>online</literal>, suppose one pool gets connected
+	    and then it goes down while the other pools try to
+	    connect. The &serv-replica; service considers this pool in
+	    known state, and when the other seven pools get connected
+	    it can start adjustments and does not wait any more.
+	  </para>
+	  <para>
+	    If the system was in equilibrium state before the crash,
+	    the &serv-replica; service may find some deficient
+	    replicas because of the crashed pool and start replication
+	    right away.
+	  </para>
+	</informalexample>
+      </section>
+    </section>
+
+    <section id="cf-repman-op-same-host">
+      <title>Avoid replicas on the same host</title>
       <para>
-	When RM starts it cleans up DB. Then it waits for some time to
-	give a chance to the pools to get connected. RM tries do not
-	start too early and give a chance to most of the pools in the
-	system to connect. Otherwise unnecessary massive replication
-	will start.  When configuration is unknown RM waits for some
-	time until <quote>quorum</quote> of the pools get
-	connected. Currently this is implemented by some delay to
-	start adjustments to get chance to the pools to connect.
+	For security reasons you might want to spread your replicas
+	such that they are not on the same host, or in the same
+	building or even in the same town. To configure this you need
+	to set the <varname>tag.hostname</varname> label for your
+	pools and check the properties
+	<varname>replicaCheckPoolHost</varname> and
+	<varname>replicaEnableSameHostReplica</varname>.
       </para>
-
-      <para>
-	Normally (during Cold Start) all information in DB is cleaned
-	up and recreated again by polling pools which are online
-	shortly after some minimum delay after RM starts. RM starts to
-	track pools state (pool up/down messages and polling list of
-	online pools) and updates list of replicas in the pools which
-	came online. This process lasts for about 10-15 minutes to
-	make sure all pools come up online and/or get connected. Pools
-	which once get connected to RM are in online or down state.
-      </para>
-
-
-      <para>
-	It can be annoying to wait for some large period of time until
-	all known <quote>good</quote> pools get connected. There is
-	<quote>Hot Restart</quote> option to accelerate restart of the
-	system after the crash of the head node.
-      </para>
-
-      <para>
-	On Hot Restart RM retrieves information about pools state
-	before the crash from DB and saves pools state to some
-	internal structure. When pool gets connected RM checks the old
-	pool state and registers old pools state in DB again if the
-	state was offline, offline-prepare or <quote>drainoff</quote>
-	state. RM also checks if the pool was online before the
-	crash. When all pools which were <quote>online</quote> get
-	connected once, RM supposes it recovered it's old
-	configuration and RM starts adjustments.  RM operates in the
-	<quote>fluid world</quote>. It does not required that pools
-	stay online. The point is when all online pools get connected
-	online we can start adjustments. If some pools went down
-	during connection process they are already accounted and
-	adjustment will take care of it.
-      </para>
-
       <informalexample>
 	<para>
-	  Example: Suppose we had have ten pools in the system where
-	  eight pools were online and two were offline.  RM does not
-	  care about two offline pools get connected to start
-	  adjustments. For the other eight pools which were online,
-	  suppose one pool get connected and then it falls down while
-	  the other pools try to connect. RM considers this pool in
-	  known state, and when other seven pools get connected it can
-	  start adjustments and does not wait any more. If system was
-	  in equilibrium state before the crash, RM may find some
-	  deficient replicas because of the crashed pool and start
-	  replication right away.
+	  We assume that some pools of your &dcache; are in Hamburg
+	  and some are in Berlin. In the layout files where the
+	  respective pools are defined you can set
 	</para>
+	<programlisting>[poolDomain]
+[poolDomain/pool1]
+name=pool1
+path=/srv/dcache/p1
+maxDiskSpace=500G
+waitForFiles=${path}/data
+tag.hostname=Hamburg</programlisting>
+        <para>
+	  and
+	</para>
+	<programlisting>[poolDomain]
+[poolDomain/pool2]
+name=pool2
+path=/srv/dcache/p2
+maxDiskSpace=500G
+waitForFiles=${path}/data
+tag.hostname=Berlin</programlisting>
       </informalexample>
-
-    </section>
-
-
-    <section id="cf-repman-op-more">
-      <title>More on operation</title>
-
-      <para>
-	RM has few threads running at the same time. Adjuster keeps
-	count of the replicas within the valid range, the other
-	threads help to do this.
-      </para>
-
-      <para>
-	Adjuster. Information about all replicas is kept in
-	DB. Adjuster makes several queries in DB during adjustment
-	cycle to get the list of files for which replicas must be
-	reduced or replicated:
-      </para>
-
-
-      <itemizedlist>
-	<listitem>
-	  <para>redundant replicas, Nrep &gt; max</para>
-	</listitem>
-	<listitem>
-	  <para>unique replicas in drainoff pools</para>
-	</listitem>
-	<listitem>
-	  <para>unique replicas in offline-prepare pools</para>
-	</listitem>
-	<listitem>
-	  <para>deficient replicas, Nrep &lt; min</para>
-	</listitem>
-      </itemizedlist>
-
-
-      <para>
-	Number of replicas is counted in pools which are online or
-	offline. Offline-prepare or drainoff pools considered
-	read-only and can be used as a source pool for
-	replication. Last replica of the file in the system must not
-	be removed.
-      </para>
-
-
-      <para>
-	The information in DB updated when new replica is added or
-	removed from the pool. When some pool changes it's state all
-	replicas in the pool became available or unavailable. This
-	changes the number of accessible replicas for the file. The
-	current list is marked as invalid and RM restarts adjustment
-	cycle from the beginning. When nothing happens for some time
-	adjustment cycle is triggered by timeout to make sure RM did
-	not miss anything because some messages get lost.
-      </para>
-
-      <para>
-	When it is found that replica needs replication or reduction
-	the worker thread starts to do the job asynchronously. Number
-	of Worker threads is limited to the max [default=6],
-	separately for reducers and replicators. If no workers are
-	available adjuster will wait for the worker thread. Worker
-	thread starts operation by sending message to &dcache; and waits
-	until operation finishes or timeout expires. The timeout is
-	different for reduction (replica removal) and replication, the
-	replication timout shall be larger to account for the time to
-	transfer the largest file between the pools. When the worker
-	thread starts operation it marks replica as <quote>having the
-	operation</quote> in action table in DB, and this replica will
-	be excluded from other operations in the system until
-	operation done or timeout expire. When there are few replicas
-	for the same file found to be replicated (or reduced), RM
-	schedules one replica for replication and proceeds with
-	processing the other files. When Adjuster reaches the end of
-	the list, it may return to the processing of the other
-	replicas of the first file without delay considering the
-	previous operation with the file complete.
-      </para>
-
-      <para>
-	Sometimes Adjuster gets error on operation with replica and in
-	some cases if it does the same operation with the same replica
-	again this <quote>unresolved</quote> error happens again and
-	again blocking RM to keep from processing other replicas. To
-	avoid such loops and <quote>dynamic deadlock</quote> RM can
-	put the replica which encountered the problem into
-	<emphasis><quote>exclude</quote></emphasis> state. To return
-	this replica into operation administrator shall manually
-	<emphasis><quote>release</quote></emphasis> this replica.
-      </para>
-
-      <para>
-	When pool changes its state RM receives a message which can be
-	lost or is not sent in some cases like pool crash. To make
-	sure RM has correct information about pool states it runs
-	PoolsWatchDog thread. WatchDog polls pools states and compares
-	it to the result of the previous poll to find out which pools
-	departed from or arrived into the system. Then it sleeps for
-	some time and does the check again. When there were no changes
-	in the pool configuration WatchDog throttles messages
-	<quote>no pool configuration change</quote> in the log file
-	&mdash; but it is still running.
-      </para>
-
-      <para>
-	Cyclical threads &mdash; Adjuster and WatchDog write and
-	timestamps it's current state in DB. It is displayed on Web
-	page so it is possible to check if it is running. Excluded
-	files are listed there too.
-      </para>
-    </section>
-
-
-
-    <section id="cf-repman-op-cmds">
-      <title>Commands</title>
-
-      <para>
-	If you are advanced user and have proper privileges and you
-	know how to issue command to admin interface you may connect
-	to the &cell-replicamngr; cell and issue the following
-	commands. You may find more commands in online help which are
-	for debug only &mdash; do not use them as they can stop RM operating
-	properly.
-      </para>
-
-      <informaltable frame="none">
-	<tgroup cols="2">
-
-	  <colspec colwidth="*" colname="c1" />
-	  <colspec colwidth="2*" colname="c2"/>
-
-	  <tbody>
-	    <row>
-	      <entry>
-		<userinput>set pool <replaceable>pool</replaceable>
-		<replaceable>state</replaceable></userinput>
-	      </entry>
-	      <entry>set pool state</entry>
-	    </row>
-
-	    <row>
-	      <entry>
-		<userinput>show pool
-		<replaceable>pool</replaceable></userinput>
-	      </entry>
-	      <entry>show pool state</entry>
-	    </row>
-
-	    <row>
-	      <entry>
-		<userinput>ls unique
-		<replaceable>pool</replaceable></userinput>
-	      </entry>
-	      <entry>
-		<para>
-		  check if pool drained off (has unique
-		  pndfsIds). Reports number of replicas in this
-		  pool. Zero if no locked replicas.
-		</para>
-	      </entry>
-	    </row>
-
-	    <row>
-	      <entry>
-		<userinput>exclude
-		<replaceable>pnfsId</replaceable></userinput>
-	      </entry>
-	      <entry>
-		<para>
-		  exclude <replaceable>pnfsId</replaceable> from adjustments
-		</para>
-	      </entry>
-	    </row>
-
-	    <row>
-	      <entry>
-		<userinput>release
-		<replaceable>pnfsId</replaceable></userinput>
-	      </entry>
-	      <entry>
-		<para>
-		  removes transaction/'BAD' status for pnfsId
-		</para>
-	      </entry>
-	    </row>
-
-	    <row>
-	      <entry>
-		<userinput>debug true | false</userinput>
-	      </entry>
-	      <entry>
-		<para>
-		  enable/disable DEBUG messages in the log file
-		</para>
-	      </entry>
-	    </row>
-	  </tbody>
-	</tgroup>
-      </informaltable>
-
+         <para>
+	   By default the property
+	   <varname>replicaCheckPoolHost</varname> is
+	   <literal>true</literal> and
+	   <varname>replicaEnableSameHostReplica</varname> is
+	   <literal>false</literal>. This means that the
+	   <varname>tag.hostname</varname> will be checked and the
+	   replication to a pool with the same
+	   <varname>tag.hostname</varname> is not allowed.
+	 </para>
     </section>
 
     <section id="cf-repman-op-hybrid">
       <title>Hybrid &dcache;</title>
 
       <para>
-	<quote>Hybrid</quote> &dcache; operates on combination of
-	<quote>normal</quote> pools (backuped to the tape or
-	<quote>scratch</quote> pools) and the set of resilient
-	pools. Resilience manager takes care only for the subset of
-	pools configured in the Pool Group named
-	<quote>ResilientPools</quote> and ignores all other
-	pools. Currently resilient pool group name is hardcoded as
-	<quote>ResilientPools</quote>, and you shall create replica
-	manager cell to use in hybrid &dcache; by instantiating class
-	diskCacheV111.replicaManager.ReplicaManagerV2 (note
-	<quote>V2</quote> in the classname).
+	A <firstterm>hybrid &dcache;</firstterm> operates on a
+	combination of pools (maybe connected to tape) which are not
+	in a resilient pool group and the set of resilient pools. The
+	&serv-replica; service takes care only of the subset of pools
+	configured in the pool group for resilient pools and ignores
+	all other pools.
       </para>
+      <note>
+	<para>
+	  If a file in a resilient pool is marked precious and the
+	  pool were connected to a tape system, then it would be
+	  flushed to tape. Therefore, the pools in the resilient pool
+	  group are not allowed to be connected to tape.
+	</para>
+      </note>
 
-      <para>
-	Add to <filename>PoolManager.conf</filename>:
-      </para>
-
-      <screen>psu create pgroup ResilientPools</screen>
-
-      <screen>psu addto  pgroup ResilientPools <replaceable>myPoolName001</replaceable>
-psu addto  pgroup ResilientPools <replaceable>myPoolName002</replaceable>
-psu addto  pgroup ResilientPools <replaceable>myPoolName003</replaceable></screen>
-
-      <para>
-	Pools included in the resilient pool groop can also be
-	included in other pool groups.
-      </para>
     </section>
 
+    <section id="cf-repman-op-cmds">
+      <title>Commands for the admin interface</title>
+
+      <para>
+	If you are an advanced user, have proper privileges and you
+	know how to issue a command to the admin interface you may
+	connect to the &cell-replicamngr; cell and issue the following
+	commands. You may find more commands in online help which are
+	for debug only &mdash; do not use them as they can stop
+	&serv-replica; service operating properly.
+      </para>
+
+    <variablelist>
+      <varlistentry>
+	<term><command>set pool</command>
+	<replaceable>pool</replaceable><replaceable>state</replaceable></term>
+	<listitem>
+	  <para>
+	    set pool state
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term><command>show pool</command>
+	<replaceable>pool</replaceable></term>
+	<listitem>
+	  <para>
+	    show pool state
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term><command>ls unique</command>
+	<replaceable>pool</replaceable></term>
+	<listitem>
+	  <para>
+	    Reports number of unique replicas in this pool.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term><command>exclude</command>
+	<replaceable>pnfsId</replaceable></term>
+	<listitem>
+	  <para>
+	    exclude <replaceable>pnfsId</replaceable> from adjustments
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term><command>release</command>
+	<replaceable>pnfsId</replaceable></term>
+	<listitem>
+	  <para>
+	    removes transaction/<literal>BAD</literal> status for
+	    <replaceable>pnfsId</replaceable>
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term><command>debug true | false</command></term>
+	<listitem>
+	  <para>
+	    enable/disable DEBUG messages in the log file
+	  </para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+    </section>
+
+  </section>
 
     <section id="cf-repman-op-args">
-      <title>Arguments for the &cell-replicamngr; cell in the batch
-      file:</title>
+      <title>Properties of the &serv-replica; service</title>
 
-      <para>
-	Default argument values as for <computeroutput>$Id:
-	ReplicaManager.java,v 1.22 2004/08/25 22:32:07 cvs Exp
-	$</computeroutput>
-      </para>
+     <variablelist>
+       <varlistentry>
+	 <term>replica/cell.name</term>
+	 <listitem>
+	   <para>
+	     Default: <literal>replicaManager</literal>
+	   </para>
+	   <para>
+	     Cell name of the &serv-replica; service
+	   </para>
+	 </listitem>
+       </varlistentry>
+       <varlistentry>
+	 <term>replicaManager</term>
+	 <listitem>
+	   <para>
+	     Default: <literal>no</literal>
+	   </para>
+	   <para>
+	     Set this value to <literal>yes</literal> if you want to use the &serv-replica; service.
+	   </para>
+	 </listitem>
+       </varlistentry>
+        <varlistentry>
+	 <term>resilientGroupName</term>
+	 <listitem>
+	   <para>
+	     Default: <literal>ResilientPools</literal>
+	   </para>
+	   <para>
+	     If you want to use another pool group for the resilient
+	     pools set this value to the name of the resilient pool
+	     group.
+	   </para>
+	 </listitem>
+       </varlistentry>
+       <varlistentry>
+	 <term>replicaManagerDatabaseHost</term>
+	 <listitem>
+	   <para>
+	     Default: <literal>localhost
+	   </literal>
+	   </para>
+	   <para>
+	     Set this value to the name of host of the &serv-replica; service database.
+	   </para>
+	 </listitem>
+       </varlistentry>
+       <varlistentry>
+	 <term>replicaDbName</term>
+	 <listitem>
+	   <para>
+	     Default: <literal>replicas</literal>
+	   </para>
+	   <para>
+	     Name of the replica database table.
+	   </para>
+	 </listitem>
+       </varlistentry>
+       <varlistentry>
+	 <term>replicaDbUser</term>
+	 <listitem>
+	   <para>
+	     Default: <literal>srmdcache</literal>
+	   </para>
+	   <para>
+	     Change if the <literal>replicas</literal> database was
+	     created with a user other than
+	     <literal>srmdcache</literal>.
+	   </para>
+	 </listitem>
+       </varlistentry>
+       <varlistentry>
+	 <term>replicaPasswordFile</term>
+	 <listitem>
+	   <para>
+	     Default: no password
+	   </para>
+	 </listitem>
+       </varlistentry>
+       <varlistentry>
+	 <term>replicaDbJdbcDriver</term>
+	 <listitem>
+	   <para>
+	     Default: <literal>org.postgresql.Driver</literal>
+	   </para>
+	   <para>
+	     &serv-replica; service was tested with &psql; only.
+	   </para>
+	 </listitem>
+       </varlistentry>
+       <varlistentry>
+	 <term>replicaPoolWatchDogPeriod</term>
+	 <listitem>
+	   <para>
+	     Default: <literal>600</literal> (10 min)
+	   </para>
+	   <para>
+	     Pools Watch Dog poll period. Poll the pools with this
+	     period to find if some pool went south without sending a
+	     notice (messages). Can not be too short because a pool
+	     can have a high load and not send pings for some
+	     time. Can not be less than pool ping period.
+	   </para>
+	 </listitem>
+       </varlistentry>
+       <varlistentry>
+	 <term>replicaExcludedFilesExpirationTimeout</term>
+	 <listitem>
+	   <para>
+	     Default: <literal>43200</literal> (12 hours)
+	   </para>
+	 </listitem>
+       </varlistentry>
+       <varlistentry>
+	 <term>replicaDelayDBStartTimeout</term>
+	 <listitem>
+	   <para>
+	     Default: <literal>1200</literal> (20 min)
+	   </para>
+	   <para>
+	     On first start it might take some time for the pools to
+	     get connected. If replication started right away, it
+	     would lead to massive replications when not all pools
+	     were connected yet. Therefore the database init thread
+	     sleeps some time to give a chance to the pools to get
+	     connected.
+	   </para>
+	 </listitem>
+       </varlistentry>
+       <varlistentry>
+	 <term>replicaAdjustStartTimeout</term>
+	 <listitem>
+	   <para>
+	     Default: <literal>1200</literal> (20 min)
+	   </para>
+	   <para>
+	     Normally Adjuster waits for database init thread to finish. If
+	     by some abnormal reason it cannot find a database thread then it
+	     will sleep for this delay.
+	   </para>
+	 </listitem>
+       </varlistentry>
+       <varlistentry>
+	 <term>replicaWaitReplicateTimeout</term>
+	 <listitem>
+	   <para>
+	     Default: <literal>43200</literal> (12 hours)
+	   </para>
+	   <para>
+	     Timeout for pool-to-pool replica copy transfer.
+	   </para>
+	 </listitem>
+       </varlistentry>
+       <varlistentry>
+	 <term>replicaWaitReduceTimeout</term>
+	 <listitem>
+	   <para>
+	     Default: <literal>43200</literal> (12 hours)
+	   </para>
+	   <para>
+	     Timeout to delete replica from the pool.
+	   </para>
+	 </listitem>
+       </varlistentry>
+       <varlistentry>
+	 <term>replicaDebug</term>
+	 <listitem>
+	   <para>
+	     Default: <literal>false</literal>
+	   </para>
+	   <para>
+	     Disable / enable debug messages in the log file.
+	   </para>
+	 </listitem>
+       </varlistentry>
+       <varlistentry>
+	 <term>replicaMaxWorkers</term>
+	 <listitem>
+	   <para>
+	     Default: <literal>6</literal>
+	   </para>
+	   <para>
+	     Number of worker threads to do the replication. The same
+	     number of worker threads is used for reduction. Must be
+	     more for larger systems but avoid situation when requests
+	     get queued in the pool.
+	   </para>
+	 </listitem>
+       </varlistentry>
+       <varlistentry>
+	 <term>replicaMin</term>
+	 <listitem>
+	   <para>
+	     Default: <literal>2</literal>
+	   </para>
+	   <para>
+	     Minimum number of replicas in pools which are
+	     <literal>online</literal> or <literal>offline</literal>.
+	   </para>
+	 </listitem>
+       </varlistentry>
+       <varlistentry>
+	 <term>replicaMax</term>
+	 <listitem>
+	   <para>
+	     Default: <literal>3</literal>
+	   </para>
+	   <para>
+	     Maximum number of replicas in pools which are
+	     <literal>online</literal> or <literal>offline</literal>.
+	   </para>
+	 </listitem>
+       </varlistentry>
+       <varlistentry>
+	 <term>replicaCheckPoolHost</term>
+	 <listitem>
+	   <para>
+	     Default: <literal>true</literal>
+	   </para>
+	   <para>
+	     Checks <varname>tag.hostname</varname> which can be
+	     specified in the layout file for each pool.
+	   </para>
+	   <para>
+	     Set this property to <literal>false</literal> if you do
+	     not want to perform this check.
+	   </para>
+	 </listitem>
+       </varlistentry>
+       <varlistentry>
+	 <term>replicaEnableSameHostReplica</term>
+	 <listitem>
+	   <para>
+	     Default: <literal>false</literal>
+	   </para>
+	   <para>
+	     If set to <literal>true</literal> you allow files to be
+	     copied to a pool, which has the same
+	     <varname>tag.hostname</varname> as the source pool.
+	     <note>
+	       The property <varname>replicaCheckPoolHost</varname>
+	       needs to be set to <literal>true</literal> if
+	       <varname>replicaEnableSameHostReplica</varname> is set
+	       to false.
+	     </note>
+	   </para>
+	 </listitem>
+       </varlistentry>
+     </variablelist>
 
-      <para>
-	You do not need to put these arguments in the batch file until
-	you want to change these defaults and you know what are you
-	doing.  For normal operation you may want to chose
-	<quote>-ColdStart</quote> or <quote>-hotRestart</quote> (is
-	default) mode of startup and (min,max) for desired range of
-	number of replicas of the file.
-      </para>
-
-      <informaltable frame="none">
-	<tgroup cols="2">
-
-	  <colspec colwidth="2*" colname="c1" />
-	  <colspec colwidth="3*" colname="c2"/>
-
-	  <tbody>
-	    <row>
-	      <entry namest="c1" nameend="c2" align='center' morerows='0'
-		     valign='bottom'><emphasis>General</emphasis></entry>
-	    </row>
-
-	    <row>
-	      <entry>-min=2  -max=3</entry>
-	      <entry>
-		<para>
-		  Valid range for the replicas count in
-		  <quote>available</quote> pools.
-		</para>
-	      </entry>
-	    </row>
-
-	    <row>
-	      <entry>
-		-debug=false | true
-	      </entry>
-	      <entry>
-		<para>
-		  Disable / enable debug messages in the log file
-		</para>
-	      </entry>
-	    </row>
-
-	    <row>
-	      <entry namest="c1" nameend="c2" align='center' morerows='0'
-		     valign='bottom'><emphasis>Startup mode</emphasis></entry>
-	    </row>
-
-	    <row>
-	      <entry>-hotRestart</entry>
-	      <entry/>
-	    </row>
-
-	    <row>
-	      <entry align="center">default</entry>
-
-	      <entry>
-		<para>
-		  Startup will be accelerated, when all
-		  <quote>known</quote> pools registered in DB as
-		  <quote>online</quote> before the crash, will
-		  re-connect again during hot restart. Opposite to
-		  -coldStart.
-		</para>
-	      </entry>
-	    </row>
-
-	    <row>
-	      <entry>-coldStart</entry>
-	      <entry/>
-	    </row>
-
-	    <row>
-	      <entry align="center">optional</entry>
-	      <entry>
-		<para>
-		  Good for the first time or big changes in pool
-		  configuration. Will create new pool configuration in
-		  DB. Opposite to -hotRestart.
-		</para>
-	      </entry>
-	    </row>
-
-	    <row>
-	      <entry>-delayDBStartTO=1200</entry>
-	      <entry>on Cold Start:</entry>
-	    </row>
-
-	    <row>
-	      <entry align="center">20 min</entry>
-	      <entry>
-		<para>
-		  DB init thread sleep this time to get chance to
-		  pools to get connected to prevent massive
-		  replications when not all pools connected yet when
-		  the replication starts.
-		</para>
-	      </entry>
-	    </row>
-
-	    <row>
-	      <entry>-delayAdjStartTO=1260</entry>
-	      <entry>
-		<para>
-		  Normally Adjuster waits for DB init thread to
-		  finish. If by some abnormal reason it can not find
-		  DB thread then it will sleep for this delay. It
-		  should be slightly more then
-		  <quote>delayDBStartTO</quote>.
-		</para>
-	      </entry>
-	    </row>
-
-	    <row>
-	      <entry align="center">21 min</entry>
-	      <entry/>
-	    </row>
-
-	    <row>
-	      <entry namest="c1" nameend="c2" align='center' morerows='0'
-		     valign='bottom'>
-		<emphasis>DB connection</emphasis>
-	      </entry>
-	    </row>
-
-	    <row>
-	      <entry>
-		-dbURL=jdbc:postgresql://dbservernode.domain.edu:5432/replicas
-	      </entry>
-
-	      <entry>
-		<para>
-		  Configure host:port where DB server is running and
-		  DB table name. For DB on remote host you shall
-		  enable <systemitem class="protocol">TCP</systemitem>
-		  connections to DB from your host (see installation
-		  instructions).
-		</para>
-	      </entry>
-	    </row>
-
-	    <row>
-	      <entry>
-		-jdbcDrv=org.postgresql.Driver
-	      </entry>
-
-	      <entry>
-		<para>
-		  DB driver. Replica Manager was tested with Postgres
-		  DB only.
-		</para>
-	      </entry>
-	    </row>
-
-	    <row>
-	      <entry>
-		-dbUser=myDBUserName
-	      </entry>
-	      <entry>
-		<para>
-		  Configure different DB user
-		</para>
-	      </entry>
-	    </row>
-
-	    <row>
-	      <entry>
-		-dbPass=myDBUserPassword
-	      </entry>
-	      <entry>
-		<para>
-		  Configure different DB path
-		</para>
-	      </entry>
-	    </row>
-
-	    <row>
-	      <entry namest="c1" nameend="c2" align='center' morerows='0'
-		     valign='bottom'><emphasis>Delays</emphasis></entry>
-	    </row>
-
-	    <row>
-	      <entry>-maxWorkers=4</entry>
-
-	      <entry>
-		<para>
-		  Number of worker threads to do the replication, the
-		  same number of worker threads used for
-		  reduction. Must be more for larger system but avoid
-		  situation when requests get queued in the
-		  pool.
-		</para>
-	      </entry>
-	    </row>
-
-	    <row>
-	      <entry>
-		-waitReplicateTO=43200
-	      </entry>
-	      <entry/>
-	    </row>
-
-	    <row>
-	      <entry align="center">12 hours</entry>
-	      <entry>
-		<para>
-		  Timeout for pool-to-pool replica copy transfer.
-		</para>
-	      </entry>
-	    </row>
-
-	    <row>
-	      <entry>
-		-waitReduceTO=43200
-	      </entry>
-	      <entry/>
-	    </row>
-
-	    <row>
-	      <entry align="center">12 hours</entry>
-	      <entry>
-		<para>
-		  Timeout to delete replica from the pool.
-		</para>
-	      </entry>
-	    </row>
-
-	    <row>
-	      <entry>-waitDBUpdateTO=600</entry>
-	      <entry/>
-	    </row>
-
-	    <row>
-	      <entry align="center">10 min</entry>
-	      <entry>
-		<para>
-		  Adjuster cycle period. If nothing changed, sleep for
-		  this time, and restart adjustment cycle to query DB
-		  and check do we have work to do?
-		</para>
-	      </entry>
-	    </row>
-
-	    <row>
-	      <entry>
-		-poolWatchDogPeriod=600
-	      </entry>
-	      <entry/>
-	    </row>
-
-	    <row>
-	      <entry align="center">10 min</entry>
-	      <entry/>
-	    </row>
-
-	  </tbody>
-	</tgroup>
-      </informaltable>
-
-
-      <para>
-	Pools Watch Dog pool period. Poll the pools with this period
-	to find if some pool went south without sending notice
-	(messages). Can not be too short because pool can have high
-	load and do not send pings for some time. Can not be less than
-	pool ping period.
-      </para>
-    </section>
-
-  </section>
-
-  <section id="cf-repman-monitoring-install">
-    <title>Monitoring Installation</title>
-
-    <para><emphasis>DRAFT</emphasis></para>
-
-
-    <section id="cf-repman-mon-scope">
-      <title>Scope of this document</title>
-
-      <para>
-	This section briefly summarizes steps to install Monitoring
-	for the Replica Manager. RM installation is described here
-	<xref linkend="cf-repman-install"/>.  It's meant as
-	<quote>aide-memoire</quote> for people doing &dcache;
-	packaging. The document is of very little use for &dcache; end
-	users.  You may find useful information on how to operate the
-	Resilience Manager at the Resilient Manual.
-      </para>
-
-      <para>
-	Resilience Manager uses &tomcat; to monitor its
-	operation. This package is not required for normal RM
-	operation, but it is highly desirable to install and run it to
-	properly monitor RM.
-      </para>
-    </section>
-
-    <section id="cf-repman-mon-prereq">
-      <title>Prerequisites</title>
-
-      <para>
-	The &psql; database must be installed and running on the
-	machine hosting the replica manager module and DB schema must
-	be initalized as described in RM installation instructions
-	(<quote>Database Preparation</quote>). You will see something
-	in the tables if Resilience Manager is running.
-      </para>
-    </section>
-
-    <section id="cf-repman-mon-install">
-      <title>&tomcat; Installation and Configuration</title>
-
-      <itemizedlist>
-	<listitem>
-	  <para>
-	    get the binary &tomcat; distribution (currently version
-	    5.5.x) from Apache Jakarta &tomcat; website <ulink
-	    url="http://tomcat.apache.org/download-55.cgi#5.5.25"/>
-	    and install it folowing the instruction form the web site.
-	  </para>
-	</listitem>
-
-	<listitem>
-	  <para>
-	    &tomcat; uses port 8080 by default, but we have changed it
-	    to 8090 in the <filename>conf/server.xml</filename> file
-	    because 8080 is too popular &mdash; check this port and change
-	    it !
-	  </para>
-
-	  <screen>&lt;Connector port="8090"
-...</screen>
-	</listitem>
-
-
-	<listitem>
-	  <para>
-	    You need to copy jdbc &psql; driver into
-	    <filename>common/lib</filename> directory in &tomcat;
-	    installation from URL : <ulink
-	    url="http://jdbc.postgresql.org/download/pg74.215.jdbc3.jar"/>
-	    This version of the driver works with Java 1.4 and 1.5 .
-	  </para>
-	</listitem>
-
-	<listitem>
-	  <para>
-	    deploy <filename>replica.war</filename> file into
-	    <filename>tomcat/apache-tomcat-5.5.x/webapps/</filename>
-	  </para>
-	</listitem>
-
-	<listitem>
-	  <para>
-	    start the &tomcat;:
-	  </para>
-
-	  <screen>&prompt-root; <userinput>tomcat/apache-tomcat-5.5.x/bin/startup.sh</userinput></screen>
-	</listitem>
-      </itemizedlist>
-
-      <para>
-	You can now access the Resilience Manager monitoring info
-	using URL:
-	http://<replaceable>your.hostname:8090</replaceable>/replica
-      </para>
-    </section>
-
-  </section>
+   </section>
 
 </chapter>
