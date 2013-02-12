@@ -13,7 +13,7 @@
 
 <chapter id="cf-pm">
 
-  <title>Configuring the &serv-poolmngr;</title>
+  <title>The &serv-poolmngr; service</title>
 
   <!--
   <para>(We assume a basic knowledge of the functionality and terminology of
