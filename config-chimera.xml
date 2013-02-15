@@ -2,9 +2,11 @@
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
                          "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
 <!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+
 %sharedents;
 
 ]>
+
 <chapter id="cf-chimera">
   <title>&chimera;</title>
 
@@ -515,26 +517,28 @@ StoreName myStore
 	    <replaceable>storeName</replaceable></quote> and specifies
 	    the name of the store that is used by &dcache; to
 	    construct the <link
-	    linkend="chimera-tags-storageClass">storage class</link> if
-	    the <glossterm linkend="gl-hsm_type">&hsm;
-	    type</glossterm> is <literal>osm</literal>.
+	    linkend="chimera-tags-storageClass">storage class</link>
+	    if the <glossterm
+	    linkend="gl-hsm_type">HSM Type</glossterm>
+	    is <literal>osm</literal>.
 	  </para>
 	</listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>&hsm;Type</term>
+	<term>HSMType</term>
 
 	<listitem>
 	  <para>
-	    The <glossterm linkend="gl-hsm_type">&hsm;
-	    type</glossterm> is normally determined from the other
-	    existing tags. E.g., if the tag
-	    <literal>OSMTemplate</literal> exists, &hsm; type
-	    <literal>osm</literal> is assumed. With this tag it can be
-	    set explicitly. A class implementing that &hsm; type has
-	    to exist. Currently the only implementations are
-	    <literal>osm</literal> and <literal>enstore</literal>.
+	    The <glossterm
+	    linkend="gl-hsm_type"><literal>HSMType</literal></glossterm>
+	    tag is normally determined from the other existing
+	    tags. E.g., if the tag <literal>OSMTemplate</literal>
+	    exists, <literal>HSMType</literal>=<literal>osm</literal>
+	    is assumed. With this tag it can be set explicitly. A
+	    class implementing that &hsm; type has to exist. Currently
+	    the only implementations are <literal>osm</literal> and
+	    <literal>enstore</literal>.
           </para>
         </listitem>
       </varlistentry>
@@ -545,8 +549,9 @@ StoreName myStore
 	<listitem>
           <para>
 	    The storage group is also used to construct the <link
-	    linkend="chimera-tags-storageClass">storage Class</link> if
-	    the <glossterm linkend="gl-hsm_type">&hsm; type</glossterm>
+	    linkend="chimera-tags-storageClass">storage class</link>
+	    if the <glossterm
+	    linkend="gl-hsm_type"><literal>HSMType</literal></glossterm>
 	    is <literal>osm</literal>.
           </para>
         </listitem>
@@ -568,14 +573,15 @@ StoreName myStore
       </varlistentry>
 
       <varlistentry>
-        <term>&hsm;Instance</term>
+        <term>hsmInstance</term>
 
 	<listitem>
 	  <para>
-	    If not set, the &hsm; instance will be the same as the
-	    &hsm; type. Setting this tag will only change the name as
-	    used in the <link linkend="chimera-tags-storageClass">storage
-	    class</link> and in the pool commands.
+	    If not set, the <literal>hsmInstance</literal> tag will be
+	    the same as the <literal>HSMType</literal> tag. Setting
+	    this tag will only change the name as used in the <link
+	    linkend="chimera-tags-storageClass">storage class</link>
+	    and in the pool commands.
           </para>
         </listitem>
       </varlistentry>
@@ -612,7 +618,7 @@ sGroup</screen>
 
       <para>
 	As the tag <literal>OSMTemplate</literal> was created the tag
-	&hsm; type is assumed to be <literal>osm</literal>.
+	<literal>HSMType</literal> is assumed to be <literal>osm</literal>.
       </para>
       <para>
 	The storage class of the files which are copied into the
@@ -682,7 +688,8 @@ alldata</screen>
 
       <para>
 	As the tag <literal>OSMTemplate</literal> was created the
-	&hsm; type is assumed to be <literal>osm</literal>.
+	<literal>HSMType</literal> is assumed to be
+	<literal>osm</literal>.
       </para>
 
       <para>
@@ -713,8 +720,8 @@ alldata</screen>
     </informalexample>
 
     <para>
-      There are more tags used by &dcache; if the &hsm; type
-      <literal>enstore</literal> is used.
+      There are more tags used by &dcache; if the
+      <literal>HSMType</literal> is <literal>enstore</literal>.
     </para>
   </section>
 
