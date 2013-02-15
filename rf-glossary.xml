@@ -47,7 +47,7 @@
     </glossentry>
 
     <glossentry id="gl-hsm_type">
-      <glossterm>HSM type</glossterm>
+      <glossterm>HSM Type</glossterm>
       <glossdef>
 	<para>
 	  The type of &hsm; which is connected to &dcache; as a
@@ -60,6 +60,16 @@
 	</para>
       </glossdef>
     </glossentry>
+
+    <glossentry id="gl-hsm_instance">
+      <glossterm>HSM Instance</glossterm>
+      <glossdef>
+	<para>
+	</para>
+      </glossdef>
+    </glossentry>
+
+
 
     <glossentry id="gl-lfs">
       <glossterm>Large File Store (<abbrev>LFS</abbrev>)</glossterm>
@@ -564,7 +574,40 @@
 	<glossterm>Storage Class</glossterm>
 	<glossdef>
 	  <para>
+	    The storage class is a string of the form
+	    <literallayout>
+	      <literal><replaceable>StoreName</replaceable>:<replaceable>StorageGroup</replaceable>@<replaceable>type-of-storage-system</replaceable></literal>
+	    </literallayout>
+	    containing exactly one <literal>@</literal>-symbol.
+
+	    <itemizedlist>
+	      <listitem>
+		<para>
+		  <literal><replaceable>StoreName</replaceable></literal>:<literal><replaceable>StorageGroup</replaceable></literal>
+		  is a string describing the storage class in a syntax
+		  which depends on the storage system.
+		</para>
+	      </listitem>
+	      <listitem>
+		<para>
+		  <literal><replaceable>type-of-storage-system</replaceable></literal>
+		denotes the type of storage system in use.
+		</para>
+		<para>
+		  In general use
+		  <literal><replaceable>type-of-storage-system</replaceable>=osm</literal>.
+		</para>
+	      </listitem>
+	    </itemizedlist>
 	  </para>
+	  <para>
+	     A storage class is used by a tertiary
+	    storage system to decide where to store the file (i.e. on
+	    which set of tapes).  &dcache; can use the storage class
+	    for a similar purpose, namely to decide on which pools the
+	    file can be stored.
+	  </para>
+
 	</glossdef>
       </glossentry>
 
