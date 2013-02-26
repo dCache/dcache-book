@@ -202,6 +202,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY rpm      "<acronym>RPM</acronym>">
 <!ENTITY p12      "<acronym>PKCS12</acronym>">
 <!ENTITY x509     "<literal>X.509</literal>">
+<!ENTITY xml      "<acronym>XML</acronym>">
 
 <!-- Standard and rfc -->
 <!ENTITY posix      "<acronym>POSIX</acronym>">
@@ -222,6 +223,8 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY integrity  "<emphasis>INTEGRITY</emphasis>">
 <!ENTITY privacy    "<emphasis>PRIVACY</emphasis>">
 
+<!-- Various dCache internals -->
+<!ENTITY pnfsid     "<literal>PNFS-ID</literal>">
 
 
 <!-- Some commands -->
