@@ -133,6 +133,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!-- Services are the names used in layout files -->
 <!ENTITY serv-acl             "<literal>acl</literal>">
 <!ENTITY serv-admin           "<literal>admin</literal>">
+<!ENTITY serv-alarms           "<literal>alarms</literal>">
 <!ENTITY serv-authdcap        "<literal>authdcap</literal>">
 <!ENTITY serv-billing         "<literal>billing</literal>">
 <!ENTITY serv-broadcast       "<literal>broadcast</literal>">
