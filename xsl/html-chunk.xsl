@@ -96,10 +96,10 @@
   <xsl:template match="*" mode="class.value">
     <xsl:param name="class" select="local-name(.)"/>
         <xsl:if test="self::chapter[@status = 'draft'] |parent::chapter[@status = 'draft'] | self::section[@status = 'draft']">
-    <!-- permit customization of class value only -->
-    <xsl:value-of select="$class"/>
-    <xsl:value-of select="concat(' ','draft')"/>
-    </xsl:if>
+	  <!-- permit customization of class value only -->
+	  <xsl:value-of select="$class"/>
+	  <xsl:value-of select="concat(' ','draft')"/>
+	</xsl:if>
   </xsl:template>
 
 
