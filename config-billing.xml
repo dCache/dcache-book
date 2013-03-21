@@ -8,7 +8,7 @@
 
 <chapter id="cf-billing">
 
-  <title>The billing service</title>
+  <title>The &serv-billing; Service</title>
 
   <para>
     &dcache; has built-in monitoring capabilities which provide an
