@@ -5,7 +5,7 @@
 %sharedents;
 ]>
 <chapter id="rf-ports">
-  <title>&dcache; default port values</title>
+  <title>&dcache; Default Port Values</title>
 
   <table>
 	  <tgroup cols='3' align='left' colsep='1' rowsep='1'>
