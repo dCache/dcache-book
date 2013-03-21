@@ -33,7 +33,6 @@
   <xi:include href="config-xrootd.xml"/>
   <xi:include href="config-nfs.xml"/>
   <xi:include href="config-SRM.xml"/>
-  <xi:include href="config-statistics.xml"/>
   <xi:include href="config-billing.xml"/>
   <xi:include href="config-alarms.xml"/>
   <xi:include href="config-webadmin.xml"/>
