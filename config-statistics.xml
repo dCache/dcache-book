@@ -231,7 +231,11 @@ pool1 StoreA:GroupB@osm 21307929 10155 2466935 10155 0 925 0  0   0   0   85362 
 	  </tbody>
 	</tgroup>
       </informaltable>
-
+      <para>
+	The
+	<filename>YYYY/MM/DD/YYYY-MM-DD-HH.raw</filename>
+	files do not contain line 2 and 3.
+      </para>
     </section>
 
 
