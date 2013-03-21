@@ -29,7 +29,7 @@
 ]>
 
 <chapter id="cf-glue">
-  <title>&glue; info provider</title>
+  <title>&glue; Info Provider</title>
 
   <para>
     The GLUE information provider supplied with &dcache; provides the
