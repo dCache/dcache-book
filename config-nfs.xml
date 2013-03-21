@@ -8,7 +8,7 @@
 
 <chapter id="cf-nfs4">
 
-  <title>&dcache; as &nfs4; server</title>
+  <title>&dcache; as &nfs4; Server</title>
   <para>
     This chapter explains how to configure &dcache; in order to access
     it via the &nfs4; protocol, allowing clients to mount &dcache; and perform
