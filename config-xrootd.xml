@@ -399,10 +399,10 @@ xrootdAuthNPlugin=gsi
           you may or may not want &dcache; to fail if the host
           certificate chain can not be verified against trusted certificate
           authorities. Whether &dcache; performs this check can be controlled
-          by setting the option <varname>verifyHostCertificateChain</varname>:
+          by setting the option <varname>grid.hostcert.verify</varname>:
 
           <programlisting>..
-verifyHostCertificateChain=true
+grid.hostcert.verify=true
 ..
 </programlisting>
 
