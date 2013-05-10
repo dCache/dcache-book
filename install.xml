@@ -221,128 +221,101 @@ Starting postgresql-9.2 service:                           [  OK  ]</screen>
           </important>
         </section>
 
-      <section id="in-install-postgres-chimera">
-	<title>Configuring &chimera;</title>
+    </section>
 
-        <para>
-          &chimera; is a library providing a hierarchical name space
-          with associated meta data. Where pools in &dcache; store the
-          content of files, &chimera; stores the names and meta data
-          of those files. &chimera; itself stores the data in a
-          relational database. We will use &psql; in this tutorial.
-          The properties of &chimera; are defined in
-          <filename>&path-ods-usd;/defaults/chimera.properties</filename>.
-          See <xref linkend="cf-chimera"/> for more information.
-        </para>
 
-        <section id="in-install-postgres-chimera-initDB">
-	  <title>Initialize the database</title>
+    <section id="in-install-chimera">
+      <title>Configuring &chimera;</title>
 
-          <para>
-            Create the <database>Chimera</database> user and database and add the
-            Chimera-specific tables and stored procedures:
-          </para>
+      <para>
+	&chimera; is a library providing a hierarchical name space
+	with associated meta data. Where pools in &dcache; store the
+	content of files, &chimera; stores the names and meta data of
+	those files. &chimera; itself stores the data in a relational
+	database. We will use &psql; in this tutorial.  The properties
+	of &chimera; are defined in
+	<filename>&path-ods-usd;/defaults/chimera.properties</filename>.
+	See <xref linkend="cf-chimera"/> for more information.
+      </para>
 
-          <screen>&prompt-root; <userinput>createdb -U postgres chimera</userinput>
+      <section id="in-install-chimera-initDB">
+	<title>Creating users and databases for &dcache;</title>
+	<para>
+	  Create the <database>Chimera</database> database and user.
+	</para>
+
+	<screen>&prompt-root; <userinput>createdb -U postgres chimera</userinput>
 CREATE DATABASE
-
 &prompt-root; <userinput>createuser -U postgres --no-superuser --no-createrole --createdb --pwprompt chimera</userinput>
 Enter password for new role:
 Enter it again:
-CREATE ROLE
-<lineannotation>You do not need to enter a password.</lineannotation>
+<lineannotation>You do not need to enter a password.</lineannotation></screen>
 
-&prompt-root; <userinput>psql -U chimera chimera -f &path-odl-usd;/chimera/sql/create.sql</userinput>
-psql:&path-odl-usd;/chimera/sql/create.sql:23: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_inodes_pkey" for table "t_inodes"
-CREATE TABLE
-psql:&path-odl-usd;/chimera/sql/create.sql:35: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_dirs_pkey" for table "t_dirs"
-CREATE TABLE
-psql:&path-odl-usd;/chimera/sql/create.sql:45: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_inodes_data_pkey" for table "t_inodes_data"
+      <para>
+	The &dcache; components will access the database server with
+	the user <database class="user">srmdcache</database>.
+      </para>
+
+      <screen>&prompt-root; <userinput>createuser -U postgres --no-superuser --no-createrole --createdb --pwprompt srmdcache</userinput>
+Enter password for new role: 
+Enter it again:
+<lineannotation>You do not need to enter a password.</lineannotation></screen>
+
+      <para>
+	Several management components running on the head node as well
+	as the &srm; will use the database <database>dcache</database>
+	for storing their state information:
+      </para>
+
+      <screen>&prompt-root; <userinput>createdb -U srmdcache dcache</userinput></screen>
+
+      <para>
+	There might be several of these on several hosts. Each is used
+	by the &dcache; components running on the respective host.
+      </para>
+
+      <para>
+	Create the database used for the billing plots.
+      </para>
+
+      <screen>
+&prompt-root; <userinput>createdb -O srmdcache -U postgres billing</userinput></screen>
+
+      <para>
+	And run the command <command>dcache database update</command>.
+      </para>
+      <screen>&prompt-root; <userinput>dcache database update</userinput>
+PnfsManager@dCacheDomain: 
+INFO  - Successfully acquired change log lock
+INFO  - Creating database history table with name: databasechangelog
+INFO  - Reading from databasechangelog
 <lineannotation>many more like this...</lineannotation>
-INSERT 0 1
-<lineannotation>many more like this...</lineannotation>
-INSERT 0 1
-CREATE INDEX
-CREATE INDEX
-psql:&path-odl-usd;/chimera/sql/create.sql:256: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_storageinfo_pkey" for table "t_storageinfo"
-CREATE TABLE
-psql:&path-odl-usd;/chimera/sql/create.sql:263: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_access_latency_pkey" for table "t_access_latency"
-CREATE TABLE
-psql:&path-odl-usd;/chimera/sql/create.sql:270: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_retention_policy_pkey" for table "t_retention_policy"
-CREATE TABLE
-psql:&path-odl-usd;/chimera/sql/create.sql:295: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_locationinfo_pkey" for table "t_locationinfo"
-CREATE TABLE
-psql:&path-odl-usd;/chimera/sql/create.sql:311: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_locationinfo_trash_pkey" for table "t_locationinfo_trash"
-CREATE TABLE
-CREATE INDEX
-psql:&path-odl-usd;/chimera/sql/create.sql:332: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t_acl_pkey" for table "t_acl"
-CREATE TABLE
-CREATE INDEX
+      </screen>
 
-&prompt-root; <userinput>createlang -U postgres plpgsql chimera</userinput>
-<lineannotation>superfluous with &psql; version 9.2</lineannotation>
+      <para>
+	Now the configuration of &chimera; is done.
+      </para>
 
-&prompt-root; <userinput>psql -U chimera chimera -f &path-odl-usd;/chimera/sql/pgsql-procedures.sql</userinput>
-CREATE FUNCTION
-CREATE FUNCTION
-CREATE FUNCTION
-CREATE TRIGGER
-CREATE FUNCTION
-CREATE TRIGGER
-CREATE SEQUENCE
-CREATE FUNCTION
-CREATE TRIGGER
-</screen>
-
-        </section>
       </section>
 
-        <section id="in-install-postgres-users">
-	  <title>Creating users and databases for &dcache;</title>
-
-         <para>
-          The &dcache; components will access the database server with
-          the user <database class="user">srmdcache</database> which can
-          be created with the <command>createuser</command>; for
-          example:
-         </para>
-
-         <screen>&prompt-root; <userinput>createuser -U postgres --no-superuser --no-createrole --createdb --pwprompt srmdcache</userinput>
-<lineannotation>You do not need to enter a password</lineannotation></screen>
-
-         <para>
-          Several management components running on the head node as
-          well as the &srm; will use the database
-          <database>dcache</database> for storing their state
-          information:
-	 </para>
-
-	 <screen>&prompt-root; <userinput>createdb -U srmdcache dcache</userinput></screen>
-
-	 <para>
-	   There might be several of these on several hosts. Each is
-	   used by the &dcache; components running on the respective
-	   host.
-	 </para>
-
-	 <para>
-	   Now the configuration of &psql; is done. Before the first
-	   start of &dcache; replace the file
-	   <filename>&path-ode-ed;/gplazma.conf</filename> with an
-	   empty file.
-	 </para>
-<screen>&prompt-root; <userinput>mv &path-ode-ed;/gplazma.conf &path-ode-ed;/gplazma.conf.bak</userinput>
+      <para>
+	Before the first start of &dcache; replace the file
+	<filename>&path-ode-ed;/gplazma.conf</filename> with an empty
+	file.
+      </para>
+      <screen>&prompt-root; <userinput>mv &path-ode-ed;/gplazma.conf &path-ode-ed;/gplazma.conf.bak</userinput>
 &prompt-root; <userinput>touch &path-ode-ed;/gplazma.conf</userinput></screen>
-         <para>
-	   &dcache; can be started now.
-	 </para>
+      <para>
+	&dcache; can be started now.
+      </para>
 
-	 <screen>&prompt-root; <userinput>&path-odb-n-s;dcache start</userinput>
+      <screen>&prompt-root; <userinput>&path-odb-n-s;dcache start</userinput>
 Starting dCacheDomain done</screen>
-	</section>
-     <para>
-       So far, no configuration of &dcache; is done, so only the predefined domain is started.
-     </para>
+
+
+      <para>
+	So far, no configuration of &dcache; is done, so only the predefined domain is started.
+      </para>
 
     </section>
 
