@@ -1945,7 +1945,7 @@ passwd tanja 6a4cd089 read-write 500 100 / / /</programlisting>
       </para>
       <informalexample>
         <para>
-          The <filename>&path-ode-ed;/dcachesrm-gplazma.policy</filename> file
+          The <filename>&path-ode-ed;/gplazma.conf</filename> file
           would look like this:
         </para>
         <programlisting>
