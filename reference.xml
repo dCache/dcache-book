@@ -18,19 +18,6 @@
   </chapter>
 
 
-<!--
-  <chapter id="rf-setup">
-    <title>dCache Start-Up Parameters</title>
-    
-    <para>
-      The important variables in the <glossterm
-        linkend="gl-dcachesetup-file">dCacheSetup file</glossterm> and
-      parameters in the <glossterm linkend="gl-batch-file">batch
-        files</glossterm> are described below. 
-    </para>
-    
-  </chapter>
--->
 
   <chapter id="rf-cc">
     <title>&dcache; Cell Commands</title>
@@ -54,20 +41,6 @@
     <xi:include href="rf-cc-pm.xml"/>    
   </chapter>
 
-
-
-  <!-- Devopers corner -->
-
-  <chapter id="rf-dc">
-    <title>dCache Developers Corner</title>
-    
-    <para>
-      This chapter provides useful informatiom for &dcache; developers
-      and is included as reference material and theory of operation.
-    </para>
-
-    <xi:include href="rf-dc-StorageInfoQuotaObserver.xml"/>
-  </chapter>
   <xi:include href="rf-ports.xml"/>
   <!--
   <xi:include href="rf-dvl.xml"/>
