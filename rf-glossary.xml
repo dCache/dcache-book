@@ -5,7 +5,7 @@
 %sharedents;
 ]>
 
-<chapter id="rf-glossary" status="draft">
+<chapter id="rf-glossary">
 
   <title>Glossary</title>
 
@@ -14,6 +14,196 @@
   </para>
 
   <glosslist>
+    <glossentry id="gl-dcacheconf-file">
+      <glossterm>The <filename>dcache.conf</filename> File</glossterm>
+      <glossdef>
+        <para>
+          This is the primary configuration file of a &dcache;.  It is
+          located at
+          <filename>&path-ode-ed;/dcache.conf</filename>.
+        </para>
+	<para>
+	  The <filename>dcache.conf</filename> file is initially
+	  empty. If one of the default configuration values needs to
+	  be changed, copy the default setting of this value from one
+	  of the <glossterm linkend="gl-properties-files">properties
+	  files</glossterm> in <filename
+	  class="dir">&path-ods-usd;/defaults</filename> to this file
+	  and update the value.
+	</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry id="gl-layout-file">
+      <glossterm>The <literal>layout</literal> File</glossterm>
+      <glossdef>
+	<para>
+	  The layout file is located in the directory <filename
+	  class="dir">&path-ode-ed;/layouts</filename>. It contains
+	  lists of the <glossterm
+	  linkend="gl-domain">domain</glossterm>s and the services
+	  that are to be run within these domains.
+	</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry id="gl-properties-files">
+      <glossterm>The <literal>properties</literal> Files</glossterm>
+      <glossdef>
+	<para>
+	  The properties files are located in the directory
+	  <filename
+	      class="dir">&path-ods-usd;/defaults</filename>. They
+	  contain the default settings of the &dcache;.
+	</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry id="gl-chimera">
+      <glossterm>Chimera</glossterm>
+      <glossdef>
+	<para>
+	  The &chimera; namespace is a core component of &dcache;.  It
+	  maps each stored file to a unique identification number and
+	  allows storing of metadata against either files or
+	  directories.	  
+	</para>
+
+	<para>
+	  &chimera; includes some features like <glossterm
+	  linkend="gl-file-level">levels</glossterm>, <glossterm
+	  linkend="gl-directory-tag">directory tags</glossterm> and
+	  many of the <glossterm linkend="gl-pnfs-dot-cmd">dot
+	  commands</glossterm>.
+	</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry id="gl-chimera-id">
+      <glossterm>Chimera ID</glossterm>
+      <glossdef>
+	<para>
+	  A <glossterm linkend="gl-chimera">Chimera</glossterm> ID is a
+	  36 hexadecimal digit that uniquely defines a file or
+	  directory.
+	</para>
+      </glossdef>
+    </glossentry>
+
+
+    <glossentry id="gl-domain">
+      <glossterm>Domain</glossterm>
+      <glossdef>
+	<para>
+	  A domain is a collection of one or more <glossterm
+	  linkend="gl-cell">cell</glossterm>s that provide a set of
+	  related services within a &dcache; instance.  Each domain
+	  requires its own Java Virtual Machine.  A typical domain
+	  might provide external connectivity (i.e., a <glossterm
+	  linkend="gl-door">door</glossterm>) or manage the
+	  <glossterm linkend="gl-pool">pools</glossterm> hosted on a
+	  machine.
+	</para>
+
+	<para>
+	  Each domain has at least one cell, called the
+	  &cell-system; cell and many tunnel cells for communicating
+	  with other Domains.  To provide a useful service, a domain
+	  will contain other cells that provide specific behaviour.
+	</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry id="gl-cell">
+      <glossterm>Cell</glossterm>
+      <glossdef>
+	<para>
+	  A cell is a collection of Java threads that provide a
+	  discrete and simple service within &dcache;.  Each cell is
+	  hosted within a <glossterm
+	  linkend="gl-domain">domain</glossterm>.
+	</para>
+
+	<para>
+	  Cells have an address derived from concatenating their
+	  name, the <literal>@</literal> symbol and their containing
+	  domain name.
+	</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry id="gl-well-known-cell">
+      <glossterm>Well Known Cell</glossterm>
+      <glossdef>
+	<para>
+	  A well-known cell is a <glossterm
+	  linkend="gl-cell">cell</glossterm> that registers itself
+	  centrally.  Within the admin interface, a well-known cell
+	  may be referred to by just its cell name.
+	</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry id="gl-door">
+      <glossterm>Door</glossterm>
+      <glossdef>
+	<para>
+	  Door is the generic name for special <glossterm
+	  linkend="gl-cell">cell</glossterm>s that provides the
+	  first point of access for end clients to communicate with
+	  a &dcache; instance.  There are different door
+	  implementations (e.g., &gsidcap; door and &gridftp; door),
+	  allowing a &dcache; instance to support multiple
+	  communication protocols.
+	</para>
+
+	<para>
+	  A door will (typically) bind to a well-known port number
+	  depending on the protocol the door supports.  This allows
+	  for only a single door instance per machine for each
+	  protocol.
+	</para>
+
+	<para>
+	  A door will typically identify which <glossterm
+	  linkend="gl-pool">pool</glossterm> will satisfy the end
+	  user's operation and redirect the client to the
+	  corresponding pool.  In some cases this is not possible;
+	  for example, some protocols (such as &gridftp; version 1)
+	  do not allow servers to redirect end-clients, in other
+	  cases pool servers may be behind a firewall, so preventing
+	  direct access.  When direct end-client access is not
+	  possible, the door may act as a data proxy, streaming data
+	  to the client.
+	</para>
+
+	<para>
+	  By default, each door is hosted in a dedicated <glossterm
+	  linkend="gl-domain">domain</glossterm>.  This allows easy
+	  control of whether a protocol is supported from a
+	  particular machine.
+	</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry id="gl-jvm">
+      <glossterm>Java Virtual Machine (JVM)</glossterm>
+      <glossdef>
+	<para>
+	  Java programs are typically compiled into a binary form
+	  called Java byte-code.  Byte-code is comparable to the
+	  format that computers understand native; however, no
+	  mainstream processor understands Java byte-code.  Instead
+	  compiled Java programs typically require a translation
+	  layer for them to run.  This translation layer is called a
+	  Java Virtual Machine (JVM).  It is a standardised
+	  execution environment that Java programs may run within.
+	  A JVM is typically represented as a process within the
+	  host computer.
+	</para>
+      </glossdef>
+    </glossentry>
+
     <glossentry id="gl-tss">
       <glossterm>tertiary storage system</glossterm>
       <glossdef>
@@ -88,7 +278,7 @@
 	  linkend="gl-pool">pools</glossterm> configured to do so.
 	  The <literal>LFS</literal> option, specified for each pool
 	  within the <glossterm
-	  linkend="gl-poollist-file"><filename>poollist</filename>
+	  linkend="gl-layout-file"><literal>layout</literal>
 	  file</glossterm>, describes how that pool should behave.
 	  This option can take three possible values:
 	</para>
@@ -113,30 +303,11 @@
 		not scheduled for the &hsm; store
 		procedure. Consequently, these file will only
 		disappear from the pool when deleted in the <glossterm
-		linkend="gl-namespace">namespace</glossterm>.
+		linkend="gl-chimera">&chimera;</glossterm> namespace.
 	      </para>
 	    </listitem>
 	  </varlistentry>
 
-          <varlistentry>
-            <term><literal>volatile</literal> (or <literal>transient</literal>)</term>
-	    <listitem>
-	      <para>
-		Newly create files are regarded cached and are not
-		scheduled for the &hsm; store procedure.  Though they
-		will never be stored on tape, these file are part of
-		the aging procedure and will be removed as soon as new
-		space is needed.
-	      </para>
-
-	      <note>
-		<para>
-		  The <literal>volatile</literal> lfs mode is
-		  deprecated and should not be used.
-		</para>
-	      </note>
-	    </listitem>
-	  </varlistentry>
 	</variablelist>
       </glossdef>
     </glossentry>
@@ -202,59 +373,8 @@
 	</glossdef>
       </glossentry>
 
-    <glossentry id="gl-dcachesetup-file">
-      <glossterm>The <filename>dCacheSetup</filename> File</glossterm>
-      <glossdef>
-        <para>
-          This is the primary configuration file of a &dcache; host.
-          It is located at
-          <filename>$dcache_home/config/dCacheSetup</filename>
-          (typically
-          <filename>&path-odc-ed;/dCacheSetup</filename>). Each
-          <glossterm linkend="gl-domain">domain</glossterm> uses the
-          file
-          <filename>config/<replaceable>domainName</replaceable>Setup</filename>
-          which is in fact a symbolic link to
-          <filename>config/dCacheSetup</filename>. The
-          <filename>config/dCacheSetup</filename> file might even be
-          the same across the hosts of a &dcache; instance.
-        </para>
-      </glossdef>
-    </glossentry>
 
-      <glossentry id="gl-primary-interface">
-	<glossterm>Primary Network Interface</glossterm>
-	<glossdef>
-	  <para>
-	  </para>
-	</glossdef>
-      </glossentry>
-
-      <glossentry id="gl-poollist-file">
-	<glossterm><literal>poollist</literal> File</glossterm>
-	<glossdef>
-	  <para>
-	    The poollist files are a collection of files in the
-	    <filename class="directory">&path-odc-ed;</filename>
-	    directory.  Each <literal>poollist</literal> file
-	    describes the set of <glossterm
-	    linkend="gl-pool">pools</glossterm> that should be
-	    available for a given node.  These files have a filename
-	    like
-	    <filename><replaceable>hostname</replaceable>.poollist</filename>,
-	    where
-	    <literal><replaceable>hostname</replaceable></literal> is
-	    the simple hostname of the node the pools are to run on.
-	  </para>
-
-	  <para>
-	    The file consists of one or more lines, with each line
-	    describing a pool.
-	  </para>
-	</glossdef>
-      </glossentry>
-
-(      <glossentry id="gl-location-manager">
+      <glossentry id="gl-location-manager">
 	<glossterm>Location Manager</glossterm>
 	<glossdef>
 	  <para>
@@ -269,118 +389,7 @@
 	</glossdef>
       </glossentry>
 
-      <glossentry id="gl-cell">
-	<glossterm>Cell</glossterm>
-	<glossdef>
-	  <para>
-	    A cell is a collection of Java threads that provide a
-	    discrete and simple service within &dcache;.  Each cell is
-	    hosted within a <glossterm
-	    linkend="gl-domain">domain</glossterm>.
-	  </para>
 
-	  <para>
-	    Cells have an address derived from concatenating their
-	    name, the <literal>@</literal> symbol and their containing
-	    domain name.
-	  </para>
-	</glossdef>
-      </glossentry>
-
-      <glossentry id="gl-domain">
-	<glossterm>Domain</glossterm>
-	<glossdef>
-	  <para>
-	    A domain is a collection of one or more <glossterm
-	    linkend="gl-cell">cell</glossterm>s that provide a set of
-	    related services within a &dcache; instance.  Each domain
-	    requires its own Java Virtual Machine.  A typical domain
-	    might provide external connectivity (i.e., a <glossterm
-	    linkend="gl-door">door</glossterm>) or manage the
-	    <glossterm linkend="gl-pool">pools</glossterm> hosted on a
-	    machine.
-	  </para>
-
-	  <para>
-	    Each domain has at least one cell, called the
-	    &cell-system; cell and many tunnel cells for communicating
-	    with other Domains.  To provide a useful service, a domain
-	    will contain other cells that provide specific behaviour.
-	  </para>
-	</glossdef>
-      </glossentry>
-
-      <glossentry id="gl-door">
-	<glossterm>Door</glossterm>
-	<glossdef>
-	  <para>
-	    Door is the generic name for special <glossterm
-	    linkend="gl-cell">cell</glossterm>s that provides the
-	    first point of access for end clients to communicate with
-	    a &dcache; instance.  There are different door
-	    implementations (e.g., &gsidcap; door and &gridftp; door),
-	    allowing a &dcache; instance to support multiple
-	    communication protocols.
-	  </para>
-
-	  <para>
-	    A door will (typically) bind to a well-known port number
-	    depending on the protocol the door supports.  This allows
-	    for only a single door instance per machine for each
-	    protocol.
-	  </para>
-
-	  <para>
-	    A door will typically identify which <glossterm
-	    linkend="gl-pool">pool</glossterm> will satisfy the end
-	    user's operation and redirect the client to the
-	    corresponding pool.  In some cases this is not possible;
-	    for example, some protocols (such as &gridftp; version 1)
-	    do not allow servers to redirect end-clients, in other
-	    cases pool servers may be behind a firewall, so preventing
-	    direct access.  When direct end-client access is not
-	    possible, the door may act as a data proxy, streaming data
-	    to the client.
-	  </para>
-
-	  <para>
-	    By default, each door is hosted in a dedicated <glossterm
-	    linkend="gl-domain">domain</glossterm>.  This allows easy
-	    control of whether a protocol is supported from a
-	    particular machine.
-	  </para>
-	</glossdef>
-      </glossentry>
-
-      <glossentry id="gl-jvm">
-	<glossterm>Java Virtual Machine (JVM)</glossterm>
-	<glossdef>
-	  <para>
-	    Java programs are typically compiled into a binary form
-	    called Java byte-code.  Byte-code is comparable to the
-	    format that computers understand native; however, no
-	    mainstream processor understands Java byte-code.  Instead
-	    compiled Java programs typically require a translation
-	    layer for them to run.  This translation layer is called a
-	    Java Virtual Machine (JVM).  It is a standardised
-	    execution environment that Java programs may run within.
-	    A JVM is typically represented as a process within the
-	    host computer.
-	  </para>
-	</glossdef>
-      </glossentry>
-
-      <glossentry id="gl-well-known-cell">
-	<glossterm>Well Known Cell</glossterm>
-	<glossdef>
-	  <para>
-	    A well-known cell is a <glossterm
-	    linkend="gl-cell">cell</glossterm> that registers itself
-	    centrally.  Within the admin interface, a well-known cell
-	    may be referred to by just its cell name.
-	  </para>
-	</glossdef>
-      </glossentry>
 
       <glossentry id="gl-pinboard">
 	<glossterm>Pinboard</glossterm>
@@ -393,7 +402,7 @@
 	  </para>
 	</glossdef>
       </glossentry>
-
+<!--
       <glossentry id="gl-breakeven">
 	<glossterm>Breakeven Parameter</glossterm>
 	<glossdef>
@@ -425,108 +434,31 @@
 	  </para>
 	</glossdef>
       </glossentry>
+-->
 
-      <glossentry id="gl-namespace">
-	<glossterm>Namespace</glossterm>
-
+      <glossentry id="gl-file-level">
+	<glossterm>file level</glossterm>
 	<glossdef>
 	  <para>
-	    The namespace is a core component of &dcache;.  It maps
-	    each stored file to a unique identification number and
-	    allows storing of metadata against either files or
-	    directories.
-	  </para>
-
-	  <para>
-	    &dcache; supports two (independent) namespace
-	    implementations: <glossterm
-	    linkend="gl-pnfs">&pnfs;</glossterm> and <glossterm
-	    linkend="gl-chimera">Chimera</glossterm>.
-	  </para>
-	</glossdef>
-      </glossentry>
-
-      <glossentry id="gl-pnfs">
-	<glossterm>&pnfs; filesystem</glossterm>
-	<glossdef>
-	  <para>
-	    &pnfs; is a filesystem that uses a database to store all
-	    information, including the contents of files.  This
-	    filesystem is made available via NFS, so authorised hosts
-	    can mount &pnfs; and use it like any other file system.
-	  </para>
-
-	  <para>
-	    &dcache; may use &pnfs; as its <glossterm
-	    linkend="gl-namespace">namespace</glossterm>.  Although it
-	    is possible to store file contents in &pnfs;, &dcache;
-	    does not do this.  Instead &dcache; stores the file data
-	    on one (or more) <glossterm
-	    linkend="gl-pool">pools</glossterm>.
-	  </para>
-
-	  <para>
-	    &pnfs; includes some unique additional properties.  These
-	    include <glossterm linkend="gl-pnfs-dot-cmd">dot
-	    commands</glossterm>, <glossterm
-	    linkend="gl-pnfs-id">&pnfs; IDs</glossterm>, <glossterm
-	    linkend="gl-pnfs-level">levels</glossterm>, <glossterm
-	    linkend="gl-pnfs-tag">directory tags</glossterm> and
-	    <glossterm
-	    linkend="gl-pnfs-wormhole">wormholes</glossterm>.
-	  </para>
-	</glossdef>
-      </glossentry>
-
-      <glossentry id="gl-pnfs-dot-cmd">
-	<glossterm>&pnfs; dot command</glossterm>
-	<glossdef>
-	  <para>
-	    To configure and access some of the special features of
-	    the <glossterm linkend="gl-pnfs">&pnfs;
-	    filesystem</glossterm>, special files may be read, written
-	    to or created.  These files all start with a dot (or
-	    period) and have one or more parameters after, each
-	    parameter is contained within a set of parentheses; for
-	    example, the file
-	    <filename>.(tag)(<replaceable>foo</replaceable>)</filename>
-	    is the &pnfs; dot command for reading or writing the
-	    <replaceable>foo</replaceable> <glossterm
-	    linkend="gl-pnfs-tag">directory tag</glossterm> value.
-	  </para>
-
-	  <para>
-	    Care must be taken when accessing a dot command from a
-	    shell.  Shells will often expand parentheses so the
-	    filename must be protected against this; for example, by
-	    quoting the filename or by escaping the parentheses.
-	  </para>
-	</glossdef>
-      </glossentry>
-
-      <glossentry id="gl-pnfs-level">
-	<glossterm>&pnfs; level</glossterm>
-	<glossdef>
-	  <para>
-	    In <glossterm linkend="gl-pnfs">&pnfs;</glossterm>, each
+	    In <glossterm linkend="gl-chimera">&chimera;</glossterm>, each
 	    file can have up to eight independent contents; these
 	    file-contents, called levels, may be accessed
 	    independently.  &dcache; will store some file metadata in
 	    levels 1 and 2, but &dcache; will not store any file data
-	    in &pnfs;.
+	    in &chimera;.
 	  </para>
 	</glossdef>
       </glossentry>
 
-      <glossentry id="gl-pnfs-tag">
-	<glossterm>&pnfs; directory tag</glossterm>
+      <glossentry id="gl-directory-tag">
+	<glossterm>directory tag</glossterm>
 	<glossdef>
 	  <para>
-	    <glossterm linkend="gl-pnfs">&pnfs;</glossterm> includes
-	    the concept of tags.  A tag is a keyword-value pair
-	    associated with a directory.  Subdirectories inherit tags
-	    from their parent directory.  New values may be assigned,
-	    but tags cannot be removed.  The <glossterm
+	    <glossterm linkend="gl-chimera">&chimera;</glossterm>
+	    includes the concept of tags.  A tag is a keyword-value
+	    pair associated with a directory.  Subdirectories inherit
+	    tags from their parent directory.  New values may be
+	    assigned, but tags cannot be removed.  The <glossterm
 	    linkend="gl-pnfs-dot-cmd">dot command</glossterm>
 	    <filename>.(tag)(<replaceable>foo</replaceable>)</filename>
 	    may be used to read or write tag
@@ -542,19 +474,47 @@
 	</glossdef>
       </glossentry>
 
-      <glossentry id="gl-pnfs-id">
-	<glossterm>&pnfs; ID</glossterm>
+      <glossentry id="gl-pnfs-dot-cmd">
+	<glossterm>dot command</glossterm>
 	<glossdef>
 	  <para>
-	    Each component (file, directory, etc) in a &pnfs; instance
-	    has a unique ID: a 24-digit hexadecimal number.  This
-	    unique ID is used in &dcache; to refer to files without
-	    knowing the component's name or in which directory the
-	    component is located.
+	    To configure and access some of the special features of
+	    the <glossterm linkend="gl-chimera">&chimera;
+	    namespace</glossterm>, special files may be read, written
+	    to or created.  These files all start with a dot (or
+	    period) and have one or more parameters after. Each
+	    parameter is contained within a set of parentheses; for
+	    example, the file
+	    <filename>.(tag)(<replaceable>foo</replaceable>)</filename>
+	    is the &chimera; dot command for reading or writing the
+	    <replaceable>foo</replaceable> <glossterm
+	    linkend="gl-directory-tag">directory tag</glossterm> value.
+	  </para>
+
+	  <para>
+	    Care must be taken when accessing a dot command from a
+	    shell.  Shells will often expand parentheses so the
+	    filename must be protected against this; for example, by
+	    quoting the filename or by escaping the parentheses.
+	  </para>
+	</glossdef>
+      </glossentry>
+
+      <glossentry id="gl-pnfs-wormhole">
+	<glossterm>Wormhole</glossterm>
+	<glossdef>
+	  <para>
+	    A wormhole is a feature of the <glossterm
+	    linkend="gl-chimera">&chimera; namespace</glossterm>.  A
+	    wormhole is a file that is accessible in all directories;
+	    however, the file is not returned when scanning a
+	    directory(e.g., using the <command>ls</command> command).
 	  </para>
 
 	</glossdef>
       </glossentry>
+
+
 
       <glossentry id="gl-p2p">
 	<glossterm>Pool to Pool Transfer</glossterm>
@@ -610,31 +570,7 @@
 
 	</glossdef>
       </glossentry>
-
-      <glossentry id="gl-batch-file">
-	<glossterm><filename>batch</filename> File</glossterm>
-	<glossdef>
-	  <para>
-	    A batch file describes which <glossterm
-	    linkend="gl-cell">cell</glossterm>s in a <glossterm
-	    linkend="gl-domain">domain</glossterm> are to be started
-	    and with what options.  They typically have filenames from
-	    combining the name of a domain with
-	    <filename>.batch</filename>; for example, the
-	    &domain-dcache; domain has a corresponding batch file
-	    <filename>dCache.batch</filename>
-	  </para>
-
-	  <para>
-	    Although the cells in a domain may be configured by
-	    altering the corresponding batch file, most typical
-	    changes can be altered by editing the
-	    <filename>dCacheConfig</filename> file and this is the
-	    preferred method.
-	  </para>
-	</glossdef>
-      </glossentry>
-
+<!--
       <glossentry id="gl-context">
 	<glossterm>Context</glossterm>
 	<glossdef>
@@ -642,56 +578,7 @@
 	  </para>
 	</glossdef>
       </glossentry>
-
-      <glossentry id="gl-pnfs-wormhole">
-	<glossterm>Wormhole</glossterm>
-	<glossdef>
-	  <para>
-	    A wormhole is a feature of the <glossterm
-	    linkend="gl-pnfs">&pnfs; filesystem</glossterm>.  A
-	    wormhole is a file that is accessible in all directories;
-	    however, the file is not returned when scanning a
-	    directory(e.g., using the <command>ls</command> command).
-	  </para>
-
-	</glossdef>
-      </glossentry>
-
-      <glossentry id="gl-chimera">
-	<glossterm>Chimera</glossterm>
-	<glossdef>
-	  <para>
-	    Chimera is a <glossterm
-	    linkend="gl-namespace">namespace</glossterm>
-	    implementation that is similar to <glossterm
-	    linkend="gl-pnfs">&pnfs;</glossterm> but provides better
-	    integration with a relational database.  Because of this,
-	    it allows additional functionality to be added, so some
-	    &dcache; features require a chimera namespace.
-	  </para>
-
-	  <para>
-	    Many <glossterm linkend="gl-pnfs">&pnfs;</glossterm>
-	    features are available in Chimera, including <glossterm
-	    linkend="gl-pnfs-level">levels</glossterm>, <glossterm
-	    linkend="gl-pnfs-tag">directory tags</glossterm> and many
-	    of the <glossterm linkend="gl-pnfs-dot-cmd">dot
-	    commands</glossterm>.
-	  </para>
-	</glossdef>
-      </glossentry>
-
-      <glossentry id="gl-chimera-id">
-	<glossterm>Chimera ID</glossterm>
-	<glossdef>
-	  <para>
-	    A <glossterm linkend="gl-chimera">Chimera</glossterm> ID is a
-	    36 hexadecimal digit that uniquely defines a file or
-	    directory.  It's equivalent to a <glossterm
-	    linkend="gl-pnfs-id">&pnfs; ID</glossterm>.
-	  </para>
-	</glossdef>
-      </glossentry>
+-->
 
     <glossentry id="gl-replica">
       <glossterm>Replica</glossterm>
@@ -769,32 +656,6 @@
           implementation of an SRM which can turn any &dcache;
           instance into a grid storage element.
         </para>
-      </glossdef>
-    </glossentry>
-
-    <glossentry id="gl-pnfscompanion">
-      <glossterm>&pnfs; Companion</glossterm>
-      <glossdef>
-        <para>
-          The &pnfs; companion is a (database) table that stores
-          &dcache; specific information; specifically, on which pools
-          a file may be found.  &dcache; can operate without a
-          companion and will store file location information within a
-          <glossterm linkend="gl-pnfs-level">level</glossterm>.
-	</para>
-
-	<para>
-	  Storing replica location information in the companion
-	  database greatly improves the performance of &dcache; as the
-	  location information is often queried by the <glossterm
-	  linkend="gl-poolmanager">pool manager</glossterm>.
-        </para>
-
-	<para>
-	  Although a companion database may be used with <glossterm
-	  linkend="gl-chimera">Chimera</glossterm>, doing so provides
-	  no performance improvements and is not recommended.
-	</para>
       </glossdef>
     </glossentry>
 
@@ -904,9 +765,9 @@
 
 	<para>
 	  The list of directories that are to store pool data are
-	  found in the <glossterm
-	  linkend="gl-poollist-file"><filename>poollist</filename>
-	  File</glossterm>, which is located on the pool node.
+	  found in definition of the pools in the <glossterm
+	  linkend="gl-layout-file"><literal>layout</literal>
+	  Files</glossterm>, which are located on the pool nodes.
 	</para>
       </glossdef>
     </glossentry>
@@ -919,8 +780,7 @@
 	  linkend="gl-pool">pool</glossterm>.  It is responsible for
 	  deleting files on the pool that have been marked for
 	  removal.  Files can be marked for removal because their
-	  corresponding <glossterm
-	  linkend="gl-namespace">namespace</glossterm> entry has been
+	  corresponding namespace entry has been
 	  deleted or because the local file is a <glossterm
 	  linkend="gl-cached">cache copy</glossterm> and more disk
 	  space is needed.
@@ -935,8 +795,7 @@
 	  The &hsm; sweeper, if enabled, is a component that is
 	  responsible for removing files from the <glossterm
 	  linkend="gl-hsm">&hsm;</glossterm> when the corresponding
-	  <glossterm linkend="gl-namespace">namespace</glossterm>
-	  entry has been removed.
+	  namespace entry has been removed.
 	</para>
       </glossdef>
     </glossentry>
@@ -948,17 +807,18 @@
 	  The pool manager determines the pool used for storing a file
 	  by calculating a cost value for each available pool. The
 	  pool with the lowest cost is used. The costs are calculated
-	  by the cost module as described in <!-- xref
-	  linkend="cf-pm-cm"/ -->. The total cost is a linear combination
-	  of the <!-- <glossterm
+	  by the cost module as described in <xref
+	  linkend="cf-pm-classic"/>. The total cost is a linear
+	  combination of the performance cost and the space cost. <!--
+	  <glossterm
 	  linkend="gl-performance_cost">performance</glossterm> and
-	  <glossterm linkend="gl-space_cost">space cost</glossterm>.--> I.e.,
+	  <glossterm linkend="gl-space_cost">space
+	  cost</glossterm>.--> I.e.,
 	</para>
 
 	<informalequation>
-	  <alt>
-	    <varname>cost</varname> = <varname>ccf</varname> * <varname>performance_cost</varname> + <varname>scf</varname> * <varname>space_cost</varname>
-	  </alt>
+	  <programlisting>
+	    <varname>cost</varname> = <varname>ccf</varname> * <varname>performance_cost</varname> + <varname>scf</varname> * <varname>space_cost</varname>	  </programlisting>
 
 	  <mediaobject>
 	  </mediaobject>
@@ -972,14 +832,13 @@
       </glossdef>
     </glossentry>
 
+
     <glossentry id="gl-performance_cost">
       <glossterm>performance cost</glossterm>
       <glossdef>
 	<para>
-
+	  See also <xref linkend="cf-pm-classic-perf"/>.
 	</para>
-
-	<glossseealso>gl-cost</glossseealso>
 
       </glossdef>
     </glossentry>
@@ -989,10 +848,8 @@
       <glossdef>
 
 	<para>
-
+	  See also <xref linkend="cf-pm-classic-space"/>..
 	</para>
-
-	<glossseealso>gl-cost</glossseealso>
 
       </glossdef>
     </glossentry>
