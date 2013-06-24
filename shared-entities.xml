@@ -127,6 +127,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY cell-ftp             "<literal>FTP</literal>">
 <!ENTITY cell-gridftp             "<literal>gridftp</literal>">
 <!ENTITY cell-kerberosftp             "<literal>kerberosftp</literal>">
+<!ENTITY cell-locationmngr "<literal>LocationManager</literal>">
 
 
 <!-- Various services -->
