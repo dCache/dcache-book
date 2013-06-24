@@ -204,19 +204,14 @@
 	<varname>grid.hostcert.key</varname>.
       </para>
       
-      <para>
-        The following example shows a setup for two network interfaces
-        with the hostnames <literal>door-internal</literal>
-        (111.111.111.5) and <literal>door-external</literal>
-        (222.222.222.5) which are served by two &gridftp; doors in two
-        domains.
-      </para>
-      
 
       <informalexample>
 	<para>
-	  Layout file for two &gridftp; doors serving separate network
-	  interfaces.
+	  In this example we show a setup for two &gridftp; doors
+	  serving two network interfaces with the hostnames
+	  <literal>door-internal</literal> (111.111.111.5) and
+	  <literal>door-external</literal> (222.222.222.5) which are
+	  served by two &gridftp; doors in two domains.
 	</para>
 
 	<programlisting>[internalDomain]
