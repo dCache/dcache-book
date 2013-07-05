@@ -210,7 +210,7 @@
                             <!-- width="100%" scalefit="1" contentdepth="100%" should scale optimal, but fop doesnt like it -->
       </imageobject>
       <imageobject role="html">
-	<imagedata fileref="../images/test.png" format="PNG" align="center"/>
+	<imagedata fileref="/images/test.png" format="PNG" align="center"/>
       </imageobject>
     </mediaobject>
   </figure>
