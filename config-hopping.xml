@@ -379,9 +379,9 @@ psu set link ocean-copy-link -readpref=10 -writepref=0 -cachepref=10 -p2ppref=-1
 
 	<para>
 	  Initially no rules are configured for the
-	  &cell-hopmngr;. You may add rules by either edit the
-	  <filename>&path-od-vld;/HoppingManager.conf</filename> and
-	  restart the &serv-hopping; service, or use the admin
+	  &cell-hopmngr;. You may add rules by either edit the file
+	  <filename>&path-od-vld;/config/HoppingManager.conf</filename>
+	  and restart the &serv-hopping; service, or use the admin
 	  interface and save the modifications by the
 	  <command>save</command> command into the
 	  <filename>HoppingManager.conf</filename>
