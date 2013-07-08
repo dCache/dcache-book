@@ -1936,25 +1936,33 @@ passwd tanja 6a4cd089 read-write 500 100 / / /</programlisting>
       <programlisting>wget --user=tanja --password=dickerelch http://webdav-door.example.org:2880/pnfs/</programlisting>
     </section>
 
+
     <section id="cf-gplazma-webadmin-example">
       <title>&cell-gplazma; config example to work with authenticated webadmin</title>
       <para>
-        In this section we show an example configuration to enable working with
-        &cell-webadmin; in authenticated mode and give a user administrator
-        access.
+        This section describes how to configure &serv-gplazma; to enable
+      &serv-webadmin; in authenticated mode with a grid certificate as
+      well as with a username/password and how to give a user
+      administrator access. 
+
+ 
       </para>
       <informalexample>
         <para>
-          The <filename>&path-ode-ed;/gplazma.conf</filename> file
-          would look like this:
+          In this example for the
+          <filename>&path-ode-ed;/gplazma.conf</filename> file the
+          &gp2-x509; plugin is used for the authentication step with
+          the grid certificate and the &gp2-kpwd; plugin is used for
+          the authentication step with username/password.
         </para>
-        <programlisting>
-auth requisite kpwd
-map  requisite kpwd
-session required kpwd</programlisting>
+        <programlisting>auth optional x509
+auth optional kpwd
+map requisite kpwd
+session requisite kpwd
+</programlisting>
         <para>
-          The <filename>&path-ode-ed;/dcache.kpwd</filename> file would look
-          like this:
+          The following example will show how to set up the
+          <filename>&path-ode-ed;/dcache.kpwd</filename> file:
         </para>
         <programlisting>version 2.1
 
@@ -1966,22 +1974,30 @@ login john read-write 1700 1000 / / /
 # set pwd
 passwd john 8402480 read-write 1700 1000 / / /</programlisting>
         <para>
-          This maps the subject part of a Grid-Certificate
+	  This maps the DN of a grid certificate
           <literal>subject=/C=DE/O=ExampleOrganisation/OU=EXAMPLE/CN=John Doe</literal>
-          to the User <systemitem class="username">john</systemitem> and the
-          entry <programlisting>login john read-write 1700 1000 / / /
-  /C=DE/O=GermanGrid/OU=DESY/CN=John Doe</programlisting> applies unix-like
-          values to <systemitem class="username">john</systemitem>, most
-          important is the <literal>1000</literal>, because it is the assigned
-          &gid;. This must match the value of the <varname>webadminAdminGid</varname>
-          configured in your webadmin.  This is sufficient for login using a
-          certificate. The entry
-          <programlisting>passwd john 8402480 read-write 1700 1000 / / /</programlisting>
-          enables Username/Password login, such as a valid login would be user
-          <systemitem class="username">john</systemitem> with some password.  The
-          password is encrypted with the kpwd-algorithm (also see <xref
-              linkend="cf-gplazma-kpwd"/>) and then stored in the file.  Again
-          the <literal>1000</literal> here is the assigned &gid;.
+          to the user <systemitem class="username">john</systemitem> and the
+          entry 
+	</para>
+	<programlisting>login john read-write 1700 1000 / / /
+  /C=DE/O=GermanGrid/OU=DESY/CN=John Doe</programlisting> 
+        <para>
+	  applies unix-like values to <systemitem
+	  class="username">john</systemitem>, most important is the
+	  <literal>1000</literal>, because it is the assigned
+	  &gid;. This must match the value of the
+	  <varname>webadminAdminGid</varname> configured in your
+	  webadmin.  This is sufficient for login using a
+	  certificate. The entry
+	</para>
+	<programlisting>passwd john 8402480 read-write 1700 1000 / / /</programlisting>
+	<para>
+          enables Username/Password login, such as a valid login would
+          be user <systemitem class="username">john</systemitem> with
+          some password.  The password is encrypted with the
+          kpwd-algorithm (also see <xref linkend="cf-gplazma-kpwd"/>)
+          and then stored in the file.  Again the
+          <literal>1000</literal> here is the assigned &gid;.
         </para>
       </informalexample>
     </section>
