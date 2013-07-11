@@ -402,25 +402,35 @@
 	  </para>
 	</glossdef>
       </glossentry>
-<!--
+
       <glossentry id="gl-breakeven">
 	<glossterm>Breakeven Parameter</glossterm>
 	<glossdef>
 	  <para>
-	  </para>
-	</glossdef>
-      </glossentry>
-
-      <glossentry id="gl-secondary-interface">
-	<glossterm>Secondary Network Interface</glossterm>
-	<glossdef>
-	  <para>
+	    The breakeven parameter has to be a positive number
+	    smaller than 1.0. It specifies the impact of the age of
+	    the least recently used file on space cost. It the LRU
+	    file is one week old, the space cost will be equal to (1 +
+	    breakeven). Note that this will not be true, if the
+	    breakeven parameter has been set to a value greater or
+	    equal to 1.
 	  </para>
 	</glossdef>
       </glossentry>
 
       <glossentry id="gl-lru">
 	<glossterm>least recently used (LRU) File</glossterm>
+	<glossdef>
+	  <para>
+	    The file that has not be requested for the longest.
+	  </para>
+	</glossdef>
+      </glossentry>
+
+
+<!--
+      <glossentry id="gl-secondary-interface">
+	<glossterm>Secondary Network Interface</glossterm>
 	<glossdef>
 	  <para>
 	  </para>
