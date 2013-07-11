@@ -1940,12 +1940,10 @@ passwd tanja 6a4cd089 read-write 500 100 / / /</programlisting>
     <section id="cf-gplazma-webadmin-example">
       <title>&cell-gplazma; config example to work with authenticated webadmin</title>
       <para>
-        This section describes how to configure &serv-gplazma; to enable
-      &serv-webadmin; in authenticated mode with a grid certificate as
-      well as with a username/password and how to give a user
-      administrator access. 
-
- 
+        This section describes how to configure &serv-gplazma; to
+        enable &serv-webadmin; in authenticated mode with a grid
+        certificate as well as with a username/password and how to
+        give a user administrator access.
       </para>
       <informalexample>
         <para>
