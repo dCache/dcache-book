@@ -9,24 +9,6 @@
 <chapter id="cb-postgres">
 
   <title>&psql; and &dcache;</title>
-<!--
-  <chapterinfo>
-    <author>
-      <firstname>Vladimir</firstname>
-      <surname>Podstavkov</surname>
-    </author>
-
-    <author>
-      <firstname>Mathias</firstname>
-      <surname>de Riese</surname>
-    </author>
-
-    <author>
-      <firstname>Martin</firstname>
-      <surname>Radicke</surname>
-    </author>
-  </chapterinfo>
--->
 
   <para>
     &psql; is used for various things in a &dcache; system: The
@@ -35,21 +17,20 @@
     linkend="gl-spacemanager">space manager</glossterm>, the
     <glossterm linkend="gl-replicamanager">replica
     manager</glossterm>, the <glossterm
-    linkend="gl-pnfscompanion">&pnfs; companion</glossterm>, the
-    <glossterm linkend="gl-billing">&cell-billing;</glossterm>, and the
-    &pnfs; server might make use of one or more databases in a single
-    or several separate &psql; servers.
+    linkend="gl-billing">&cell-billing;</glossterm>, and the &pnfs;
+    server might make use of one or more databases in a single or
+    several separate &psql; servers.
   </para>
   
   <para>
-    The &srm;, the pin manager, the space manager, the replica
-    manager, and the &pnfs; companion will use the &psql; database as
-    configured at cell start-up in the corresponding batch files. The
-    &cell-billing; will only write the accounting information into a
-    database if it is configured with the option
-    <option>-useSQL</option>. The &pnfs; server will use a &psql;
-    server if the <literal>pnfs-posgresql</literal> version is
-    used. It will use several databases in the &psql; server.
+    The &srm;, the pin manager, the space manager and the replica
+    manager will use the &psql; database as configured at cell
+    start-up in the corresponding batch files. The &cell-billing; will
+    only write the accounting information into a database if it is
+    configured with the option <option>-useSQL</option>. The &pnfs;
+    server will use a &psql; server if the
+    <literal>pnfs-posgresql</literal> version is used. It will use
+    several databases in the &psql; server.
   </para>
 
   <section id="cb-postgres-install">
@@ -148,23 +129,21 @@ export dbConnectString="user=pnfsserver password=<replaceable>yourPassword</repl
     <para>
       On small systems it should never be a problem to use one single
       &psql; server for all the functions listed above. In the
-      standard installation, the &cell-replicamngr;, the &pnfs;
-      companion are not activated by default. The &cell-billing; will
-      only write to a file by default.
+      standard installation, the &cell-replicamngr; is not activated
+      by default. The &cell-billing; will only write to a file by
+      default.
     </para>
 
     <para>
       Whenever the &psql; server is going to be used for another
       functionality, the impact on performance should be checked
       carefully. To improve the performance, the functionality should
-      be installed on a separate host. Generally, a &psql; server
-      for a specific funcionality should be on the same host as the
-      &dcache; cell accessing that &psql; server, and the
-      &psql; server containing the databases for the &pnfs; server
-      should run on the same host as the &pnfs; server and the
-      &cell-pnfsmngr; cell of the &dcache; system accessing
-      it. Accordingly, the &pnfs; companion and the &pnfs; server
-      itself will use the same &psql; server.
+      be installed on a separate host. Generally, a &psql; server for
+      a specific funcionality should be on the same host as the
+      &dcache; cell accessing that &psql; server, and the &psql;
+      server containing the databases for &chimera; should run on the
+      same host as &chimera; and the &cell-pnfsmngr; cell of the
+      &dcache; system accessing it.
     </para>
 
     <para>
@@ -230,13 +209,6 @@ export dbConnectString="user=pnfsserver password=<replaceable>yourPassword</repl
 	          <entry>&cell-spacemngr;</entry>
 	          <entry><varname>spaceManagerDatabaseHost</varname> or if not set: <varname>srmDbHost</varname> or if not set: <systemitem class="systemname">localhost</systemitem></entry>
 	          <entry>dcache</entry>
-	          <entry><database class="user">srmdcache</database></entry>
-              <entry><userinput>srmdcache</userinput></entry>
-	        </row>
-	        <row>
-	          <entry>companion</entry>
-	          <entry><varname>companionDatabaseHost</varname> or if not set: <systemitem class="systemname">localhost</systemitem></entry>
-	          <entry>companion</entry>
 	          <entry><database class="user">srmdcache</database></entry>
               <entry><userinput>srmdcache</userinput></entry>
 	        </row>
