@@ -33,11 +33,10 @@
     linkend="gl-pinmanager">pin manager</glossterm>, the <glossterm
     linkend="gl-spacemanager">space manager</glossterm>, the
     <glossterm linkend="gl-replicamanager">replica
-    manager</glossterm>, the <glossterm
-    linkend="gl-pnfscompanion">&pnfs; companion</glossterm>, the
-    <glossterm linkend="gl-billing">&cell-billing;</glossterm>, and the
-    &pnfs; server might make use of one or more databases in a single
-    or several separate &psql; servers.
+    manager</glossterm>, the &pnfs; companion, the <glossterm
+    linkend="gl-billing">&cell-billing;</glossterm>, and the &pnfs;
+    server might make use of one or more databases in a single or
+    several separate &psql; servers.
   </para>
   
   <para>
