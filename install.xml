@@ -11,43 +11,6 @@
 
   <title>Installing &dcache;</title>
 
-<!--
-  <chapterinfo>
-    <author>
-      <firstname>Michael</firstname>
-      <surname>Ernst</surname>
-      <affiliation>
-	<shortaffil>FNAL</shortaffil>
-      </affiliation>
-    </author>
-
-    <author>
-      <firstname>Patrick</firstname>
-      <surname>Fuhrmann</surname>
-      <affiliation>
-        <shortaffil>DESY</shortaffil>
-      </affiliation>
-    </author>
-
-    <author>
-      <firstname>Mathias</firstname>
-      <surname>de Riese</surname>
-      <affiliation>
-        <shortaffil>DESY</shortaffil>
-      </affiliation>
-    </author>
-
-    <author>
-      <firstname>Antje</firstname>
-      <surname>Petersen </surname>
-      <affiliation>
-        <shortaffil>DESY</shortaffil>
-      </affiliation>
-    </author>
-
-  </chapterinfo>
--->
-
   <para>
     The first section describes the installation of a fresh &dcache;
     instance using RPM files downloaded from <ulink
@@ -769,6 +732,9 @@ dcache.java.memory.direct=16m</programlisting>
       </listitem>
       <listitem>
 	use the <ulink url='http://www.dcache.org/manuals/upgrade-1.9.12-to-2.2.shtml'>The Ultimate Golden Release Upgrade Guide II</ulink> to upgrade from 1.9.12 to 2.2.
+      </listitem>
+      <listitem>
+	use the <ulink url='http://www.dcache.org/manuals/upgrade/upgrade-2.2-to-2.6.html'>The Ultimate Golden Release Upgrade Guide III</ulink> to upgrade from 2.2 to 2.6. 
       </listitem>
       <listitem>
 	use the <ulink url='http://trac.dcache.org/wiki/optToUsr'>/opt
