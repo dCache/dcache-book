@@ -281,16 +281,16 @@
 
 
 
-  <section id="cb-pool-migration" status="draft">
+
+
+
+  <section id="cb-pool-migration">
     <title>Migration Module</title>
 
     <para>
-      The migration module is a component of &dcache; pools introduced
-      in version 1.9.1. The purpose of the component is essentially to
+      The purpose of the migration module is essentially to
       copy or move the content of a pool to one or more other
-      pools. The migration module replaces the copy manager found in
-      previous releases of &dcache;. We advice against using the old
-      copy manager, as it known to have problems.
+      pools.
     </para>
 
     <para>
@@ -301,7 +301,7 @@
       <listitem>
         <para>
           Vacating pools, that is, moving all files to other pools
-          before decomisioning the pool.
+          before decomissioning the pool.
         </para>
       </listitem>
 
@@ -371,6 +371,16 @@
         which in turns means the migration module becomes simpler and
         more robust. Should a pool crash during a migration job, the
         job can be rerun and the remaining files will be transfered.
+	<note>
+	  <para>
+	    Please notice that a job is only idempotent as long as the
+	    set of target pools do not change. If pools go offline or
+	    are excluded as a result of a an exclude or include
+	    expression, then the idempotent nature of a job may be
+	    lost.
+
+	  </para>
+	</note>
       </para>
 
       <para>
@@ -436,18 +446,97 @@
       <title>Command Summary</title>
 
       <para>
-        All commands begin with the string
-        <command>migration</command>, e.g. <command>migration
-        copy</command>. The commands <command>migration
-        copy</command>, <command>migration cache</command> and
-        <command>migration move</command> create new migration
-        jobs. These commands take the same options and only differ in
-        default values. Except for the number of concurrent tasks,
-        transfer parameters of existing jobs cannot be changed. This
-        is by design to ensure idempotency of jobs. The concurrency
-        can be altered through the <command>migration
-        concurrency</command> command.
+	Login to the <link linkend='intouch-admin'>admin
+	interface</link> and <command>cd</command> to a pool to use
+	the <command>migration</command> commands. Use the command
+	<command>help migration</command> to view the possiblities.
       </para>
+      <screen>&dc-prompt-local; <userinput>cd <replaceable>poolname</replaceable></userinput>
+&dc-prompt-pool; <userinput>help migration</userinput>
+migration cache [OPTIONS] TARGET...
+migration cancel [-force] JOB
+migration clear
+migration concurrency ID CONCURRENCY
+migration copy [OPTIONS] TARGET...
+migration info JOB
+migration ls
+migration move [OPTIONS] TARGET...
+migration resume JOB
+migration suspend JOB
+      </screen>
+
+      <para>
+	The commands <command>migration copy</command>,
+	<command>migration cache</command> and <command>migration
+	move</command> create new migration jobs. These commands are
+	used to copy files to other pools. Unless filter options are
+	specified, all files on the source pool are copied.  The
+	syntax for these commands is the same; example
+	<command>migration copy</command>:
+	<cmdsynopsis>
+	  <command>migration <replaceable>copy</replaceable></command>
+	  <arg><parameter><replaceable>option</replaceable></parameter></arg><arg choice='plain'><replaceable>target</replaceable></arg>
+      </cmdsynopsis>
+      </para>
+      <para>
+	There are four different types of options. The filter options,
+	transfer options, target options and lifetime options. Please
+	run the command <command>help migration copy</command> for a
+	detailed description of the various options.
+      </para>
+
+      <para>
+	The commands <command>migration copy</command>,
+	<command>migration move</command> and <command>migration
+	cache</command> take the same options and only differ in
+	default values.
+      </para>
+
+      <variablelist>
+	<varlistentry>
+	  <term>migration move</term>
+	  <listitem>
+	    <para>
+	      The command <command>migration move</command> does the
+	      same as the command <command>migration copy</command>
+	      with the options:
+	    </para>
+	    <itemizedlist>
+	      <listitem>
+		<varname>-smode</varname>=<literal>delete</literal>
+		(default for <command>migration copy</command> is
+		<literal>same</literal>).
+	      </listitem>
+	      <listitem>
+		<varname>-pins</varname>=<literal>move</literal>
+		(default for <command>migration copy</command> is
+		<literal>keep</literal>).
+	      </listitem>
+	    </itemizedlist>
+	    <para>
+	      additionally it uses the option
+	      <varname>-verify</varname>.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>migration cache</term>
+	  <listitem>
+	    <para>
+	      The command <command>migration cache</command> does the
+	      same as the command <command>migration copy</command>
+	      with the option:
+	    </para>
+	    <itemizedlist>
+	      <listitem>
+		<varname>-tmode</varname>=<literal>cached</literal>
+	      </listitem>
+	    </itemizedlist>
+	  </listitem>
+	</varlistentry>
+
+      </variablelist>
 
       <para>
         Jobs are assinged a job ID and are executed in the
@@ -466,6 +555,107 @@
         commands. Existing tasks are allowed to finish before a job is
         suspended or cancelled.
       </para>
+
+      <informalexample>
+	<para>
+	  A migration job can be suspended and resumed with the
+	  commands <command>migration suspend </command> and
+	  <command>migration resume</command> respectively.
+	</para>
+	<screen>&dc-prompt-local; <userinput>cd <replaceable>poolname</replaceable></userinput>
+&dc-prompt-pool; <userinput>migration copy -pnfsid=000060D40698B4BF4BE284666ED29CC826C7 pool2</userinput>
+[1] INITIALIZING migration copy 000060D40698B4BF4BE284666ED29CC826C7 pool2
+[1] SLEEPING     migration copy 000060D40698B4BF4BE284666ED29CC826C7 pool2
+&dc-prompt-pool; <userinput>migration ls</userinput>
+[1] RUNNING      migration copy 000060D40698B4BF4BE284666ED29CC826C7 pool2
+&dc-prompt-pool; <userinput>migration suspend 1</userinput>
+[1] SUSPENDED    migration copy 000060D40698B4BF4BE284666ED29CC826C7 pool2
+&dc-prompt-pool; <userinput>migration resume 1</userinput>
+[1] RUNNING      migration copy 000060D40698B4BF4BE284666ED29CC826C7 pool2
+&dc-prompt-pool; <userinput>migration info 1</userinput>
+Command    : migration copy -pnfsid=000060D40698B4BF4BE284666ED29CC826C7 pool2
+State      : RUNNING
+Queued     : 0
+Attempts   : 1
+Targets    : pool2
+Completed  : 0 files; 0 bytes; 0%
+Total      : 5242880 bytes
+Concurrency: 1
+Running tasks:
+[1] 00007C75C2E635CD472C8A75F5A90E4960D3: TASK.GettingLocations
+&dc-prompt-pool; <userinput>migration info 1</userinput>
+Command    : migration copy -pnfsid=000060D40698B4BF4BE284666ED29CC826C7 pool2
+State      : FINISHED
+Queued     : 0
+Attempts   : 1
+Targets    : pool2
+Completed  : 1 files; 5242880 bytes
+Total      : 5242880 bytes
+Concurrency: 1
+Running tasks:
+&dc-prompt-pool; <userinput>migration ls</userinput>
+[1] FINISHED     migration copy 000060D40698B4BF4BE284666ED29CC826C7 pool2
+	</screen>
+
+	<para>
+	  A migration job can be cancelled with the command
+	  <command>migration cancel </command>.
+	</para>
+	<screen>&dc-prompt-local; <userinput>cd <replaceable>poolname</replaceable></userinput>
+&dc-prompt-pool; <userinput>migration copy -pnfsid=0000D194FBD450A44D3EA606D0434D6D88CD pool2</userinput>
+[1] INITIALIZING migration copy 0000D194FBD450A44D3EA606D0434D6D88CD pool2
+&dc-prompt-pool; <userinput>migration cancel 1</userinput>
+[1] CANCELLED    migration copy -pnfsid=0000D194FBD450A44D3EA606D0434D6D88CD pool2
+	</screen>
+	<para>
+	  And terminated jobs can be cleared with the command
+	  <command>migration clear</command>.
+	</para>
+	<screen>&dc-prompt-pool; <userinput>migration ls</userinput>
+[3] FINISHED     migration copy -pnfsid=0000D194FBD450A44D3EA606D0434D6D88CD pool2
+[2] FINISHED     migration copy -pnfsid=00007C75C2E635CD472C8A75F5A90E4960D3 pool2
+[1] FINISHED     migration copy -pnfsid=0000A48650142CBF4E55A7A26429DFEA27B6 pool2
+[5] FINISHED     migration move -pnfsid=000028C0C288190C4CE7822B3DB2CA6395E2 pool2
+[4] FINISHED     migration move -pnfsid=00007C75C2E635CD472C8A75F5A90E4960D3 pool2
+&dc-prompt-pool; <userinput>migration clear</userinput>
+&dc-prompt-pool; <userinput>migration ls</userinput>
+	</screen>
+
+	<para>
+	  Except for the number of concurrent tasks, transfer
+	  parameters of existing jobs cannot be changed. This is by
+	  design to ensure idempotency of jobs. The concurrency can be
+	  altered through the <command>migration concurrency</command>
+	  command.
+      </para>
+
+      <screen>&dc-prompt-pool; <userinput>migration concurrency 4 2</userinput>
+&dc-prompt-pool; <userinput>migration info</userinput>
+Command    : migration copy pool2
+State      : FINISHED
+Queued     : 0
+Attempts   : 6
+Targets    : pool2
+Completed  : 6 files; 20976068 bytes
+Total      : 20976068 bytes
+Concurrency: 2
+Running tasks:
+      </screen>
+
+
+      </informalexample>
+
+
+
+
+
+
+
+
+
+
+
+
     </section>
 
     <section>
@@ -474,18 +664,20 @@
       <section>
         <title>Vacating a pool</title>
 
-        <para>
-          To vacate <replaceable>sourcePool</replaceable>, we first
-          mark the pool read-only to avoid that more files are added
-          to the pool, and then move all files to
-          <replaceable>targetPool</replaceable>. It is not strictly
-          necessary to mark the pool read-only, however if not done
-          there is no guarantee that the pool is empty when the
-          migration job terminates. The job can be rerun to move
-          remaining files.
-        </para>
+	<informalexample>
+	  <para>
+	    To vacate the pool <replaceable>sourcePool</replaceable>,
+	    we first mark the pool <literal>read-only</literal> to
+	    avoid that more files are added to the pool, and then move
+	    all files to the pool
+	    <replaceable>targetPool</replaceable>. It is not strictly
+	    necessary to mark the pool <literal>read-only</literal>,
+	    however if not done there is no guarantee that the pool is
+	    empty when the migration job terminates. The job can be
+	    rerun to move remaining files.
+	  </para>
 
-<screen>&dc-prompt-srcpool; <userinput>pool disable -rdonly</userinput>
+	  <screen>&dc-prompt-srcpool; <userinput>pool disable -rdonly</userinput>
 &dc-prompt-srcpool; <userinput>migration move <replaceable>targetPool</replaceable></userinput>
 [1] RUNNING      migration move <replaceable>targetPool</replaceable>
 &dc-prompt-srcpool; <userinput>migration info 1</userinput>
@@ -511,20 +703,21 @@ Concurrency: 1
 Running tasks:
 &dc-prompt-srcpool; <userinput>rep ls</userinput>
 &dc-prompt-srcpool;</screen>
+	</informalexample>
       </section>
 
       <section>
         <title>Caching recently accessed files</title>
+	<informalexample>
+	  <para>
+	    Say we want to cache all files belonging to the storage
+	    group <literal>atlas:default</literal> and accessed within
+	    the last month on a set of low-cost cache pools defined by
+	    the pool group <literal>cache_pools</literal>. We can
+	    achieve this through the following command.
+	  </para>
 
-        <para>
-          Say we want to cache all files belonging to the storage
-          group atlas:default and accessed within the last month on a
-          set of low-cost cache pools defined by pool group
-          cache_pools. We can achieve this through the following
-          command.
-        </para>
-
-<screen>&dc-prompt-srcpool; <userinput>migration cache -target=pgroup -accessed=0..2592000 -storage=atlas:default cache_pools</userinput>
+	  <screen>&dc-prompt-srcpool; <userinput>migration cache -target=pgroup -accessed=0..2592000 -storage=atlas:default cache_pools</userinput>
 [1] INITIALIZING migration cache -target=pgroup -accessed=0..2592000 -storage=atlas:default cache_pools
 &dc-prompt-srcpool; <userinput>migration info 1</userinput>
 Command    : migration cache -target=pgroup -accessed=0..2592000 -storage=atlas:default cache_pools
@@ -538,11 +731,13 @@ Concurrency: 1
 Running tasks:
 [72] 00010000000000000000BE10: TASK.Copying -> [pool_2@local]</screen>
 
-        <para>
-          The files on the source pool will not be altered. Any file
+           <para>
+	     The files on the source pool will not be altered. Any file
           copied to one of the target pools will be marked cached.
-        </para>
+	   </para>
+	</informalexample>
       </section>
+
     </section>
   </section>
 
@@ -648,34 +843,36 @@ Starting poolDomain done
 
 <screen>&dc-prompt-pool; <userinput>rep set sticky <replaceable>pnfsid</replaceable> <option>on|off</option></userinput></screen>
 
-      the 'sticky' mode will stay with the file as long as the file
-      is in the pool.  If the file is removed from the pool and
-      recreated afterwards this information gets lost.
+      the <literal>sticky</literal> mode will stay with the file as
+      long as the file is in the pool.  If the file is removed from
+      the pool and recreated afterwards this information gets lost.
     </para>
 
     <para>
       You may use the same mechanism globally:  in the command line
       interface (local mode) there is the command
 
-<screen>&dc-prompt-pool; <userinput>set sticky <replaceable>pnfsid</replaceable></userinput></screen>
+<screen>&dc-prompt-local; <userinput>set sticky <replaceable>pnfsid</replaceable></userinput></screen>
 
       This command does:
       <orderedlist>
         <listitem>
           <para>
-            Flags the file as sticky in the name space database
-            (pnfs). So from now the filename is globally set sticky.
+            Flags the file as <literal>sticky</literal> in the name
+            space database (&chimera;). So from now the filename is
+            globally set <literal>sticky</literal>.
           </para>
         </listitem>
         <listitem>
           <para>
             Will go to all pools where it finds the file and will flag
-            it sticky in the pools.
+            it <literal>sticky</literal> in the pools.
           </para>
         </listitem>
         <listitem>
           <para>
-            All new copies of the file will become sticky.
+            All new copies of the file will become
+            <literal>sticky</literal>.
           </para>
         </listitem>
       </orderedlist>
