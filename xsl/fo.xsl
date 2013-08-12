@@ -66,8 +66,7 @@
     <xsl:attribute name="border-color">#8fbc8f</xsl:attribute>
     <xsl:attribute name="border-style">solid</xsl:attribute>
     <xsl:attribute name="border-width">thin</xsl:attribute>
-    <xsl:attribute name="padding">7pt</xsl:attribute>
-
+    <xsl:attribute name="padding">0pt</xsl:attribute>
     <xsl:attribute name="background-color">
       <xsl:choose>
 	<xsl:when test="self::programlisting">#FFFFF8</xsl:when>
@@ -109,7 +108,203 @@
       <xsl:call-template name="inline.charseq"/>
     </fo:inline>
   </xsl:template>
-  
+
+  <!-- Add 'Example' to informalexample -->
+  <xsl:template name="informal.object">
+  <xsl:variable name="id">
+    <xsl:call-template name="object.id"/>
+  </xsl:variable>
+
+  <xsl:variable name="keep.together">
+    <xsl:call-template name="pi.dbfo_keep-together"/>
+  </xsl:variable>
+
+  <!-- Some don't have a pgwide attribute, so may use a PI -->
+  <xsl:variable name="pgwide.pi">
+    <xsl:call-template name="pi.dbfo_pgwide"/>
+  </xsl:variable>
+
+  <xsl:variable name="pgwide">
+    <xsl:choose>
+      <xsl:when test="@pgwide">
+        <xsl:value-of select="@pgwide"/>
+      </xsl:when>
+      <xsl:when test="$pgwide.pi">
+        <xsl:value-of select="$pgwide.pi"/>
+      </xsl:when>
+      <!-- child element may set pgwide -->
+      <xsl:when test="*[@pgwide]">
+        <xsl:value-of select="*[@pgwide][1]/@pgwide"/>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:variable>
+
+  <xsl:choose>
+    <!-- informaltables have their own templates and
+         are not handled by formal.object -->
+    <xsl:when test="local-name(.) = 'equation'">
+      <xsl:choose>
+        <xsl:when test="$pgwide = '1'">
+          <fo:block id="{$id}"
+                    xsl:use-attribute-sets="pgwide.properties
+                                            equation.properties">
+            <xsl:if test="$keep.together != ''">
+              <xsl:attribute name="keep-together.within-column"><xsl:value-of
+                              select="$keep.together"/></xsl:attribute>
+            </xsl:if>
+            <xsl:call-template name="equation.without.title"/>
+          </fo:block>
+        </xsl:when>
+        <xsl:otherwise>
+          <fo:block id="{$id}"
+                    xsl:use-attribute-sets="equation.properties">
+            <xsl:if test="$keep.together != ''">
+              <xsl:attribute name="keep-together.within-column"><xsl:value-of
+                              select="$keep.together"/></xsl:attribute>
+            </xsl:if>
+            <xsl:call-template name="equation.without.title"/>
+          </fo:block>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:when>
+    <xsl:when test="local-name(.) = 'procedure'">
+      <fo:block id="{$id}"
+                xsl:use-attribute-sets="procedure.properties">
+        <xsl:if test="$keep.together != ''">
+          <xsl:attribute name="keep-together.within-column"><xsl:value-of
+                          select="$keep.together"/></xsl:attribute>
+        </xsl:if>
+        <xsl:apply-templates/>
+      </fo:block>
+    </xsl:when>
+    <xsl:when test="local-name(.) = 'informalfigure'">
+      <xsl:choose>
+        <xsl:when test="$pgwide = '1'">
+          <fo:block id="{$id}"
+                    xsl:use-attribute-sets="pgwide.properties
+                                            informalfigure.properties">
+            <xsl:if test="$keep.together != ''">
+              <xsl:attribute name="keep-together.within-column"><xsl:value-of
+                              select="$keep.together"/></xsl:attribute>
+            </xsl:if>
+            <xsl:apply-templates/>
+          </fo:block>
+        </xsl:when>
+        <xsl:otherwise>
+          <fo:block id="{$id}"
+                    xsl:use-attribute-sets="informalfigure.properties">
+            <xsl:if test="$keep.together != ''">
+              <xsl:attribute name="keep-together.within-column"><xsl:value-of
+                              select="$keep.together"/></xsl:attribute>
+            </xsl:if>
+            <xsl:apply-templates/>
+          </fo:block>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:when>
+
+    <xsl:when test="local-name(.) = 'informalexample'">
+
+      <xsl:choose>
+        <xsl:when test="$pgwide = '1'">
+          <fo:block id="{$id}" border-style="solid" border-width="thin" border-color="grey"
+                    xsl:use-attribute-sets="pgwide.properties
+                                            informalexample.properties">
+
+            <xsl:if test="$keep.together != ''">
+              <xsl:attribute name="keep-together.within-column"><xsl:value-of
+                              select="$keep.together"/></xsl:attribute>
+            </xsl:if>
+	    <fo:block margin-left="2%" margin-right="2%" margin-top="1%" margin-bottom="1%">
+            <fo:inline font-weight="bold">Example:</fo:inline>
+            <xsl:apply-templates/>
+            </fo:block>
+          </fo:block>
+        </xsl:when>
+        <xsl:otherwise>
+	  <fo:block id="{$id}" border-style="solid" border-width="thin" border-color="grey"
+                    xsl:use-attribute-sets="informalexample.properties">
+            <xsl:if test="$keep.together != ''">
+              <xsl:attribute name="keep-together.within-column"><xsl:value-of
+                              select="$keep.together"/></xsl:attribute>
+            </xsl:if>
+            <fo:block margin-left="2%" margin-right="2%" margin-top="1%" margin-bottom="1%">
+                <fo:inline font-weight="bold">Example:</fo:inline>
+            <xsl:apply-templates/>
+            </fo:block>
+
+          </fo:block>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:when>
+    <xsl:when test="local-name(.) = 'informalequation'">
+      <xsl:choose>
+        <xsl:when test="$pgwide = '1'">
+          <fo:block id="{$id}"
+                    xsl:use-attribute-sets="pgwide.properties
+                                            informalequation.properties">
+            <xsl:if test="$keep.together != ''">
+              <xsl:attribute name="keep-together.within-column"><xsl:value-of
+                              select="$keep.together"/></xsl:attribute>
+            </xsl:if>
+            <xsl:apply-templates/>
+          </fo:block>
+        </xsl:when>
+        <xsl:otherwise>
+          <fo:block id="{$id}"
+                    xsl:use-attribute-sets="informalequation.properties">
+            <xsl:if test="$keep.together != ''">
+              <xsl:attribute name="keep-together.within-column"><xsl:value-of
+                              select="$keep.together"/></xsl:attribute>
+            </xsl:if>
+            <xsl:apply-templates/>
+          </fo:block>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:when>
+    <xsl:otherwise>
+      <fo:block id="{$id}"
+                xsl:use-attribute-sets="informal.object.properties">
+        <xsl:if test="$keep.together != ''">
+          <xsl:attribute name="keep-together.within-column"><xsl:value-of
+                          select="$keep.together"/></xsl:attribute>
+        </xsl:if>
+        <xsl:apply-templates/>
+      </fo:block>
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+
+
+  <!-- add brackets for replaceable -->
+
+  <xsl:template match="replaceable">
+    <xsl:call-template name="inline.add-brackets"/>
+  </xsl:template>
+
+  <xsl:template name="inline.add-brackets">
+    <xsl:param name="content">
+      <xsl:call-template name="simple.xlink">
+	<xsl:with-param name="content">
+	  <xsl:apply-templates/>
+	</xsl:with-param>
+      </xsl:call-template>
+    </xsl:param>
+
+    <fo:inline color="#268bd2" xsl:use-attribute-sets="monospace.properties">
+      <xsl:call-template name="anchor"/>
+      <xsl:if test="@dir">
+	<xsl:attribute name="direction">
+	  <xsl:choose>
+	    <xsl:when test="@dir = 'ltr' or @dir = 'lro'">ltr</xsl:when>
+	    <xsl:otherwise>rtl</xsl:otherwise>
+	  </xsl:choose>
+	</xsl:attribute>
+      </xsl:if>
+      <xsl:value-of select="concat('&lt;',$content,'&gt;')"/>
+    </fo:inline>
+  </xsl:template>
+
 
   <!-- Support tables with tabstyle='small' -->
   <xsl:attribute-set name="table.table.properties">
