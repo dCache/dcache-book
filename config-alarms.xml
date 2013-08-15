@@ -35,7 +35,7 @@
       <filename>&path-od-vld;/alarms/alarms.xml</filename> the
       &serv-alarms; service should be defined on the same host as the
       &serv-httpd; service. You can modify where this file is placed
-      by setting the property <varname>alarms.store.path</varname> to
+      by setting the property <varname>httpd.alarms.db.xml.path</varname> to
       a different location.
     </para>
     <para>
@@ -211,8 +211,8 @@
     </note>
 
     <programlisting>[httpdDomain]
-    authenticated=true
-    webadminAdminGid=<replaceable>1234</replaceable>
+    httpd.enable.authn=true
+    httpd.authz.admin-gid=<replaceable>1234</replaceable>
 [httpdDomain/httpd]</programlisting>
 
 
@@ -288,9 +288,9 @@
       often, and purges all alarms marked as <literal>closed</literal>
       with a timestamp earlier than the given window. This daemon can
       be configured using the properties
-      <varname>webadmin.alarm.cleaner.enabled</varname>,
-      <varname>webadmin.alarm.cleaner.timeout</varname> and
-      <varname>webadmin.alarm.cleaner.delete-threshold</varname>.
+      <varname>httpd.enable.alarm-cleaner</varname>,
+      <varname>httpd.alarm-cleaner.timeout</varname> and
+      <varname>httpd.alarm-cleaner.delete-entries-before</varname>.
     </para>
 
   </section>
@@ -312,10 +312,10 @@
     <para>
       To use a database instead of the &xml; file you need to modify
       the <filename>&path-ode-ed;/dcache.conf</filename> file. Set the
-      property <varname>alarms.store.db.type</varname> to
+      property <varname>httpd.alarms.db.type</varname> to
       <literal>rdbms</literal>. Moreover, as you want to maintain a
       history you should disable the
-      <varname>webadmin.alarm.cleaner.enabled</varname>.
+      <varname>httpd.enable.alarm-cleaner</varname>.
     </para>
 
     <para>
@@ -324,8 +324,8 @@
     </para>
     <para>
       Modify the <filename>&path-ode-ed;/dcache.conf</filename> file
-      <programlisting>alarms.store.db.type=rdbms
-webadmin.alarm.cleaner.enabled=false</programlisting>
+      <programlisting>httpd.alarms.db.type=rdbms
+httpd.enable.alarm-cleaner=false</programlisting>
       and restart &dcache;.
       <screen>&prompt-root; <userinput>dcache restart</userinput></screen>
     </para>
@@ -734,7 +734,7 @@ java -cp ${CP} ch.qos.logback.classic.net.SimpleSocketServer ${PORT} /var/lib/dc
 
 
        <varlistentry>
-	 <term>alarms.server.config</term>
+	 <term>alarms.log.config.path</term>
 	 <listitem>
 	   <para>
 	     Default: <literal>${alarms.dir}/logback-server.xml</literal>
@@ -746,7 +746,7 @@ java -cp ${CP} ch.qos.logback.classic.net.SimpleSocketServer ${PORT} /var/lib/dc
        </varlistentry>
 
        <varlistentry>
-	 <term>alarms.store.db.type</term>
+	 <term>httpd.alarms.db.type</term>
 	 <listitem>
 	   <para>
 	     Default: <literal>xml</literal>
@@ -754,53 +754,41 @@ java -cp ${CP} ch.qos.logback.classic.net.SimpleSocketServer ${PORT} /var/lib/dc
 	   <para>
 	     Defines what kind of database (either XML or
 	     &psql;). Set
-	     <varname>alarms.store.db.type</varname>=<literal>rdbms</literal>
+	     <varname>httpd.alarms.db.type</varname>=<literal>rdbms</literal>
 	     to use &psql;.
 	   </para>
 	 </listitem>
        </varlistentry>
 
        <varlistentry>
-	 <term>alarms.store.db.changelog</term>
-	 <listitem>
-	   <para>
-	     Default: <literal>org/dcache/alarms/db/sql/alarms.changelog-master.xml</literal>
-	   </para>
-	   <para>
-	     Liquibase master changelog.
-	   </para>
-	 </listitem>
-       </varlistentry>
-
-        <varlistentry>
-	 <term>alarms.store.path</term>
+	 <term>httpd.alarms.db.xml.path</term>
 	 <listitem>
 	   <para>
 	     Default: <literal>${alarms.dir}/alarms.xml</literal>
 	   </para>
 	   <para>
 	     The path of the <filename>alarms.xml</filename>. Used if
-	     <varname>alarms.store.db.type</varname>=<literal>xml</literal>.
+	     <varname>httpd.alarms.db.type</varname>=<literal>xml</literal>.
 	   </para>
 	 </listitem>
        </varlistentry>
 
        <varlistentry>
-	 <term>alarms.store.db.rdbms</term>
+	 <term>alarms.db.rdbms.type</term>
 	 <listitem>
 	   <para>
 	     Default: <literal>postgresql</literal>
 	   </para>
 	   <para>
 	     If this value is changed from its default the
-	     <varname>alarms.store.db.driver</varname> property must
+	     <varname>httpd.alarms.db.driver</varname> property must
 	     also be changed.
 	   </para>
 	 </listitem>
        </varlistentry>
 
        <varlistentry>
-	 <term>alarms.store.db.driver</term>
+	 <term>httpd.alarms.db.driver</term>
 	 <listitem>
 	   <para>
 	     Default: <literal>org.postgresql.Driver</literal>
@@ -808,7 +796,7 @@ java -cp ${CP} ch.qos.logback.classic.net.SimpleSocketServer ${PORT} /var/lib/dc
 	   <para>
 	     This property should give the correct namespace for the
 	     RDBMS set by the property
-	     <varname>alarms.store.db.rdbms</varname>.
+	     <varname>alarms.db.rdbms.type</varname>.
 	   </para>
 	 </listitem>
        </varlistentry>
@@ -826,7 +814,7 @@ java -cp ${CP} ch.qos.logback.classic.net.SimpleSocketServer ${PORT} /var/lib/dc
        </varlistentry>
 
        <varlistentry>
-	 <term>alarms.store.db.user</term>
+	 <term>httpd.alarms.db.user</term>
 	 <listitem>
 	   <para>
 	     Default:
@@ -838,7 +826,7 @@ java -cp ${CP} ch.qos.logback.classic.net.SimpleSocketServer ${PORT} /var/lib/dc
        </varlistentry>
 
        <varlistentry>
-	 <term>alarms.store.db.pass</term>
+	 <term>httpd.alarms.db.password</term>
 	 <listitem>
 	   <para>
 	     Default: <literal>no password</literal>
@@ -850,7 +838,7 @@ java -cp ${CP} ch.qos.logback.classic.net.SimpleSocketServer ${PORT} /var/lib/dc
        </varlistentry>
 
        <varlistentry>
-	 <term>alarms.store.db.properties</term>
+	 <term>httpd.alarms.db.config.path</term>
 	 <listitem>
 	   <para>
 	     Default: <literal>${alarms.dir}/datanucleus.properties</literal>
@@ -865,7 +853,7 @@ java -cp ${CP} ch.qos.logback.classic.net.SimpleSocketServer ${PORT} /var/lib/dc
        </varlistentry>
 
        <varlistentry>
-	 <term>webadmin.alarm.cleaner.enabled</term>
+	 <term>httpd.enable.alarm-cleaner</term>
 	 <listitem>
 	   <para>
 	     Default: <literal>true</literal>
@@ -878,7 +866,7 @@ java -cp ${CP} ch.qos.logback.classic.net.SimpleSocketServer ${PORT} /var/lib/dc
        </varlistentry>
 
        <varlistentry>
-	 <term>webadmin.alarm.cleaner.timeout</term>
+	 <term>httpd.alarm-cleaner.timeout</term>
 	 <listitem>
 	   <para>
 	     Default: <literal>168</literal> (24 x 7 hours)
@@ -891,7 +879,7 @@ java -cp ${CP} ch.qos.logback.classic.net.SimpleSocketServer ${PORT} /var/lib/dc
        </varlistentry>
 
        <varlistentry>
-	 <term>webadmin.alarm.cleaner.delete-threshold</term>
+	 <term>httpd.alarm-cleaner.delete-entries-before</term>
 	 <listitem>
 	   <para>
 	     Default: <literal>336</literal> (24 X 14 hours)
