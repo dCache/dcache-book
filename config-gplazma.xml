@@ -20,6 +20,7 @@
 <!ENTITY gp2-voms "<literal>voms</literal> plug-in">
 <!ENTITY gp2-krb5 "<literal>krb5</literal> plug-in">
 <!ENTITY gp2-nsswitch "<literal>nsswitch</literal> plug-in">
+<!ENTITY gp2-banfile "<literal>banfile</literal> plug-in">
 
 <!ENTITY auth "<literal>auth</literal>">
 <!ENTITY map "<literal>map</literal>">
@@ -551,6 +552,72 @@ session requisite nis #6</programlisting>
             </varlistentry>
           </variablelist>
         </section>
+
+        <section id="cf-gplazma-gp2-configuration-plug-ins-banfile-account">
+          <title>banfile</title>
+          <para>
+            The &gp2-banfile; bans users by their principal class and the
+            associated name.  It is configured via a simple plain text file.
+            <informalexample>
+              <programlisting># Ban users by principal
+alias dn=org.globus.gsi.jaas.GlobusPrincipal
+alias kerberos=javax.security.auth.kerberos.KerberosPrincipal
+alias fqan=org.dcache.auth.FQANPrincipal
+alias name=org.dcache.auth.LoginNamePrincipal
+
+ban name:ernie
+ban kerberos:BERT@EXAMPLE.COM
+ban com.example.SomePrincipal:Samson</programlisting>
+              <para>
+                In this example the first line is a comment. Lines 2 to 5
+                define aliases for principal class names that can then be used
+                in the following banning section. The four aliases defined in
+                this example are actually hard coded into &cell-gplazma;,
+                therefore you can use these short names without explicitly
+                defining them in your configuration file. Line 7 to 9 contain
+                ban definitions.  Line 9 directly uses the class name of a
+                principal class instead of using an alias.
+              </para>
+              <para>
+                Please note that the plug-in only supports principals whose
+                assiciated name is a single line of plain text. In programming
+                terms this means the constructor of the principal class has to
+                take exactly one single string parameter.
+              </para>
+              <para>
+                For the plugin to work, the configuration file has to exist
+                even if it is empty.
+              </para>
+            </informalexample>
+          </para>
+          <variablelist>
+            <title>Properties</title>
+            <varlistentry><term><varname role="dcache.property">gplazma.banfile.path</varname></term>
+              <listitem>
+                <para>
+                  Path to configuration file
+                </para>
+                <para>
+                  Default: <filename>&path-ode-ed;/ban.conf</filename>
+                </para>
+              </listitem>
+            </varlistentry>
+          </variablelist>
+
+          <para>To activate the &gp2-banfile; it has to be added to <filename>gplazma.conf</filename>:
+            <informalexample>
+              <programlisting># Map grid or kerberos users to local accounts
+auth    optional  x509
+auth    optional  voms
+map     requisite vorolemap
+map     optional  krb5
+map     optional  nis
+session requisite nis
+account requisite banfile</programlisting>
+            </informalexample>
+          </para>
+        </section>
+
       </section>
 
       <section id="cf-gplazma-gp2-configuration-plug-ins-session">
