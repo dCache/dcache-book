@@ -127,12 +127,14 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY cell-ftp             "<literal>FTP</literal>">
 <!ENTITY cell-gridftp             "<literal>gridftp</literal>">
 <!ENTITY cell-kerberosftp             "<literal>kerberosftp</literal>">
+<!ENTITY cell-locationmngr "<literal>LocationManager</literal>">
 
 
 <!-- Various services -->
 <!-- Services are the names used in layout files -->
 <!ENTITY serv-acl             "<literal>acl</literal>">
 <!ENTITY serv-admin           "<literal>admin</literal>">
+<!ENTITY serv-alarms           "<literal>alarms</literal>">
 <!ENTITY serv-authdcap        "<literal>authdcap</literal>">
 <!ENTITY serv-billing         "<literal>billing</literal>">
 <!ENTITY serv-broadcast       "<literal>broadcast</literal>">
@@ -202,6 +204,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY rpm      "<acronym>RPM</acronym>">
 <!ENTITY p12      "<acronym>PKCS12</acronym>">
 <!ENTITY x509     "<literal>X.509</literal>">
+<!ENTITY xml      "<acronym>XML</acronym>">
 
 <!-- Standard and rfc -->
 <!ENTITY posix      "<acronym>POSIX</acronym>">
@@ -222,6 +225,8 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY integrity  "<emphasis>INTEGRITY</emphasis>">
 <!ENTITY privacy    "<emphasis>PRIVACY</emphasis>">
 
+<!-- Various dCache internals -->
+<!ENTITY pnfsid     "<literal>PNFS-ID</literal>">
 
 
 <!-- Some commands -->
@@ -319,6 +324,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY path-ode-ed "<phrase layout='opt'>/opt/d-cache/etc</phrase><phrase layout='fhs'>/etc/dcache</phrase>">
 <!ENTITY path-ode-eg "<phrase layout='opt'>/opt/d-cache/etc</phrase><phrase layout='fhs'>/etc/grid-security</phrase>">
 <!ENTITY path-ode-eda "<phrase layout='opt'>/opt/d-cache/etc</phrase><phrase layout='fhs'>/etc/dcache/admin</phrase>">
+<!ENTITY path-ode-usdr "<phrase layout='opt'>/opt/d-cache/etc</phrase><phrase layout='fhs'>/usr/share/dcache/replica</phrase>">
 <!ENTITY path-ods-usd "<phrase layout='opt'>/opt/d-cache/share</phrase><phrase layout='fhs'>/usr/share/dcache</phrase>">
 <!ENTITY path-odl-usd "<phrase layout='opt'>/opt/d-cache/libexec</phrase><phrase layout='fhs'>/usr/share/dcache</phrase>">
 <!ENTITY path-odc-ed "<phrase layout='opt'>/opt/d-cache/config</phrase><phrase layout='fhs'>/etc/dcache</phrase>">

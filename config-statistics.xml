@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+
+%sharedents;
+<!ENTITY cell-poolstat   "<literal>PoolStatistics</literal>">
+
+]>
+
+
+<chapter id="cf-statistics">
+
+  <title>The &serv-statistics; Service</title>
+
+  <para>
+    The &serv-statistics; service collects information on the amount
+    of data stored on all pools and the total data flow including
+    streams from and to tertiary storage systems.
+  </para>
+  <para>
+    Once per hour an &ascii; file is produced, containing a table with
+    information on the amount of used disk space and the data
+    transferred starting midnight up to this point in time. Data is
+    sorted per pool and storage class.
+  </para>
+  <para>
+    In addition to the hourly statistics, files are produced reporting
+    on the daily, monthly and yearly &dcache; activities. An &html;
+    tree is produced and updated once per hour allowing to navigate
+    through the collected statistics information.
+  </para>
+
+  <section id="cf-statistics-basic">
+    <title>The Basic Setup</title>
+    <para>
+      Define the &serv-statistics; service in the domain, where the
+      &serv-httpd; is running.
+    </para>
+    <programlisting>[httpdDomain]
+[httpdDomain/httpd]
+...
+[httpdDomain/statistics]</programlisting>
+
+    <para>
+      The &serv-statistics; service automatically creates a directory
+      tree, structured according to years, months and days.
+    </para>
+
+    <para>
+      Once per hour, a <filename>total.raw</filename> file is produced
+      underneath the active <filename class='directory'>year</filename>,
+      <filename class='directory'>month</filename> and <filename
+      class='directory'>day</filename> directories, containing the sum over
+      all pools and storage classes of the corresponding time
+      interval. The <filename class='directory'>day</filename> directory
+      contains detailed statistics per hour and for the whole day.
+    </para>
+    <programlisting>&path-od-vld;/statistics/YYYY/total.raw
+&path-od-vld;/statistics/YYYY/MM/total.raw
+&path-od-vld;/statistics/YYYY/MM/DD/total.raw
+&path-od-vld;/statistics/YYYY/MM/DD/YYYY-MM-DD-day.raw
+&path-od-vld;/statistics/YYYY/MM/DD/YYYY-MM-DD-HH.raw</programlisting>
+
+    <para>
+      In the same directory tree the &html; files are created for each
+      day, month and year.
+    </para>
+    <programlisting>&path-od-vld;/statistics/YYYY/index.html
+&path-od-vld;/statistics/YYYY/MM/index.html
+&path-od-vld;/statistics/YYYY/MM/DD/index.html</programlisting>
+
+    <para>
+      By default the path for the statistics data is <filename
+      class="directory">/var/lib/dcache/statistics</filename>.  You
+      can modify this path by setting the property
+      <varname>dcache.paths.statistics</varname> to a different value.
+    </para>
+
+
+  </section>
+
+  <section id="cf-statistics-webPage">
+    <title>The Statistics Web Page</title>
+    <para>
+      Point a web browser to your &dcache; webpage at
+      <uri>http://<replaceable>head-node.example.org</replaceable>:2288/</uri>. On
+      the bottom you find the link to <literal>Statistics</literal>.
+    </para>
+    <para>
+      The statistics data needs to be collected for a day before it
+      will appear on the web page.
+    </para>
+    <note>
+      <para>
+	You will get an error if you try to read the statistics web
+	page right after you enabled the &serv-statistics; as the web
+	page has not yet been created.
+      </para>
+
+      <para>
+	Create data and the web page by logging in to the admin
+	interface and running the commands <command>create
+	stat</command> and <command>create html</command>.
+	<screen>&dc-prompt-local; cd PoolStatistics@<replaceable>httpdDomain</replaceable>
+<prompt>(PoolStatistics@)<replaceable>httpdDomain</replaceable> admin &gt;</prompt> create stat
+Thread started for internal run
+<prompt>(PoolStatistics@)<replaceable>httpdDomain</replaceable> admin &gt;</prompt> create html
+java.lang.NullPointerException</screen>
+      </para>
+      <para>
+	Now you can see a statistics web page.
+      </para>
+    </note>
+
+      <para>
+	Statistics is calculated once per hour at
+	<literal><replaceable>HH</replaceable>:55</literal>. The daily
+	stuff is calculated at <literal>23:55</literal>. Without
+	manual intervention, it takes two midnights before all &html;
+	statistics pages are available. There is a way to get this
+	done after just one midnight. After the first midnight
+	following the first startup of the statistics module, log into
+	the &cell-poolstat; cell and run the following commands in the
+	given sequence. The specified date has to be the
+	Year/Month/Day of today.
+      </para>
+
+	<screen><prompt>(PoolStatistics@)<replaceable>httpdDomain</replaceable> admin &gt;</prompt> create html <replaceable>YYYY</replaceable> <replaceable>MM</replaceable> <replaceable>DD</replaceable>
+done
+<prompt>(PoolStatistics@)<replaceable>httpdDomain</replaceable> admin &gt;</prompt> create html <replaceable>YYYY</replaceable> <replaceable>MM</replaceable>
+done
+<prompt>(PoolStatistics@)<replaceable>httpdDomain</replaceable> admin &gt;</prompt> create html <replaceable>YYYY</replaceable>
+done
+<prompt>(PoolStatistics@)<replaceable>httpdDomain</replaceable> admin &gt;</prompt> create html
+done
+</screen>
+
+      <para>
+	You will see an empty statistics page at
+	<uri>http://<replaceable>head-node.example.org</replaceable>:2288/statistics/</uri>.
+      </para>
+
+	<para>
+	  On the <literal>Statistics Help Page</literal>
+	  <uri>http://<replaceable>head-node.example.org</replaceable>:2288/docs/statisticsHelp.html</uri>
+	  you find an explanation for the colors.
+	</para>
+
+  </section>
+
+
+
+    <section id="cf-statistics-raw">
+      <title>Explanation of the File Format of the
+      <filename>xxx.raw</filename> Files</title>
+
+      <para>
+	The file formats of the
+	<filename>&path-od-vld;/statistics/YYYY/MM/DD/YYYY-MM-DD-HH.raw</filename>
+	and the
+	<filename>&path-od-vld;/statistics/YYYY/MM/DD/YYYY-MM-DD-day.raw</filename>
+	files are similar. The file
+	<filename>&path-od-vld;/statistics/YYYY/MM/DD/YYYY-MM-DD-HH.raw</filename>
+	does not contain columns 2 and 3 as these are related to the
+	day and not to the hour.
+      </para>
+
+      <informalexample>
+	<para>
+	  The file format of the
+	  <filename>&path-od-vld;/statistics/YYYY/MM/DD/YYYY-MM-DD-day.raw</filename>
+	  files:
+	</para>
+	<programlisting>#
+# timestamp=1361364900897
+# date=Wed Feb 20 13:55:00 CET 2013
+#
+pool1 StoreA:GroupB@osm 21307929 10155 2466935 10155 0 925 0  0   0   0   85362 0</programlisting>
+    </informalexample>
+
+      <para>
+	Format of <filename>YYYY-MM-DD-day.raw</filename> files.
+      </para>
+
+      <informaltable>
+	<tgroup cols="2">
+	  <colspec colnum="1" colname="Column" align="center" colwidth="*"/>
+	  <colspec colnum="2" colname="Description" align="center" colwidth="3*"/>
+	  <thead>
+	    <row>
+	      <entry>Column Number</entry>
+	      <entry>Column Description</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row> <entry>0</entry> <entry>Pool Name</entry> </row>
+	    <row> <entry>1</entry> <entry>Storage Class</entry> </row>
+	    <row> <entry>2</entry> <entry>Bytes stored on this pool
+	    for this storage class at beginning of day &mdash; green
+	    bar</entry> </row>
+	    <row> <entry>3</entry> <entry>Number of files stored on
+	    this pool for this storage class at beginning of
+	    day</entry></row>
+	    <row> <entry>4</entry> <entry>Bytes stored on this pool
+	    for this storage class at this hour or end of day &mdash;
+	    red bar</entry> </row>
+	    <row> <entry>5</entry> <entry>Number of files stored on
+	    this pool for this storage class at this hour or end of
+	    day</entry> </row>
+	    <row> <entry>6</entry> <entry>Total Number of transfers
+	    (in and out, dCache-client)</entry> </row>
+	    <row> <entry>7</entry> <entry>Total Number of restores
+	    (HSM to dCache)</entry> </row>
+	    <row> <entry>8</entry> <entry>Total Number of stores
+	    (dCache to HSM)</entry> </row>
+	    <row> <entry>9</entry> <entry>Total Number errors</entry>
+	    </row>
+	    <row> <entry>10</entry> <entry>Total Number of bytes
+	    transferred from client into dCache &mdash; blue
+	    bar</entry></row>
+	    <row> <entry>11</entry> <entry>Total Number of bytes
+	    transferred from dCache to clients &mdash; yellow
+	    bar</entry></row>
+	    <row> <entry>12</entry> <entry>Total Number of bytes
+	    tranferred from HSM to dCache &mdash; pink
+	    bar</entry></row>
+	    <row> <entry>13</entry> <entry>Total Number of bytes
+	    tranferred from dCache to HSM &mdash; orange
+	    bar</entry></row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+
+      <para>
+	The
+	<filename>YYYY/MM/DD/YYYY-MM-DD-HH.raw</filename>
+	files do not contain line 2 and 3.
+      </para>
+    </section>
+
+</chapter>
+

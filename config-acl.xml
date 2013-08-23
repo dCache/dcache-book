@@ -181,7 +181,7 @@
 
       <para>
         To enable &acl; support set the property
-        <varname>aclEnabled</varname> to <literal>true</literal>. This
+        <varname>pnfsmanager.acl</varname> to <literal>true</literal>. This
         property applies to the &serv-pnfsmngr; and &serv-acl; services
         and only need to be defined for these services.
       </para>

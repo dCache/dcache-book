@@ -32,130 +32,38 @@
   </section>
   -->
 
-  <section id="cb-pool-checksumming" status="draft">
-    <title>Enabling checksums</title>
+  <section id="cb-pool-checksumming">
+    <title>Checksums</title>
 
-    <section id="cb-pool-checksumming-enable">
-      <title>How to enable checksums</title>
-
-      <para>
-        The following section describes how to enable checksum
-        calculation on write transfers with maximum security. Two
-        checksums will be computed on different points for each
-        transfer: on the fly during file arrival and once the file was
-        completely written to disk . Both checksums are compared with
-        each other and (if available) with another checksum sent by
-        the client. If, and only if, all of them match, the transfer
-        is considered to be successful and the checksum is stored in
-        &pnfs;.
-      </para>
-
-      <para>
-        To enable checksumming (independent from access protocol
-        type), make sure the following option appears in the
-        <filename>pool.batch</filename>-file:
-      </para>
-
-      <programlisting>define context startPools endDefine
-  create diskCacheV111.pools.MultiProtocolPool2 ${0} \
-  ..
-  <command>-calculate-transfer-crc \</command>
-  ..
-"</programlisting>
-
-      <para>
-        Additionally, the checksum policy must be customized
-        accordingly. This is done by modifying the pool-setup-file
-        (found at
-        <filename><replaceable>poolPath</replaceable>/pool/setup</filename>)
-        such that it contains the following line:
-      </para>
-
-      <programlisting>csm set policy -onwrite=on -ontransfer=on -enforcecrc=on</programlisting>
-
-      <para>
-        Now a restart of the pool should activate all changes. Please
-        repeat the upper procedure on all write-pools you want to have
-        checksum-enabled.
-      </para>
-
-      <warning>
-        <para>
-          Please note that the following policy options should
-          <emphasis>not</emphasis> be touched:
-        </para>
-
-        <variablelist>
-          <varlistentry>
-            <term>getcrcfromhsm</term>
-
-            <listitem>
-              <para>
-                this option is tailored to DESY's HSM and won't work
-                anywhere else
-              </para>
-            </listitem>
-          </varlistentry>
-
-          <varlistentry>
-            <term>onread</term>
-
-            <listitem>
-              <para>
-                reserved for future use, no checksum handling on read
-                transfers for now.
-              </para>
-            </listitem>
-          </varlistentry>
-
-          <varlistentry>
-            <term>frequently</term>
-
-            <listitem>
-              <para>
-                reserved for future use (recalculating checksums for
-                files residing in the pool on a regular basis).
-              </para>
-            </listitem>
-          </varlistentry>
-        </variablelist>
-      </warning>
-    </section>
-
-
-    <section id="cb-pool-checksumming-default">
-      <title>The default pool behavior</title>
-
-      <para>
-        When setting up a pool from scratch, the default policy is to
-        calculate only the checksum on the file written to disk, but
-        not on the fly upon arrival. In case there is a client
-        checksum available (always true for &dcap;), they get compared
-        and must match. Otherwise, the checksum computed on the
-        written disk file will be stored in &pnfs; instead.
-      </para>
-
-      <para>
-        To reset the default behavior, set the following line in the
-        pool-setup-file and restart the pool:
-      </para>
-
-      <programlisting>csm set policy -onwrite=on -enforcecrc=on</programlisting>
-    </section>
-  </section>
-
-
-  <section id="cb-pool-advancedChecksumming" status="draft">
-    <title>Checksums in detail</title>
-
-    <section id="cb-pool-advancedChecksumming-overview">
-      <title>Overview</title>
-
-      <para>
-        When writing data into the &dcache;, and possibly later on
-        into an &hsm;, checksums may be calculated at different points
-        within this chain.
-      </para>
+    <para>
+      In &dcache; the storage of a checksum is part of a successful
+      transfer.
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    For an incoming transfer a checksum can be sent by the
+	    client (<firstterm>Client Checksum</firstterm>, it can be
+	    calculated during the transfer (<firstterm>Transfer
+	    Checksum</firstterm>) or it can be calculated on the
+	    server after the file has been written to disk
+	    (<firstterm>Server File Checksum</firstterm>).
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    For a pool to pool transfer a Transfer Checksum or a
+	    Server File Checksum can be calculated.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    For data that is flushed to or restored from tape a
+	    checksum can be calculated before flushed to tape or after
+	    restored from tape, respectively.
+	  </para>
+	</listitem>
+      </itemizedlist>
+    </para>
 
       <variablelist>
         <varlistentry>
@@ -163,16 +71,16 @@
           <listitem>
             <para>
               The client calculates the checksum before or while the
-              data is sent to the &dcache;. The checksum value,
-              depending on when it has been calculated, may sent
-              together with the open request to the door and stored
-              into &pnfs; before the data transfer begins or it may be
+              data is sent to &dcache;. The checksum value, depending
+              on when it has been calculated, may be sent together
+              with the open request to the door and stored into
+              &chimera; before the data transfer begins or it may be
               sent with the close operation after the data has been
               transferred.
             </para>
 
             <para>
-              The &dcap; protocol providing both methods, but the
+              The &dcap; protocol provides both methods, but the
               &dcap; clients use the latter by default.
             </para>
 
@@ -212,250 +120,177 @@
         </varlistentry>
       </variablelist>
 
-      <para>
-        The graph below sketches the different schemes for &dcap; and
-        &ftp; with and without client checksum calculation:
-      </para>
-
-      <table>
-        <title>Checksum calculation flow</title>
-        <tgroup cols="4" align="center">
-          <colspec colnum="1" colname="col1" colwidth="*"/>
-          <colspec colnum="2" colname="col2" colwidth="3*"/>
-          <colspec colnum="3" colname="col3" colwidth="3*"/>
-          <colspec colnum="4" colname="col4" colwidth="3*"/>
-          <thead>
-            <row>
-              <entry>Step</entry>
-              <entry>&ftp; (w/o initial CRC)</entry>
-              <entry>&ftp; (with initial CRC)</entry>
-              <entry>&dcap;</entry>
-            </row>
-          </thead>
-          <tbody>
-            <row>
-              <entry>1</entry>
-              <entry namest="col2" nameend="col4">&pi-fo-bgcolour-item;Create Entry</entry>
-            </row>
-
-            <row>
-              <entry>2</entry>
-              <entry>&pi-fo-bgcolour-bg;</entry>
-              <entry>&pi-fo-bgcolour-item;Store Client CRC in &pnfs;</entry>
-              <entry>&pi-fo-bgcolour-bg;</entry>
-            </row>
-
-            <row>
-              <entry>3</entry> <entry namest="col2"
-              nameend="col4">&pi-fo-bgcolour-item;Server calculates
-              transfer CRC</entry>
-            </row>
-
-            <row>
-              <entry>4</entry>
-              <entry>&pi-fo-bgcolour-bg;</entry>
-              <entry>&pi-fo-bgcolour-item;Get Client CRC from &pnfs;</entry>
-              <entry>&pi-fo-bgcolour-item;Get Client CRC from mover</entry>
-            </row>
-
-            <row>
-              <entry>5</entry>
-              <entry>&pi-fo-bgcolour-bg;</entry>
-              <entry namest="col3" nameend="col4">&pi-fo-bgcolour-item;Compare Client and Server CRC</entry>
-            </row>
-
-            <row>
-              <entry>6</entry>
-              <entry>&pi-fo-bgcolour-item;Store transfer CRC in &pnfs;</entry>
-              <entry>&pi-fo-bgcolour-bg;</entry>
-              <entry>&pi-fo-bgcolour-item;Store client CRC in &pnfs;</entry>
-            </row>
-
-            <row>
-              <entry>7</entry>
-              <entry namest="col2" nameend="col4">&pi-fo-bgcolour-item;Server calculates disk file CRC</entry>
-            </row>
-          </tbody>
-        </tgroup>
-      </table>
-    </section>
-
-    <section id="cb-pool-advancedChecksumming-mover">
-      <title>ChecksumMover Interface</title>
-
-      <para>
-        As far as the server data mover is concerned, only the
-        <emphasis>Client Checksum</emphasis> and the
-        <emphasis>Transfer Checksum</emphasis> are of interrest. While
-        the client checksum is just delivered to the server mover as
-        part of the protocol (e.g. close operation for &dcap;), the
-        transfer checksum has to be calcalated by the server mover on
-        the fly. In order to communicate the different checksums to
-        the embedding pool, the server mover has to implement the
-        <emphasis>ChecksumMover</emphasis> interface in addition to
-        the <emphasis>MoverProtocol</emphasis> Interface. A mover, not
-        implementing the <emphasis>MoverProtocol</emphasis> is assumed
-        not to handle checksums at all. The <emphasis>Disk File
-        Checksum</emphasis> is calculated independedly of the mover
-        within the pool itself.
-      </para>
-
-      <screen>public interface ChecksumMover {
-
-        public void     setDigest( Checksum transferChecksum ) ;
-        public Checksum getClientChecksum() ;
-        public Checksum getTransferChecksum() ;
-
-}</screen>
-
-      <para>
-        The pool will or will not call the
-        <emphasis>setDigest</emphasis> method to advise the mover
-        which checksum algorithm to use. If
-        <emphasis>setDigest</emphasis> is not called, the mover is not
-        assumed to calculate the <emphasis>Transfer
-        Checksum</emphasis>.
-      </para>
-
-      <screen>java.security.MessageDigest transferDigest = transferChecksum.getMessageDigest() ;
-
-                ***
-
-        while( ... ){
-
-                rc = read( buffer , 0 , buffer.length ) ;
-
-                ***
-
-                transferDigest.update( buffer , 0 , rc ) ;
-        }</screen>
-
-
-        <para>
-          <emphasis>getClientChecksum</emphasis> and
-          <emphasis>getTransferChecksum</emphasis> are called by the
-          pool after the MoverProtocols runIO method has been
-          successfully processed. These routines should return null if
-          the corresponding checksum could not be determined for
-          whatever reason.
-        </para>
-
-        <screen>public void  setDigest( Checksum transferChecksum ){
-
-        this.transferChecksum = transferChecksum ;
-
-        }
-        public Checksum getClientChecksum(){
-                return clientChecksumString == null ?
-                        null :
-                        Checksum( clientChecksumString ) ;
-        }
-        public Checksum getTransferChecksum(){ return transferChecksum ; }</screen>
-
-    </section>
-
-
-<!-- TO HERE! -->
-
-      <section id="cb-pool-advancedChecksumming-dcapmover">
-    <title>The DCapProtocol_3_nio Mover</title>
     <para>
-                The <emphasis>DCapProtocol_3_nio</emphasis> mover implements the ChecksumMover interface and is able to report the <emphasis>Client Checksum</emphasis> and the <emphasis>Transfer Checksum</emphasis>  to the pool. To enable the <emphasis>DCapProtocol_3_nio</emphasis> Mover to calculate the <emphasis>Transfer Checksum</emphasis>, either the cell context <emphasis>dCap3-calculate-transfer-crc</emphasis> or the cell batch line option <emphasis>calculate-transfer-crc</emphasis> must be set to true. The latter may as well be set in the *.poolist file. <emphasis>DCapProtocol_3_nio</emphasis>  disables checksum calculation as soon as the mover receives a client command except 'write' (e.g. read, seek or seek_and_write).
-    </para>
-    </section>
-
-    <section id="cb-pool-advancedChecksumming-csm">
-    <title>The ChecksumModule</title>
-    <para>
-      The checksum module (as part of the Pool) and its command subset
-      (<emphasis>csm ...</emphasis>) determines the behavious of the
-      checksum calculation.
+      The default configuration is that a checksum is calculated on
+      write, i.e. a Server File Checksum.
     </para>
 
-    <itemizedlist>
-      <listitem>
-        <para>
-          <filename>csm set policy -ontransfer=on</filename>
-        </para>
+    <section id="cb-pool-checksumming-config">
+      <title>How to configure checksum calculation</title>
 
-        <para>
-          Movers, implementing the ChecksumMover interface, are
-          requested to calculate the <emphasis>Transfer
-          Checksum</emphasis>. Whether or not the mover actually
-          performance the calculation might depend on additional,
-          mover specific flags, like the
-          <emphasis>dCap3-calculate-transfer-crc</emphasis> flag for
-          the <emphasis>DCapProtocol_3_nio</emphasis> mover.
-        </para>
+      <para>
+	Configure the calculation of checksums in the <link
+	linkend='intouch-admin'>admin interface</link>. The
+	configuration has to be done for each pool separately.
+      </para>
 
-        <para>
-          If the mover reports the <emphasis>Transfer
-          Checksum</emphasis> and there is a <emphasis>Client
-          Checksum</emphasis> available, either from &pnfs; or from
-          the mover protocol, the <emphasis>Transfer
-          Checksum</emphasis> and the <emphasis>Client
-          Checksum</emphasis> are compared. A mismatch will result in
-          a <emphasis>CRC Exception</emphasis> .
-        </para>
+      <screen>&dc-prompt-local; <userinput>cd <replaceable>poolname</replaceable></userinput>
+&dc-prompt-pool; <userinput>csm set policy -<replaceable>option</replaceable>=<replaceable>on/off</replaceable></userinput>
+&dc-prompt-pool; <userinput>save</userinput></screen>
 
-        <para>
-          If there is no <emphasis>Client Checksum</emphasis>
-          available whatsoever, the <emphasis>Transfer
-          Checksum</emphasis> is stored in &pnfs;.
-        </para>
-      </listitem>
+      <para>
+	The configuration will be saved in the file
+	<filename><replaceable>path/to/pool</replaceable>/<replaceable>nameOfPooldirectory</replaceable>/setup</filename>.
+      </para>
 
-      <listitem>
-        <para>
-          <filename>csm set policy -onwrite=on</filename>
-        </para>
+      <para>
+	Use the command <command>csm info</command> to see the
+	checksum policy of the pool.
+      </para>
 
-        <para>
-          After the dataset has been completely and successfully
-          written to disk, the pool calculates the checksum based on
-          the disk file (<emphasis>Server File
-          Checksum</emphasis>). The result is compared to either the
-          <emphasis>Client Checksum</emphasis> or the
-          <emphasis>Transfer Checksum</emphasis> and a <emphasis>CRC
-          Exception</emphasis> is thrown in case of a mismatch.
-        </para>
+      <screen>&dc-prompt-pool; <userinput>csm info</userinput>
+ Policies :
+        on read : false
+       on write : true
+       on flush : false
+     on restore : false
+    on transfer : false
+    enforce crc : true
+  getcrcfromhsm : false
+          scrub : false
+      </screen>
 
-        <para>
-          If there is neither the <emphasis>Client Checksum</emphasis>
-          nor the <emphasis>Transfer Checksum</emphasis> available,
-          the <emphasis>Server File Checksum</emphasis> is stored in
-          &pnfs;.
-        </para>
-      </listitem>
+      <para>
+	The default configuration is to check checksums on write.
+      </para>
 
-      <listitem>
-        <para>
-          <filename>csm set policy -enforcecrc=on</filename>
-        </para>
+      <para>
+	Use the command <command>help csm set policy</command> to see
+	the configuration options.
+      </para>
 
-        <para>
-          In case of <emphasis>-onwrite=off</emphasis>, this options
-          enforces the calculation of the <emphasis>Server File
-          Checksum</emphasis> ONLY if neither the <emphasis>Client
-          Checksum</emphasis> nor the <emphasis>Transfer
-          Checksum</emphasis> has been sucessfully calculated. The
-          result is stored in &pnfs;.
-        </para>
-      </listitem>
-    </itemizedlist>
+      <para>
+	The syntax of the command <command>csm set policy</command> is
+
+      <cmdsynopsis>
+	<command>csm set policy</command>
+	  <arg><parameter>-<replaceable>option</replaceable></parameter>=on<arg>|off</arg></arg>
+      </cmdsynopsis>
+
+	where <replaceable>option</replaceable> can be replaced by
+      </para>
+
+
+      <variablelist>
+	<title>OPTIONS</title>
+	<varlistentry>
+	  <term><varname>ontransfer</varname></term>
+	  <listitem>
+	    <para>
+	      If supported by the protocol, the checksum is
+	      calculated during file transfer.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><varname>onwrite</varname></term>
+	  <listitem>
+	    <para>
+	      The checksum is calculated after the file has been
+	      written to disk.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><varname>onrestore</varname></term>
+	  <listitem>
+	    <para>
+	      The checksum is calculated after data has been
+	      restored from tape.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><varname>onflush</varname></term>
+	  <listitem>
+	    <para>
+	      The checksum is calculated before data is flushed to
+	      tape.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><varname>getcrcfromhsm</varname></term>
+	  <listitem>
+	    <para>
+	      If the &hsm; script supports it, the
+	      <filename><replaceable>pnfsid</replaceable>.crcval</filename>
+	      file is read and stored in &chimera;.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><varname>scrub</varname></term>
+	  <listitem>
+	    <para>
+	      Pool data will periodically be veryfied against
+	      checksums. Use the command <command>help csm set
+	      policy</command> to see the configuration options.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry><term><varname>enforcecrc</varname></term>
+	<listitem>
+	  <para>
+	    If no checksum has been calculated after or during
+	    the transfer, this option ensures that a checksum is
+	    calculated and stored in &chimera;.
+	  </para>
+	</listitem>
+	</varlistentry>
+      </variablelist>
+
+      <para>
+	The option <varname>onread</varname> has not yet been
+	implemented.
+      </para>
+
+      <para>
+	If an option is enabled a checksum is calculated as described.
+	If there is already another checksum, the checksums are
+	compared and if they match stored in &chimera;.
+      </para>
+
+      <important>
+	<para>
+	  Do not change the default configuration for the option
+	  <varname>enforcecrc</varname>. This option should always be
+	  enabled as this ensures that there will always be a checksum
+	  stored with a file.
+	</para>
+      </important>
+
     </section>
+
   </section>
 
-  <section id="cb-pool-migration" status="draft">
+
+
+
+
+
+
+
+
+
+
+  <section id="cb-pool-migration">
     <title>Migration Module</title>
 
     <para>
-      The migration module is a component of &dcache; pools introduced
-      in version 1.9.1. The purpose of the component is essentially to
+      The purpose of the migration module is essentially to
       copy or move the content of a pool to one or more other
-      pools. The migration module replaces the copy manager found in
-      previous releases of &dcache;. We advice against using the old
-      copy manager, as it known to have problems.
+      pools.
     </para>
 
     <para>
@@ -466,7 +301,7 @@
       <listitem>
         <para>
           Vacating pools, that is, moving all files to other pools
-          before decomisioning the pool.
+          before decomissioning the pool.
         </para>
       </listitem>
 
@@ -536,6 +371,16 @@
         which in turns means the migration module becomes simpler and
         more robust. Should a pool crash during a migration job, the
         job can be rerun and the remaining files will be transfered.
+	<note>
+	  <para>
+	    Please notice that a job is only idempotent as long as the
+	    set of target pools do not change. If pools go offline or
+	    are excluded as a result of a an exclude or include
+	    expression, then the idempotent nature of a job may be
+	    lost.
+
+	  </para>
+	</note>
       </para>
 
       <para>
@@ -601,18 +446,97 @@
       <title>Command Summary</title>
 
       <para>
-        All commands begin with the string
-        <command>migration</command>, e.g. <command>migration
-        copy</command>. The commands <command>migration
-        copy</command>, <command>migration cache</command> and
-        <command>migration move</command> create new migration
-        jobs. These commands take the same options and only differ in
-        default values. Except for the number of concurrent tasks,
-        transfer parameters of existing jobs cannot be changed. This
-        is by design to ensure idempotency of jobs. The concurrency
-        can be altered through the <command>migration
-        concurrency</command> command.
+	Login to the <link linkend='intouch-admin'>admin
+	interface</link> and <command>cd</command> to a pool to use
+	the <command>migration</command> commands. Use the command
+	<command>help migration</command> to view the possiblities.
       </para>
+      <screen>&dc-prompt-local; <userinput>cd <replaceable>poolname</replaceable></userinput>
+&dc-prompt-pool; <userinput>help migration</userinput>
+migration cache [OPTIONS] TARGET...
+migration cancel [-force] JOB
+migration clear
+migration concurrency ID CONCURRENCY
+migration copy [OPTIONS] TARGET...
+migration info JOB
+migration ls
+migration move [OPTIONS] TARGET...
+migration resume JOB
+migration suspend JOB
+      </screen>
+
+      <para>
+	The commands <command>migration copy</command>,
+	<command>migration cache</command> and <command>migration
+	move</command> create new migration jobs. These commands are
+	used to copy files to other pools. Unless filter options are
+	specified, all files on the source pool are copied.  The
+	syntax for these commands is the same; example
+	<command>migration copy</command>:
+	<cmdsynopsis>
+	  <command>migration <replaceable>copy</replaceable></command>
+	  <arg><parameter><replaceable>option</replaceable></parameter></arg><arg choice='plain'><replaceable>target</replaceable></arg>
+      </cmdsynopsis>
+      </para>
+      <para>
+	There are four different types of options. The filter options,
+	transfer options, target options and lifetime options. Please
+	run the command <command>help migration copy</command> for a
+	detailed description of the various options.
+      </para>
+
+      <para>
+	The commands <command>migration copy</command>,
+	<command>migration move</command> and <command>migration
+	cache</command> take the same options and only differ in
+	default values.
+      </para>
+
+      <variablelist>
+	<varlistentry>
+	  <term>migration move</term>
+	  <listitem>
+	    <para>
+	      The command <command>migration move</command> does the
+	      same as the command <command>migration copy</command>
+	      with the options:
+	    </para>
+	    <itemizedlist>
+	      <listitem>
+		<varname>-smode</varname>=<literal>delete</literal>
+		(default for <command>migration copy</command> is
+		<literal>same</literal>).
+	      </listitem>
+	      <listitem>
+		<varname>-pins</varname>=<literal>move</literal>
+		(default for <command>migration copy</command> is
+		<literal>keep</literal>).
+	      </listitem>
+	    </itemizedlist>
+	    <para>
+	      additionally it uses the option
+	      <varname>-verify</varname>.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>migration cache</term>
+	  <listitem>
+	    <para>
+	      The command <command>migration cache</command> does the
+	      same as the command <command>migration copy</command>
+	      with the option:
+	    </para>
+	    <itemizedlist>
+	      <listitem>
+		<varname>-tmode</varname>=<literal>cached</literal>
+	      </listitem>
+	    </itemizedlist>
+	  </listitem>
+	</varlistentry>
+
+      </variablelist>
 
       <para>
         Jobs are assinged a job ID and are executed in the
@@ -631,6 +555,107 @@
         commands. Existing tasks are allowed to finish before a job is
         suspended or cancelled.
       </para>
+
+      <informalexample>
+	<para>
+	  A migration job can be suspended and resumed with the
+	  commands <command>migration suspend </command> and
+	  <command>migration resume</command> respectively.
+	</para>
+	<screen>&dc-prompt-local; <userinput>cd <replaceable>poolname</replaceable></userinput>
+&dc-prompt-pool; <userinput>migration copy -pnfsid=000060D40698B4BF4BE284666ED29CC826C7 pool2</userinput>
+[1] INITIALIZING migration copy 000060D40698B4BF4BE284666ED29CC826C7 pool2
+[1] SLEEPING     migration copy 000060D40698B4BF4BE284666ED29CC826C7 pool2
+&dc-prompt-pool; <userinput>migration ls</userinput>
+[1] RUNNING      migration copy 000060D40698B4BF4BE284666ED29CC826C7 pool2
+&dc-prompt-pool; <userinput>migration suspend 1</userinput>
+[1] SUSPENDED    migration copy 000060D40698B4BF4BE284666ED29CC826C7 pool2
+&dc-prompt-pool; <userinput>migration resume 1</userinput>
+[1] RUNNING      migration copy 000060D40698B4BF4BE284666ED29CC826C7 pool2
+&dc-prompt-pool; <userinput>migration info 1</userinput>
+Command    : migration copy -pnfsid=000060D40698B4BF4BE284666ED29CC826C7 pool2
+State      : RUNNING
+Queued     : 0
+Attempts   : 1
+Targets    : pool2
+Completed  : 0 files; 0 bytes; 0%
+Total      : 5242880 bytes
+Concurrency: 1
+Running tasks:
+[1] 00007C75C2E635CD472C8A75F5A90E4960D3: TASK.GettingLocations
+&dc-prompt-pool; <userinput>migration info 1</userinput>
+Command    : migration copy -pnfsid=000060D40698B4BF4BE284666ED29CC826C7 pool2
+State      : FINISHED
+Queued     : 0
+Attempts   : 1
+Targets    : pool2
+Completed  : 1 files; 5242880 bytes
+Total      : 5242880 bytes
+Concurrency: 1
+Running tasks:
+&dc-prompt-pool; <userinput>migration ls</userinput>
+[1] FINISHED     migration copy 000060D40698B4BF4BE284666ED29CC826C7 pool2
+	</screen>
+
+	<para>
+	  A migration job can be cancelled with the command
+	  <command>migration cancel </command>.
+	</para>
+	<screen>&dc-prompt-local; <userinput>cd <replaceable>poolname</replaceable></userinput>
+&dc-prompt-pool; <userinput>migration copy -pnfsid=0000D194FBD450A44D3EA606D0434D6D88CD pool2</userinput>
+[1] INITIALIZING migration copy 0000D194FBD450A44D3EA606D0434D6D88CD pool2
+&dc-prompt-pool; <userinput>migration cancel 1</userinput>
+[1] CANCELLED    migration copy -pnfsid=0000D194FBD450A44D3EA606D0434D6D88CD pool2
+	</screen>
+	<para>
+	  And terminated jobs can be cleared with the command
+	  <command>migration clear</command>.
+	</para>
+	<screen>&dc-prompt-pool; <userinput>migration ls</userinput>
+[3] FINISHED     migration copy -pnfsid=0000D194FBD450A44D3EA606D0434D6D88CD pool2
+[2] FINISHED     migration copy -pnfsid=00007C75C2E635CD472C8A75F5A90E4960D3 pool2
+[1] FINISHED     migration copy -pnfsid=0000A48650142CBF4E55A7A26429DFEA27B6 pool2
+[5] FINISHED     migration move -pnfsid=000028C0C288190C4CE7822B3DB2CA6395E2 pool2
+[4] FINISHED     migration move -pnfsid=00007C75C2E635CD472C8A75F5A90E4960D3 pool2
+&dc-prompt-pool; <userinput>migration clear</userinput>
+&dc-prompt-pool; <userinput>migration ls</userinput>
+	</screen>
+
+	<para>
+	  Except for the number of concurrent tasks, transfer
+	  parameters of existing jobs cannot be changed. This is by
+	  design to ensure idempotency of jobs. The concurrency can be
+	  altered through the <command>migration concurrency</command>
+	  command.
+      </para>
+
+      <screen>&dc-prompt-pool; <userinput>migration concurrency 4 2</userinput>
+&dc-prompt-pool; <userinput>migration info</userinput>
+Command    : migration copy pool2
+State      : FINISHED
+Queued     : 0
+Attempts   : 6
+Targets    : pool2
+Completed  : 6 files; 20976068 bytes
+Total      : 20976068 bytes
+Concurrency: 2
+Running tasks:
+      </screen>
+
+
+      </informalexample>
+
+
+
+
+
+
+
+
+
+
+
+
     </section>
 
     <section>
@@ -639,18 +664,20 @@
       <section>
         <title>Vacating a pool</title>
 
-        <para>
-          To vacate <replaceable>sourcePool</replaceable>, we first
-          mark the pool read-only to avoid that more files are added
-          to the pool, and then move all files to
-          <replaceable>targetPool</replaceable>. It is not strictly
-          necessary to mark the pool read-only, however if not done
-          there is no guarantee that the pool is empty when the
-          migration job terminates. The job can be rerun to move
-          remaining files.
-        </para>
+	<informalexample>
+	  <para>
+	    To vacate the pool <replaceable>sourcePool</replaceable>,
+	    we first mark the pool <literal>read-only</literal> to
+	    avoid that more files are added to the pool, and then move
+	    all files to the pool
+	    <replaceable>targetPool</replaceable>. It is not strictly
+	    necessary to mark the pool <literal>read-only</literal>,
+	    however if not done there is no guarantee that the pool is
+	    empty when the migration job terminates. The job can be
+	    rerun to move remaining files.
+	  </para>
 
-<screen>&dc-prompt-srcpool; <userinput>pool disable -rdonly</userinput>
+	  <screen>&dc-prompt-srcpool; <userinput>pool disable -rdonly</userinput>
 &dc-prompt-srcpool; <userinput>migration move <replaceable>targetPool</replaceable></userinput>
 [1] RUNNING      migration move <replaceable>targetPool</replaceable>
 &dc-prompt-srcpool; <userinput>migration info 1</userinput>
@@ -676,20 +703,21 @@ Concurrency: 1
 Running tasks:
 &dc-prompt-srcpool; <userinput>rep ls</userinput>
 &dc-prompt-srcpool;</screen>
+	</informalexample>
       </section>
 
       <section>
         <title>Caching recently accessed files</title>
+	<informalexample>
+	  <para>
+	    Say we want to cache all files belonging to the storage
+	    group <literal>atlas:default</literal> and accessed within
+	    the last month on a set of low-cost cache pools defined by
+	    the pool group <literal>cache_pools</literal>. We can
+	    achieve this through the following command.
+	  </para>
 
-        <para>
-          Say we want to cache all files belonging to the storage
-          group atlas:default and accessed within the last month on a
-          set of low-cost cache pools defined by pool group
-          cache_pools. We can achieve this through the following
-          command.
-        </para>
-
-<screen>&dc-prompt-srcpool; <userinput>migration cache -target=pgroup -accessed=0..2592000 -storage=atlas:default cache_pools</userinput>
+	  <screen>&dc-prompt-srcpool; <userinput>migration cache -target=pgroup -accessed=0..2592000 -storage=atlas:default cache_pools</userinput>
 [1] INITIALIZING migration cache -target=pgroup -accessed=0..2592000 -storage=atlas:default cache_pools
 &dc-prompt-srcpool; <userinput>migration info 1</userinput>
 Command    : migration cache -target=pgroup -accessed=0..2592000 -storage=atlas:default cache_pools
@@ -703,11 +731,13 @@ Concurrency: 1
 Running tasks:
 [72] 00010000000000000000BE10: TASK.Copying -> [pool_2@local]</screen>
 
-        <para>
-          The files on the source pool will not be altered. Any file
+           <para>
+	     The files on the source pool will not be altered. Any file
           copied to one of the target pools will be marked cached.
-        </para>
+	   </para>
+	</informalexample>
       </section>
+
     </section>
   </section>
 
@@ -813,34 +843,36 @@ Starting poolDomain done
 
 <screen>&dc-prompt-pool; <userinput>rep set sticky <replaceable>pnfsid</replaceable> <option>on|off</option></userinput></screen>
 
-      the 'sticky' mode will stay with the file as long as the file
-      is in the pool.  If the file is removed from the pool and
-      recreated afterwards this information gets lost.
+      the <literal>sticky</literal> mode will stay with the file as
+      long as the file is in the pool.  If the file is removed from
+      the pool and recreated afterwards this information gets lost.
     </para>
 
     <para>
       You may use the same mechanism globally:  in the command line
       interface (local mode) there is the command
 
-<screen>&dc-prompt-pool; <userinput>set sticky <replaceable>pnfsid</replaceable></userinput></screen>
+<screen>&dc-prompt-local; <userinput>set sticky <replaceable>pnfsid</replaceable></userinput></screen>
 
       This command does:
       <orderedlist>
         <listitem>
           <para>
-            Flags the file as sticky in the name space database
-            (pnfs). So from now the filename is globally set sticky.
+            Flags the file as <literal>sticky</literal> in the name
+            space database (&chimera;). So from now the filename is
+            globally set <literal>sticky</literal>.
           </para>
         </listitem>
         <listitem>
           <para>
             Will go to all pools where it finds the file and will flag
-            it sticky in the pools.
+            it <literal>sticky</literal> in the pools.
           </para>
         </listitem>
         <listitem>
           <para>
-            All new copies of the file will become sticky.
+            All new copies of the file will become
+            <literal>sticky</literal>.
           </para>
         </listitem>
       </orderedlist>

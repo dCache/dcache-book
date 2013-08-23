@@ -13,7 +13,7 @@
 
 <chapter id="cf-pm">
 
-  <title>Configuring the &serv-poolmngr;</title>
+  <title>The &serv-poolmngr; Service</title>
 
   <!--
   <para>(We assume a basic knowledge of the functionality and terminology of
@@ -991,11 +991,13 @@ contentOfTag1</screen>
 	<varlistentry>
 	  <term><literal>wass</literal>:</term>
 	  <listitem>
-	    An experimental selection algorithm that select pools
-	    randomly weighted by available space, while incorporating
-	    age and amount of garbage collectible files and
-	    information about load. Will be refined in future versions
-	    and may one day become the default.
+	    This pool selection algorithm selects pools randomly
+	    weighted by available space, while incorporating age and
+	    amount of garbage collectible files and information about
+	    load. This is the partition type of the default partition.
+	    See <ulink
+	    url="http://www.dcache.org/articles/wass.html">How to Pick
+	    a Pool</ulink> for more details.
 	  </listitem>
 	</varlistentry>
       </variablelist>
@@ -1021,7 +1023,7 @@ contentOfTag1</screen>
                         <arg choice='plain'><replaceable>partitionName</replaceable></arg>
                     </cmdsynopsis>
                     Creates a new partition. If no partition type is
-                    specified, then a <literal>classic</literal> partition
+                    specified, then a <literal>wass</literal> partition
                     is created.
                 </para>
             </listitem>

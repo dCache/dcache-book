@@ -5,9 +5,14 @@
 %sharedents;
 ]>
 <chapter id="rf-ports">
-  <title>&dcache; default port values</title>
+  <title>&dcache; Default Port Values</title>
 
-  <table>
+  <para>
+    You can use the command <command>dcache ports</command> to get the
+    list of ports used by &dcache;.
+  </para>
+
+  <informaltable>
 	  <tgroup cols='3' align='left' colsep='1' rowsep='1'>
 	    <colspec colname='c1'/>
 	    <colspec colname='c2'/>
@@ -67,7 +72,7 @@
       </row>		 
 		</tbody>
 		</tgroup>
-  </table> 
+  </informaltable> 
 </chapter>  
 
 

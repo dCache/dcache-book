@@ -8,7 +8,7 @@
 
 <chapter id="cf-billing">
 
-  <title>The billing service</title>
+  <title>The &serv-billing; Service</title>
 
   <para>
     &dcache; has built-in monitoring capabilities which provide an
@@ -42,15 +42,15 @@
     </para>
     <programlisting>...
 [httpdDomain]
-[httpdDomain/httpd]
 [httpdDomain/billing]
+[httpdDomain/httpd]
 [httpdDomain/srm-loginbroker]
 ...</programlisting>
 
     <para>
-      Use the property <varname>billingLogsDir</varname> to set the
+      Use the property <varname>billing.text.dir</varname> to set the
       location of the log files and the property
-      <varname>billingDisableTxt</varname> to control whether the
+      <varname>billing.enable.text</varname> to control whether the
       plain-text log files are generated.
     </para>
 
@@ -113,10 +113,10 @@
      <replaceable>billing.format.someInfoMessage</replaceable> can be
      replaced by
      <itemizedlist>
-       <listitem><varname>billing.format.MoverInfoMessage</varname></listitem>
-       <listitem><varname>billing.format.RemoveFileInfoMessage</varname></listitem>
-       <listitem><varname>billing.format.DoorRequestInfoMessage</varname></listitem>
-       <listitem><varname>billing.format.StorageInfoMessage</varname></listitem>
+       <listitem><varname>billing.text.format.mover-info-message</varname></listitem>
+       <listitem><varname>billing.text.format.remove-file-info-message</varname></listitem>
+       <listitem><varname>billing.text.format.door-request-info-message</varname></listitem>
+       <listitem><varname>billing.text.format.storage-info-message</varname></listitem>
      </itemizedlist>
      A full explanation of the formatting is given in the
      <filename>&path-ods-usd;/defaults/billing.properties</filename>
@@ -145,7 +145,7 @@
     <orderedlist>
       <listitem>
 	<para>
-	  If the "billing" database does not already exist (see
+	  If the billing database does not already exist (see
 	  further below on migrating from an existing one), create it
 	  (we assume &psql; here):
 	</para>
@@ -166,19 +166,29 @@
 
       <listitem>
 	<para>
-	  The property <literal>billingToDb</literal> controls whether
+	  The property <literal>billing.enable.db</literal> controls whether
 	  the billing cell sends billing messages to the database. By
 	  default the option is disabled. To activate, set the value
-	  to <literal>yes</literal> and restart the domain in which
+	  to <literal>true</literal> and restart the domain in which
 	  the &serv-httpd; service is running.
 	</para>
+	<note>
+	  <para>
+	    Please take care to define the &serv-billing; service
+	    before the &serv-httpd; service in your layout file. If
+	    the &serv-billing; service is defined in a separate
+	    domain, this domain should be defined before the domain in
+	    which the &serv-httpd; service is running.
+	  </para>
+	</note>
+
 	<informalexample>
 	  <para>
 	    Extract from the layout file:
 	  <programlisting>[httpdDomain]
-        billingToDb=yes
-[httpdDomain/httpd]
+     billing.enable.db=true
 [httpdDomain/billing]
+[httpdDomain/httpd]
 ...</programlisting>
           <screen>&prompt-root; <userinput>dcache restart httpdDomain</userinput>
 Stopping httpdDomain 0 1 done
@@ -204,10 +214,10 @@ Starting httpdDomain done</screen>
 
 
 	  <itemizedlist>
-	    <listitem><literal>billingDbName</literal></listitem>
-	    <listitem><literal>billingDbHost</literal></listitem>
-	    <listitem><literal>billingDbUser</literal></listitem>
-	    <listitem><literal>billingDbPass</literal></listitem>
+	    <listitem><varname>billing.db.name</varname></listitem>
+	    <listitem><varname>billing.db.host</varname></listitem>
+	    <listitem><varname>billing.db.user</varname></listitem>
+	    <listitem><varname>billing.db.password</varname></listitem>
 	  </itemizedlist>
 	  <para>
 	    The current database values can be checked with the
@@ -228,8 +238,8 @@ httpdDomain     billing     billing  localhost srmdcache Yes        Yes</screen>
 	    Database inserts are batched for performance, and are controlled by the following properties:
 	  </para>
 	  <itemizedlist>
-	    <listitem><literal>billingMaxInsertsBeforeCommit</literal> (defaults to <literal>10000</literal>)</listitem>
-	    <listitem><literal>billingMaxTimeBeforeCommitInSecs</literal> (defaults to <literal>5</literal>)</listitem>
+	    <listitem><varname>billing.db.inserts.max-before-commit</varname> (defaults to <literal>10000</literal>)</listitem>
+	    <listitem><varname>billing.db.inserts.timeout-before-commit</varname> (defaults to <literal>5</literal>)</listitem>
 	  </itemizedlist>
 	  <para>
 	    The default settings should usually be sufficient.
@@ -245,7 +255,7 @@ httpdDomain     billing     billing  localhost srmdcache Yes        Yes</screen>
 	    internal settings, should be indicated using:
 	  </para>
 	  <itemizedlist>
-	    <listitem><literal>billingInfoAccessPropertiesFile</literal> (defaults to <literal>""</literal>)</listitem>
+	    <listitem><varname>billing.db.config.path</varname> (defaults to <literal>""</literal>)</listitem>
 	  </itemizedlist>
 	  <para>
 	    Changing this configuration requires an understanding of
@@ -263,8 +273,8 @@ httpdDomain     billing     billing  localhost srmdcache Yes        Yes</screen>
 	    something else would entail the above-mentioned necessary
 	    modification of the
 	    <filename>datanucleus.properties</filename> as well as
-	    changing the <literal>billingDbDriver</literal> and
-	    <literal>billingDbUrl</literal> properties appropriately.
+	    changing the <varname>billing.db.driver</varname> and
+	    <varname>billing.db.url</varname> properties appropriately.
 	    This is not a recommended procedure, though in certain
 	    exceptional circumstances, it may be desirable or
 	    necessary.  Once again, consultation with the &dcache;
@@ -282,7 +292,7 @@ httpdDomain     billing     billing  localhost srmdcache Yes        Yes</screen>
       If you have selected to store billing messages to the database,
       it is also possible to generate and display a set of histograms
       from the data in these tables.  To turn on plot generation, set
-      the property <varname>generatePlots</varname> to
+      the property <varname>httpd.enable.plots.billing</varname> to
       <literal>true</literal> and restart the domain in which the
       &serv-httpd; is running.
     </para>
@@ -290,8 +300,8 @@ httpdDomain     billing     billing  localhost srmdcache Yes        Yes</screen>
       <para>
 	Extract from the layout file:
 	<programlisting>[httpdDomain]
-        billingToDb=yes
-	generatePlots=true
+     billing.enable.db=true
+     httpd.enable.plots.billing=true
 [httpdDomain/httpd]
 [httpdDomain/billing]
 ...</programlisting>
@@ -308,7 +318,7 @@ httpdDomain     billing     billing  localhost srmdcache Yes        Yes</screen>
 	<literal>30</literal>)
       </listitem>
       <listitem>
-	<varname>billingPlotsExportType</varname> (defaults to
+	<varname>httpd.plots.billing.type</varname> (defaults to
 	<literal>png</literal> and can be set to <literal>gif</literal>)
       </listitem>
     </itemizedlist>
@@ -354,55 +364,18 @@ httpdDomain     billing     billing  localhost srmdcache Yes        Yes</screen>
 	      traffic between the pool manager and the billing
 	      service.  To store this data (and thus generate the
 	      relevant plots), the
-	      <varname>poolmanager.cache-hit-messages.enabled</varname>
+	      <varname>poolmanager.enable.cache-hit-message</varname>
 	      property must be set either in
 	      <filename>dcache.conf</filename> or in the layout file
 	      for the domain where the &serv-poolmngr; runs:
 	    </para>
-	    <programlisting>poolmanager.cache-hit-messages.enabled=true</programlisting>
+	    <programlisting>poolmanager.enable.cache-hit-message=true</programlisting>
 	  </note>
 	</listitem>
       </itemizedlist>
 
       Each individual plot can be magnified by clicking on it.
     </para>
-
-<section id="config-billing-plots-custom">
-  <title>Customizing the plots</title>
-  <para>
-    As with the database itself, it is expected that the
-    standard/default set-up for plotting will usually be sufficient.
-    In the case where alteration of the look and feel of the plotting
-    is desired, a new <filename>plot.properties</filename> file needs
-    to be provided.  The path to this file, which will override the
-    internal settings, should be indicated using the property
-    <literal>billingPlotPropertiesFile</literal>.
-  </para>
-  <para>
-    This configuration file contains settings relevant to the <ulink
-    url="http://java.freehep.org"> JAIDA/Freehep</ulink> libraries
-    used to create the graphics. The meaning of most of these
-    properties is rather straightforward. For possible alternatives,
-    it is suggested you consult the <ulink
-    url="http://java.freehep.org/doc/release/v1.2.2/doc/api/overview-summary.html">Freehep
-    reference</ulink> pages (note that the
-    <literal>histogram.factory</literal> property must be included in
-    any custom file but will normally have the same value).
-  </para>
-
-  <para>
-    To view the internal <literal>plot.properties</literal> settings
-    extract the
-    <filename>dcache-core-<replaceable>version</replaceable>.jar</filename>
-    to some temporary directory.
-  </para>
-  <screen>&prompt-root; <userinput>ls /usr/share/dcache/classes/dcache-core*</userinput>
-/usr/share/dcache/classes/dcache-core-<replaceable>version</replaceable>
-&prompt-root; <userinput>cd /tmp</userinput>
-&prompt-root; <userinput>jar xf /usr/share/dcache/classes/dcache-core-<replaceable>version</replaceable>.jar org/dcache/services/billing/plot/plot.properties</userinput>
-&prompt-root; <userinput>less org/dcache/services/billing/plot/plot.properties</userinput></screen>
-
-</section>
 
 </section>
 
