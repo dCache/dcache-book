@@ -253,7 +253,7 @@ resilientGroupName=default</programlisting>
 		     format="SVG" align="center" contentwidth="10cm" />
 	</imageobject>
 	<imageobject role="html">
-	  <imagedata fileref="images/resilient_poolstate_v1-0.png"
+	  <imagedata fileref="/images/resilient_poolstate_v1-0.png"
 		     format="PNG" align="center"/>
 	</imageobject>
       </mediaobject>
