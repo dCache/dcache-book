@@ -39,6 +39,7 @@
   <xi:include href="config-acl.xml"/>
   <xi:include href="config-info-provider.xml"/>
   <xi:include href="config-stage-protection.xml"/>
+  <xi:include href="config-write-token.xml"/>
 <!--
   <xi:include href="config-webdav.xml"/>
   <xi:include href="config-ftp.xml"/>
