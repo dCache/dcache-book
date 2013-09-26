@@ -132,30 +132,23 @@ Rules / Guidelines / Suggestions for adding new entities:
 
 <!-- Various services -->
 <!-- Services are the names used in layout files -->
-<!ENTITY serv-acl             "<literal>acl</literal>">
 <!ENTITY serv-admin           "<literal>admin</literal>">
-<!ENTITY serv-alarms           "<literal>alarms</literal>">
-<!ENTITY serv-authdcap        "<literal>authdcap</literal>">
+<!ENTITY serv-alarms          "<literal>alarms</literal>">
 <!ENTITY serv-billing         "<literal>billing</literal>">
 <!ENTITY serv-broadcast       "<literal>broadcast</literal>">
 <!ENTITY serv-cleaner         "<literal>cleaner</literal>">
 <!ENTITY serv-cns             "<literal>cns</literal>">
 <!ENTITY serv-dcap            "<literal>dcap</literal>">
 <!ENTITY serv-dir             "<literal>dir</literal>">
-<!ENTITY serv-dummy-prstgr    "<literal>dummy-prestager></literal>">
 <!ENTITY serv-ftp             "<literal>ftp</literal>">
 <!ENTITY serv-gplazma         "<literal>gplazma</literal>">
 <!ENTITY serv-gridftp         "<literal>gridftp</literal>">
 <!ENTITY serv-gsidcap         "<literal>gsidcap</literal>">
-<!ENTITY serv-gsi-pam         "<literal>gsi-pam</literal>">
-<!ENTITY serv-hopping         "<literal>hopping</literal>">
+<!ENTITY serv-hoppingmanager  "<literal>hoppingmanager</literal>">
 <!ENTITY serv-httpd           "<literal>httpd</literal>">
 <!ENTITY serv-info            "<literal>info</literal>">
-<!ENTITY serv-kerbdcap        "<literal>kerberosdcap</literal>">
-<!ENTITY serv-kerbftp         "<literal>kerberosftp</literal>">
 <!ENTITY serv-loginbroker     "<literal>loginbroker</literal>">
-<!ENTITY serv-nfsv3           "<literal>nfsv3</literal>">
-<!ENTITY serv-nfsv41          "<literal>nfsv41</literal>">
+<!ENTITY serv-nfs             "<literal>nfs</literal>">
 <!ENTITY serv-pinmngr         "<literal>pinmanager</literal>">
 <!ENTITY serv-pnfsmngr        "<literal>pnfsmanager</literal>">
 <!ENTITY serv-pool            "<literal>pool</literal>">
@@ -163,7 +156,6 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY serv-replica         "<literal>replica</literal>">
 <!ENTITY serv-spacemngr       "<literal>spacemanager</literal>">
 <!ENTITY serv-srm             "<literal>srm</literal>">
-<!ENTITY serv-srm-loginbroker "<literal>srm-loginbroker</literal>">
 <!ENTITY serv-statistics      "<literal>statistics</literal>">
 <!ENTITY serv-topo            "<literal>topo</literal>">
 <!ENTITY serv-transfmngrs     "<literal>transfermanagers</literal>">

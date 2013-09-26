@@ -193,7 +193,7 @@ export dbConnectString="user=pnfsserver password=<replaceable>yourPassword</repl
           <tbody>
 	        <row>
 	          <entry>SRM</entry>
-	          <entry><varname>srmDatabaseHost</varname>or if not set: <varname>srmDbHost</varname> or if not set: <systemitem class="systemname">localhost</systemitem></entry>
+	          <entry><varname>srm.db.host</varname>or if not set: <varname>srmDbHost</varname> or if not set: <systemitem class="systemname">localhost</systemitem></entry>
 	          <entry>dcache</entry>
 	          <entry><database class="user">srmdcache</database></entry>
               <entry><userinput>srmdcache</userinput></entry>
@@ -205,16 +205,9 @@ export dbConnectString="user=pnfsserver password=<replaceable>yourPassword</repl
 	          <entry><database class="user">srmdcache</database></entry>
               <entry><userinput>srmdcache</userinput></entry>
 	        </row>
-	        <row>
-	          <entry>&cell-spacemngr;</entry>
-	          <entry><varname>spaceManagerDatabaseHost</varname> or if not set: <varname>srmDbHost</varname> or if not set: <systemitem class="systemname">localhost</systemitem></entry>
-	          <entry>dcache</entry>
-	          <entry><database class="user">srmdcache</database></entry>
-              <entry><userinput>srmdcache</userinput></entry>
-	        </row>
             <row>
 	          <entry>&cell-replicamngr;</entry>
-	          <entry><varname>replicaManagerDatabaseHost</varname> or if not set: <systemitem class="systemname">localhost</systemitem></entry>
+	          <entry><varname>replica.db.host</varname> or if not set: <systemitem class="systemname">localhost</systemitem></entry>
 	          <entry>replicas</entry>
 	          <entry><database class="user">srmdcache</database></entry>
               <entry><userinput>srmdcache</userinput></entry>

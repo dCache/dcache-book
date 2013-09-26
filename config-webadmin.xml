@@ -95,12 +95,12 @@
 
 	<para>
 	  The most important value is
-	  <varname>webadminAdminGid</varname>, because it configures
+	  <varname>httpd.authz.admin-gid</varname>, because it configures
 	  who is allowed to alter &dcache; behaviour, which certainly
 	  should not be everyone: 
 	</para>
-	<programlisting># # When a user has this GID he can become an Admin for the webadmin interface #
-webadminAdminGid=1000</programlisting>
+	<programlisting># # When a user has this GID he can become an admin for the webadmin interface #
+httpd.authz.admin-gid=0</programlisting>
 	<para>
 	    To see all webadmin specific property values have a look
 	    at

@@ -1452,14 +1452,14 @@ storageAuthzPath="/etc/grid-security/storage-authzdb"</programlisting>
     <para>
       Refer to the file <filename>gplazma.properties</filename> for a full list
       of properties for &cell-gplazma; One commonly used property is 
-      <varname>gPlazmaNumberOfSimultaneousRequests</varname>, which is used to 
+      <varname>gplazma.cell.limits.threads</varname>, which is used to 
       set the maximum number of concurrent requests to &cell-gplazma;. The default
       value is <literal>30</literal>.
     </para>
 
     <para>
       Setting the value for
-      <varname>gPlazmaNumberOfSimultaneousRequests</varname> too high may
+      <varname>gplazma.cell.limits.threads</varname> too high may
       result in large spikes of CPU activity and the potential to run out of
       memory. Setting the number too low results in potentially slow login
       activity.
@@ -1481,11 +1481,11 @@ storageAuthzPath="/etc/grid-security/storage-authzdb"</programlisting>
           anonymous access, disable requesting and requiring the client
           authentication and activate basic authentication.
         </para>
-        <programlisting>webdavProtocol=http
-webdavAnonymousAccess=NONE
-webdavWantClientAuth=false
-webdavNeedClientAuth=false
-webdavBasicAuthentication=true</programlisting>
+        <programlisting>webdav.authn.protocol=http
+webdav.authz.anonymous-operations=NONE
+webdav.authn.accept-client-cert=false
+webdav.authn.require-client-cert=false
+webdav.authn.basic=true</programlisting>
         <para>
           Adjust the <filename>&path-ode-ed;/gplazma.conf</filename> to use the
           &gp2-kpwd; (for more information see also <xref
@@ -1522,8 +1522,8 @@ passwd tanja 6a4cd089 read-write 500 100 / / /</programlisting>
     <section id="cf-gplazma-webadmin-example">
       <title>&cell-gplazma; config example to work with authenticated webadmin</title>
       <para>
-      This section describes how to configure &serv-gplazma; to enable
-      &serv-webadmin; in authenticated mode with a grid certificate as
+      This section describes how to configure &serv-gplazma; to enable the 
+      webadmin servlet in authenticated mode with a grid certificate as
       well as with a username/password and how to give a user
       administrator access.
       </para>
@@ -1565,7 +1565,7 @@ passwd john 8402480 read-write 1700 1000 / / /</programlisting>
 	  class="username">john</systemitem>, most important is the
 	  <literal>1000</literal>, because it is the assigned
 	  &gid;. This must match the value of the
-	  <varname>webadminAdminGid</varname> configured in your
+	  <varname>httpd.authz.admin-gid</varname> configured in your
 	  webadmin.  This is sufficient for login using a
 	  certificate. The entry:
 	</para>

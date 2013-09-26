@@ -117,7 +117,7 @@
 	all pools. This is done by the following change to the file
 	<filename>&path-ode-ed;/dcache.conf</filename>:
       </para>
-      <programlisting>poolIoQueue=queueA,queueB</programlisting>
+      <programlisting>pool.queues=queueA,queueB</programlisting>
 
       <para>
 	Each door may be configured to use a particular mover
@@ -126,8 +126,8 @@
 	does not have the particular mover queue configured and will
 	consequently end up in the default mover queue of that pool.
       </para>
-      <programlisting>gsiftpIoQueue=queueA
-dcapIoQueue=queueB</programlisting>
+      <programlisting>ftp.mover.queue=queueA
+dcap.mover.queue=queueB</programlisting>
       <para>
         All requests send from this kind of door will ask to be
         scheduled to the given mover queue. The selection of the pool
@@ -147,9 +147,9 @@ dcapIoQueue=queueB</programlisting>
 	  <literal>queueB</literal> for &dcap;.
 	</para>
 
-      <programlisting>poolIoQueue=queueA,queueB
-gsiftpIoQueue=queueA
-dcapIoQueue=queueB</programlisting>
+      <programlisting>pool.queues=queueA,queueB
+ftp.mover.queue=queueA
+dcap.mover.queue=queueB</programlisting>
       </informalexample>
 
       <para>
@@ -168,15 +168,16 @@ dcapIoQueue=queueB</programlisting>
 
 	<programlisting>[myPools]
 [myPools/pool1]
-poolIoQueue=queueC
+pool.queues=queueC
 [myPools/pool2]
-poolIoQueue=queueD
+pool.queues=queueD
 
 [myDoors]
 [myDoors/dcap]
-dcapIoQueue=queueC
-[myDoors/gridftp]
-gsiftpIoQueue=queueD</programlisting>
+dcap.mover.queue=queueC
+[myDoors/ftp]
+ftp.authn.protocol = gsi
+ftp.mover.queue=queueD</programlisting>
       </informalexample>
 
       <para>
@@ -201,7 +202,7 @@ gsiftpIoQueue=queueD</programlisting>
         For the &dcap; protocol, it is possible to allow the client to
         choose another queue name than the one defined in the file
         <filename>dcache.conf</filename>. To achieve this
-        the property <varname>dcapIoQueueOverwrite</varname> needs to
+        the property <varname>dcap.authz.mover-queue-overwrite</varname> needs to
         be set to <literal>allowed</literal>.
       </para>
 
@@ -211,9 +212,9 @@ gsiftpIoQueue=queueD</programlisting>
 	  <literal>queue_dccp</literal>, where <literal>queueA</literal>
 	  shall be the queue for &dcap;.
 	</para>
-	<programlisting>poolIoQueue=queueA,queue_dccp
-dcapIoQueue=queueA
-dcapIoQueueOverwrite=allowed</programlisting>
+	<programlisting>pool.queues=queueA,queue_dccp
+dcap.mover.queue=queueA
+dcap.authz.mover-queue-overwrite=allowed</programlisting>
 
 
       <para>
@@ -252,57 +253,57 @@ dcapIoQueueOverwrite=allowed</programlisting>
 	  </thead>
           <tbody>
             <row>
-	      <entry>poolIoQueue</entry>
+	      <entry>pool.queues</entry>
 	      <entry>&no-default;</entry>
 	      <entry> I/O queue name</entry>
 	    </row>
             <row>
-	      <entry>dcapIoQueue</entry>
+	      <entry>dcap.mover.queue</entry>
 	      <entry>&no-default;</entry>
 	      <entry>Insecure &dcap; I/O queue name</entry>
 	    </row>
 	    <row>
-	      <entry>gsidcapIoQueue</entry>
+	      <entry>dcap.mover.queue</entry>
 	      <entry>&no-default;</entry>
 	      <entry>&gsidcap; I/O queue name</entry>
 	    </row>
             <row>
-	      <entry>dcapIoQueueOverwrite</entry>
+	      <entry>dcap.authz.mover-queue-overwrite</entry>
 	      <entry>denied</entry>
 	      <entry>Controls whether an application is allowed to overwrite a queue name</entry>
 	    </row>
             <row>
-	      <entry>gsidcapIoQueueOverwrite</entry>
+	      <entry>dcap.authz.mover-queue-overwrite</entry>
 	      <entry>denied</entry>
 	      <entry>Controls whether an application is allowed to overwrite a queue name</entry>
 	    </row>
             <row>
-	      <entry>kerberosdcapIoQueueOverwrite</entry>
+	      <entry>dcap.authz.mover-queue-overwrite</entry>
 	      <entry>denied</entry>
 	      <entry>Controls whether an application is allowed to overwrite a queue name</entry>
 	    </row>
             <row>
-	      <entry>gsiftpIoQueue</entry>
+	      <entry>ftp.mover.queue</entry>
 	      <entry>&no-default;</entry>
 	      <entry>&gsiftp; I/O queue name</entry>
 	    </row>
             <row>
-	      <entry>nfsIoQueue</entry>
+	      <entry>nfs.mover.queue</entry>
 	      <entry>&no-default;</entry>
 	      <entry>&nfs; I/O queue name</entry>
 	    </row>
             <row>
-	      <entry>remoteGsiftpIoQueue</entry>
+	      <entry>transfermanagers.mover.queue</entry>
 	      <entry>&no-default;</entry>
 	      <entry>queue used for SRM third-party transfers (i.e. the srmCopy command)</entry>
 	    </row>
             <row>
-	      <entry>webdavIoQueue</entry>
+	      <entry>webdav.mover.queue</entry>
 	      <entry>&no-default;</entry>
 	      <entry>&webdav; and &http; I/O queue name</entry>
 	    </row>
             <row>
-	      <entry>xrootdIoQueue</entry>
+	      <entry>xrootd.mover.queue</entry>
 	      <entry>&no-default;</entry>
 	      <entry>&xrootd; I/O queue name</entry>
 	    </row>
@@ -338,22 +339,22 @@ dcapIoQueueOverwrite=allowed</programlisting>
 	  </thead>
           <tbody>
 	    <row>
-	      <entry>gsidcapIoQueue</entry>
+	      <entry>dcap.mover.queue</entry>
 	      <entry>&no-default;</entry>
 	      <entry>&gsidcap; I/O queue name</entry>
 	    </row>
             <row>
-	      <entry>dcapIoQueue</entry>
+	      <entry>dcap.mover.queue</entry>
 	      <entry>&no-default;</entry>
 	      <entry>Insecure &dcap; I/O queue name</entry>
 	    </row>
             <row>
-	      <entry>gsidcapIoQueueOverwrite</entry>
+	      <entry>dcap.authz.mover-queue-overwrite</entry>
 	      <entry>denied</entry>
 	      <entry>Is application allowed to overwrite queue name?</entry>
 	    </row>
             <row>
-	      <entry>dcapIoQueueOverwrite</entry>
+	      <entry>dcap.authz.mover-queue-overwrite</entry>
 	      <entry>denied</entry>
 	      <entry>Is application allowed to overwrite queue name?</entry>
 	    </row>
@@ -385,7 +386,7 @@ dcapIoQueueOverwrite=allowed</programlisting>
           </thead>
           <tbody>
             <row>
-	      <entry>gsiFtpPortNumber</entry>
+	      <entry>ftp.net.port.gsi</entry>
 	      <entry>2811</entry>
 	      <entry>&gsiftp; port listen port</entry>
 	    </row>
@@ -400,7 +401,7 @@ dcapIoQueueOverwrite=allowed</programlisting>
 	      <entry>Use the space reservation service</entry>
 	    </row>
             <row>
-	      <entry>performanceMarkerPeriod</entry>
+	      <entry>ftp.performance-marker-period</entry>
 	      <entry>180</entry>
 	      <entry>Performance markers in seconds</entry>
 	    </row>
@@ -408,64 +409,54 @@ dcapIoQueueOverwrite=allowed</programlisting>
 	      <entry>gplazmaPolicy</entry>
 	      <entry>${ourHomeDir}/etc/dcachesrm-gplazma.policy</entry>
 	      <entry>Location of the gPlazma Policy File</entry>
-	    </row>
+	    </row>        
             <row>
-	      <entry>useGPlazmaAuthorizationModule</entry>
-	      <entry>&false;</entry>
-	      <entry>Use the gPlazma module</entry>
-	    </row>
-            <row>
-	      <entry>useGPlazmaAuthorizationCell</entry>
-	      <entry>&true;</entry>
-	      <entry>Use the &cell-gplazma; cell</entry>
-	    </row>
-            <row>
-	      <entry>gsiftpPoolManagerTimeout</entry>
+	      <entry>ftp.service.poolmanager.timeout</entry>
 	      <entry>5400</entry>
 	      <entry>Pool Manager timeout in seconds</entry>
 	    </row>
             <row>
-	      <entry>gsiftpPoolTimeout</entry>
+	      <entry>ftp.service.pool.timeout</entry>
 	      <entry>600</entry>
 	      <entry>Pool timeout in seconds</entry>
 	    </row>
             <row>
-	      <entry>gsiftpPnfsTimeout</entry>
+	      <entry>ftp.service.pnfsmanager.timeout</entry>
 	      <entry>300</entry>
 	      <entry>Pnfs timeout in seconds</entry>
 	    </row>
             <row>
-	      <entry>gsiftpMaxRetries</entry>
+	      <entry>ftp.limits.retries</entry>
 	      <entry>80</entry>
 	      <entry>Number of PUT/GET retries</entry>
 	    </row>
             <row>
-	      <entry>gsiftpMaxStreamsPerClient</entry>
+	      <entry>ftp.limits.streams-per-client</entry>
 	      <entry>10</entry>
 	      <entry>Number of parallel streams per &ftp; PUT/GET</entry>
 	    </row>
             <row>
-	      <entry>gsiftpDeleteOnConnectionClosed</entry>
+	      <entry>ftp.enable.delete-on-failure</entry>
 	      <entry>&true;</entry>
 	      <entry>Delete file on connection closed</entry>
 	    </row>
             <row>
-	      <entry>gsiftpMaxLogin</entry>
+	      <entry>ftp.limits.clients</entry>
 	      <entry>100</entry>
 	      <entry>Maximum number of concurrently logged in users</entry>
 	    </row>
             <row>
-	      <entry>gsiftpAdapterInternalInterface</entry>
+	      <entry>ftp.net.internal</entry>
 	      <entry>&no-default;</entry>
 	      <entry>In case of two interfaces</entry>
 	    </row>
             <row>
-	      <entry>clientDataPortRange</entry>
+	      <entry>ftp.net.port-range</entry>
 	      <entry>20000:25000</entry>
 	      <entry>The client data port range</entry>
 	    </row>
             <row>
-	      <entry>kpwdFile</entry>
+	      <entry>gplazma.kpwd.file</entry>
 	      <entry><filename>${ourHomeDir}/etc/dcache.kpwd</filename></entry>
 	      <entry>Legacy authorization</entry>
 	    </row>
@@ -498,19 +489,19 @@ dcapIoQueueOverwrite=allowed</programlisting>
 
 	  <tbody>
 	    <row>
-	      <entry>srmPort</entry>
+	      <entry>srm.net.port</entry>
 	      <entry>8443</entry>
-	      <entry>srmPort</entry>
+	      <entry>srm.net.port</entry>
 	    </row>
 	    <row>
-	      <entry>srmDatabaseHost</entry>
+	      <entry>srm.db.host</entry>
 	      <entry><systemitem class="systemname">localhost</systemitem></entry>
-	      <entry>srmDatabaseHost</entry>
+	      <entry>srm.db.host</entry>
 	    </row>
 	    <row>
-	      <entry>srmTimeout</entry>
+	      <entry>srm.limits.external-copy-script.timeout</entry>
 	      <entry>3600</entry>
-	      <entry>srmTimeout</entry>
+	      <entry>srm.limits.external-copy-script.timeout</entry>
 	    </row>
 	    <row>
 	      <entry>srmVacuum</entry>
@@ -528,133 +519,135 @@ dcapIoQueueOverwrite=allowed</programlisting>
 	      <entry>srmProxiesDirectory</entry>
 	    </row>
 	    <row>
-	      <entry>srmBufferSize</entry>
+	      <entry>srm.limits.transfer-buffer.size</entry>
 	      <entry>1048576</entry>
-	      <entry>srmBufferSize</entry>
+	      <entry>srm.limits.transfer-buffer.size</entry>
 	    </row>
 	    <row>
-	      <entry>srmTcpBufferSize</entry>
+	      <entry>srm.limits.transfer-tcp-buffer.size</entry>
 	      <entry>1048576</entry>
-	      <entry>srmTcpBufferSize</entry>
+	      <entry>srm.limits.transfer-tcp-buffer.size</entry>
 	    </row>
 	    <row>
-	      <entry>srmDebug</entry>
+	      <entry>srm.enable.external-copy-script.debug</entry>
 	      <entry>&true;</entry>
-	      <entry>srmDebug</entry>
+	      <entry>srm.enable.external-copy-script.debug</entry>
 	    </row>
 	    <row>
-	      <entry>srmGetReqThreadQueueSize</entry>
+	      <entry>srm.limits.request.scheduler.thread.queue.size</entry>
 	      <entry>1000</entry>\
-	      <entry>srmGetReqThreadQueueSize</entry>
+	      <entry>srm.limits.request.scheduler.thread.queue.size</entry>
 	    </row>
 	    <row>
-	      <entry>srmGetReqThreadPoolSize</entry>
+	      <entry>srm.limits.request.scheduler.thread.pool.size</entry>
 	      <entry>100</entry>
-	      <entry>srmGetReqThreadPoolSize</entry>
+	      <entry>srm.limits.request.scheduler.thread.pool.size</entry>
 	    </row>
 	    <row>
-	      <entry>srmGetReqMaxWaitingRequests</entry>
+	      <entry>srm.limits.request.scheduler.waiting.max</entry>
 	      <entry>1000</entry>
-	      <entry>srmGetReqMaxWaitingRequests</entry>
+	      <entry>srm.limits.request.scheduler.waiting.max</entry>
 	    </row>
 	    <row>
-	      <entry>srmGetReqReadyQueueSize</entry>
+	      <entry>srm.limits.request.scheduler.ready-queue.size</entry>
 	      <entry>1000</entry>
-	      <entry>srmGetReqReadyQueueSize</entry>
+	      <entry>srm.limits.request.scheduler.ready-queue.size</entry>
 	    </row>
 	    <row>
-	      <entry>srmGetReqMaxReadyRequests</entry>
+	      <entry>srm.limits.request.scheduler.ready.max</entry>
 	      <entry>100</entry>
-	      <entry>srmGetReqMaxReadyRequests</entry>
+	      <entry>srm.limits.request.scheduler.ready.max</entry>
 	    </row>
 	    <row>
-	      <entry>srmGetReqMaxNumberOfRetries</entry>
+	      <entry>srm.limits.request.scheduler.retries.max</entry>
 	      <entry>10</entry>
-	      <entry>srmGetReqMaxNumberOfRetries</entry>
+	      <entry>srm.limits.request.scheduler.retries.max</entry>
 	    </row>
 	    <row>
-	      <entry>srmGetReqRetryTimeout</entry>
+	      <entry>srm.limits.request.scheduler.retry-timeout</entry>
 	      <entry>60000</entry>
-	      <entry>srmGetReqRetryTimeout</entry>
+	      <entry>srm.limits.request.scheduler.retry-timeout</entry>
 	    </row>
 	    <row>
-	      <entry>srmGetReqMaxNumOfRunningBySameOwner</entry>
+	      <entry>srm.limits.request.scheduler.same-owner-running.max</entry>
 	      <entry>10</entry>
-	      <entry>srmGetReqMaxNumOfRunningBySameOwner</entry>
+	      <entry>srm.limits.request.scheduler.same-owner-running.max</entry>
 	    </row>
 	    <row>
-	      <entry>srmPutReqThreadQueueSize</entry>
+	      <entry>srm.limits.request.put.scheduler.thread.queue.size</entry>
 	      <entry>1000</entry>
-	      <entry>srmPutReqThreadQueueSize</entry>
+	      <entry>srm.limits.request.put.scheduler.thread.queue.size</entry>
 	    </row>
 	    <row>
-	      <entry>srmPutReqThreadPoolSize</entry>
+	      <entry>srm.limits.request.put.scheduler.thread.pool.size</entry>
 	      <entry>100</entry>
-	      <entry>srmPutReqThreadPoolSize</entry>
+	      <entry>srm.limits.request.put.scheduler.thread.pool.size</entry>
 	    </row>
 	    <row>
-	      <entry>srmPutReqMaxWaitingRequests</entry>
+	      <entry>srm.limits.request.put.scheduler.waiting.max</entry>
 	      <entry>1000</entry>
-	      <entry>srmPutReqMaxWaitingRequests</entry>
+	      <entry>srm.limits.request.put.scheduler.waiting.max</entry>
 	    </row>
 	    <row>
-	      <entry>srmPutReqReadyQueueSize</entry>
+	      <entry>srm.limits.request.put.scheduler.ready-queue.size</entry>
 	      <entry>1000</entry>
-	      <entry>srmPutReqReadyQueueSize</entry>
+	      <entry>srm.limits.request.put.scheduler.ready-queue.size</entry>
 	    </row>
 	    <row>
-	      <entry>srmPutReqMaxReadyRequests</entry>
+	      <entry>srm.limits.request.put.scheduler.ready.max</entry>
 	      <entry>100</entry>
-	      <entry>srmPutReqMaxReadyRequests</entry>
+	      <entry>srm.limits.request.put.scheduler.ready.max</entry>
 	    </row>
 	    <row>
-	      <entry>srmPutReqMaxNumberOfRetries</entry>
+	      <entry>srm.limits.request.put.scheduler.retries.max</entry>
 	      <entry>10</entry>
-	      <entry>srmPutReqMaxNumberOfRetries</entry>
+	      <entry>srm.limits.request.put.scheduler.retries.max</entry>
 	    </row>
 	    <row>
-	      <entry>srmPutReqRetryTimeout</entry>
+	      <entry>srm.limits.request.put.scheduler.retry-timeout</entry>
 	      <entry>60000</entry>
-	      <entry>srmPutReqRetryTimeout</entry>
+	      <entry>srm.limits.request.put.scheduler.retry-timeout</entry>
 	    </row>
 	    <row>
-	      <entry>srmPutReqMaxNumOfRunningBySameOwner</entry>
+	      <entry>srm.limits.request.put.scheduler.same-owner-running.max</entry>
 	      <entry>10</entry>
-	      <entry>srmPutReqMaxNumOfRunningBySameOwner</entry>
+	      <entry>srm.limits.request.put.scheduler.same-owner-running.max</entry>
 	    </row>
 	    <row>
-	      <entry>srmCopyReqThreadQueueSize</entry>
+	      <entry>srm.limits.request.copy.scheduler.thread.queue.size</entry>
 	      <entry>1000</entry>
-	      <entry>srmCopyReqThreadQueueSize</entry>
+	      <entry>srm.limits.request.copy.scheduler.thread.queue.size</entry>
 	    </row>
 	    <row>
-	      <entry>srmCopyReqThreadPoolSize</entry>
+	      <entry>srm.limits.request.copy.scheduler.thread.pool.size</entry>
 	      <entry>100</entry>
-	      <entry>srmCopyReqThreadPoolSize</entry>
+	      <entry>srm.limits.request.copy.scheduler.thread.pool.size</entry>
 	    </row>
 	    <row>
-	      <entry>srmCopyReqMaxWaitingRequests</entry>
+	      <entry>srm.limits.request.copy.scheduler.waiting.max</entry>
 	      <entry>1000</entry>
-	      <entry>srmCopyReqMaxWaitingRequests</entry>
+	      <entry>srm.limits.request.copy.scheduler.waiting.max</entry>
 	    </row>
 	    <row>
-	      <entry>srmCopyReqMaxNumberOfRetries</entry>
+	      <entry>srm.limits.request.copy.scheduler.retries.max</entry>
 	      <entry>30</entry>
-	      <entry>srmCopyReqMaxNumberOfRetries</entry>
+	      <entry>srm.limits.request.copy.scheduler.retries.max</entry>
 	    </row>
 	    <row>
-	      <entry>srmCopyReqRetryTimeout</entry>
+	      <entry>srm.limits.request.copy.scheduler.retry-timeout</entry>
 	      <entry>60000</entry>
-	      <entry>srmCopyReqRetryTimeout</entry>
+	      <entry>srm.limits.request.copy.scheduler.retry-timeout</entry>
 	    </row>
 	    <row>
-	      <entry>srmCopyReqMaxNumOfRunningBySameOwner</entry>
+	      <entry>srm.limits.request.copy.scheduler.same-owner-running.max</entry>
 	      <entry>10</entry>
-	      <entry>srmCopyReqMaxNumOfRunningBySameOwner</entry>
+	      <entry>srm.limits.request.copy.scheduler.same-owner-running.max</entry>
 	    </row>
           </tbody>
         </tgroup>
       </table>
     </section>
   </section>
+
+
 </chapter>

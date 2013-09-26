@@ -817,14 +817,14 @@ rh set max active <replaceable>numberOfConcurrentGETs</replaceable></programlist
 	<title>The namespace layout</title>
 	<para>
 	  In order to allow &dcache; to remove files from attached
-	  &tss;es, the <quote>cleaner.hsm = enabled</quote> must be
+	  &tss;es, the <quote>cleaner.enable.hsm = true</quote> must be
 	  added immediately underneath the [namespaceDomain/cleaner]
 	  service declaration:
 	</para>
 	<programlisting>[namespaceDomain]
  ... other services ...
 [namespaceDomain/cleaner]
-cleaner.hsm = enabled
+cleaner.enable.hsm = true
 .. more ...</programlisting>
 
       </section>

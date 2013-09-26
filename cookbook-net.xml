@@ -62,8 +62,8 @@
 	  On the pool nodes the LAN range ports need to be opened to
 	  allow pool to pool communication. By default these are ports
 	  <literal>33115-33145</literal> (set by the properties
-	  <varname>net.lan.port.min</varname> and
-	  <varname>net.lan.port.max</varname>).
+	  <varname>dcache.net.lan.port.min</varname> and
+	  <varname>dcache.net.lan.port.max</varname>).
 	</para>
       </listitem>
     </itemizedlist>
@@ -82,8 +82,8 @@
 	  clients to connect to the pools. The default values for the
 	  WAN port range are <literal>20000-25000</literal>. The WAN
 	  port range is defined by the properties
-	  <varname>net.wan.port.min</varname> and
-	  <varname>net.wan.port.max</varname>.
+	  <varname>dcache.net.wan.port.min</varname> and
+	  <varname>dcache.net.wan.port.max</varname>.
 	</para>
       </listitem>
     </itemizedlist>
@@ -113,8 +113,8 @@
 	      On the pool nodes the LAN range ports need to be opened
 	      to allow pool to pool communication. By default these
 	      are ports <literal>33115-33145</literal> (set by the
-	      properties <varname>net.lan.port.min</varname> and
-	      <varname>net.lan.port.max</varname>).
+	      properties <varname>dcache.net.lan.port.min</varname> and
+	      <varname>dcache.net.lan.port.max</varname>).
 	    </para>
 	  </listitem>
 	</itemizedlist>
@@ -134,8 +134,8 @@
 	      the WAN port range are
 	      <literal>20000-25000</literal>. The WAN port range is
 	      defined by the properties
-	      <varname>net.wan.port.min</varname> and
-	      <varname>net.wan.port.max</varname>.
+	      <varname>dcache.net.wan.port.min</varname> and
+	      <varname>dcache.net.wan.port.max</varname>.
 	    </para>
 	  </listitem>
 	</itemizedlist>
@@ -200,8 +200,8 @@
 	to listen on the interface they should serve. The locations of
 	the grid host certificate and key files for the interface have
 	to be specified explicitly with the properties
-	<varname>grid.hostcert.cert</varname> and
-	<varname>grid.hostcert.key</varname>.
+	<varname>dcache.authn.hostcert.cert</varname> and
+	<varname>dcache.authn.hostcert.key</varname>.
       </para>
       
 
@@ -216,31 +216,33 @@
 
 	<programlisting>[internalDomain]
 listen=111.111.111.5
-grid.hostcert.cert=&path-ode-ed;/interface-cert-internal.pem
-grid.hostcert.key=&path-ode-ed;/interface-key-internal.pem
+dcache.authn.hostcert.cert=&path-ode-ed;/interface-cert-internal.pem
+dcache.authn.hostcert.key=&path-ode-ed;/interface-key-internal.pem
 [internalDomain/loginbroker]
-cell.name=loginbroker-internal
+loginbroker.cell.name=loginbroker-internal
 [internalDomain/srm]
-cell.name=srm-internal
-srm.lookup.loginbroker=loginbroker-internal
-srmHost=door-internal
-[internalDomain/gridftp]
-cell.name=GFTP-door-internal
-loginBroker=loginbroker-internal
+srm.cell.name=srm-internal
+srm.protocols.loginbroker=loginbroker-internal
+srm.net.host=door-internal
+[internalDomain/ftp]
+ftp.authn.protocol = gsi
+ftp.cell.name=GFTP-door-internal
+dcache.service.loginbroker=loginbroker-internal
 
 [externalDomain]
 listen=222.222.222.5
-grid.hostcert.cert=&path-ode-ed;/interface-cert-external.pem
-grid.hostcert.key=&path-ode-ed;/interface-key-external.pem
+dcache.authn.hostcert.cert=&path-ode-ed;/interface-cert-external.pem
+dcache.authn.hostcert.key=&path-ode-ed;/interface-key-external.pem
 [externalDomain/loginbroker]
-cell.name=loginbroker-external
+loginbroker.cell.name=loginbroker-external
 [externalDomain/srm]
-cell.name=srm-external
-srm.lookup.loginbroker=loginbroker-external
-srmHost=door-external
-[externalDomain/gridftp]
-cell.name=GFTP-door-external
-loginBroker=loginbroker-external</programlisting>
+srm.cell.name=srm-external
+srm.protocols.loginbroker=loginbroker-external
+srm.net.host=door-external
+[externalDomain/ftp]
+ftp.authn.protocol = gsi
+ftp.cell.name=GFTP-door-external
+dcache.service.loginbroker=loginbroker-external</programlisting>
 
       </informalexample>
       
@@ -283,7 +285,7 @@ loginBroker=loginbroker-external</programlisting>
       <para>
         Tell the &gridftp; door explicitly which IP it should send to
         the pool for the data connection with the
-        <varname>gsiftpAdapterInternalInterface</varname>
+        <varname>ftp.net.internal</varname>
         property.
       </para>
       <informalexample>
@@ -293,7 +295,7 @@ loginBroker=loginbroker-external</programlisting>
 	  of the &gridftp; door host which has the IP address
 	  <literal>10.0.1.1</literal>, set
       </para>
-      <programlisting>gsiftpAdapterInternalInterface=10.0.1.1</programlisting>
+      <programlisting>ftp.net.internal=10.0.1.1</programlisting>
       <para>
 	in the <filename>&path-ode-ed;/dcache.conf</filename> file.
       </para>

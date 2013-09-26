@@ -45,16 +45,16 @@
     <filename>&path-ode-ed;/dcache.conf</filename>:
   </para>
 
-  <programlisting>stagePolicyEnforcementPoint=PoolManager</programlisting>
+  <programlisting>dcache.authz.staging.pep=PoolManager</programlisting>
 
 
   <para>
     The file name of the white list must be configured by setting the
-    <varname>stageConfigurationFilePath</varname> parameter in
+    <varname>dcache.authz.staging</varname> parameter in
     <filename>&path-ode-ed;/dcache.conf</filename>:
   </para>
 
-  <programlisting>stageConfigurationFilePath=&path-odc-ed;/StageConfiguration.conf</programlisting>
+  <programlisting>dcache.authz.staging=&path-odc-ed;/StageConfiguration.conf</programlisting>
 
   <para>
     The parameter needs to be defined on all nodes which enforce the

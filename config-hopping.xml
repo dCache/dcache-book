@@ -89,7 +89,7 @@
     </para>
 
     <para>
-      Forwarding of incoming files can be enabled by setting the <varname>replicateOnArrival</varname> property in the <filename>&path-ode-ed;/dcache.conf</filename> file or per pool in the layout file. It can be set to <literal>on</literal>, <literal>PoolManager</literal> or <literal>HoppingManager</literal>, where <literal>on</literal> does the same as <literal>PoolManager</literal>.
+      Forwarding of incoming files can be enabled by setting the <varname>pool.destination.replicate</varname> property in the <filename>&path-ode-ed;/dcache.conf</filename> file or per pool in the layout file. It can be set to <literal>on</literal>, <literal>PoolManager</literal> or <literal>HoppingManager</literal>, where <literal>on</literal> does the same as <literal>PoolManager</literal>.
     </para>
 
 	<para>
@@ -167,18 +167,18 @@
       <title>File Hopping managed by the &cell-poolmngr;</title>
      <para>
        To enable replication on arrival by the &cell-poolmngr; set the
-       property <varname>replicateOnArrival</varname> to
-       <literal>on</literal> for the particular pool
+       property <varname>pool.destination.replicate</varname> to
+       <literal>PoolManager</literal> for the particular pool
      </para>
      <programlisting>[<replaceable>exampleDomain</replaceable>]
 [<replaceable>exampleDomain</replaceable>/pool]
 ...
-replicateOnArrival=on</programlisting>
+pool.destination.replicate=PoolManager</programlisting>
 	<para>
 	  or for several pools in the <filename>&path-ode-ed;/dcache.conf</filename> file.
 	</para>
 	<programlisting>...
-replicateOnArrival=on</programlisting>
+pool.destination.replicate=PoolManager</programlisting>
 
       <para>
 	File hopping configuration instructs a pool to send a
@@ -222,13 +222,13 @@ replicateOnArrival=on</programlisting>
 
 name=ocean
 path=/path/to/pool-ocean
-waitForFiles=${path}/data
-replicateOnArrival=on
+pool.wait-for-files=${path}/data
+pool.destination.replicate=PoolManager
 
 name=mountain
 path=/path/to/pool-mountain
-waitForFiles=${path}/data
-replicateOnArrival=on</programlisting>
+pool.wait-for-files=${path}/data
+pool.destination.replicate=PoolManager</programlisting>
 
        <para>
 	 In the layout file it is defined that all files arriving on
@@ -371,17 +371,17 @@ psu set link ocean-copy-link -readpref=10 -writepref=0 -cachepref=10 -p2ppref=-1
 	<title>Starting the FileHopping Manager service</title>
 
 	<para>
-	  Add the &serv-hopping; service to a domain in your layout
+	  Add the &serv-hoppingmanager; service to a domain in your layout
 	  file and restart the domain.
 	</para>
 	<programlisting>[<replaceable>DomainName</replaceable>]
-[<replaceable>DomainName</replaceable>/hopping]</programlisting>
+[<replaceable>DomainName</replaceable>/hoppingmanager]</programlisting>
 
 	<para>
 	  Initially no rules are configured for the
 	  &cell-hopmngr;. You may add rules by either edit the file
 	  <filename>&path-od-vld;/config/HoppingManager.conf</filename>
-	  and restart the &serv-hopping; service, or use the admin
+	  and restart the &serv-hoppingmanager; service, or use the admin
 	  interface and save the modifications by the
 	  <command>save</command> command into the
 	  <filename>HoppingManager.conf</filename>
@@ -393,18 +393,18 @@ psu set link ocean-copy-link -readpref=10 -writepref=0 -cachepref=10 -p2ppref=-1
 
 	<para>
 	  To enable replication on arrival by the &cell-hopmngr; set
-	  the property <varname>replicateOnArrival</varname> to
+	  the property <varname>pool.destination.replicate</varname> to
 	  <literal>HoppingManager</literal> for the particular pool
 	</para>
 	<programlisting>[<replaceable>exampleDomain</replaceable>]
 [<replaceable>exampleDomain</replaceable>/pool]
 ...
-replicateOnArrival=HoppingManager</programlisting>
+pool.destination.replicate=HoppingManager</programlisting>
 	<para>
 		or for several pools in the <filename>&path-ode-ed;/dcache.conf</filename> file.
 	</para>
 	<programlisting>...
-replicateOnArrival=HoppingManager</programlisting>
+pool.destination.replicate=HoppingManager</programlisting>
 
       </section>
 
@@ -613,8 +613,8 @@ replicateOnArrival=HoppingManager</programlisting>
 	<para>
 	  In order to instruct a particular pool to send a
 	  <literal>replicateFile</literal> message to the
-	  &serv-hopping; service, you need to add the line
-	  <literal>replicateOnArrival=HoppingManager</literal> to the
+	  &serv-hoppingmanager; service, you need to add the line
+	  <literal>pool.destination.replicate=HoppingManager</literal> to the
 	  layout file.
 	</para>
 	<informalexample>
@@ -623,8 +623,8 @@ replicateOnArrival=HoppingManager</programlisting>
 
 name=write-pool
 path=/path/to/write-pool-exp-a
-waitForFiles=${path}/data
-replicateOnArrival=HoppingManager
+pool.wait-for-files=${path}/data
+pool.destination.replicate=HoppingManager
 ...</programlisting>
 
       <para>

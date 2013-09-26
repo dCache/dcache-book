@@ -142,41 +142,31 @@
 
       <informalexample>
 	<para>
-	  Change the value for <literal>srmDatabaseHost=localhost</literal> in
+	  Change the value for <varname>srm.db.host</varname> in
 	  the layout file.
 	</para>
 
 	<programlisting>[<replaceable>srm-${host.name}Domain</replaceable>]
 [<replaceable>srm-${host.name}Domain</replaceable>/srm]
-srmDatabaseHost=hostname</programlisting>
+srm.db.host=hostname</programlisting>
       </informalexample>
 
       <para>
-	In the file
-	<filename>&path-ods-usd;/defaults/srm.properties</filename>
-	you will find the default values
+	The property
+	<varname>srm.limits.request.copy.scheduler.thread.pool.size</varname>
+	controls number of copy requests in the running state. Copy
+	requests are 3-rd party srm transfers and therefore the
+	property
+	<varname>transfermanagers.limits.external-transfers</varname>
+	is best to be set to the same value as shown below.
       </para>
 
-      <programlisting># ---- Database name
-srmDbName=dcache
 
-# ---- Database user name
-srmDbUser=srmdcache</programlisting>
+      <programlisting>srm.limits.request.copy.scheduler.thread.pool.size=250
+transfermanagers.limits.external-transfers=${srm.limits.request.copy.scheduler.thread.pool.size}</programlisting>
 
       <para>
-	The defaults for the configuration parameters for the
-	&cell-srm; service can be found in
-	<filename>&path-ods-usd;/defaults/dcache.properties</filename>.
-      </para>
-
-      <programlisting>srmCopyReqThreadPoolSize=250
-remoteGsiftpMaxTransfers=${srmCopyReqThreadPoolSize}</programlisting>
-
-      <para>
-	If you want to modify these values make sure that both
-	<varname>srmCopyReqThreadPoolSize</varname> and
-	<varname>remoteGsiftpMaxTransfers</varname> are set to the
-	same values.  The common value should be the roughly equal to
+	The common value should be the roughly equal to
 	the maximum number of the &srm; - to -&srm; copies your system
 	can sustain.
       </para>
@@ -186,8 +176,8 @@ remoteGsiftpMaxTransfers=${srmCopyReqThreadPoolSize}</programlisting>
 	  have 30 pools then the number should be 3x30=90.
 	</para>
 
-      <programlisting>srmCopyReqThreadPoolSize=90
-remoteGsiftpMaxTransfers=90</programlisting>
+      <programlisting>srm.limits.request.copy.scheduler.thread.pool.size=90
+transfermanagers.limits.external-transfers=90</programlisting>
       </informalexample>
 
       <informalexample>
@@ -195,8 +185,8 @@ remoteGsiftpMaxTransfers=90</programlisting>
 	  US-CMS T1 has:
 	</para>
 
-	<programlisting>srmCopyReqThreadPoolSize=2000
-remoteGsiftpMaxTransfers=2000</programlisting>
+	<programlisting>srm.limits.request.copy.scheduler.thread.pool.size=2000
+transfermanagers.limits.external-transfers=2000</programlisting>
       </informalexample>
 
      <note>
@@ -321,7 +311,7 @@ remoteGsiftpMaxTransfers=2000</programlisting>
 	    <para>
 	      If the space reservation request does not specify a
 	      retention policy we will assign
-	      <varname>DefaultRetentionPolicy</varname> a retention
+	      <varname>pnfsmanager.default-retention-policy</varname> a retention
 	      policy by default. The default value is
 	      <literal>CUSTODIAL</literal>.
 	    </para>
@@ -336,7 +326,7 @@ remoteGsiftpMaxTransfers=2000</programlisting>
 		Change the default value to
 		<literal>REPLICA</literal>.
 	      </para>
-	      <programlisting>DefaultRetentionPolicy=REPLICA</programlisting>
+	      <programlisting>pnfsmanager.default-retention-policy=REPLICA</programlisting>
 	    </informalexample>
 
 	  </listitem>
@@ -384,7 +374,7 @@ remoteGsiftpMaxTransfers=2000</programlisting>
 	    <para>
 	      If a space reservation request does not specify an
 	      access latency we will assign
-	      <varname>DefaultAccessLatencyForSpaceReservation</varname> an
+	      <varname>spacemanager.default-access-latency</varname> an
 	      access latency by default. The default value is
 	      <literal>NEARLINE</literal>.
 	    </para>
@@ -399,7 +389,7 @@ remoteGsiftpMaxTransfers=2000</programlisting>
 	      <para>
 		Change the default value to <literal>ONLINE</literal>.
 	      </para>
-	      <programlisting>DefaultAccessLatencyForSpaceReservation=ONLINE</programlisting>
+	      <programlisting>spacemanager.default-access-latency=ONLINE</programlisting>
 	    </informalexample>
 
 	  </listitem>
@@ -441,7 +431,7 @@ remoteGsiftpMaxTransfers=2000</programlisting>
 	<filename>&path-ode-ed;/dcache.conf</filename>
       </para>
 
-      <programlisting>srmSpaceManagerEnabled=true</programlisting>
+      <programlisting>dcache.enable.space-reservation=true</programlisting>
 
     </section>
 
@@ -497,7 +487,7 @@ remoteGsiftpMaxTransfers=2000</programlisting>
 	    for &srm; Version 2.2 data transfers that are not given
 	    the space token explicitly. The parameter that enables
 	    this behavior is
-	    <varname>srmImplicitSpaceManagerEnabled</varname>, which
+	    <varname>srm.enable.space-reservation.implicit</varname>, which
 	    is described in <xref linkend="cf-srm-expert-config"/>.
 	    If no implicit space reservation can be made, the transfer
 	    will fail.
@@ -514,8 +504,8 @@ remoteGsiftpMaxTransfers=2000</programlisting>
 	    then the <literal>AccessLatency</literal> and
 	    <literal>RetentionPolicy</literal> will be set on basis of
 	    the system wide defaults, which are controlled by
-	    <varname>DefaultRetentionPolicy</varname> and
-	    <varname>DefaultAccessLatencyForSpaceReservation</varname>
+	    <varname>pnfsmanager.default-retention-policy</varname> and
+	    <varname>spacemanager.default-access-latency</varname>
 	    variables in
 	    <filename>&path-ode-ed;/dcache.conf</filename>.
 	  </para>
@@ -747,7 +737,7 @@ last time all link groups were updated: Mon Nov 28 12:12:51 CET 2011(13224787710
 	  <filename>&path-ode-ed;/dcache.conf</filename> file.
 	</para>
 
-	<programlisting>SpaceManagerLinkGroupAuthorizationFileName=/path/to/LinkGroupAuthorization.conf</programlisting>
+	<programlisting>spacemanager.authz.link-group-file-name=/path/to/LinkGroupAuthorization.conf</programlisting>
 
 	<para>
 	  The file <filename>LinkGroupAuthorization.conf</filename>
@@ -1174,11 +1164,11 @@ Space token =110044</screen>
 	Edit the file <filename>&path-ode-ed;/dcache.conf</filename> to enable space
 	reservation for non &srm; transfers.
       </para>
-      <programlisting>SpaceManagerReserveSpaceForNonSRMTransfers=true</programlisting>
+      <programlisting>spacemanager.enable.reserve-space-for-non-srm-tranfers=true</programlisting>
 
 	<para>
 	  If the &serv-spacemngr; is enabled,
-	  <varname>SpaceManagerReserveSpaceForNonSRMTransfers</varname>
+	  <varname>spacemanager.enable.reserve-space-for-non-srm-tranfers</varname>
 	  is set to <literal>true</literal>, and if the transfer
 	  request comes from a door, and there was no prior space
 	  reservation made for this file, the &cell-spacemngr; will
@@ -1218,10 +1208,10 @@ Space token =110044</screen>
     </para>
 
     <section>
-      <title>srmSpaceManagerEnabled</title>
+      <title>dcache.enable.space-reservation</title>
 
       <para>
-	<varname>srmSpaceManagerEnabled</varname> tells if the space
+	<varname>dcache.enable.space-reservation</varname> tells if the space
 	management is activated in &cell-srm;.
       </para>
 
@@ -1234,23 +1224,23 @@ Space token =110044</screen>
 	Usage example:
       </para>
 
-      <programlisting>srmSpaceManagerEnabled=true</programlisting>
+      <programlisting>dcache.enable.space-reservation=true</programlisting>
     </section>
 
     <section>
-      <title>srmImplicitSpaceManagerEnabled</title>
+      <title>srm.enable.space-reservation.implicit</title>
 
       <para>
-	<varname>srmImplicitSpaceManagerEnabled</varname> tells if
+	<varname>srm.enable.space-reservation.implicit</varname> tells if
 	the space should be reserved for &srm; Version 1 transfers and
 	for &srm; Version 2 transfers that have no space token
-	specified. Will have effect only if srmSpaceManagerEnabled.
+	specified. 
       </para>
 
       <para>
 	Possible values are <literal>true</literal> and
 	<literal>false</literal>. This is enabled by default. It has no
-	effect if <varname>srmSpaceManagerEnabled</varname> is set to
+	effect if <varname>dcache.enable.space-reservation</varname> is set to
 	<literal>true</literal>.
       </para>
 
@@ -1258,14 +1248,14 @@ Space token =110044</screen>
 	Usage example:
       </para>
 
-      <programlisting>srmImplicitSpaceManagerEnabled=true</programlisting>
+      <programlisting>srm.enable.space-reservation.implicit=true</programlisting>
     </section>
 
     <section>
-      <title>overwriteEnabled</title>
+      <title>dcache.enable.overwrite</title>
 
       <para>
-	<varname>overwriteEnabled</varname> tells &srm; and
+	<varname>dcache.enable.overwrite</varname> tells &srm; and
 	&gridftp; servers if the overwrite is allowed. If enabled on
 	the &srm; node, should be enabled on all &gridftp; nodes.
       </para>
@@ -1279,19 +1269,19 @@ Space token =110044</screen>
 	Usage example:
       </para>
 
-      <programlisting>overwriteEnabled=true</programlisting>
+      <programlisting>dcache.enable.overwrite=true</programlisting>
     </section>
 
     <section>
-      <title>srmOverwriteByDefault</title>
+      <title>srm.enable.overwrite-by-default</title>
 
       <para>
-	<varname>srmOverwriteByDefault</varname> Set this to
+	<varname>srm.enable.overwrite-by-default</varname> Set this to
 	<literal>true</literal> if you want overwrite to be enabled
 	for &srm; v1.1 interface as well as for &srm; v2.2 interface
 	when client does not specify desired overwrite mode. This
 	option will be considered only if
-	<varname>overwriteEnabled</varname> is set to
+	<varname>dcache.enable.overwrite</varname> is set to
 	<literal>true</literal>.
       </para>
 
@@ -1304,14 +1294,14 @@ Space token =110044</screen>
 	Usage example:
       </para>
 
-      <programlisting>srmOverwriteByDefault=false </programlisting>
+      <programlisting>srm.enable.overwrite-by-default=false </programlisting>
     </section>
 
     <section>
-      <title>srmDatabaseHost</title>
+      <title>srm.db.host</title>
 
       <para>
-	<varname>srmDatabaseHost</varname> tells &cell-srm; which
+	<varname>srm.db.host</varname> tells &cell-srm; which
 	database host to connect to.
       </para>
 
@@ -1323,7 +1313,7 @@ Space token =110044</screen>
 	Usage example:
       </para>
 
-      <programlisting>srmDatabaseHost=database-host.example.org</programlisting>
+      <programlisting>srm.db.host=database-host.example.org</programlisting>
     </section>
 
     <section>
@@ -1346,9 +1336,9 @@ Space token =110044</screen>
     </section>
 
     <section>
-      <title>pinManagerDbHost</title>
+      <title>pinmanager.db.host</title>
       <para>
-	<varname>pinManagerDbHost</varname> tells &cell-pinmngr;
+	<varname>pinmanager.db.host</varname> tells &cell-pinmngr;
     which database host to connect to.
       </para>
 
@@ -1360,14 +1350,14 @@ Space token =110044</screen>
 	Usage example:
       </para>
 
-      <programlisting>pinManagerDbHost=database-host.example.org</programlisting>
+      <programlisting>pinmanager.db.host=database-host.example.org</programlisting>
     </section>
 
     <section>
-      <title>srmDbName</title>
+      <title>srm.db.name</title>
 
       <para>
-	<varname>srmDbName</varname> tells &cell-srm; which database
+	<varname>srm.db.name</varname> tells &cell-srm; which database
 	to connect to.
       </para>
 
@@ -1379,14 +1369,14 @@ Space token =110044</screen>
 	Usage example:
       </para>
 
-      <programlisting>srmDbName=dcache</programlisting>
+      <programlisting>srm.db.name=dcache</programlisting>
     </section>
 
     <section>
-      <title>srmDbUser</title>
+      <title>srm.db.user</title>
 
       <para>
-	<varname>srmDbUser</varname> tells &cell-srm; which database
+	<varname>srm.db.user</varname> tells &cell-srm; which database
 	user name to use when connecting to database. Do not change
 	unless you know what you are doing.
       </para>
@@ -1399,14 +1389,14 @@ Space token =110044</screen>
 	Usage example:
       </para>
 
-      <programlisting>srmDbUser=srmdcache</programlisting>
+      <programlisting>srm.db.user=srmdcache</programlisting>
     </section>
 
     <section>
-      <title>srmDbPassword</title>
+      <title>srm.db.password</title>
 
       <para>
-	<varname>srmDbPassword</varname> tells &cell-srm; which
+	<varname>srm.db.password</varname> tells &cell-srm; which
 	database password to use when connecting to database. The
 	default value is <literal>srmdcache</literal>.
       </para>
@@ -1415,14 +1405,14 @@ Space token =110044</screen>
 	Usage example:
       </para>
 
-      <programlisting>srmDbPassword=NotVerySecret</programlisting>
+      <programlisting>srm.db.password=NotVerySecret</programlisting>
     </section>
 
     <section>
-      <title>srmPasswordFile</title>
+      <title>srm.db.password.file</title>
 
       <para>
-	<varname>srmPasswordFile</varname> tells &cell-srm; which
+	<varname>srm.db.password.file</varname> tells &cell-srm; which
 	database password file to use when connecting to database.  Do
 	not change unless you know what you are doing. It is
 	recommended that MD5 authentication method is used. To learn
@@ -1442,14 +1432,14 @@ Space token =110044</screen>
 	Usage example:
       </para>
 
-      <programlisting>srmPasswordFile=/root/.pgpass</programlisting>
+      <programlisting>srm.db.password.file=/root/.pgpass</programlisting>
     </section>
 
     <section>
-      <title>srmRequestHistoryDatabaseEnabled</title>
+      <title>srm.request.enable.history-database</title>
 
       <para>
-	<varname>srmRequestHistoryDatabaseEnabled</varname> enables
+	<varname>srm.request.enable.history-database</varname> enables
 	logging of the transition history of the &srm; request in the
 	database. The request transitions can be examined through the
 	command line interface. Activation of this option might lead
@@ -1466,14 +1456,14 @@ Space token =110044</screen>
 	Usage example:
       </para>
 
-      <programlisting>srmRequestHistoryDatabaseEnabled=true</programlisting>
+      <programlisting>srm.request.enable.history-database=true</programlisting>
     </section>
 
     <section>
-      <title>srmDbLogEnabled</title>
+      <title>transfermanagers.enable.log-to-database</title>
 
       <para>
-	<varname>srmDbLogEnabled</varname> tells &cell-srm; to store
+	<varname>transfermanagers.enable.log-to-database</varname> tells &cell-srm; to store
 	the information about the remote (copy, srmCopy) transfer
 	details in the database. Activation of this option might lead to
 	the increase of the database activity, so if the &psql; load
@@ -1489,7 +1479,7 @@ Space token =110044</screen>
 	Usage example:
       </para>
 
-      <programlisting>srmDbLogEnabled=false</programlisting>
+      <programlisting>transfermanagers.enable.log-to-database=false</programlisting>
     </section>
 
     <section>
@@ -1506,13 +1496,13 @@ Space token =110044</screen>
     </section>
 
     <section>
-      <title>pnfsSrmPath</title>
+      <title>srm.root</title>
 
       <para>
-	<varname>pnfsSrmPath</varname> tells &cell-srm; what the root
+	<varname>srm.root</varname> tells &cell-srm; what the root
 	of all &srm; paths is in pnfs. &cell-srm; will prepend path to all
 	the local &surl; paths passed to it by &srm; client. So if the
-	<varname>pnfsSrmPath</varname> is set to
+	<varname>srm.root</varname> is set to
 	<literal>/pnfs/fnal.gov/THISISTHEPNFSSRMPATH</literal> and
 	someone requests the read of
 	<uri>srm://srm.example.org:8443/file1</uri>, &srm; will
@@ -1531,14 +1521,14 @@ Space token =110044</screen>
 	Usage example:
       </para>
 
-      <programlisting>pnfsSrmPath="/pnfs/fnal.gov/data/experiment"</programlisting>
+      <programlisting>srm.root="/pnfs/fnal.gov/data/experiment"</programlisting>
     </section>
 
     <section>
-      <title>parallelStreams</title>
+      <title>srm.limits.parallel-streams</title>
 
       <para>
-	<varname>parallelStreams</varname> specifies the number of the
+	<varname>srm.limits.parallel-streams</varname> specifies the number of the
 	parallel streams that &cell-srm; will use when performing third
 	party transfers between this system and remote &gsiftp;
 	servers, in response to &srm; v1.1 copy or &srm; V2.2 srmCopy
@@ -1555,14 +1545,14 @@ Space token =110044</screen>
 	Usage example:
       </para>
 
-      <programlisting>parallelStreams=20</programlisting>
+      <programlisting>srm.limits.parallel-streams=20</programlisting>
     </section>
 
     <section>
-      <title>srmBufferSize</title>
+      <title>srm.limits.transfer-buffer.size</title>
 
       <para>
-	<varname>srmBufferSize</varname> specifies the number of bytes
+	<varname>srm.limits.transfer-buffer.size</varname> specifies the number of bytes
 	to use for the in memory buffers for performing third party
 	transfers between this system and remote &gsiftp; servers, in
 	response to &srm; v1.1 copy or &srm; V2.2 srmCopy
@@ -1579,14 +1569,14 @@ Space token =110044</screen>
 	Usage example:
       </para>
 
-      <programlisting>srmBufferSize=1048576</programlisting>
+      <programlisting>srm.limits.transfer-buffer.size=1048576</programlisting>
     </section>
 
     <section>
-      <title>srmTcpBufferSize</title>
+      <title>srm.limits.transfer-tcp-buffer.size</title>
 
       <para>
-	<varname>srmTcpBufferSize</varname> specifies the number of
+	<varname>srm.limits.transfer-tcp-buffer.size</varname> specifies the number of
 	bytes to use for the tcp buffers for performing third party
 	transfers between this system and remote &gsiftp; servers, in
 	response to &srm; v1.1 copy or &srm; V2.2 srmCopy
@@ -1603,14 +1593,14 @@ Space token =110044</screen>
 	Usage example:
       </para>
 
-      <programlisting>srmTcpBufferSize=1048576</programlisting>
+      <programlisting>srm.limits.transfer-tcp-buffer.size=1048576</programlisting>
     </section>
 
     <section>
-      <title>srmAuthzCacheLifetime</title>
+      <title>srm.service.gplazma.cache.timeout</title>
 
       <para>
-	<varname>srmAuthzCacheLifetime</varname> specifies the
+	<varname>srm.service.gplazma.cache.timeout</varname> specifies the
 	duration that authorizations will be cached. Caching decreases
 	the volume of messages to the &cell-gplazma; cell or other
 	authorization mechanism.  To turn off caching, set the value
@@ -1625,17 +1615,17 @@ Space token =110044</screen>
 	Usage example:
       </para>
 
-      <programlisting>srmAuthzCacheLifetime=60</programlisting>
+      <programlisting>srm.service.gplazma.cache.timeout=60</programlisting>
     </section>
 
 
     <section>
-      <title>srmGetLifeTime, srmPutLifeTime and srmCopyLifeTime</title>
+      <title>srm.limits.request.bring-online.lifetime, srm.limits.request.put.lifetime and srm.limits.request.copy.lifetime</title>
 
       <para>
-	<varname>srmGetLifeTime</varname>,
-	<varname>srmPutLifeTime</varname> and
-	<varname>srmCopyLifeTime</varname> specify the lifetimes of
+	<varname>srm.limits.request.bring-online.lifetime</varname>,
+	<varname>srm.limits.request.put.lifetime</varname> and
+	<varname>srm.limits.request.copy.lifetime</varname> specify the lifetimes of
 	the srmPrepareToGet (srmBringOnline) srmPrepareToPut and
 	srmCopy requests lifetimes in millisecond. If the system is
 	unable to fulfill the requests before the request lifetimes
@@ -1650,25 +1640,25 @@ Space token =110044</screen>
 	Usage example:
       </para>
 
-      <programlisting>srmGetLifeTime=14400000
-srmPutLifeTime=14400000
-srmCopyLifeTime=14400000</programlisting>
+      <programlisting>srm.limits.request.bring-online.lifetime=14400000
+srm.limits.request.put.lifetime=14400000
+srm.limits.request.copy.lifetime=14400000</programlisting>
     </section>
 
     <section>
-      <title>srmGetReqMaxReadyRequests, srmPutReqMaxReadyRequests, srmGetReqReadyQueueSize and srmPutReqReadyQueueSize </title>
+      <title>srm.limits.request.scheduler.ready.max, srm.limits.request.put.scheduler.ready.max, srm.limits.request.scheduler.ready-queue.size and srm.limits.request.put.scheduler.ready-queue.size </title>
 
       <para>
-	<varname>srmGetReqMaxReadyRequests</varname> and
-	<varname>srmPutReqMaxReadyRequests</varname> specify the
+	<varname>srm.limits.request.scheduler.ready.max</varname> and
+	<varname>srm.limits.request.put.scheduler.ready.max</varname> specify the
 	maximum number of the files for which the transfer &url;s will
 	be computed and given to the users in response to &srm; get
 	(srmPrepareToGet) and put (srmPrepareToPut) requests. The rest
 	of the files that are ready to be transfered are put on the
 	<literal>Ready</literal> queues, the maximum length of these
 	queues are controlled by
-	<varname>srmGetReqReadyQueueSize</varname> and
-	<varname>srmPutReqReadyQueueSize</varname> parameters. These
+	<varname>srm.limits.request.scheduler.ready-queue.size</varname> and
+	<varname>srm.limits.request.put.scheduler.ready-queue.size</varname> parameters. These
 	parameters should be set according to the capacity of the
 	system, and are usually greater than the maximum number of the
 	&gridftp; transfers that this &dcache; instance &gridftp;
@@ -1679,19 +1669,19 @@ srmCopyLifeTime=14400000</programlisting>
 	Usage example:
       </para>
 
-      <programlisting>srmGetReqReadyQueueSize=10000
-srmGetReqMaxReadyRequests=2000
-srmPutReqReadyQueueSize=10000
-srmPutReqMaxReadyRequests=1000</programlisting>
+      <programlisting>srm.limits.request.scheduler.ready-queue.size=10000
+srm.limits.request.scheduler.ready.max=2000
+srm.limits.request.put.scheduler.ready-queue.size=10000
+srm.limits.request.put.scheduler.ready.max=1000</programlisting>
     </section>
 
     <section>
-      <title>srmCopyReqThreadPoolSize and remoteGsiftpMaxTransfers</title>
+      <title>srm.limits.request.copy.scheduler.thread.pool.size and transfermanagers.limits.external-transfers</title>
 
       <para>
-	<varname>srmCopyReqThreadPoolSize</varname> and
-	<varname>remoteGsiftpMaxTransfers</varname>.
-	srmCopyReqThreadPoolSize is used to specify how many parallel
+	<varname>srm.limits.request.copy.scheduler.thread.pool.size</varname> and
+	<varname>transfermanagers.limits.external-transfers</varname>.
+	<varname>srm.limits.request.copy.scheduler.thread.pool.size</varname> is used to specify how many parallel
 	srmCopy file copies to execute simultaneously. Once the
 	&cell-srm; contacted the remote &srm; system, and obtained a Transfer
 	&url; (usually &gsiftp; &url;), it contacts a Copy Manager
@@ -1699,25 +1689,25 @@ srmPutReqMaxReadyRequests=1000</programlisting>
 	perform a &gridftp; transfer between the remote &gridftp; server
 	and a &dcache; pool. The maximum number of simultaneous
 	transfers that &cell-remotegsitransfermngr; will support is
-	<varname>remoteGsiftpMaxTransfers</varname>, therefore it is important that
-	<varname>remoteGsiftpMaxTransfers</varname> is greater than or equal to
-	<varname>srmCopyReqThreadPoolSize</varname>.
+	<varname>transfermanagers.limits.external-transfers</varname>, therefore it is important that
+	<varname>transfermanagers.limits.external-transfers</varname> is greater than or equal to
+	<varname>srm.limits.request.copy.scheduler.thread.pool.size</varname>.
       </para>
 
       <para>
 	Usage example:
       </para>
 
-      <programlisting>srmCopyReqThreadPoolSize=250
-remoteGsiftpMaxTransfers=260</programlisting>
+      <programlisting>srm.limits.request.copy.scheduler.thread.pool.size=250
+transfermanagers.limits.external-transfers=260</programlisting>
     </section>
 
     <section>
-      <title>srmCustomGetHostByAddr</title>
+      <title>srm.enable.custom-get-host-by-address</title>
 
       <para>
-	<varname>srmCustomGetHostByAddr</varname>
-	srmCustomGetHostByAddr enables using the BNL developed
+	<varname>srm.enable.custom-get-host-by-address</varname>
+	<varname>srm.enable.custom-get-host-by-address</varname> enables using the BNL developed
 	procedure for host by IP resolution if standard InetAddress
 	method failed.
       </para>
@@ -1726,16 +1716,15 @@ remoteGsiftpMaxTransfers=260</programlisting>
 	Usage example:
       </para>
 
-      <programlisting>srmCustomGetHostByAddr=true</programlisting>
+      <programlisting>srm.enable.custom-get-host-by-address=true</programlisting>
     </section>
 
     <section>
-      <title>RecursiveDirectoryCreation</title>
+      <title>srm.enable.recursive-directory-creation</title>
 
       <para>
-	<varname>RecursiveDirectoryCreation</varname> allows or
-	disallows automatic creation of directories via &srm;,
-	allow=true, disallow=false.
+	<varname>srm.enable.recursive-directory-creation</varname> allows or
+	disallows automatic creation of directories via &srm;. Set this to <literal>true</literal> or <literal>false</literal>.
       </para>
 
       <para>
@@ -1746,7 +1735,7 @@ remoteGsiftpMaxTransfers=260</programlisting>
 	Usage example:
       </para>
 
-      <programlisting>RecursiveDirectoryCreation=true</programlisting>
+      <programlisting>srm.enable.recursive-directory-creation=true</programlisting>
     </section>
 
        <section>
