@@ -46,9 +46,9 @@
   <para>
     The domain that hosts the location manager service is also configurable.  By default,
     the service runs within the &domain-dcache; domain; however, this may be changed by
-    setting the <literal>broker.domain</literal> property.  The port that
+    setting the <varname>dcache.broker.domain</varname> property.  The port that
     the location manager listens on is also configurable, using the
-    <literal>serviceLocatorPort</literal> property; however, most sites may leave this
+    <varname>dcache.broker.port</varname> property; however, most sites may leave this
     property unaltered and use the default value.
   </para>
 

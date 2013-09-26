@@ -93,11 +93,11 @@ Starting xrootd-babelfishDomain done</screen>
 	<para>
 	<emphasis>Globally:</emphasis> Edit
 	<filename>&path-ode-ed;/dcache.conf</filename> and
-	add the variable <varname>xrootdPort</varname> with the desired value (a
+	add the variable <varname>xrootd.net.port</varname> with the desired value (a
 	restart of the domain(s) running the &door-xrootd; is required):
     </para>
       <screen>..
-xrootdPort=1095
+xrootd.net.port=1095
 ..</screen>
     </listitem>
     </orderedlist>
@@ -105,16 +105,16 @@ xrootdPort=1095
     <para>
       For controlling the &tcp;-portrange within which &xrootd;-movers
       will start listening in the &domain-pool;, you can add the properties
-      <literal>net.lan.port.min</literal> and
-      <literal>net.lan.port.max</literal> to
+      <literal>dcache.net.lan.port.min</literal> and
+      <literal>dcache.net.lan.port.max</literal> to
       <filename>&path-ode-ed;/dcache.conf</filename> and adapt them
       according to your preferences. The default values can be viewed in
       <filename>&path-ods-usd;/defaults/dcache.properties</filename>.
     </para>
 
     <programlisting>..
-net.lan.port.min=30100
-net.lan.port.max=30200
+dcache.net.lan.port.min=30100
+dcache.net.lan.port.max=30200
 ..</programlisting>
 
     </section>
@@ -235,7 +235,7 @@ xrootdIsReadOnly=false
 	information at the time of request, new files/subdirectories
 	generated through &xrootd; will inherit UID/GID from its
 	parent directory. The user used for this can be configured via the
-	xrootdUser property.
+	<varname>xrootd.authz.user</varname> property.
       </para>
 
     </section>
@@ -253,23 +253,13 @@ xrootdIsReadOnly=false
       <para>
 	To activate this feature, a colon-seperated list containing
 	the full paths of authorized directories must be added
-	to <filename>&path-ode-ed;/dcache.conf</filename>. If both read and
-	write access should be authorized for certain directories, add the
-	following line to <filename>&path-ode-ed;/dcache.conf</filename>:
-      </para>
-
-      <programlisting>..
-xrootdAllowedPaths=/pnfs/<replaceable>example.org</replaceable>/path1:/pnfs/<replaceable>example.org</replaceable>/path2
-..</programlisting>
-
-       <para>
-        If you want to split permissions depending on whether the operation is
-        reading or writing, add the following lines instead:
+	to <filename>&path-ode-ed;/dcache.conf</filename>.
+	You will need to specify the read and write permissions separately.
        </para>
 
        <programlisting>..
-xrootdAllowedReadPaths=/pnfs/<replaceable>example.org</replaceable>/rpath1:/pnfs/<replaceable>example.org</replaceable>/rpath2
-xrootdAllowedWritePaths=/pnfs/<replaceable>example.org</replaceable>/wpath1:/pnfs/<replaceable>example.org</replaceable>/wpath2
+xrootd.authz.read-paths=/pnfs/<replaceable>example.org</replaceable>/rpath1:/pnfs/<replaceable>example.org</replaceable>/rpath2
+xrootd.authz.write-paths=/pnfs/<replaceable>example.org</replaceable>/wpath1:/pnfs/<replaceable>example.org</replaceable>/wpath2
 ..</programlisting>
 
       <para>
@@ -399,10 +389,10 @@ xrootdAuthNPlugin=gsi
           you may or may not want &dcache; to fail if the host
           certificate chain can not be verified against trusted certificate
           authorities. Whether &dcache; performs this check can be controlled
-          by setting the option <varname>grid.hostcert.verify</varname>:
+          by setting the option <varname>dcache.authn.hostcert.verify</varname>:
 
           <programlisting>..
-grid.hostcert.verify=true
+dcache.authn.hostcert.verify=true
 ..
 </programlisting>
 

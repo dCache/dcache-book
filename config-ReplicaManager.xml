@@ -36,7 +36,7 @@
       installed on the same machine as the &serv-replica; service
       &mdash; usually the admin node of the &dcache; instance.  If
       this is not the case you need to set the property
-      <varname>replicaManagerDatabaseHost</varname>.
+      <varname>replica.db.host</varname>.
     </para>
     <para>
       To create and configure the database
@@ -69,7 +69,7 @@
 	 node with the &domain-dcache; and on the node on which the
 	 &serv-pnfsmngr; is running.
 	</para>
-	<programlisting>replicaManager=yes</programlisting>
+	<programlisting>dcache.enable.replica=true</programlisting>
 	<note>
 	  <para>
 	    It will not work properly if you defined the
@@ -131,12 +131,12 @@
 	    In the file <filename>&path-ode-ed;/dcache.conf</filename>
 	    set the value for the property
 	    <varname>replicaManager</varname> to
-	    <literal>yes</literal> and the
-	    <literal>resilientGroupName</literal> to
+	    <literal>true</literal> and the
+	    <literal>replica.poolgroup</literal> to
 	    <literal>default</literal>.
 	  </para>
-	  <programlisting>replicaManager=yes
-resilientGroupName=default</programlisting>
+	  <programlisting>dcache.enable.replica=true
+replica.poolgroup=default</programlisting>
 	</listitem>
 	<listitem>
 	  <para>
@@ -193,7 +193,7 @@ resilientGroupName=default</programlisting>
 	  please specify the group name in the
 	  <filename>etc/dcache.conf</filename> file.
 	</para>
-	<programlisting>resilientGroupName=<replaceable>NameOfResilientPoolGroup</replaceable>.</programlisting>
+	<programlisting>replica.poolgroup=<replaceable>NameOfResilientPoolGroup</replaceable>.</programlisting>
 
     </section>
   </section>
@@ -229,7 +229,7 @@ resilientGroupName=default</programlisting>
       The &serv-replica; service counts the number of replicas for
       each file in the pools which can be used online (see Pool States
       below) and keeps the number of replicas within the valid range
-      (<literal>replicaMin</literal>, <literal>replicaMax</literal>).
+      (<literal>replica.limits.replicas.min</literal>, <literal>replica.limits.replicas.max</literal>).
     </para>
 
 
@@ -403,8 +403,8 @@ resilientGroupName=default</programlisting>
 	  <para>
 	    Now the admin can set the pool state down. Files from
 	    other pools might be replicated now, depending on the
-	    values of <literal>replicaMin</literal> and
-	    <literal>replicaMax</literal>.
+	    values of <literal>replica.limits.replicas.min</literal> and
+	    <literal>replica.limits.replicas.max</literal>.
 	  </para>
 	</listitem>
       </varlistentry>
@@ -505,8 +505,8 @@ resilientGroupName=default</programlisting>
 	building or even in the same town. To configure this you need
 	to set the <varname>tag.hostname</varname> label for your
 	pools and check the properties
-	<varname>replicaCheckPoolHost</varname> and
-	<varname>replicaEnableSameHostReplica</varname>.
+	<varname>replica.enable.check-pool-host</varname> and
+	<varname>replica.enable.same-host-replica</varname>.
       </para>
       <informalexample>
 	<para>
@@ -518,8 +518,8 @@ resilientGroupName=default</programlisting>
 [poolDomain/pool1]
 name=pool1
 path=/srv/dcache/p1
-maxDiskSpace=500G
-waitForFiles=${path}/data
+pool.size=500G
+pool.wait-for-files=${path}/data
 tag.hostname=Hamburg</programlisting>
         <para>
 	  and
@@ -528,15 +528,15 @@ tag.hostname=Hamburg</programlisting>
 [poolDomain/pool2]
 name=pool2
 path=/srv/dcache/p2
-maxDiskSpace=500G
-waitForFiles=${path}/data
+pool.size=500G
+pool.wait-for-files=${path}/data
 tag.hostname=Berlin</programlisting>
       </informalexample>
          <para>
 	   By default the property
-	   <varname>replicaCheckPoolHost</varname> is
+	   <varname>replica.enable.check-pool-host</varname> is
 	   <literal>true</literal> and
-	   <varname>replicaEnableSameHostReplica</varname> is
+	   <varname>replica.enable.same-host-replica</varname> is
 	   <literal>false</literal>. This means that the
 	   <varname>tag.hostname</varname> will be checked and the
 	   replication to a pool with the same
@@ -643,10 +643,10 @@ tag.hostname=Berlin</programlisting>
 
      <variablelist>
        <varlistentry>
-	 <term>replica/cell.name</term>
+	 <term>replica.cell.name</term>
 	 <listitem>
 	   <para>
-	     Default: <literal>replicaManager</literal>
+	     Default: <literal>dcache.enable.replica</literal>
 	   </para>
 	   <para>
 	     Cell name of the &serv-replica; service
@@ -654,18 +654,18 @@ tag.hostname=Berlin</programlisting>
 	 </listitem>
        </varlistentry>
        <varlistentry>
-	 <term>replicaManager</term>
+	 <term>dcache.enable.replica</term>
 	 <listitem>
 	   <para>
-	     Default: <literal>no</literal>
+	     Default: <literal>false</literal>
 	   </para>
 	   <para>
-	     Set this value to <literal>yes</literal> if you want to use the &serv-replica; service.
+	     Set this value to <literal>true</literal> if you want to use the &serv-replica; service.
 	   </para>
 	 </listitem>
        </varlistentry>
         <varlistentry>
-	 <term>resilientGroupName</term>
+	 <term>replica.poolgroup</term>
 	 <listitem>
 	   <para>
 	     Default: <literal>ResilientPools</literal>
@@ -678,7 +678,7 @@ tag.hostname=Berlin</programlisting>
 	 </listitem>
        </varlistentry>
        <varlistentry>
-	 <term>replicaManagerDatabaseHost</term>
+	 <term>replica.db.host</term>
 	 <listitem>
 	   <para>
 	     Default: <literal>localhost
@@ -690,7 +690,7 @@ tag.hostname=Berlin</programlisting>
 	 </listitem>
        </varlistentry>
        <varlistentry>
-	 <term>replicaDbName</term>
+	 <term>replica.db.name</term>
 	 <listitem>
 	   <para>
 	     Default: <literal>replicas</literal>
@@ -701,7 +701,7 @@ tag.hostname=Berlin</programlisting>
 	 </listitem>
        </varlistentry>
        <varlistentry>
-	 <term>replicaDbUser</term>
+	 <term>replica.db.user</term>
 	 <listitem>
 	   <para>
 	     Default: <literal>srmdcache</literal>
@@ -714,7 +714,7 @@ tag.hostname=Berlin</programlisting>
 	 </listitem>
        </varlistentry>
        <varlistentry>
-	 <term>replicaPasswordFile</term>
+	 <term>replica.db.password.file</term>
 	 <listitem>
 	   <para>
 	     Default: no password
@@ -722,7 +722,7 @@ tag.hostname=Berlin</programlisting>
 	 </listitem>
        </varlistentry>
        <varlistentry>
-	 <term>replicaDbJdbcDriver</term>
+	 <term>replica.db.driver</term>
 	 <listitem>
 	   <para>
 	     Default: <literal>org.postgresql.Driver</literal>
@@ -733,7 +733,7 @@ tag.hostname=Berlin</programlisting>
 	 </listitem>
        </varlistentry>
        <varlistentry>
-	 <term>replicaPoolWatchDogPeriod</term>
+	 <term>replica.limits.pool-watchdog-period</term>
 	 <listitem>
 	   <para>
 	     Default: <literal>600</literal> (10 min)
@@ -748,7 +748,7 @@ tag.hostname=Berlin</programlisting>
 	 </listitem>
        </varlistentry>
        <varlistentry>
-	 <term>replicaExcludedFilesExpirationTimeout</term>
+	 <term>replica.limits.excluded-files-expiration-timeout</term>
 	 <listitem>
 	   <para>
 	     Default: <literal>43200</literal> (12 hours)
@@ -756,7 +756,7 @@ tag.hostname=Berlin</programlisting>
 	 </listitem>
        </varlistentry>
        <varlistentry>
-	 <term>replicaDelayDBStartTimeout</term>
+	 <term>replica.limits.delay-db-start-timeout</term>
 	 <listitem>
 	   <para>
 	     Default: <literal>1200</literal> (20 min)
@@ -772,7 +772,7 @@ tag.hostname=Berlin</programlisting>
 	 </listitem>
        </varlistentry>
        <varlistentry>
-	 <term>replicaAdjustStartTimeout</term>
+	 <term>replica.limits.adjust-start-timeout</term>
 	 <listitem>
 	   <para>
 	     Default: <literal>1200</literal> (20 min)
@@ -785,7 +785,7 @@ tag.hostname=Berlin</programlisting>
 	 </listitem>
        </varlistentry>
        <varlistentry>
-	 <term>replicaWaitReplicateTimeout</term>
+	 <term>replica.limits.wait-replicate-timeout</term>
 	 <listitem>
 	   <para>
 	     Default: <literal>43200</literal> (12 hours)
@@ -796,7 +796,7 @@ tag.hostname=Berlin</programlisting>
 	 </listitem>
        </varlistentry>
        <varlistentry>
-	 <term>replicaWaitReduceTimeout</term>
+	 <term>replica.limits.wait-reduce-timeout</term>
 	 <listitem>
 	   <para>
 	     Default: <literal>43200</literal> (12 hours)
@@ -807,18 +807,7 @@ tag.hostname=Berlin</programlisting>
 	 </listitem>
        </varlistentry>
        <varlistentry>
-	 <term>replicaDebug</term>
-	 <listitem>
-	   <para>
-	     Default: <literal>false</literal>
-	   </para>
-	   <para>
-	     Disable / enable debug messages in the log file.
-	   </para>
-	 </listitem>
-       </varlistentry>
-       <varlistentry>
-	 <term>replicaMaxWorkers</term>
+	 <term>replica.limits.workers</term>
 	 <listitem>
 	   <para>
 	     Default: <literal>6</literal>
@@ -832,7 +821,7 @@ tag.hostname=Berlin</programlisting>
 	 </listitem>
        </varlistentry>
        <varlistentry>
-	 <term>replicaMin</term>
+	 <term>replica.limits.replicas.min</term>
 	 <listitem>
 	   <para>
 	     Default: <literal>2</literal>
@@ -844,7 +833,7 @@ tag.hostname=Berlin</programlisting>
 	 </listitem>
        </varlistentry>
        <varlistentry>
-	 <term>replicaMax</term>
+	 <term>replica.limits.replicas.max</term>
 	 <listitem>
 	   <para>
 	     Default: <literal>3</literal>
@@ -856,7 +845,7 @@ tag.hostname=Berlin</programlisting>
 	 </listitem>
        </varlistentry>
        <varlistentry>
-	 <term>replicaCheckPoolHost</term>
+	 <term>replica.enable.check-pool-host</term>
 	 <listitem>
 	   <para>
 	     Default: <literal>true</literal>
@@ -872,7 +861,7 @@ tag.hostname=Berlin</programlisting>
 	 </listitem>
        </varlistentry>
        <varlistentry>
-	 <term>replicaEnableSameHostReplica</term>
+	 <term>replica.enable.same-host-replica</term>
 	 <listitem>
 	   <para>
 	     Default: <literal>false</literal>
@@ -882,9 +871,9 @@ tag.hostname=Berlin</programlisting>
 	     copied to a pool, which has the same
 	     <varname>tag.hostname</varname> as the source pool.
 	     <note>
-	       The property <varname>replicaCheckPoolHost</varname>
+	       The property <varname>replica.enable.check-pool-host</varname>
 	       needs to be set to <literal>true</literal> if
-	       <varname>replicaEnableSameHostReplica</varname> is set
+	       <varname>replica.enable.same-host-replica</varname> is set
 	       to false.
 	     </note>
 	   </para>

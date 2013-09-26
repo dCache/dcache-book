@@ -802,7 +802,7 @@ java -cp ${CP} ch.qos.logback.classic.net.SimpleSocketServer ${PORT} /var/lib/dc
        </varlistentry>
 
        <varlistentry>
-	 <term>alarms.store.db.host</term>
+	 <term>alarms.db.host</term>
 	 <listitem>
 	   <para>
 	     Default: <literal>localhost</literal>

@@ -48,19 +48,21 @@
 
       <programlisting>[namespaceDomain]
 [namespaceDomain/pnfsmanager]
-[namespaceDomain/nfsv3]</programlisting>
+[namespaceDomain/nfs]
+nfs.version=3</programlisting>
     </informalexample>
 
     <informalexample>
       <para>
 	If you want to run the &nfs4; server you need to add the
-	corresponding &cell-nfsv41; service to a domain in the
+	corresponding &serv-nfs; service to a domain in the
 	<filename>&path-ode-ed;/layouts/mylayout.conf</filename>
 	file and start this domain.
       </para>
       <programlisting>[namespaceDomain]
 [namespaceDomain/pnfsmanager]
-[namespaceDomain/nfsv41]</programlisting>
+[namespaceDomain/nfs]
+nfs.version = 4.1</programlisting>
     </informalexample>
 
       <para>

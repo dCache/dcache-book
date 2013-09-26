@@ -339,12 +339,12 @@ Starting dCacheDomain done</screen>
 	      In this first installation of &dcache; your &dcache;
 	      will not be connected to a tape sytem. Therefore please
 	      change the values for
-	      <literal>DefaultRetentionPolicy</literal> and
-	      <literal>DefaultAccessLatency</literal> in the file
+	      <literal>pnfsmanager.default-retention-policy</literal> and
+	      <literal>pnfsmanager.default-access-latency</literal> in the file
 	      <filename>&path-ode-ed;/dcache.conf</filename>.
 	    </para>
-	    <programlisting>DefaultRetentionPolicy=REPLICA
-DefaultAccessLatency=ONLINE</programlisting>
+	    <programlisting>pnfsmanager.default-retention-policy=REPLICA
+pnfsmanager.default-access-latency=ONLINE</programlisting>
           </note>
 
 	  <para>
@@ -435,7 +435,7 @@ DefaultAccessLatency=ONLINE</programlisting>
 	      These are the first lines of
 	      <filename>&path-ode-ed;/layouts/single.conf</filename>:
 	    </para>
-	    <programlisting>broker.scheme=none
+	    <programlisting>dcache.broker.scheme=none
 
 [dCacheDomain]
 [dCacheDomain/admin]
@@ -520,10 +520,10 @@ DefaultAccessLatency=ONLINE</programlisting>
       <programlisting>[<replaceable>domainname</replaceable>/pool]
 name=<replaceable>poolname</replaceable>
 path=/path/to/pool
-waitForFiles=${path}/data</programlisting>
+pool.wait-for-files=${path}/data</programlisting>
 
 	<para>
-	  The property <varname>waitForFiles</varname> instructs the
+	  The property <varname>pool.wait-for-files</varname> instructs the
 	  pool not to start up until the specified file or directory
 	  is available.  This prevents problems should the underlying storage be unavailable (e.g., if a
 	  RAID device is offline).
@@ -690,7 +690,7 @@ dcache.java.memory.direct=16m</programlisting>
     </important>
 
     <para>
-      On any other nodes than the head node, the property <varname>broker.host</varname>
+      On any other nodes than the head node, the property <varname>dcache.broker.host</varname>
       has to be added to the file <filename>&path-ode-ed;/dcache.conf</filename>. This property
       should point to the host containing the special domain &domain-dcache;, because that domain acts implicitly as a broker.
     </para>

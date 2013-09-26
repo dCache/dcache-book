@@ -16,7 +16,7 @@
 
   <para>
    If you are using space reservations, i.e. you set
-   <programlisting>srmSpaceManagerEnabled=true</programlisting> in
+   <programlisting>dcache.enable.space-reservation=true</programlisting> in
    your configuration file and all of your pools are in <link
    linkend="cf-pm-linkgroups">link groups</link>, then you can only
    write into &dcache; if a link group is available for your
@@ -43,7 +43,7 @@
       You need to specify the location of the file in the
       <filename>&path-ode-ed;/dcache.conf</filename> file.
       </para>
-      <programlisting>SpaceManagerLinkGroupAuthorizationFileName=&path-ode-ed;/LinkGroupAuthorization.conf</programlisting>
+      <programlisting>spacemanager.authz.link-group-file-name=&path-ode-ed;/LinkGroupAuthorization.conf</programlisting>
 
     <informalexample>
       <para>

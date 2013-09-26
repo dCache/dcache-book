@@ -34,11 +34,12 @@
     <para>
       To enable the &door-nfs4;, you have to change the layout file
       corresponding to your &dcache;-instance.  Enable the
-      &serv-nfsv41; within the domain that you want to run it by adding the
+      &serv-nfs; within the domain that you want to run it by adding the
       following line
     </para>
     <programlisting>..
-[<replaceable>domainName</replaceable>/nfsv41]
+[<replaceable>domainName</replaceable>/nfs]
+nfs.version = 4.1
 ..</programlisting>
 
     <informalexample>
@@ -48,7 +49,8 @@
 
        <programlisting>..
 [nfs-${host.name}Domain]
-[nfs-${host.name}Domain/nfsv41]
+[nfs-${host.name}Domain/nfs]
+nfs.version = 4.1
 ..</programlisting>
 
     </informalexample>
@@ -150,9 +152,9 @@
           The <filename>&path-ode-ed;/dcache.conf</filename> on pool nodes and
           node running &door-nfs4; must enable kerberos and &rpcsec_gss;:
              <programlisting>nfs.rpcsec_gss=true
-kerberos.realm=<replaceable>YOUR.REALM</replaceable>
-kerberos.jaas.config=&path-ode-ed;/gss.conf
-kerberos.key-distribution-center-list=your.kdc.server</programlisting>
+dcache.authn.kerberos.realm=<replaceable>YOUR.REALM</replaceable>
+dcache.authn.jaas.config=&path-ode-ed;/gss.conf
+dcache.authn.kerberos.key-distribution-center-list=your.kdc.server</programlisting>
       </para>
       <para>
         The <filename>&path-ode-ed;/gss.conf</filename> on pool nodes and node

@@ -180,35 +180,14 @@
       <title>Enabling &acl; support</title>
 
       <para>
-        To enable &acl; support set the property
-        <varname>pnfsmanager.acl</varname> to <literal>true</literal>. This
-        property applies to the &serv-pnfsmngr; and &serv-acl; services
-        and only need to be defined for these services.
+        To enable &acl; support set
+        <varname>pnfsmanager.enable.acl</varname>=<literal>true</literal>
+        in the layout file.
       </para>
-    </section>
-
-    <section id="cf-acl-config-admin">
-      <title>Enabling the &serv-acl; service</title>
-
-        <para>
-          To query and define &acl;s on files and directories enable
-          the &serv-acl; service. This service exposes a command line
-          interface to administer &acl;s. The command line interface
-          of the service is described in section <xref
-          linkend="cf-acl-admin"/>.
-        </para>
-
-        <para>
-            To enable the &serv-acl; service, you have to change the
-            layout file corresponding to your &dcache;-instance.
-            Enable the &serv-acl; service within the domain that you
-            want to run it in by adding the following line
-        </para>
-
-        <programlisting>..
-[<replaceable>domainName</replaceable>/acl]
+      <programlisting>..
+[<replaceable>domainName</replaceable>/pnfsmanager]
+pnfsmanager.enable.acl=true
 ..</programlisting>
-
     </section>
 
   </section>
