@@ -968,36 +968,73 @@ contentOfTag1</screen>
 	<varlistentry>
 	  <term><literal>classic</literal>:</term>
 	  <listitem>
-	    This is the pool selection algorithm used in the versions
+	    <para>
+	      This is the pool selection algorithm used in the versions
 	    of &dcache; prior to version <literal>2.0</literal>. See
 	    <xref linkend='cf-pm-classic'/> for a detailed
 	    description.
+	    </para>
 	  </listitem>
 	</varlistentry>
 	<varlistentry>
 	  <term><literal>random</literal>:</term>
 	  <listitem>
-	    This pool selection algorithm selects a pool randomly from
-	    the set of available pools.
+	    <para>
+	      This pool selection algorithm selects a pool randomly
+	      from the set of available pools.
+	    </para>
 	  </listitem>
 	</varlistentry>
 	<varlistentry>
 	  <term><literal>lru</literal>:</term>
 	  <listitem>
-	    This pool selection algorithm selects the pool that has
-	    not been used the longest.
+	    <para>
+	      This pool selection algorithm selects the pool that has
+	      not been used the longest.
+	    </para>
 	  </listitem>
 	</varlistentry>
 	<varlistentry>
 	  <term><literal>wass</literal>:</term>
 	  <listitem>
-	    This pool selection algorithm selects pools randomly
-	    weighted by available space, while incorporating age and
-	    amount of garbage collectible files and information about
-	    load. This is the partition type of the default partition.
-	    See <ulink
-	    url="http://www.dcache.org/articles/wass.html">How to Pick
-	    a Pool</ulink> for more details.
+	    <para>
+	      This pool selection algorithm selects pools randomly
+	      weighted by available space, while incorporating age and
+	      amount of garbage collectible files and information
+	      about load.
+	    </para>
+	    <para>
+	      This is the partition type of the default partition.
+	      See <ulink
+	      url="http://www.dcache.org/articles/wass.html">How to
+	      Pick a Pool</ulink> for more details.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><literal>wrandom</literal>:</term>
+	  <listitem>
+	    <para>
+	      This pool selection algorithm selects read pools
+	      randomly and write pools with a weighted probability
+	      (based on (free+removable/total) per pool. 
+	    </para>
+	    <para>
+	      The <literal>wrandom</literal> partition type is a
+	      special case of the <literal>wass</literal> partition
+	      type: by choosing the correct parameters,
+	      <literal>wass</literal> can be made to perform like
+	      <literal>wrandom</literal>.
+	    </para>	   
+	    <para>
+	      The advantage of <literal>wass</literal> over
+	      <literal>wrandom</literal> is that it is more flexible
+	      and tries to take into account a file's age. This is
+	      something like a distributed LRU cache: the system tries
+	      to delete older removable files to keep newer removable
+	      files. This is advantageous if files read recently are
+	      more likely to be re-read than older files.
+	    </para>
 	  </listitem>
 	</varlistentry>
       </variablelist>
