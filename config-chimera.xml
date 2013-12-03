@@ -615,6 +615,16 @@ StoreName myStore
           </para>
         </listitem>
       </varlistentry>
+      <varlistentry>
+        <term>WriteToken</term>
+        <listitem>
+          <para>
+            Assign a <literal>WriteToken</literal> tag to a directory
+            in order to be able to write to a space token without
+            using the &srm;.
+          </para>
+        </listitem>
+      </varlistentry>
     </variablelist>
   </section>
 
