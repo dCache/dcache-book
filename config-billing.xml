@@ -238,8 +238,21 @@ httpdDomain     billing     billing  localhost srmdcache Yes        Yes</screen>
 	    Database inserts are batched for performance, and are controlled by the following properties:
 	  </para>
 	  <itemizedlist>
-	    <listitem><varname>billing.db.inserts.max-before-commit</varname> (defaults to <literal>10000</literal>)</listitem>
-	    <listitem><varname>billing.db.inserts.timeout-before-commit</varname> (defaults to <literal>5</literal>)</listitem>
+	    <listitem><varname>billing.db.inserts.max-before-commit</varname>
+	    (defaults to <literal>10000</literal>)</listitem>
+	    <listitem><varname>billing.db.inserts.timeout-before-commit</varname>
+	    (defaults to <literal>5</literal>)</listitem>
+	    <listitem><varname>billing.db.inserts.timeout-before-commit</varname>
+	    (defaults to <literal>5</literal>)</listitem>
+	    <listitem><varname>billing.db.inserts.queue-delegate.type</varname>
+	    (defaults to
+	    <literal>org.dcache.services.billing.db.impl.DirectQueueDelegate</literal>)</listitem>
+	    <listitem><varname>billing.db.inserts.max-queue-size</varname>
+	    (defaults to <literal>100000</literal>)</listitem>
+	    <listitem><varname>billing.db.inserts.max-batch-size</varname>
+	    (defaults to <literal>1000</literal>)</listitem>
+	    <listitem><varname>billing.db.inserts.drop-messages-at-limit</varname>
+	    (defaults to <literal>true</literal>)</listitem>
 	  </itemizedlist>
 	  <para>
 	    The default settings should usually be sufficient.
