@@ -134,7 +134,7 @@ webdavAnonymousAccess=FULL</programlisting>
         </informalexample>
 
 	<para>
-	  For anonymous access you neet to set the property
+	  For anonymous access you need to set the property
 	  <varname>dcapAnonymousAccessLevel</varname> to
 	  <literal>FULL</literal>.
 	</para>
