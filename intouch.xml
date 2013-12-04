@@ -134,6 +134,18 @@ webdavAnonymousAccess=FULL</programlisting>
         </informalexample>
 
 	<para>
+	  For anonymous access you need to set the property
+	  <varname>dcapAnonymousAccessLevel</varname> to
+	  <literal>FULL</literal>.
+	</para>
+
+	<informalexample>
+	  <programlisting>[dCacheDomain]
+[dCacheDomain/dcap]
+       dcapAnonymousAccessLevel=FULL</programlisting>
+        </informalexample>
+
+	<para>
 	  For this tutorial install &dcap; on your worker node. This
 	  can be the machine where your &dcache; is running.
 	</para>
