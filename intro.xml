@@ -220,18 +220,118 @@
     gives an overview of the architecture of the &dcache; system.
   </para>
 
-  <!-- TODO:
-      companion
 
-      finish replica manager
+<section id='intro-protos'>
+<title>Protocols Supported by &dcache;</title>
 
-      Emails durchgehen: Patrick, Timur, Alex, Vladimir,...
+<informaltable>
+  <tgroup cols='7' align='center' colsep='1' rowsep='1' >
+	    <colspec colname='c1'/>
+	    <colspec colname='c2'/>
+	    <colspec colname='c3'/>
+	    <colspec colname='c4'/>
+	    <colspec colname='c5'/>
+	    <colspec colname='c6'/>
+	    <colspec colname='c7'/>
 
-      Where to put comments/help/release notes for actual USERS (srmcp and dccp, ...)
-    -->
+    <thead>
+      <row>
+	<entry></entry>
+	<entry>&dcap;</entry>
+	<entry>&ftp;</entry>
+	<entry>&xrootd;</entry>
+	<entry>&nfs4;</entry>
+	<entry>&webdav;</entry>
+	<entry>&srm;</entry>
+      </row>
+    </thead>
+    <tbody>
+      <row>
+	<entry></entry>
+	<entry>+</entry>
+	<entry>+</entry>
+	<entry>+</entry>
+	<entry>+</entry>
+	<entry>+</entry>
+	<entry>-</entry>
+      </row>
+      <row>
+	<entry>kerberos</entry>
+	<entry>+</entry>
+	<entry>+</entry>
+	<entry>-</entry>
+	<entry>+</entry>
+	<entry>-</entry>
+	<entry>-</entry>
+      </row>
+      <row>
+	<entry>Client Certificate</entry>
+	<entry>+</entry>
+	<entry>+</entry>
+	<entry>+</entry>
+	<entry>-</entry>
+	<entry>+</entry>
+	<entry>+</entry>
+      </row>
+      <row>
+	<entry>username/password</entry>
+	<entry>+</entry>
+	<entry>+</entry>
+	<entry>-</entry>
+	<entry>-</entry>
+	<entry>+</entry>
+	<entry>-</entry>
+      </row>
+      <row>
+	<entry>Control Connection Encrypted</entry>
+	<entry>+</entry>
+	<entry>+</entry>
+	<entry>+</entry>
+	<entry>+</entry>
+	<entry>+</entry>
+	<entry>+</entry>
+      </row>
+      <row>
+	<entry>Data Connection Encrypted</entry>
+	<entry>-</entry>
+	<entry>-</entry>
+	<entry>-</entry>
+	<entry>+</entry>
+	<entry>-</entry>
+	<entry>-</entry>
+      </row>
+      <row>
+	<entry>passiv</entry>
+	<entry>+</entry>
+	<entry>+</entry>
+	<entry>+</entry>
+	<entry>+</entry>
+	<entry>+</entry>
+	<entry>+</entry>
+      </row>
+      <row>
+	<entry>active</entry>
+	<entry>+</entry>
+	<entry>+</entry>
+	<entry>-</entry>
+	<entry>-</entry>
+	<entry>-</entry>
+	<entry>-</entry>
+      </row>
+
+    </tbody>
+  </tgroup>
+</informaltable>
+
+
+</section>
+
+
+
+
+
   
-    <!-- TODO:
-      Short description, features, overview of structure
+    <!-- TODO: Short description, features, overview of structure
     
       Filesystem - PNFS (Database), Data on Pools/Tape, Protocols, SRM (Database)
     
