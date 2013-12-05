@@ -1,0 +1,1108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+%sharedents;
+<!ENTITY acl "<acronym>ACL</acronym>">
+<!ENTITY ace "<acronym>ACE</acronym>">
+<!ENTITY ace-access  "<nonterminal def='#ebnf.ace.access'>Access</nonterminal>">
+<!ENTITY ace-mask    "<nonterminal def='#ebnf.ace.mask'>Mask</nonterminal>">
+<!ENTITY ace-subject "<nonterminal def='#ebnf.ace.subject'>Subject</nonterminal>">
+]>
+
+
+<chapter id="sv-acl">
+
+  <title>
+    The &serv-acl; Service
+  </title>
+
+  <para>
+    &dcache; includes support for Access Control Lists (&acl;s).  This
+    support is conforming to the <ulink
+    url="http://www.nfsv4-editor.org/draft-25/draft-ietf-nfsv4-minorversion1-25.html">NFS
+    version 4 Protocol specification</ulink>.
+  </para>
+
+  <para>
+    This chapter provides some background information and details on
+    configuring &dcache; to use &acl;s and how to administer the
+    resulting system.
+  </para>
+
+  <note>
+    <title>&acl;s and &pnfs;</title>
+
+    <para>
+      &acl;s are only supported with the &chimera; name space
+      backend. Versions before 1.9.12 had partial support for &acl;s
+      with the &pnfs; backend, however due to the limitations of that
+      implementation &acl;s were practically useless with &pnfs;.
+    </para>
+  </note>
+
+  <section id="sv-acl-introduction">
+    <title>Introduction</title>
+
+    <para>
+      &dcache; allows control over namespace operations (e.g.,
+      creating new files and directories, deleting items, renaming
+      items) and data operations (reading data, writing data) using
+      the standard Unix permission model.  In this model, files and
+      directories have both owner and group-owner attributes and a set
+      of permissions that apply to the owner, permissions for users
+      that are members of the group-owner group and permissions for
+      other users.
+    </para>
+
+    <para>
+      Although Unix permission model is flexible enough for many
+      deployment scenarios there are configurations that either cannot
+      configured easily or are impossible.  To satisfy these more
+      complex permission handling &dcache; has support for &acl;-based
+      permission handling.
+    </para>
+
+    <para>
+      An Access Control List (&acl;) is a set of rules for determining
+      whether an end-user is allowed to undertake some specific
+      operation.  Each &acl; is tied to a specific namespace entry: a
+      file or directory.  When an end-user wishes to undertake some
+      operation then the &acl; for that namespace entry is checked to
+      see if that user is authorised.  If the operation is to create a
+      new file or directory then the &acl; of the parent directory is
+      checked.
+    </para>
+
+    <note>
+      <title>File- and directory- &acl;s</title>
+
+      <para>
+	Each &acl; is associated with a specific file or directory in
+	&dcache;.  Although the general form is the same whether the
+	&acl; is associated with a file or directory, some aspects of
+	an &acl; may change.  Because of this, we introduce the terms
+	<firstterm>file-&acl;</firstterm> and
+	<firstterm>directory-&acl;</firstterm> when taking about
+	&acl;s associated with a file or a directory respectively.  If
+	the term <firstterm>&acl;</firstterm> is used then it refers
+	to both file-&acl;s and directory-&acl;s.
+      </para>
+    </note>
+
+    <para>
+      Each &acl; contains a list of one or more Access Control Entries
+      (&ace;s).  The &ace;s describe how &dcache; determines whether
+      an end-user is authorised.  Each &ace; contains information
+      about which group of end users it applies to and describes
+      whether this group is authorised for some subset of possible
+      operations.
+    </para>
+
+    <para>
+      The order of the &ace;s within an &acl; is significant.  When
+      checking whether an end-user is authorised each &ace; is checked
+      in turn to see if it applies to the end-user and the requested
+      operation.  If it does then that &ace; determines whether that
+      end-user is authorised.  If not then the next &ace; is checked.
+      Thus an &acl; can have several &ace;s and the first matched
+      &ace; <quote>wins</quote>.
+    </para>
+
+    <para>
+      One of the problems with traditional Unix-based permission model
+      is its inflexible handling of newly created files and
+      directories.  With transitional filesystems, the permissions
+      that are set are under the control of the user-process creating
+      the file.  The sysadmin has no direct control over the
+      permissions that newly files or directories will have.  The
+      &acl; permission model solves this problem by allowing explicit
+      configuration using inheritance.
+    </para>
+
+    <para>
+      &acl; inheritance is when a new file or directory is created
+      with an &acl; containing a set of &ace;s from the parent
+      directory's &acl;.  The inherited &ace;s are specially marked so
+      that only those that are intended will be inherited.
+    </para>
+
+    <para>
+      Inheritance only happens when a new file or directory is
+      created.  After creation, the &acl; of the new file or directory
+      is completely decoupled from the parent directory's &acl;: the
+      &acl; of the parent directory may be altered without affecting
+      the &acl; of the new file or directory and visa versa.
+    </para>
+
+    <para>
+      Inheritance is optional.  Within a directory's &acl; some &ace;s
+      may be inherited whilst others are not.  New files or
+      directories will receive only those &ace;s that are configured;
+      the remaining &ace;s will not be copied.
+    </para>
+  </section>
+
+
+  <section id="sv-acl-db-install">
+    <title>Database configuration</title>
+
+    <para>
+      &acl; support requires database tables to store &acl; and &ace;
+      information.  These tables are part of the &chimera; name space
+      backend and for a new installation no additional steps are
+      needed to prepare the database.
+    </para>
+
+    <para>
+        Early versions of &chimera; (before &dcache; 1.9.3) did not create
+        the &acl; table during installation. If the database is
+        lacking the extra table then it has to be created before
+        enabling &acl; support. This is achieved by applying two SQL
+        files:
+    </para>
+
+<screen>&prompt-root; <userinput>psql chimera &lt; &path-odl-usd;/chimera/sql/addACLtoChimeraDB.sql</userinput>
+&prompt-root; <userinput>psql chimera &lt; &path-odl-usd;/chimera/sql/pgsql-procedures.sql</userinput></screen>
+  </section>
+
+  <section id="sv-acl-dcachesetup">
+    <title>Configuring &acl; support</title>
+
+    <para>
+      The <filename>dcache.conf</filename> and layout files contain a
+      number of settings that may be adjusted to configure &dcache;'s
+      permission settings.  These settings are are described in this
+      section.
+    </para>
+
+    <section id="sv-acl-config-enable">
+      <title>Enabling &acl; support</title>
+
+      <para>
+        To enable &acl; support set the property
+        <varname>aclEnabled</varname> to <literal>true</literal>. This
+        property applies to the &serv-pnfsmngr; and &serv-acl; services
+        and only need to be defined for these services.
+      </para>
+    </section>
+
+    <section id="sv-acl-config-admin">
+      <title>Enabling the &serv-acl; service</title>
+
+        <para>
+          To query and define &acl;s on files and directories enable
+          the &serv-acl; service. This service exposes a command line
+          interface to administer &acl;s. The command line interface
+          of the service is described in section <xref
+          linkend="sv-acl-admin"/>.
+        </para>
+
+        <para>
+            To enable the &serv-acl; service, you have to change the
+            layout file corresponding to your &dcache;-instance.
+            Enable the &serv-acl; service within the domain that you
+            want to run it in by adding the following line
+        </para>
+
+        <programlisting>..
+[<replaceable>domainName</replaceable>/acl]
+..</programlisting>
+
+    </section>
+
+  </section>
+
+
+<!-- Section ACL Administration  -->
+  <section id="sv-acl-admin">
+    <title>Administrating &acl;s</title>
+
+    <para>
+      Altering &dcache; &acl; behaviour is achieved by connecting to
+      the &cell-pnfsmngr; <glossterm
+      linkend="gl-well-known-cell">well-known cell</glossterm> using
+      the administrator interface.  For further details about how to
+      use the administrator interface, see <xref
+      linkend="intouch-admin"/>.
+    </para>
+
+    <para>
+      The <command>info</command> and <command>help</command> commands
+      are available within &cell-pnfsmngr; and fulfil their usual
+      functions.
+    </para>
+
+<!-- Sub-section of 'ACL Administration': How to set ACLs -->
+    <section>
+      <title>How to set &acl;s</title>
+
+      <para>
+	The <command>setfacl</command> command is used to set a new
+	&acl;.  This command accepts arguments with the following
+	form:
+      </para>
+
+      <cmdsynopsis>
+	<command>setfacl</command>
+	<arg choice='plain'><replaceable>ID</replaceable></arg>
+	<arg choice='plain'><replaceable>ACE</replaceable></arg>
+	<arg choice='opt' rep='repeat'><replaceable>ACE</replaceable></arg>
+      </cmdsynopsis>
+
+      <para>
+	The <replaceable>ID</replaceable> argument is either a
+	&pnfs;-ID or the absolute path of some file or directory in
+	&dcache;.  The <command>setfacl</command> command requires one
+	or more <replaceable>ACE</replaceable> arguments seperated by
+	spaces.
+      </para>
+
+      <para>
+	The <command>setfacl</command> command creates a new &acl; for
+	the file or directory represented by
+	<replaceable>ID</replaceable>.  This new &acl; replaces any
+	existing &ace;s for <replaceable>ID</replaceable>.
+      </para>
+
+      <para>
+	An &acl; has one or more &ace;s.  Each &ace; defines
+	permissions to access this resource for some <link
+	linkend="ebnf.ace.subject">Subject</link>.  The &ace;s are
+	space-separated and the ordering is significant. The format
+	and description of these &ace; values are described below.
+      </para>
+
+      <section>
+	<title>Description of the &ace; structure</title>
+
+	<para>
+	  The <replaceable>ACE</replaceable> arguments to the
+	  <command>setfacl</command> command have a specific format.
+	  This format is described below in Extended Backus-Naur Form
+	  (<abbrev>EBNF</abbrev>).
+	</para>
+
+	<productionset>
+	  <production id="ebnf.ace">
+	    <lhs>ACE</lhs>
+	    <rhs>
+	      <nonterminal def="#ebnf.ace.subject">Subject</nonterminal> ':'
+	      <nonterminal def="#ebnf.ace.access">Access</nonterminal> | <sbr/>
+
+	      <nonterminal def="#ebnf.ace.subject">Subject</nonterminal> ':'
+	      <nonterminal def="#ebnf.ace.access">Access</nonterminal> ':'
+	      <nonterminal def="#ebnf.ace.inheritance">Inheritance</nonterminal>
+	    </rhs>
+	  </production>
+
+	  <production id="ebnf.ace.subject">
+	    <lhs>Subject</lhs>
+	    <rhs>
+	      'USER:' <nonterminal def="#ebnf.ace.user">UserID</nonterminal> | <sbr/>
+	      'GROUP:' <nonterminal def="#ebnf.ace.group">GroupID</nonterminal> | <sbr/>
+	      'OWNER@' | <sbr/>
+	      'GROUP@' | <sbr/>
+	      'EVERYONE@' | <sbr/>
+	      'ANONYMOUS@' | <sbr/>
+	      'AUTHENTICATED@'
+	    </rhs>
+	  </production>
+
+	  <production id="ebnf.ace.access">
+	    <lhs>Access</lhs>
+	    <rhs>
+	      '+' <nonterminal def="#ebnf.ace.mask">Mask</nonterminal> | <sbr/>
+	      '-' <nonterminal def="#ebnf.ace.mask">Mask</nonterminal>
+	    </rhs>
+	  </production>
+
+	  <production id="ebnf.ace.mask">
+	    <lhs>Mask</lhs>
+	    <rhs>
+	      <nonterminal def="#ebnf.ace.mask">Mask</nonterminal>
+	      <nonterminal def="#ebnf.ace.maskItem">MaskItem</nonterminal> | <sbr/>
+	      <nonterminal def="#ebnf.ace.maskItem">MaskItem</nonterminal>
+	    </rhs>
+	  </production>
+
+	  <production id="ebnf.ace.maskItem">
+	    <lhs>MaskItem</lhs>
+	    <rhs>
+	      'r' | 'l' | 'w' | 'f' | 's' | 'a' | 'n' |
+	      'N' | 'x' | 'd' | 'D' | 't' | 'T' | 'c' |
+	      'C' | 'o'
+	    </rhs>
+	  </production>
+
+	  <production id="ebnf.ace.inheritance">
+	    <lhs>Inheritance</lhs>
+
+	    <rhs>
+	      <nonterminal def="#ebnf.ace.inheritance">Inheritance</nonterminal> <nonterminal def="#ebnf.ace.flag">Flag</nonterminal> | <sbr/>
+	      <nonterminal def="#ebnf.ace.flag">Flag</nonterminal>
+	    </rhs>
+	  </production>
+
+	  <production id="ebnf.ace.flag">
+	    <lhs>Flag</lhs>
+	    <rhs>'f' | 'd' | 'o'</rhs>
+	  </production>
+
+	  <production id="ebnf.ace.user">
+	    <lhs>UserID</lhs>
+	    <rhs>INTEGER</rhs>
+	  </production>
+
+	  <production id="ebnf.ace.group">
+	    <lhs>GroupID</lhs>
+	    <rhs>INTEGER</rhs>
+	  </production>
+	</productionset>
+
+	<para>
+	  The various options are described below.
+	</para>
+
+	<section>
+	  <title>The Subject</title>
+
+	  <para>
+	    The <link linkend="ebnf.ace.subject">Subject</link>
+	    defines to which user or group of users the &ace; will
+	    apply.  It acts as a filter so that only those users that
+	    match the Subject will have their access rights affected.
+	  </para>
+
+	  <para>
+	    As indicated by the EBNF above, the Subject of an &ace;
+	    can take one of several forms.  These are described below:
+	  </para>
+
+	  <variablelist>
+	    <?dbhtml list-presentation="table"?>
+	    <?dbhtml term-presentation="bold" ?>
+	    <?dbhtml table-summary="values of the subject" ?>
+	    <varlistentry>
+	      <term><literal>USER:</literal><replaceable>id</replaceable></term>
+	      <listitem>
+		<para>
+		  The <literal>USER:</literal> prefix indicates that
+		  the &ace; applies only to the specific end-user: the
+		  &dcache; user with ID <replaceable>id</replaceable>.
+		  For example, <literal>USER:0:+w</literal> is an
+		  &ace; that allows user 0 to write over a file's
+		  existing data.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term><literal>GROUP:</literal><replaceable>id</replaceable></term>
+	      <listitem>
+		<para>
+		  The <literal>GROUP:</literal> prefix indicates that
+		  the &ace; applies only to those end-users who are a
+		  member of the specific group: the &dcache; group
+		  with ID <replaceable>id</replaceable>.  For example,
+		  <literal>GROUP:20:+a</literal> is an &ace; that
+		  allows any user who is a member of group 20 to
+		  append data to the end of a file.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term><literal>OWNER@</literal></term>
+	      <listitem>
+		<para>
+		  The <literal>OWNER@</literal> subject indicates that
+		  the &ace; applies only to whichever end-user owns
+		  the file or directory.  For example,
+		  <literal>OWNER@:+d</literal> is an &ace; that allows
+		  the file's or directory's owner to delete it.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	    <term><literal>GROUP@</literal></term>
+	    <listitem>
+	      <para>
+		The <literal>GROUP@</literal> subject indicates that
+		the &ace; applies only to all users that are members
+		of the group-owner of the file or directory.  For
+		example, <literal>GROUP@:+l</literal> is an &ace; that
+		allows any user that is in a directory's group-owner
+		to list the directory's contents.
+	      </para>
+	    </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term><literal>EVERYONE@</literal></term>
+	      <listitem>
+		<para>
+		  The <literal>EVERYONE@</literal> subject indicates
+		  that the &ace; applies to all users.  For example,
+		  <literal>EVERYONE@:+r</literal> is an &ace; that
+		  makes a file world-readable.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term><literal>ANONYMOUS@</literal></term>
+	      <listitem>
+		<para>
+		  The <literal>ANONYMOUS@</literal> Subject indicates
+		  that the &ace; applies to all users who have not
+		  authenticated themselves.  For example,
+		  <literal>ANONYMOUS@:-l</literal> is an &ace; that
+		  prevents unauthenticated users from listing the
+		  contents of a directory.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term><literal>AUTHENTICATED@</literal></term>
+	      <listitem>
+		<para>
+		  The <literal>AUTHENTICATED@</literal> Subject
+		  indicates that an &ace; applies to all authenticated
+		  users.  For example,
+		  <literal>AUTHENTICATED@:+r</literal> is an &ace;
+		  that allows any authenticated user to read a file's
+		  contents.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	  </variablelist>
+	</section>
+
+	<note>
+	  <title>Authenticated or anonymous</title>
+
+	  <para>
+	    An end user of &dcache; is either authenticated or is
+	    unauthenticated, but never both.  Because of this, an end
+	    user operation will either match &ace;s with
+	    <literal>ANONYMOUS@</literal> Subjects or
+	    <literal>AUTHENTICATED@</literal> Subjects but the request
+	    will never match both at the same time.
+	  </para>
+	</note>
+
+	<section>
+	  <title>Access mask</title>
+
+	  <para>
+	    &ace-access; (defined in the <link
+	    linkend="ebnf.ace">&ace; EBNF</link> above) describes what
+	    kind of operations are being described by the &ace; and
+	    whether the &ace; is granting permission or denying it.
+	  </para>
+
+	  <para>
+	    An individual &ace; can either grant permissions or deny
+	    them, but never both.  However, an &acl; may be composed
+	    of any mixture of authorising- and denying- &ace;s.  The
+	    first character of &ace-access; describes whether the
+	    &ace; is authorising or denying.
+	  </para>
+
+	  <para>
+	    If &ace-access; begins with a plus symbol
+	    (<literal>+</literal>) then the &ace; authorises the
+	    &ace-subject; some operations.  The &ace;
+	    <literal>EVERYONE@:+r</literal> authorises all users to
+	    read a file since the &ace-access; begins with a
+	    <literal>+</literal>.
+	  </para>
+
+	  <para>
+	    If the &ace-access; begins with a minus symbol
+	    (<literal>-</literal>) then the &ace; denies the
+	    &ace-subject; some operations.  The &ace;
+	    <literal>EVERYONE@:-r</literal> prevents any user from
+	    reading a file since the Access begins with a
+	    <literal>-</literal>.
+	  </para>
+
+	  <para>
+	    The first character of &ace-access; must be
+	    <literal>+</literal> or <literal>-</literal>, no other
+	    possibility is allowed.  The initial <literal>+</literal>
+	    or <literal>-</literal> of &ace-access; is followed by one
+	    or more operation letters.  These letters form the &ace;'s
+	    <firstterm>access mask</firstterm> (&ace-mask; in <link
+	    linkend="ebnf.ace">&ace; EBNF</link> above).
+	  </para>
+
+	  <para>
+	    The access mask describes which operations may be allowed
+	    or denied by the &ace;.  Each type of operation has a
+	    corresponding letter; for example, obtaining a directory
+	    listing has a corresponding letter <literal>l</literal>.
+	    If a user attempts an operation of a type corresponding to
+	    a letter present in the access mask then the &ace; may
+	    affect whether the operation is authorised.  If the
+	    corresponding letter is absent from the access mask then
+	    the &ace; will be ignored for this operation.
+	  </para>
+
+	  <para>
+	    The following table describes the access mask letters and
+	    the corresponding operations:
+	  </para>
+
+	  <note>
+	    <title>File- and directory- specific operations</title>
+
+	    <para>
+	      Some operations and, correspondingly, some access mask
+	      letters only make sense for &acl;s attached to certain
+	      types of items.  Some operations only apply to
+	      directories, some operations are only for files and some
+	      operations apply to both files and directories.
+	    </para>
+
+	    <para>
+	      When configuring an &acl;, if an &ace; has an operation
+	      letter in the access mask that is not applicable to
+	      whatever the &acl; is associated with then the letter is
+	      converted to an equivalent.  For example, if
+	      <literal>l</literal> (list directory) is in the access
+	      mask of an &ace; that is part of a file-&acl; then it is
+	      converted to <literal>r</literal>.  These mappings are
+	      described in the following table.
+	    </para>
+	  </note>
+
+	  <variablelist>
+	    <?dbhtml list-presentation="table"?>
+	    <?dbhtml term-presentation="bold" ?>
+	    <?dbhtml table-summary="access mask" ?>
+	    <varlistentry>
+	      <term><literal>r</literal></term>
+	      <listitem>
+		<para>
+		  reading data from a file.  Specifying
+		  <literal>r</literal> in an &ace;'s access mask
+		  controls whether end-users are allowed to read a
+		  file's contents.  If the &ace; is part of a
+		  directory-&acl; then the letter is converted to
+		  <literal>l</literal>.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term><literal>l</literal></term>
+	      <listitem>
+		<para>
+		  listing the contents of a directory.  Specifying
+		  <literal>l</literal> in an &ace;'s access mask
+		  controls whether end-users are allowed to list a
+		  directory's contents.  If the &ace; is part of a
+		  file-&acl; then the letter is converted to
+		  <literal>r</literal>.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term><literal>w</literal></term>
+	      <listitem>
+		<para>
+		  overwriting a file's existing contents.  Specifying
+		  <literal>w</literal> in an &ace;'s access mask
+		  controls whether end-users are allowed to write data
+		  anywhere within the file's current offset
+		  range. This includes the ability to write to any
+		  arbitrary offset and, as a result, to grow the file.
+		  If the &ace; is part of a directory-&acl; then the
+		  letter is converted to <literal>f</literal>.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term><literal>f</literal></term>
+	      <listitem>
+		<para>
+		  creating a new file within a directory.  Specifying
+		  <literal>f</literal> in an &ace;'s access mask
+		  controls whether end-users are allowed to create a
+		  new file.  If the &ace; is part of an file-&acl;
+		  then then the letter is converted to
+		  <literal>w</literal>.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term><literal>s</literal></term>
+	      <listitem>
+		<para>
+		  creating a subdirectory within a directory.
+		  Specifying <literal>s</literal> in an &ace;'s access
+		  mask controls whether end-users are allowed to
+		  create new subdirectories.  If the &ace; is part of
+		  a file-&acl; then the letter is converted to
+		  <literal>a</literal>.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term><literal>a</literal></term>
+	      <listitem>
+		<para>
+		  appending data to the end of a file.  Specifying
+		  <literal>a</literal> in an &ace;'s access mask
+		  controls whether end-users are allowed to add data
+		  to the end of a file.  If the &ace; is part of a
+		  directory-&acl; then the letter is converted to
+		  <literal>s</literal>.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term><literal>n</literal></term>
+	      <listitem>
+		<para>
+		  reading attributes.  Specifying <literal>n</literal>
+		  in an &ace;'s access mask controls whether end-users
+		  are allowed to read attributes.  This letter may be
+		  specified in &ace;s that are part of a file-&acl;
+		  and those that are part of a directory-&acl;.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term><literal>N</literal></term>
+	      <listitem>
+		<para>
+		  write attributes.  Specifying <literal>N</literal>
+		  in an &ace;'s access mask controls whether end-users
+		  are allowed to write attributes.  This letter may be
+		  specified in &ace;s that are part of a file-&acl;
+		  and those that are part of a directory-&acl;.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term><literal>x</literal></term>
+	      <listitem>
+		<para>
+		  executing a file or entering a directory.
+		  <literal>x</literal> may be specified in an &ace;
+		  that is part of a file-&acl; or a directory-&acl;;
+		  however, the operation that is authorised will be
+		  different.
+		</para>
+
+		<para>
+		  Specifying <literal>x</literal> in an &ace;s access
+		  mask that is part of a file-&acl; will control
+		  whether end users matching the &ace; Subject are
+		  allowed to execute that file.
+		</para>
+
+		<para>
+		  Specifying <literal>x</literal> in an &ace;s access
+		  mask that is part of a directory-&acl; will control
+		  whether end users matching &ace; Subject are allowed
+		  to search a directory for a named file or
+		  subdirectory.  This operation is needed for end
+		  users to change their current working directory.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term><literal>d</literal></term>
+	      <listitem>
+		<para>
+		  deleting a namespace entry.  Specifying
+		  <literal>d</literal> in an &ace;'s access mask
+		  controls whether end-users are allowed to delete the
+		  file or directory the &acl; is attached.  The end
+		  user must be also authorised for the parent
+		  directory (see <literal>D</literal>).
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term><literal>D</literal></term>
+	      <listitem>
+		<para>
+		  deleting a child of a directory.  Specifying
+		  <literal>D</literal> in the access mask of an &ace;
+		  that is part of a directory-&acl; controls whether
+		  end-users are allowed to delete items within that
+		  directory.  The end user must be also authorised for
+		  the existing item (see <literal>d</literal>).
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term><literal>t</literal></term>
+	      <listitem>
+		<para>
+		  reading basic attributes.  Specifying
+		  <literal>t</literal> in the access mask of an &ace;
+		  controls whether end users are allowed to read basic
+		  (i.e., non-&acl;) attributes of that item.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term><literal>T</literal></term>
+	      <listitem>
+		<para>
+		  altering basic attributes. Specifying
+		  <literal>T</literal> in an &ace;'s access mask
+		  controls whether end users are allowed to alter
+		  timestamps of the item the &ace;'s &acl; is
+		  attached.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term><literal>c</literal></term>
+	      <listitem>
+		<para>
+		  reading &acl; information.  Specifying
+		  <literal>c</literal> in an &ace;'s access mask
+		  controls whether end users are allowed to read the
+		  &acl; information of the item to which the &ace;'s
+		  &acl; is attached.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term><literal>C</literal></term>
+	      <listitem>
+		<para>
+		  writing &acl; information.  Specifying
+		  <literal>C</literal> in an &ace;'s access mask
+		  controls whether end users are allowed to update
+		  &acl; information of the item to which the &ace;'s
+		  &acl; is attached.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term><literal>o</literal></term>
+	      <listitem>
+		<para>
+		  altering owner and owner-group information.
+		  Specifying <literal>o</literal> controls whether end
+		  users are allowed to change ownership information of
+		  the item to which the &ace;'s &acl; is attached.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	  </variablelist>
+	</section>
+
+	<section id="sv-acl-inheritance">
+	  <title>&acl; inheritance</title>
+
+	  <para>
+	    To enable &acl; inheritance, the optional <link
+	    linkend="ebnf.ace.inheritance">inheritance flags</link>
+	    must be defined.  The flag is a list of letters.  There
+	    are three possible letters that may be included and the
+	    order doesn't matter.
+	  </para>
+
+	  <variablelist>
+	    <?dbhtml list-presentation="table"?>
+	    <?dbhtml term-presentation="bold" ?>
+	    <?dbhtml table-summary="Inheritance Flags" ?>
+	    <title>&ace; Inheritance Flags</title>
+	    <varlistentry>
+	      <term><literal>f</literal></term>
+	      <listitem>
+		<para>
+		  This inheritance flag only affects those &ace;s that
+		  form part of an directory-&acl;.  If the &ace; is
+		  part of a file-&acl; then specifying
+		  <literal>f</literal> has no effect.
+		</para>
+
+		<para>
+		  If a file is created in a directory with an &ace;
+		  with <literal>f</literal> in inheritance flags then
+		  the &ace; is copied to the newly created file's
+		  &acl;.  This &ace; copy will not have the
+		  <literal>f</literal> inheritance flag.
+		</para>
+
+		<para>
+		  Specifying <literal>f</literal> in an &ace;'s
+		  inheritance flags does not affect whether this &ace;
+		  is inherited by a newly created subdirectory. See
+		  <literal>d</literal> for more details.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+
+	    <varlistentry>
+	      <term><literal>d</literal></term>
+	      <listitem>
+		<para>
+		  This inheritance flag only affect those &ace;s that
+		  form part of an directory-&acl;.  If the &ace; is
+		  part of a file-&acl; then specifying
+		  <literal>d</literal> has no effect.
+		</para>
+
+		<para>
+		  Specifying <literal>d</literal> in an &ace;'s
+		  inheritance flags does not affect whether this &ace;
+		  is inherited by a newly created file. See
+		  <literal>f</literal> for more details.
+		</para>
+
+		<para>
+		  If a subdirectory is created in a directory with an
+		  &ace; with <literal>d</literal> in the &ace;'s
+		  inheritance flag then the &ace; is copied to the
+		  newly created subdirectory's &acl;.  This &ace; copy
+		  will have the <literal>d</literal> inheritance flag
+		  specified.  If the <literal>f</literal> inheritance
+		  flag is specified then this, too, will be copied.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+
+	    <varlistentry>
+	      <term><literal>o</literal></term>
+	      <listitem>
+		<para>
+		  The <literal>o</literal> flag may only be used when
+		  the &ace; also has the <literal>f</literal>,
+		  <literal>d</literal> or both <literal>f</literal>
+		  and <literal>d</literal> inheritance flags.
+		</para>
+
+		<para>
+		  Specifying <literal>o</literal> in the inheritance
+		  flag will suppress the &ace;.  No user operations
+		  will be authorised or denied as a result of such an
+		  &ace;.
+		</para>
+
+		<para>
+		  When a file or directory inherits from an &ace; with
+		  <literal>o</literal> in the inheritance flags then
+		  the <literal>o</literal> is <emphasis>not</emphasis>
+		  present in the newly created file or directory's
+		  &ace;.  Since the newly created file or directory
+		  will not have the <literal>o</literal> in it's
+		  inheritance flags the &ace; will take effect.
+		</para>
+
+		<para>
+		  An <literal>o</literal> in the inheritance flag
+		  allows child files or directories to inherit
+		  authorisation behaviour that is different from the
+		  parent directory.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	  </variablelist>
+	</section>
+      </section>
+
+      <section>
+	<title>Examples</title>
+
+	<para>
+	  This section gives some specific examples of how to set
+	  &acl;s to achieve some specific behaviour.
+	</para>
+
+	<example id="sv-acl-eg-delete">
+	  <title>&acl; allowing specific user to delete files in a directory</title>
+
+	  <para>
+	    This example demonstrates how to configure a
+	    directory-&acl; so user 3750 can delete any file within
+	    the directory <filename
+	    class="directory">/pnfs/example.org/data/exampleDir</filename>.
+	  </para>
+
+	  <screen>&dc-prompt-pnfsmngr; <userinput>setfacl /pnfs/example.org/data/exampleDir EVERYONE@:+l USER:3750:D
+    <lineannotation>(...line continues...)</lineannotation>   USER:3750:+d:of</userinput>
+&dc-prompt-pnfsmngr; <userinput>setfacl /pnfs/example.org/data/exampleDir/existingFile1
+    <lineannotation>(...line continues...)</lineannotation>   USER:3750:+d:f</userinput>
+&dc-prompt-pnfsmngr; <userinput>setfacl /pnfs/example.org/data/exampleDir/existingFile2
+    <lineannotation>(...line continues...)</lineannotation>   USER:3750:+d:f</userinput></screen>
+
+	  <para>
+	    The first command creates an &acl; for the directory.
+	    This &acl; has three &ace;s.  The first &ace; allows
+	    anyone to list the contents of the directory.  The second
+	    &ace; allows user 3750 to delete content within the
+	    directory in general.  The third &ace; is inherited by all
+	    newly created files and specifies that user 3750 is
+	    authorised to delete the file independent of that file's
+	    ownership.
+	  </para>
+
+	  <para>
+	    The second and third commands creates an &acl; for files
+	    that already exists within the directory.  Since &acl;
+	    inheritance only applies to newly created files or
+	    directories, any existing files must have an &acl;
+	    explicitly set.
+	  </para>
+	</example>
+
+	<example>
+	  <title>&acl; to deny a group</title>
+
+	  <para>
+	    The following example demonstrates authorising all end
+	    users to list a directory.  Members of group 1000 can also
+	    create subdirectories.  However, any member of group 2000
+	    can do neither.
+	  </para>
+
+	  <screen>&dc-prompt-pnfsmngr; <userinput>setfacl /pnfs/example.org/data/exampleDir GROUP:2000:-sl
+    <lineannotation>(...line continues...)</lineannotation>    EVERYONE@:+l GROUP:1000:+s</userinput></screen>
+
+	  <para>
+	    The first &ace; denies any member of group 2000 the
+	    ability to create subdirectories or list the directory
+	    contents.  As this &ace; is first, it takes precedence
+	    over other &ace;s.
+	  </para>
+
+	  <para>
+	    The second &ace; allows everyone to list the directory's
+	    content.  If an end user who is a member of group 2000
+	    attempts to list a directory then their request will match
+	    the first &ace; so will be denied.  End users attempting
+	    to list a directory that are not a member of group 2000
+	    will not match the first &ace; but will match the second
+	    &ace; and will be authorised.
+	  </para>
+
+	  <para>
+	    The final &ace; authorises members of group 1000 to create
+	    subdirectories.  If an end user who is a member of group
+	    1000 and group 2000 attempts to create a subdirectory then
+	    their request will match the first &ace; and be denied.
+	  </para>
+	</example>
+
+	<example>
+	  <title>&acl; to allow a user to delete all files and subdirectories</title>
+
+	  <para>
+	    This example is an extension to <xref
+	    linkend="sv-acl-eg-delete"/>.  The previous example
+	    allowed deletion of the contents of a directory but not
+	    the contents of any subdirectories.  This example allows
+	    user 3750 to delete all files and subdirectories within
+	    the directory.
+	  </para>
+
+	  <screen>&dc-prompt-pnfsmngr; <userinput>setfacl /pnfs/example.org/data/exampleDir USER:3750:+D:d
+    <lineannotation>(...line continues...)</lineannotation>    USER:3750:+d:odf</userinput></screen>
+
+	  <para>
+	    The first &ace; is <literal>USER:3750:+D:d</literal>.
+	    This authorises user 3750 to delete any contents of
+	    directory <filename
+	    class="directory">/pnfs/example.org/data/exampleDir</filename>
+	    that has an &acl; authorising them with
+	    <literal>d</literal> operation.
+	  </para>
+
+	  <para>
+	    The first &ace; also contains the inheritance flag
+	    <literal>d</literal> so newly created subdirectories will
+	    inherit this &ace;.  Since the inherited &ace; will also
+	    contain the <literal>d</literal> inheritance flag, this
+	    &ace; will be copied to all subdirectories when they are
+	    created.
+	  </para>
+
+	  <para>
+	    The second &ace; is <literal>USER:3750:+d:odf</literal>.
+	    The &ace; authorises user 3750 to delete whichever item
+	    the &acl; containing this &ace; is associated with.
+	    However, since the &ace; contains the <literal>o</literal>
+	    in the inheritance flags, user 3750 is
+	    <emphasis>not</emphasis> authorised to delete the
+	    directory <filename
+	    class="directory">/pnfs/example.org/data/exampleDir</filename>
+	  </para>
+
+	  <para>
+	    Since the second &ace; has both the <literal>d</literal>
+	    and <literal>f</literal> inheritance flags, it will be
+	    inherited by all files and subdirectories of <filename
+	    class="directory">/pnfs/example.org/data/exampleDir</filename>,
+	    but without the <literal>o</literal> flag.  This
+	    authorises user 3750 to delete these items.
+	  </para>
+
+	  <para>
+	    Subdirectories (and files) will inherit the second &ace;
+	    with both <literal>d</literal> and <literal>f</literal>
+	    inheritance flags.  This implies that all files and
+	    sub-subdirecties within a subdirectory of <filename
+	    class="directory">/pnfs/example.org/data/exampleDir</filename>
+	    will also inherit this &ace;, so will also be deletable by user 3750.
+	  </para>
+	</example>
+      </section>
+    </section>
+<!-- End of sub-section of 'ACL Administration': How to set ACLs -->
+
+<!-- Sub-section of 'ACL Administration': How to get ACLs -->
+    <section id="sv-acl-view">
+      <title>Viewing configured &acl;s</title>
+
+      <para>
+	The <command>getfacl</command> is used to obtain the current
+	&acl; for some item in &dcache; namespace.  It takes the
+	following arguments.
+      </para>
+
+      <cmdsynopsis>
+	<command>getfacl</command>
+	<group choice='plain'>
+	  <arg><replaceable>pnfsId</replaceable></arg>
+	  <arg><replaceable>globalPath</replaceable></arg>
+	</group>
+      </cmdsynopsis>
+
+      <para>
+	The <command>getfacl</command> command fetches the &acl;
+	information of a namespace item (a file or directory).  The
+	item may be specified by its &pnfs;-ID or its absolute path.
+      </para>
+
+      <example>
+	<title>Obtain &acl; information by absolute path</title>
+
+	<screen>&dc-prompt-pnfsmngr; <userinput>getfacl /pnfs/example.org/data/exampleDir</userinput>
+ACL: rsId = 00004EEFE7E59A3441198E7EB744B0D8BA54, rsType = DIR
+order = 0, type = A, accessMsk = lfsD, who = USER, whoID = 12457
+order = 1, type = A, flags = f, accessMsk = lfd, who = USER, whoID = 87552
+In extra format:
+USER:12457:+lfsD
+USER:87552:+lfd:f</screen>
+      </example>
+
+      <para>
+	The information is provided twice.  The first part gives
+	detailed information about the &acl;.  The second part, after
+	the <literal>In extra format:</literal> heading, provides a
+	list of &ace;s that may be used when updating the &acl; using
+	the <command>setfacl</command> command.
+      </para>
+    </section>
+  </section>
+
+</chapter>

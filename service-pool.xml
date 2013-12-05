@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+%sharedents;
+
+]>
+
+
+<chapter id="sv-pool">
+
+  <title>
+   The &serv-pool; Service
+  </title>
+
+  <para>
+    In &dcache; pools are used to store data.
+  </para>
+
+  <section id="sv-pool-">
+    <title>The Basic Setup</title>
+    <para>
+     Pools are usually defined in domains dedicated to pools only.
+    </para>
+
+    <para>
+      Instead of defining a pool in the layout file it is more
+      convenient to use the command <command>dcache pool
+      create</command> of the <literal>dcache</literal> script. A
+      directory for the new pool will be created and the pool will
+      automatically be added to the layout file.
+    </para>
+
+    <para>
+      The syntax of this command is
+    </para>
+    <cmdsynopsis>
+      <command>dcache pool create</command>
+      <arg>--meta=file|db</arg>
+      <arg>--size=<replaceable>bytes</replaceable></arg>
+      <arg>--lfs=none|precious|volatile|transient</arg>
+      <replaceable>directory</replaceable>
+      <replaceable>name</replaceable>
+      <replaceable>domain</replaceable>
+    </cmdsynopsis>
+
+    <variablelist>
+       <varlistentry>
+	<term>--meta=file|db</term>
+	<listitem>
+	  <para>
+	    For
+	    <varname>meta</varname>=<literal>file</literal> the
+	    directory <filename
+	    class='directory'>/path/to/pool/control</filename> which will
+	    contain the meta data of the pool is created.
+	    </para>
+	    <para>For
+	    <varname>meta</varname>=<literal>db</literal> the
+	    directory <filename
+	    class='directory'>/path/to/pool/meta</filename> which ...... the
+	    meta data of the pool is created.
+	    </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>--size=<replaceable>bytes</replaceable>
+	</term>
+	<listitem>
+	  <para>
+	    The size of the pool can be specified in bytes.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>--lfs=none|precious|volatile|transient
+	</term>
+	<listitem>
+	  <para>
+	    The default value is <literal>none</literal>. This is used
+	    for pools that are connected to a tape system.
+	  </para>
+	  <para>
+	    Set <varname>--lfs</varname>=<literal>precious</literal>
+	    if the pool is not connected to tape.
+	  </para>
+	  <para>
+	    Set <varname>--lfs</varname>=<literal>volatile</literal>
+	    if 
+	  </para>
+	  <para>
+	    Set <varname>--lfs</varname>=<literal>transient</literal>
+	    if 
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>directory
+	</term>
+	<listitem>
+	  <para>
+	    The name of the directory of the pool that will be created.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>name
+	</term>
+	<listitem>
+	  <para>
+	    The name of the pool.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>domain
+	</term>
+	<listitem>
+	  <para>
+	    The name of the domain in which the &serv-pool; service should run.
+	  </para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+
+    <informalexample>
+      <screen>&prompt-root; <userinput>&path-odb-n-s;dcache pool create --meta=db --size=500M /srv/dcache/p1 pool1 poolDomain</userinput>
+Created a pool in /srv/dcache/p1. The pool was added to poolDomain in
+file:/etc/dcache/layouts/mylayout.conf.</screen>
+      <para>
+	The directory <filename class='directory'>/srv/dcache/p1</filename>
+	and a subdirectory <filename
+	class='directory'>/srv/dcache/p1/data</filename> have been
+	created. The new entry in the layout file has been added.
+      </para>
+      <programlisting>[poolDomain]
+[poolDomain/pool]
+name=pool1
+path=/srv/dcache/p1
+maxDiskSpace=500M
+metaDataRepository=org.dcache.pool.repository.meta.db.BerkeleyDBMetaDataRepository
+waitForFiles=${path}/data:${path}/meta</programlisting>
+    </informalexample>
+
+
+    <para>
+    </para>
+  </section>
+
+
+
+</chapter>

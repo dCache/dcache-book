@@ -1,0 +1,383 @@
+Has been included in: dCache as xRootd-Server
+
+Introduction
+============
+
+dCache supports the xrootd protocol, allowing xrootd clients like
+ROOT’s TXNetfile and xrdcp to do file operations against a dCache
+instance.
+
+Both unauthenticated, token authorized, and GSI authenticated xrootd
+are supported.
+
+Enabling an xrootd door
+=======================
+
+To enable an xrootd door, specify xrootd as a service in the dCache
+layout file. The following two lines would add the door to a dedicated
+domain, but the service can also be added to any existing domain.
+
+[exampleDomain]
+[exampleDomain/xrootd]
+
+By default xrootd doors are read-only and unauthenticated.  Any xrootd
+client can be used to access world readable files in dCache after the
+domain containig the service has been started with the following
+command:
+
+dcache start exampleDomain
+
+Access control
+==============
+
+Unauthenticated access
+----------------------
+
+By default xrootd access is unauthenticated. Any access is however
+still subject to regular authorization checks.  The property
+xrootdUser can be used to specify the identity of an anonymous
+client. All authorization checks are performed with respect to this
+identity. The default identity is 'nobody', meaning that only
+operations with world-permissions are allowed.
+
+Settings xrootdUser to root essentially disables all authorization
+checks. Setting xrootdUser to a UID:GID[,GID...] (for UID and GID
+being integers), means that authorization is performed against those
+UIDs and GIDs.
+
+Ownership of files and directories created by anonymous clients is
+controlled by xrootdUser too. The default of 'nobody' causes the owner
+and group owner to be inherited from the parent directory. For other
+values the owner and group owner are set to the values specified by
+xrootdUser.
+
+
+Enabling write access
+---------------------
+
+By default dCache xrootd is restricted to read-only because plain
+xrootd is completely unauthenticated. A typical error message on the
+client side if the server is read-only looks like:
+
+ [user] $ xrdcp -d 1 /bin/sh root://ford.desy.de//pnfs/desy.de/data/xrd_test2
+Setting debug level 1
+061024 18:43:05 001 Xrd: main: (C) 2004 SLAC INFN xrdcp 0.2 beta
+061024 18:43:05 001 Xrd: Create: (C) 2004 SLAC INFN XrdClient kXR_ver002+kXR_asyncap
+061024 18:43:05 001 Xrd: ShowUrls: The converted URLs count is 1
+061024 18:43:05 001 Xrd: ShowUrls: URL n.1: root://ford.desy.de:1094//pnfs/desy.de/data/asdfas.
+061024 18:43:05 001 Xrd: Open: Access to server granted.
+061024 18:43:05 001 Xrd: Open: Opening the remote file /pnfs/desy.de/data/asdfas
+061024 18:43:05 001 Xrd: XrdClient::TryOpen: doitparallel=1
+061024 18:43:05 001 Xrd: Open: File open in progress.
+061024 18:43:06 5819 Xrd: SendGenCommand: Server declared: Permission denied. Access is read only.(error code: 3003)
+061024 18:43:06 001 Xrd: Close: File not opened.
+Error accessing path/file for root://ford//pnfs/desy.de/data/asdfas
+
+To enable read-write access, set the property xrootdIsReadOnly to
+false and restart any domain running an xrootd door.
+
+Write and read access is subject to regular authorization checks. 
+
+Restricting access by path
+--------------------------
+
+The xrootdRootPath property specifies the directory that forms the
+name space export point of the xrootd door. Ie it is the directory
+that will appear as the root directory of the door. 
+
+Besides changing the export point, it is possible to restrict read and
+write access by path prefix.
+
+To activate this feature, a colon-seperated list containing the full
+paths of authorized directories must be defined. If both read and
+write access should be authorized for certain path prefixes, set the
+property xrootdAllowedPaths. If separate permissions should be
+provided for reading and writing, then set the properties
+xrootdAllowedReadPaths and xrootdAllowedWritePaths instead.
+
+A restart of the xrootd door is required to make the changes take
+effect. As soon as any of the above options is set, all read or write
+requests to directories not matching the allowed path lists will be
+refused.
+
+Note that dCache will follow symbolic links even if these point to
+files or directories that do not have any of the specified path
+prefixes or outside the specified root directory.
+
+If both the root path and path prefix properties are specified then
+the prefix properties are relative to the root directory.
+
+Access is still subject to regular authorization checks and the path
+restrictions apply to both anonymous and authenticated users.
+
+Token based authorization
+-------------------------
+
+The xrootd dCache implementation includes a generic mechanism to plug
+in different authorization handlers. The only plugin available so far
+implements token-based authorization as suggested in
+http://people.web.psi.ch/feichtinger/doc/authz.pdf. This mechanism is
+used by the Alice project.
+
+Token based authorization includes a cryptographically signed token
+that authorizes a client to perform a particular operation on a
+particular file. The token is typically generated by a central file
+catalog and the dCache xrootd verifies the cryptographic signature.
+
+The first thing to do is to setup the keystore. The keystore file
+basically specifies all RSA-keypairs used within the authorization
+process and has exactly the same syntax as in the native xrootd
+tokenauthorization implementation. In this file, each line beginning
+with the keyword KEY corresponds to a certain Virtual Organisation
+(VO) and specifies the remote public (owned by the file catalogue) and
+the local private key belonging to that VO. A line containing the
+statement "KEY VO:*" defines a default keypair that is used as a
+fallback solution if no VO is specified in token-enhanced xrootd
+requests. Lines not starting with the KEY keyword are ignored. A
+template can be found in /opt/d-cache/etc/keystore.template.
+
+The keys itself have to be converted into a certain format in order to
+be loaded into the authorization plugin. dCache expects both keys to
+be binary DER-encoded (Distinguished Encoding Rules for
+ASN.1). Furthermore the private key must be PKCS #8-compliant and the
+public key must follow the X.509-standard.
+
+The following example demonstrates how to create and convert a keypair
+using OpenSSL:
+
+Generate new RSA private key
+[root] # openssl genrsa -rand 12938467 -out key.pem 1024
+
+Create certificate request
+[root] # openssl req -new -inform PEM -key key.pem -outform PEM -out certreq.pem
+
+Create certificate by self-signing certificate request
+[root] # openssl x509 -days 3650 -signkey key.pem -in certreq.pem -req -out cert.pem
+
+Extract public key from certificate
+[root] # openssl x509 -pubkey -in cert.pem -out pkey.pem
+[root] # openssl pkcs8 -in key.pem -topk8 -nocrypt -outform DER -out <new_private_key>
+[root] # openssl enc -base64 -d -in pkey.pem -out <new_public_key>
+
+Only the last two lines are performing the actual conversion,
+therefore you can skip the previous lines in case you already have a
+keypair. Make sure that you keystore file correctly points to the
+converted keys.
+
+To enable the plugin, it is necessary to add the following two lines
+to the file /opt/d-cache/etc/dcache.conf, so that it looks like
+
+..
+xrootdAuthzPlugin=org.dcache.xrootd.security.plugins.tokenauthz.TokenAuthorizationFactory
+xrootdAuthzKeystore=<Path_to_your_Keystore>
+..
+
+After doing a restart of dCache, any requests without an appropriate
+token should result in an error saying "authorization check failed: No
+authorization token found in open request, access denied.(error code:
+3010)".
+
+
+The token based authorization does not provide authentication. Thus
+any operation is subject to the same internal authorization checks as
+other anonymous clients, including read-only mode of the door, path
+prefix checks, and authorization by xrootdUser identity.
+
+GSI authentication
+------------------
+
+The xrootd-implementation in dCache includes a pluggable
+authentication framework. To control which authentication mechanism is
+used by xrootd, add the xrootdAuthNPlugin option to your dCache
+configuration and set it to the desired value.
+
+To enable GSI authentication in xrootd, add the following line to
+/opt/d-cache/etc/dcache.conf:
+
+..
+xrootdAuthNPlugin=gsi
+..
+
+When using GSI authentication, depending on your setup, you may or may
+not want dCache to fail if the host certificate chain can not be
+verified against trusted certificate authorities. Whether dCache
+performs this check can be controlled by setting the option
+verifyHostCertificateChain:
+
+..
+verifyHostCertificateChain=true
+..
+
+The DN and FQAN obtained by GSI authentication is mapped to an
+internal identity by contacting the gPlazma service. gPlazma can be
+used both as a centralized service or as an embedded service running
+alongside the door. The behaviour can be controlled through the
+useGPlazmaAuthorizationModule property. Setting
+useGPlazmaAuthorizationModule starts a local gPlazma instance in the
+same domain as the xrootd door.
+
+
+The identity returned by gPlazma is used for all further internal
+authorization checks. Thus for GSI authenticated requests the
+xrootdUser property is not used. Access is subject to the overall
+configuration of the door, including read-only mode and path prefix
+checks.
+
+
+
+Precedence of security mechanisms
+---------------------------------
+
+The previously explained methods to restrict access via xrootd can
+also be used together. The precedence applied in that case is as
+following: Note
+
+The xrootd-door can be configured to use either token authorization or
+strong authentication with gPlazma authorization. A combination of
+both is currently not possible.
+
+The permission check executed by the authorization plugin (if one is
+installed) is given the lowest priority, because it can controlled by
+a remote party. E.g. in the case of token based authorization, access
+control is determined by the file catalogue (global namespace).
+
+The same argument holds for many strong authentication mechanisms -
+for example, both the GSI protocol as well as the Kerberos protocols
+require trust in remote authorities. However, this only affects user
+authentication, while authorization decisions can be adjusted by local
+site administrators by adapting the gPlazma configuration.
+
+To allow local site administrators to override remote security
+settings, write access can be further restricted to few directories
+(based on the local namespace). Setting xrootd access to read-only has
+the highest priority, overriding all other settings.
+
+
+Clients
+=======
+
+<Insert the sections from the current chapter called "Quick tests">
+
+
+
+
+
+Network interfaces
+==================
+
+By default the xrootd door listens to TCP port 1094 on all network
+interfaces. 
+
+The TCP port can be customized by setting the property xrootdPort or
+simply port in the service specific section in the layout file.
+
+The network interface can currently not be changed.
+
+Doors redirect clients to pools, and hence a pool must be able to
+provide its IP address to the xrootd door. Pools with multiple NICs
+try to select a NIC that faces the client: To do this the door sends
+the client's IP address to the pool and the pool chooses the interface
+for the route that it would use to send packets to the client.
+
+All data flows directly between clients and pools. Xrootd doors do not
+provide a proxy mode. As a consequence pools must have inbound
+connectivity from the client.
+
+SRM integration
+===============
+
+Xrootd may be negotiated through SRM. The protocol identifier is
+xrootd. 
+
+
+LoginBroker integration
+=======================
+
+The SRM and other services locate available xrootd doors through the
+loginbroker service. By default all xrootd doors periodically register
+with the loginbroker service called LoginBroker. The three adjustable
+settings are the loginbroker instance name, registration frequency and
+the load change threshold that triggers a reregistration ahead of
+time. These are adjustable through the properties loginBroker,
+loginBrokerUpdateTime, and loginBrokerUpdateThreshold, respectively.
+It is unlikely that these will ever have to be adjusted.
+
+xrootd specific mover queues
+============================
+
+Transfers on pools are scheduled on queues. An xrootd door can be
+configured to submit transfers to a queue different from the default
+by defining the xrootdIoQueue property. The queue has to be created on
+all pools that will service transfers for this door. 
+
+xrootd related timeouts and limits
+==================================
+
+Doors
+-----
+
+Customzing internal timeouts should not be necessary. All timeouts can
+however be modified. All timeouts are specified in milliseconds.
+
+Property                   Default  Description
+
+xrootdPoolManagerTimeout   5400000  Timeout for pool selection
+xrootdPoolTimeout          4000     Timeout for mover instantiation
+xrootdMoverTimeout         180000   Max mover queuing time
+
+Other limits are related to thread and queue management.
+
+Property                   Default  Description
+
+xrootdThreads              1000     Max thread pool size in doors; controls
+                                    number of concurrent name space, pool
+                                    manager and pool operations are performed.
+xrootdBacklog              1024     Max TCP connection backlog.
+xrootdMaxChannelMemorySize 16777216 Max message queue size in bytes
+                                    per connection
+xrootdMaxTotalMemorySize   16777216 Max message queue size in bytes (total)
+
+
+
+Pools
+-----
+
+Property                   Default  Description
+
+xrootd.mover.timeout.idle  300000   Timeout when idle xrootd clients will  
+                                    be disconnected from a pool
+xrootdMoverDiskThreads     20       Max thread pool size for disk IO
+xrootdMoverSocketThreads   CPU cores Max thread pool size for network IO
+xrootdMoverMaxMemoryPerConnection 
+                           16777216 Max message queue size in bytes per
+                                    connection.
+xrootdMoverMaxMemory       67108864 Max message queue size in bytes (total)
+xrootdMoverMaxFrameSize    2097152  Max size of an xrootd frame 
+
+
+Compliance and compatibility
+============================
+
+
+The Scalla xrootd-Protocol Version 2.9.6,
+http://xrootd.slac.stanford.edu/doc/prod/XRdv296.pdf
+
+dCache only publishes protocol version 2.8.9 to work around
+compatibility problems with some clients.
+
+dCache implements the following xrootd messages: kXR_login, kXR_auth,
+kXR_prepare, kXR_open, kXR_stat, kXR_statx, kXR_read, kXR_readv,
+kXR_write, kXR_sync, kXR_close, kXR_rm, kXR_rmdir, kXR_mkdir, kXR_mv,
+kXR_dirlist.
+
+
+In xrootd terminology a dCache xrootd door is an xrootd redirector
+node. All name space operation are performed by the door whereas
+uploads and downloads are redirected to pools, which have the role of
+xrootd data servers. Since all name space operations are performed by
+the door, dCache's xrootd implementation is not strictly compliant
+with the specification: When a client sends a kXR_open request to a
+door for creating a new file, then the name space entry is created
+before the client is redirected to the pool. The consequence is that
+if the client decides not to follow the redirect, an empty file is
+left behind.

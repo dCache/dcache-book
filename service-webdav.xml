@@ -1,0 +1,575 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+%sharedents;
+<!ENTITY tls "<systemitem class='protocol'>TLS</systemitem>">
+]>
+<chapter id="cf-webdav">
+  <title>&webdav;</title>
+
+      <section>
+      <title>Introduction</title>
+      <para>
+	In essence, &webdav; extends &http; with the concepts of
+	directories and adds a number of additional operations to the
+	protocol. Whereas pure &http; is limitted to download (GET),
+	upload (PUT) and deletion (DELETE) of files, &webdav; adds
+	directories that can be listed using a machine readable
+	format. It also adds meta data (such as creation time) for
+	resources. Finally, it adds useful operations like MOVE and
+	COPY.
+      </para>
+
+      <para>
+	&webdav; is supported by all modern operating systems out of
+	the box. This includes Windows XP, Windows Vista, Windows 7,
+	Mac OS X, and Gnome and KDE shells for Linux and Unixes. These
+	operating systems can mount a &webdav; share and expose it
+	through the regular file manager like any other
+	directory. Even iOS and Android devices support &webdav;
+	through third party clients.
+      </para>
+     
+      <para>
+	Since &webdav; as a protocol is an extension of &http;, any
+	web browser, including Firefox, Chrome, Safari and Internet
+	Explorer, can be used to access the interface, although the
+	browser is limitted to the operations provided by &http;.
+      </para>
+     
+      <para>
+	The above description is a strong simplification of the goals
+	of &webdav;, but it gives an idea of why &webdav; is an
+	interesting protocol for &dcache;.
+      </para>
+     
+      <para>
+	&dcache; supports &webdav; through the &webdav; door. The
+	&webdav; door supports both unauthenticated &http; and client
+	certificate based authentication over &https;. The current
+	version does not yet support &http; basic or digest
+	authentication. Since &webdav; as a protocol is a superset of
+	&http;, the &webdav; door supersedes the old &http; door. When
+	accessed by a web browser, the &webdav; door provides an
+	&html; rendering for directory listings.
+      </para>
+
+    </section>
+   
+    <section>
+      <title>Enabling the &webdav; door</title>
+      <para>
+	To enable the &webdav; door, specify &cell-webDAV; as a
+	service in the &dcache; layout file. The following two lines
+	would add the service to a dedicated domain, but the service
+	can also be added to any existing domain.
+      </para>
+      <programlisting>[webdavDomain]
+[webdavDomain/webdav]</programlisting>
+
+      <para>
+	The default settings use plain &http;/&webdav; without TLS and
+	do not support any form of authentication. The default
+	settings also do not allow unauthenticated access to
+	&dcache;. Hence to be of any use either anonymous access needs
+	to be allowed or authentication needs to be enabled.
+      </para>
+
+      <para>
+	If the goal is to experiment with &webdav; access without
+	caring about access control then add the following setting:
+      </para>
+      <programlisting>webdavAnonymousAccess=FULL</programlisting>
+      <para>
+	See the following section for further information on access control.
+      </para>
+
+      <para>
+	The default port of the &webdav; door is 2880. This means that
+	after starting/restarting the domain containing the door, the
+	interface can be accessed from a webbrowser at
+	<uri>http://<replaceable>dcache.example.org</replaceable>:2880</uri>,
+	where <replaceable>dcache.example.org</replaceable> is the
+	FQDN of the host running the &dcache; domain.
+      </para>
+    </section>
+
+    <section>
+     <title>Access control</title>
+     <para>
+       By default anonymous access through &http;/&webdav; is
+       disabled. Anonymous access can be enabled through the
+       <varname>webdavAnonymousAccess</varname> property. Setting this
+       property to <literal>READONLY</literal> will allow the file
+       system to be traversed and files to be downloaded. Setting this
+       property to <literal>FULL</literal> will allow all operations,
+       including file upload, file deletion and file renaming.
+     </para>
+
+     <para>
+       The property <varname>webdavAnonymousListing</varname> controls
+       whether unauthenticated users can list directories. The default
+       value is true, although leaving
+       <varname>webdavAnonymousAccess</varname> at its default value
+       of <literal>NONE</literal> prevents directory listing
+       too. Setting <varname>webdavAnonymousListing</varname> to false
+       provides a limited form of security through obscurity by
+       preventing unauthenticated users from discovering which files
+       are available for download. Only files for which the
+       unauthenticated users know the complete &url; can be accessed.
+     </para> 
+
+     <para>
+       Anonymous clients are still subject to authorization: Only
+       operations with world access are granted.
+     </para>
+     
+     <para>
+       It is possible to restrict all access to readonly operations by
+       setting <varname>webdavReadOnly</varname> to true. This setting
+       applies to both authenticated and unauthenticated users.
+     </para>
+
+     <para>
+       The property <varname>webdavAllowedPaths</varname> allows the
+       door to be limited to a subset of the name space. A colon
+       separated list of directories can be specified. A related
+       property is <varname>webdavRootPath</varname>. It specifies the
+       directory that forms the export point of the &webdav;
+       door. I.e. it is the directory that will appear as the root
+       directory of the door. If both properties are specified then
+       <varname>webdavAllowedPaths</varname> is relative to the root
+       directory. Notice that clients are not prevented from following
+       symlinks that point to other parts of the name space. The
+       restrictions impossed by these setting apply to both
+       authenticated and unauthenticated users.
+     </para>
+
+     <para>
+       The &webdav; protocol specifies that <literal>PUT</literal>
+       overwrites existing files (but not directories). If the
+       property wevdav.overwrite is set to true, then dCache honors
+       this aspect of the WebDAV specification. If set to false,
+       attempts to overwrite existing files will be denied. To unify
+       the semantics of all dCache doors, the default is false.
+     </para>
+    </section>
+
+    <section>
+      <title>Data flow</title>
+      <para>
+	To avoid that doors become a bottleneck, &dcache; attempts to
+	support direct data connections between &dcache; pools and the
+	client. Support for this is subject to the limitations of the
+	protocol.
+      </para>
+
+      <para>
+	&webdav;/&http; downloads (i.e. <literal>GET</literal>literal>
+	operations) are by default redirected to the pool. This works
+	by on-demand instantiating a minimalistic &http; server (aka
+	an &http; mover) inside the pool and then redirecting the
+	client to that &http; server.
+      </para>
+
+      <para>
+	The redirect contains a unique 128 bit ID which is used to
+	authenticate the data connection on the pool. The redirect is
+	only valid for a single connection. Once a client has
+	disconnected from the pool it must submit a new request to a
+	door. The pool does however support &http; keep-alive which
+	means that multiple read requests can be submitted over the
+	same connection. This is useful for ranged reads.
+      </para>
+
+      <para>
+	Not all clients follow the &http; redirect issued by the
+	door. Since the redirect is only valid for a single connection
+	by the client, caching &http; proxies can get confused by the
+	redirect. Web browsers also tend to resolve relative &url;s
+	embedded in documents relative to the pool &url; rather than
+	the original door &url;. For this reason the redirect can be
+	disabled using the property
+	<varname>webdav.redirect.on-read</varname>. Setting this to
+	false will force all downloads to be proxied through the
+	&webdav; door.
+      </para>
+      
+      <para>
+	Uploads are always proxied through the &webdav; door. This is
+	because the &http; protocol requires a client to prompt the
+	user before following a redirect on <literal>PUT</literal>. We
+	are considering to add redirect on <literal>PUT</literal> in a
+	future release, but it is uncertain how many clients will
+	support this.
+      </para>
+      
+      <important>
+	<para>
+	  It is important to notice that the data connection to the
+	  pool is never encrypted. Even when using &tls; on the door,
+	  the data connection to the pool is unencrypted. The unique
+	  random ID included in the redirect provides some access
+	  control on the data connection, but if confidentiality and
+	  integrity guarantees are required then the redirect must be
+	  disabled and &tls; must be enabled for the &webdav; door.
+	</para>
+      </important>
+    </section>
+    
+    <section>
+      <title>&webdav; over &tls;</title>
+      <para>
+	Both plain &http; and &webdav; can be tunneled over &tls;. In
+	that case we usually refer to &http; as &https;.
+      </para>
+      
+      <para>
+	The property <varname>webdavProtocol</varname> controls
+	whether to enable &tls; support.  By default the &webdav; door
+	in &dcache; uses plain unencrypted &http;. Setting
+	<varname>webdavProtocol</varname> to eiher &https; or
+	https-jglobus enables &tls;. The difference between the two
+	settings is the internal &tls; implementation.
+      </para>
+
+      <para>
+	When <varname>webdavProtocol</varname> is set to &https;,
+	&dcache; uses the &tls; implementation provided with
+	&java;. This requires that a server certificate is encoded as
+	a &p12; file. The dcache script allows the host certificate to
+	be imported and used as the server certificate. Simply run the
+	following command
+      </para>
+      <programlisting>dcache import hostcert</programlisting>
+      <para>
+	Alternative the <varname>webdavKeyStore</varname> property can
+	be set to point to a &p12; encoded certificate and key.
+      </para>
+
+      <para>
+	Likewise trusted CA certificates must be imported to a &java;
+	trust store. The CA certificates stored in <filename
+	class='directory'>/etc/grid-security/certificates/</filename>
+	can be imported with the command
+      </para>
+      <programlisting>dcache import cacerts</programlisting>
+
+      <para>
+	Alternative the <varname>webdavTrustStore</varname> property
+	can be set to point to a &java; trust store.
+      </para>
+      
+      <para>
+	The main disadvantages of using &java;'s &tls; provider is
+	that host and CA certificates have to be imported and that it
+	doesn't support proxy certificates.
+      </para>
+      
+      <para>
+	When <varname>webdavProtocol</varname> is set to
+	https-jglobus, &dcache; uses the &tls; implementation provided
+	with the JGlobus library. This provider uses the host and CA
+	grid certificates stored under <filename
+	class='directory'>/etc/grid-security/</filename> directly. It
+	periodically reloads those certificates which allows the
+	certificates to be replaced without restarting the
+	door. Certificate Revocation Lists are consulted and proxy
+	certificates including VOMS extensions are supported. The main
+	disadvantage of using the JGlobus &tls; provider is that it
+	relies on the unmaintained PureTLS library.
+      </para>
+      
+      <para>
+	The host certificate and CA certificate reload period is
+	controlled with the properties
+	<varname>hostCertificateRefreshPeriod</varname> and
+	<varname>trustAnchorRefreshPeriod</varname>
+	respectively. These properties provide to both the &https; and
+	https-jglobus providers.
+      </para>
+
+      <para>
+	No matter which provider is used, &tls; can be used with and
+	without client certificates. If used without client
+	certificates then clients will still be unauthenticated. The
+	advantage over plain &http; is that the client will
+	authenticate the server, ie. the client can be certain that it
+	is talking to your &webdav; door rather than a service
+	provided by an intruder. The connection will also be
+	encrypted, providing integrity and confidentiality
+	guarantees. If used with a client certificate then two-way
+	authentication is used. Like all other doors, the &webdav;
+	door uses &cell-gplazma; to map the users certificate to an
+	internal identity. &cell-gplazma; can be used both as a
+	centralized service or as an embedded service running
+	alongside the door. The behaviour can be controlled through
+	the <varname>useGPlazmaAuthorizationModule</varname>
+	property. Setting
+	<varname>useGPlazmaAuthorizationModule</varname> starts a
+	local &cell-gplazma; instance in the same domain as the
+	&webdav; door.
+      </para>
+      
+      <para>
+	Whether client certificates are requested or required is
+	controlled by the properties
+	<varname>webdavWantClientAuth</varname> and
+	<varname>webdavNeedClientAuth</varname>. When
+	<varname>webdavWantClientAuth</varname> is set to true,
+	&dcache; will use the client certificate if provided by the
+	client during the &tls; handshake. If
+	<varname>webdavNeedClientAuth</varname> is set to true, then
+	&dcache; will deny the access unless a client certificate is
+	provided by the client during the &tls; handshake. Ie. the
+	former setting controls whether client authentication is
+	supported and the latter setting controls whether client
+	authentication is required. The default is to allow, but not
+	require a client certificate.
+      </para>
+
+      <note>
+       <para>
+        Notice that many &webdav; clients do not support client certificates.
+       </para>
+      </note>
+
+    </section>
+
+    <section>
+      <title>Binding network interfaces</title>
+      <para>
+	By default the &webdav; door listens to port 2880 on all
+	network interfaces.
+      </para>
+
+      <para>
+	The &tcp; port can be customized by setting the property
+	<varname>webdavPort</varname> or simply
+	<varname>port</varname> in the service specific section in the
+	layout file.
+      </para>
+     
+      <para>
+	The network interface can be changed with the property
+	<varname>webdavAddress</varname>. The default is the wildcard
+	address, <systemitem
+	class='ipaddress'>0.0.0.0</systemitem>. Setting this to the IP
+	of a local network interface will bind the service to that
+	interface.
+      </para>
+
+      <para>
+	When the &webdav; door acts as proxy between pool and client,
+	the pool creates a &tcp; connection per transfer to the
+	door. The door will try to guess a local interface to use for
+	this callback. An interface can be provided explicitly by
+	setting the <varname>webdavInternalAddress</varname> property.
+      </para>
+    </section> 
+    
+    <section>
+      <title>Customising the look at feel of the &html; interface</title>
+      <para>
+	The &html; rendering of directories can be customized at several levels.
+      </para>
+     
+      <para>
+	Graphics and style sheets can be replaced by placing them in a
+	custom directory and setting the property
+	<varname>webdav.static-content.dir.local</varname> to the path
+	of that directory. Any files in this directory will mask the
+	default images and style sheets shipped with &dcache;.
+      </para>
+     
+      <para>
+	The static content directory is exposed through the &webdav;
+	door as the path .webdav/. Eg
+	<uri>http://<replaceable>dcache.example.org</replaceable>:2880/.webdav/images/logo.png</uri>
+	is loaded from the subdirectory called images from the static
+	content directory. The &webdav; door first consults the local
+	directory and if not found here the default content shipped
+	with &dcache; is provided. The path under which static content
+	is exposed can be customized through the property
+	<varname>webdav.static-content.location</varname>.
+      </para>
+     
+      <para>
+	You can copy the files in <filename
+	class='directory'>share/webdav/static/</filename> to the local
+	directory and use those as a starting point. Please do not
+	modify the files in place as those will be overwritten upon
+	upgrade.
+     </para>
+     
+     <para>
+       Customizations beyond modifying the images and style sheets can
+       be done by modifying the template. To do this create a copy of
+       <filename>share/webdav/templates/list.stg</filename> and update
+       the property <varname>webdav.templates.list</varname> to a
+       &url; pointing to this copy. Please don't modify the original
+       file as it will be overwritten on upgrade. The template file is
+       written using the StringTemplate language, see <ulink
+       url="http://www.stringtemplate.org/"/> for details. The default
+       template contains some basic documentation as comments.
+     </para>
+     
+    </section>
+
+    <section>
+      <title>&webdav; and &srm;</title>
+      <para>
+	&http; and &https; may be negotiated through &srm;. The
+	protocol identifiers are <literal>http</literal> and
+	<literal>https</literal>, respectively.
+      </para>
+    </section>
+    
+    <section>
+      <title>&webdav; related timeouts</title>
+      <para>
+	Customzing internal timeouts should not be necessary. All
+	timeouts can however be modified. To this end copy them from
+	<filename>/opt/d-cache/share/defaults/webdav.properties</filename>
+	to the layout file for the node which hosts the &webdav;
+	door. It is located in <filename
+	class='directory'>/opt/d-cache/etc/layouts</filename>. All
+	timeouts are specified in milliseconds.
+      </para>
+      <programlisting>Property                   Default  Description
+
+webdavPnfsTimeout          120000   Timeout for name space operations
+webdavPoolManagerTimeout   300000   Timeout for pool selection
+webdavGplazmaTimeout       180000   Timeout for gPlazma identity mapping
+webdavPoolTimeout          10000    Timeout for mover instantiation
+webdavKillTimeout          1500     Timeout for forceful mover termination
+webdavMoverTimeout         180000   Max mover queue time
+webdavTransferConfirmation 60000    Timeout for mover shutdown at end of transfer</programlisting>
+    </section>
+	
+    <section>
+      <title>Runtime administration of the &webdav; door</title>
+      <para>
+	Like any &dcache; door, the &webdav; door exposes a command
+	line interface through the admin door. An overview of
+	supported commands is provided by the <command>help</command>
+	command. Configuration information for the door is provided by
+	the <command>info</command> command.
+      </para>
+
+      <para>
+	The latest log entries can be queried with the <command>show
+	pinboard</command> command. The default log level for the
+	pinboard is higher than for the log files and is a great
+	source for seeing what's going on inside the door right
+	now. The usual <command>log</command> commands for adjusting
+	log levels are provided. These allow the log level for both
+	pinboard and log files to be inspected and modified.
+      </para>
+
+      <para>
+	The command <command>get door info</command> provides
+	information about the active transfers. This is the same
+	information that is exposed through the &cell-httpd; service's
+	Active Transfers page.
+      </para>
+
+      <para>
+	Low level introspection of the door's inner components is
+	possible through the <command>bean</command>
+	commands. <command>bean ls</command> provides a list of
+	components. Each component can be queried for properties using
+	<command>bean properties</command> and <command>bean
+	property</command>. The most interesting components to inspect
+	are <command>scheduled-thread-pool</command> and
+	<command>jetty</command>. Eg. <command>bean properties
+	scheduled-thread-pool.activeCount</command> shows the current
+	active number of tasks in the door and <command>bean property
+	jetty.connectors[0].connections</command> shows the current number of
+	&tcp; connections to the door.
+      </para>
+
+      <para>
+	All &dcache; doors register periodically with a login
+	broker. The current login broker registration settings are
+	provided by the <command>info</command> command. The two adjustable settings
+	are the registration frequency and the load change threshold
+	that triggers a reregistration ahead of time. These can be
+	adjusted at runtime through the <command>lb</command> commands. It is unlikely
+	that these will ever have to be adjusted. Permanent changes
+	can be made by setting the properties <varname>loginBrokerUpdateTime</varname>
+	and <varname>loginBrokerUpdateThreshold</varname>.
+      </para>
+
+    </section>
+
+    <section>
+      <title>Compliance and compatibility</title>
+      <literallayout>
+RFC 2616 : Hypertext Transfer Protocol - &http;/1.1
+RFC 2818 : &http; Over &tls;
+RFC 4918 : &http; Extensions for Web Distributed Authoring and Versioning (&webdav;)
+      </literallayout>
+
+
+<!--
+      <variablelist>
+	<varlistentry>RFC 2616</varlistentry>
+	<listitem>
+	  <para>
+	    Hypertext Transfer Protocol - HTTP/1.1
+	  </para>
+	</listitem>
+	<varlistentry>
+	  <para>
+	    RFC 2818
+	  </para>
+	</varlistentry>
+	<listitem>HTTP Over TLS</listitem>
+	<varlistentry>
+	  <para>
+	    RFC 4918
+	  </para>
+	</varlistentry>
+	<listitem>HTTP Extensions for Web Distributed Authoring and Versioning (WebDAV)</listitem>
+      </variablelist>
+      No template matches listitem in variablelist.
+-->
+
+      <para>
+	The following &webdav; request methods are supported: GET,
+	PUT, DELETE, PROPFIND, MOVE, MKCOL. LOCK and UNLOCK are
+	accepted, however no locking is enforced.
+      </para>
+
+      <para>
+	The &webdav; door relies on <ulink
+	url="http://www.eclipse.org/jetty/">&jetty;</ulink> as the low
+	level &http; implementation and the <ulink
+	url="http://milton.ettrema.com/">Milton Library</ulink> for
+	&webdav;. There is a client compatibility chart for Milton at
+	<ulink url="http://milton.ettrema.com/compat/"/>.
+      </para>
+
+      <para>
+	On the pool, &http; is implemented through the <ulink
+	url="http://www.jboss.org/netty">&netty;</ulink> asynchronous
+	network application framework.
+      </para>
+
+      <para>
+	Many &webdav; clients do not support the &http; redirect
+	issued on read. Other clients, such as curl, need special
+	flags to enable it. Most &webdav; clients do not support
+	client side certificates even when they do support &https;.
+      </para>
+
+      <para>
+	Bulk upload through Mac OS X Finder currently does not work. Individual
+files can be written through &webdav;. Notice that Mac OS X has a bad
+habbit of leaving <filename>.DS_Store</filename> files behind.
+      </para>
+    </section>
+  
+</chapter>

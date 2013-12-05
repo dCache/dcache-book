@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+<!ENTITY xrootd-version          "2.1.6">
+%sharedents;
+]>
+
+<chapter id="sv-nfs4">
+
+  <title>The <literal>nfs</literal> Service</title>
+  <para>
+    This chapter explains how to configure &dcache; in order to access
+    it via the &nfs4; protocol, allowing clients to mount &dcache; and perform
+    &posix; IO using standard &nfs4; clients.
+  </para>
+
+  <important>
+    <para>
+      The <systemitem>pNFS</systemitem> mentioned in this chapter is
+      the protocol &nfs4-pnfs; and not the namespace &pnfs;.
+    </para>
+  </important>
+
+  <section id="sv-nfs4-setup">
+    <title>Setting up</title>
+
+    <para>
+      To allow file transfers in and out of &dcache; using &nfs4-pnfs;, a
+      new &door-nfs4; must be started. This door acts then as the mount point
+      for &nfs; clients.
+    </para>
+
+    <para>
+      To enable the &door-nfs4;, you have to change the layout file
+      corresponding to your &dcache;-instance.  Enable the
+      &serv-nfs; within the domain that you want to run it by adding the
+      following line
+    </para>
+    <programlisting>..
+[<replaceable>domainName</replaceable>/nfsv41]
+..</programlisting>
+
+    <informalexample>
+      <para>
+        You can just add the following lines to the layout file:
+       </para>
+
+       <programlisting>..
+[nfs-${host.name}Domain]
+[nfs-${host.name}Domain/nfsv41]
+..</programlisting>
+
+    </informalexample>
+
+    <para>
+      In addition to run an &door-nfs4; you need to add exports to the
+      <filename>/etc/exports</filename> file. The format of <filename>/etc/exports</filename>
+      is similar to the one which is provided by Linux:
+      <programlisting>#
+&lt;path&gt; [host [(options)]]</programlisting>
+
+      Where <replaceable>options</replaceable> is a comma separated combination of:
+      <variablelist>
+        <varlistentry>
+	  <term><literal>ro</literal></term>
+
+	  <listitem>
+	    <para>
+	    matching clients can access this export only in read-only mode
+	    </para>
+	  </listitem>
+        </varlistentry>
+
+        <varlistentry>
+	  <term><literal>rw</literal></term>
+
+	  <listitem>
+	    <para>
+	    matching clients can access this export only in read-write mode
+	    </para>
+	  </listitem>
+        </varlistentry>
+
+        <varlistentry>
+	  <term><literal>sec=krb5</literal></term>
+
+	  <listitem>
+	    <para>
+	    matching clients must access &nfs; using &rpcsec_gss; authentication.
+            The Quality of Protection (QOP) is &none;, e.g., the data is neither
+            encrypted nor signed when sent over the network. Nevertheless the RPC packets
+            header still protected by checksum.
+	    </para>
+	  </listitem>
+        </varlistentry>
+
+        <varlistentry>
+	  <term><literal>sec=krb5i</literal></term>
+
+	  <listitem>
+	    <para>
+	    matching clients have to access &nfs; using &rpcsec_gss; authentication.
+            The Quality of Protection (QOP) is &integrity;. The RPC requests and
+            response are protected by checksum.
+	    </para>
+	  </listitem>
+        </varlistentry>
+
+
+        <varlistentry>
+	  <term><literal>sec=krb5p</literal></term>
+
+	  <listitem>
+	    <para>
+	    matching clients have to access &nfs; using &rpcsec_gss; authentication.
+            The Quality of Protection (QOP) is &privacy;. The RPC requests and
+            response are protected by encryption.
+	    </para>
+	  </listitem>
+        </varlistentry>
+      </variablelist>
+
+      For example:
+      <informalexample>
+          <programlisting>#
+/pnfs/dcache.org/data *.dcache.org (rw,sec=krb5i)</programlisting>
+      </informalexample>
+
+      Notice, that security flavour used at mount time will be used for client -
+      pool comminication as well.
+    </para>
+
+  </section>
+  <section id="sv-nfs4-gss">
+      <title>Configuring &door-nfs4; with GSS-API support</title>
+      <para>
+        Adding <literal>sec=krb5</literal> into <filename>/etc/exports</filename>
+        is not sufficient to get kerberos authentication to work.
+      </para>
+
+      <para>
+          All clients, pool nodes and node running &door-nfs4; must have a valid kerberos
+          configuration. Each clients, pool node and node running &door-nfs4; must
+          have a <filename>/etc/krb5.keytab</filename> with <literal>nfs</literal>
+          service principal:
+            <programlisting>nfs/host.domain@<replaceable>YOUR.REALM</replaceable></programlisting>
+      </para>
+      <para>
+          The <filename>&path-ode-ed;/dcache.conf</filename> on pool nodes and
+          node running &door-nfs4; must enable kerberos and &rpcsec_gss;:
+             <programlisting>nfs.rpcsec_gss=true
+kerberos.realm=<replaceable>YOUR.REALM</replaceable>
+kerberos.jaas.config=&path-ode-ed;/gss.conf
+kerberos.key-distribution-center-list=your.kdc.server</programlisting>
+      </para>
+      <para>
+        The <filename>&path-ode-ed;/gss.conf</filename> on pool nodes and node
+        running &door-nfs4; must configure Java's security module:
+           <programlisting>com.sun.security.jgss.accept {
+com.sun.security.auth.module.Krb5LoginModule required
+doNotPrompt=true
+useKeyTab=true
+keyTab="${/}etc${/}krb5.keytab"
+debug=false
+storeKey=true
+principal="nfs/host.domain@<replaceable>YOUR.REALM</replaceable>";
+};</programlisting>
+      </para>
+      <para>
+        Now your &nfs; client can securely access &dcache;.
+      </para>
+  </section>
+
+  <section id="sv-idmap">
+    <title>Configuring principal-id mapping for NFS access</title>
+    <para>
+        The &nfs4; uses utf8 based strings to represent user and group names. This
+        is the case even for non-kerberos based accesses. Nevertheless UNIX based
+        clients as well as &dcache; internally use numbers to represent uid and gids.
+        A special service, called <systemitem class="service">idmapd</systemitem>,
+        takes care for principal-id mapping. On the client nodes the file
+        <filename>/etc/idmapd.conf</filename> is usually responsible
+        for consistent mapping on the client side. On the server side, in case of
+        &dcache; mapping done through gplazma2. The <literal>identity</literal> type
+        of plug-in required by id-mapping service. Please refer to <xref
+        linkend="sv-gplazma" /> for instructions about how to configure &cell-gplazma;.
+    </para>
+    <para>
+        Note, that <literal>nfs4 domain</literal> on clients must match
+        <literal>nfs.domain</literal> value in <filename>dcache.conf</filename>.
+    </para>
+    <para>
+        To avoid big latencies and avoiding multiple queries for the same information, like
+        ownership of a files in a big directory, the results from &cell-gplazma;
+        are cached within &door-nfs4;. The default values for cache size and life
+        time are good enough for typical installation. Nevertheless they can be
+        overriden in <filename>dcache.conf</filename> or layoutfile:
+        <programlisting>..
+# maximal number of entries in the cache
+nfs.idmap.cache.size = 512
+
+# cache entry maximal lifetime
+nfs.idmap.cache.timeout = 30
+
+# time unit used for timeout. Valid values are:
+# SECONDS, MINUTES, HOURS and DAYS
+nfs.idmap.cache.timeout.unit = SECONDS
+..</programlisting>
+    </para>
+  </section>
+
+</chapter>

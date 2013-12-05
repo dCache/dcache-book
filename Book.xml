@@ -270,5 +270,6 @@
   <xi:include href="config.xml"/>
   <xi:include href="cookbook.xml"/>
   <xi:include href="reference.xml"/>
+  <xi:include href="services.xml"/>
 
 </book>

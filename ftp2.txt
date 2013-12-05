@@ -1,0 +1,421 @@
+
+
+
+Trunk/ftp2.txt
+
+Introduction
+============
+
+dCache supports FTP, the File Transport Protocol, and various
+extensions used in the Grid community.
+
+One of the advantages of FTP over other transfer protocols is the
+support for third party transfers, also known as FXP. This allows
+files to be transferred from one FTP server to another FTP server
+without routing data through the client's network connection.
+
+
+dCache supports three variants of FTP: Plain FTP, GridFTP (GSI
+encrypted FTP) and Kerberized FTP. These are implemented through the
+dCache services ftp, gridftp and kerberosftp, respectively. Since the
+services share much functionality we describe all three services in
+this chapter.
+
+
+Enabling a plain FTP door
+=========================
+
+A plain FTP door provides anonymous and username/password
+authenticated, unencrypted access to dCache.
+
+To enable an FTP door, specify ftp as a service in the dCache layout
+file. The following two lines would add the door to a dedicated
+domain, but the service can also be added to any existing domain.
+
+[exampleDomain]
+[exampleDomain/ftp]
+
+The plain FTP door does not use gPlazma. Instead it requires a local
+kpwd file to provide username and password pairs. 
+
+To create the kpwd file use the kpwd command set of the dcache
+command utility.
+
+To add a new entry use the command:
+
+dcache kpwd dcuseradd -u 1000 -g 1000 -h / -r / -f / -w read-write -p mysecret myuser
+
+This will add an entry for user myuser with the password mysecret to
+/opt/d-cache/etc/dcache.kpwd. The user will be mapped to UID 1000 and
+GID 1000. The path to the kpwd file can be configured by setting the
+kpwdFile property.
+
+Any FTP client can be used to access files in dCache as user myuser
+after the domain containig the service has been started with the
+following command:
+
+dcache start exampleDomain
+
+
+To add an anonymous account use a hyphen as the password. The
+following adds an anonymous read-only account:
+
+dcache kpwd dcuseradd -u 1000 -g 1000 -h / -r / -f / -w read-only -p - anonymous
+
+Only world readable files are accessible through such an anonymous
+account. This means the UID and GID will be ignored.
+
+Consult the documentation on the KPWD file format for further details
+on how to modify accounts and how to limit accounts to certain parts
+of the name space.
+
+
+Enabling a GridFTP door
+=======================
+
+A GridFTP door provides a GSI authenticated and encrypted FTP service
+for dCache.
+
+To enable a GridFTP door, specify gridftp as a service in the dCache
+layout file. The following two lines would add the door to a dedicated
+domain, but the service can also be added to any existing domain.
+
+[exampleDomain]
+[exampleDomain/gridftp]
+
+Assuming that a host certificate and a collection of CA certificates
+have been installed in /etc/grid-security/, starting the door is all
+that remains to provide a functioning GridFTP service:
+
+dcache start exampleDomain
+
+Files can be copied with any GridFTP client, such as globus-url-copy,
+arccp, or UberFTP.
+
+The GridFTP door uses gPlazma to map the user's certificate to an
+internal identity. gPlazma can be used both as a centralized service
+or as an embedded service running alongside the door. The behaviour
+can be controlled through the useGPlazmaAuthorizationModule
+property. Setting useGPlazmaAuthorizationModule starts a local gPlazma
+instance in the same domain as the GridFTP door.
+
+The GridFTP protocol provides additional commands and transfer
+protocols. In dCache these commands are however not limitted to the
+GridFTP door. Plain FTP and Kerberized FTP support the GridFTP command
+set too. See the section on compliance and compatibility below.
+
+
+
+
+Enabling a Kerberized FTP door
+==============================
+
+A Kerberized FTP door provides a Keberos authenticated and encrypted
+FTP service for dCache.
+
+To enable an Kerberized FTP door, specify kerberosftp as a service in
+the dCache layout file. The following two lines would add the door to
+a dedicated domain, but the service can also be added to any existing
+domain.
+
+[exampleDomain]
+[exampleDomain/kerberosftp]
+
+....
+
+
+
+The Kerberized FTP door uses gPlazma to map Keberos Principals to
+internal identities. gPlazma can be used both as a centralized service
+or as an embedded service running alongside the door. The behaviour
+can be controlled through the useGPlazmaAuthorizationModule
+property. Setting useGPlazmaAuthorizationModule starts a local gPlazma
+instance in the same domain as the GridFTP door.
+
+
+Data flow
+=========
+
+To avoid that doors become a bottleneck, dCache attempts to support
+direct data connections between dCache pools and the client. Support
+for this is subject to the limitations of the protocol.
+
+The FTP protocol distinguishes between control channels and data
+channels. 
+
+The control channel is a TCP connection established by the client to
+the door. It is used by the client to send FTP commands to the
+door. 
+
+The data channel is one or more TCP connections used to transfer file
+data. It may be established between dCache and the client or between
+dCache and another FTP service. Who creates the data channel depends
+on whether active of passive FTP is used. In passive FTP the client
+creates the channel to dCache. In active FTP dCache creates the
+channel to the client. 
+
+For FXP transfers (aka third-party transfers) one FTP service is the
+active party and the other is passive. The active party creates the
+channel to the passive party.
+
+If at all possible dCache will attempt to let the data channel be
+created directly between the pool and the other endpoint. This is
+possible for active FTP in which dCache creates the data channel. For
+passive FTP the data channel can only be established to the pool if
+GridFTP 2 GET and PUT extensions are used by the client. For other
+passive FTP transfers the FTP door acts as a proxy. In this case the
+pool creates a TCP connection to the door and the door accepts a data
+channel connection from the other endpoint.
+
+For FXP transfers one endpoint has to be active and one has to be
+passive. If dCache is used as the passive endpoint then it will always
+be forced to proxy the data through the door, unless the client
+supports the GridFTP 2 GET and PUT extensions.
+
+
+dCache can be forced to always proxy transfers throught the door. This
+is useful if pools are on private networks or do not have inbound
+connectivity. The properties ftp.proxy.on-passive and
+ftp.proxy-on-active control whether to use the door as a proxy for
+passive and active transfers, respectively. Notice that due to the
+limitations of the FTP protocol, passive non GridFTP 2 transfers will
+always be proxied by the door, even if ftp.proxy.on-passive is false.
+
+Binding network interfaces
+==========================
+
+By default an FTP door listens to TCP port 22126 for plain FTP, TCP
+port 2811 for GridFTP and TCP port 22127 for Kerberized FTP on all
+network interfaces. The TCP port can be customized by setting the
+properties ftpPort, gsiftpPortNumber, and kerberosFtpPort,
+respectively. Alternatively the property port can be set in the
+service specific section of the layout file.
+
+The network interface can be changed with the property listen. The
+default is the wildcard address, 0.0.0.0. Setting this to the IP of a
+local network interface will bind the service to that interface.
+
+When used as a proxy, the pool establishes a TCP connection to the
+door. The door will use the network interface corresponding to the
+FQDN of the door. The IP address of a network interface to use for the
+connection from the pool can be specified explicitly by setting the
+gsiftpAdapterInteralInterface property.
+
+When the door or a pool accepts data channel connections from the
+client or another FXP endpoint it listens on a TCP port. The TCP port
+will by default be allocated in the range 20000 to 25000. The range
+can be changed by setting the properties net.wan.port.min and
+net.wan.port.max. 
+
+FTP specific mover queues
+=========================
+
+Transfers on pools are scheduled on queues. An FTP door can be
+configured to submit transfers to a queue different from the default
+by defining the gsiftpIoQueue property. The queue has to be created on
+all pools that will service transfers for this door. Despite the name,
+the property applies to all three flavors of FTP doors.
+
+
+Data channel protocols
+======================
+
+FTP allows the client to choose among several protocol for the data
+channel. dCache supports standard stream mode (mode S), the extended
+block mode (mode E) as specified by the GridFTP protocol, and eXtended
+block mode (mode X) as specified by the GridFTP v2 protocol.
+
+Stream mode (mode S) should be avoided as it has no framing format and
+no end of file marker. Thus the receiving party cannot distinguish the
+end-of-file and a premature close of the data channel.
+
+Extended block mode (mode E) is only supported by clients that
+understand the GridFTP protocol. The protocol restricts the data
+channel orientation such that the sender always has to be active, ie,
+the sender has to create the data channel. 
+
+eXtended block mode (mode X) is only supported by client that
+understand the GridFTP v2 protocol. There are currently no such
+clients on the market. In constrast to mode E, mode X does not
+restrict the data channel orientation.
+
+Both mode E and mode X allow several concurrent TCP connections to be
+bundled into a single data channel. This can in some cases increase
+throughput. The property gsiftpMaxStreamsPerClient specifies an upper
+limit on the number of concurrent TCP connections to use per
+transfer. For passive FTP dCache can only enforce the limit by
+terminating any transfer that creates too many connections.
+
+dCache does not support data channel authentication (DCAU).
+
+Performance markers
+===================
+
+GridFTP servers may provide progress information on the control
+channel. This is useful for third party transfers as the client has
+otherwise no way to monitor the progress of the transfer. The property
+performanceMarkerPeriod allows the period between two performance
+markers to be set. The default is 70 seconds.
+
+
+Overwriting files
+=================
+
+By default the FTP door refuses to overwrite existing files. This
+behaviour can be changed by setting the property overwriteEnabled to
+true. Note that this property also changes the behaviour of the SRM
+door.
+
+
+Deleting failed uploads
+=======================
+
+When an FTP door detects that an upload fails it will delete the
+file. This behaviour can be altered with the property
+gsiftpDeleteOnConnectionClosed. Setting the property to false will
+leave the partially uploaded file in dCache.
+
+
+SRM and login broker
+====================
+
+FTP access may be negotiated through the SRM. The protocol identifiers
+for FTP, GridFTP and Kerberized FTP are ftp, gsiftp and gkftp,
+respectively.
+
+FTP doors need to register with a login broker to be discoverable by
+the SRM. The name of the login broker to register with is specified by
+the loginBroker property. The period between two registrations is
+specified by the loginBrokerUpdateTime period. Note that these
+properties are used by other doors too. There is rarely a need to
+change these properties.
+
+An FTP door can be drained for SRM transfers by disabling it in the
+LoginBroker. Disabling the door in LoginBroker does not prevent that
+clients connect directly to the door.
+
+
+FTP related timeouts and limits
+===============================
+
+Customzing internal timeouts should not be necessary. All timeouts can
+however be modified. All timeouts are specified in seconds.
+
+Property                   Default  Description
+
+gsiftpPnfsTimeout          300      Timeout for name space operations
+gsiftpPoolManagerTimeout   5400     Timeout for pool selection
+gsiftpPoolTimeout          600      Timeout for mover instantiation
+
+
+The FTP retries automatically on transient errors. The maximum number
+of retries can be controlled with the property gsiftpMaxRetries.
+
+Since FTP doors may act as data channel proxies, each door provides a
+connection limit. The default is 100 and should be increased unless a
+large number of FTP doors are provided at a site. The limit can be set
+through the gsiftpMaxLogin property. Despite the name of the property,
+the limit applies to all three flavors of FTP doors.
+
+
+Runtime administration of FTP doors
+===================================
+
+Like any dCache door, FTP doors exposes a command line interface
+through the admin door. FTP doors spawn an instance per
+connection. Thus one must dinstinguish between administration of the
+master cell (an instance of the login manager) and the per connection
+instances.
+
+The mater cell is accessible under the cell name of the service. For
+instance, by default the cell name of the gridftp service is
+GFTP-${host.name}. The command 'get children' can be used to query the
+current list of connections. Each entry is a name of an FTP door
+instance that one can interact with through the admin interface. An
+example will make this clear:
+
+[kermit.ndgf.org] (local) admin > cd GFTP-fozzie 
+[kermit.ndgf.org] (GFTP-fozzie) admin > get children
+GFTP-fozzie-<unknown>-117782
+GFTP-fozzie-<unknown>-117784
+GFTP-fozzie-<unknown>-117694
+GFTP-fozzie-<unknown>-117776
+GFTP-fozzie-<unknown>-117774
+GFTP-fozzie-<unknown>-117713
+GFTP-fozzie-<unknown>-117745
+[kermit.ndgf.org] (GFTP-fozzie) admin > ..
+[kermit.ndgf.org] (local) admin > cd GFTP-fozzie-<unknown>-117774
+[kermit.ndgf.org] (GFTP-fozzie-<unknown>-117774) admin > info
+            FTPDoor
+         User  : ....
+    User Host  : ....
+   Local Host  : ....
+ Last Command  : PUT path=....;pasv;
+ Command Count : 19
+     I/O Queue : null
+GFTP-fozzie-<unknown>-117774@gridftp-fozzieDomain;p=GFtp-1;o=5001/0;
+1305709493016;000007D60B651FA547668C19C4577F1E2A38;...;...;Mover .../29455: Receiving;89733;
+
+
+Here GFTP-fozzie is the name of the master cell and
+GFTP-fozzie-<unknown>-117774 is the name of a per connection instance.
+
+
+An overview of supported commands is provided by the 'help'
+command. Configuration and connection information for the door are
+provided by the 'info' command. In the master cell 'info' mainly shows
+configuration information, while in the per connection instances
+'info' shows information about that particular client connection.
+
+The latest log entries can be queried with the 'show pinboard'
+command. The default log level for the pinboard is higher than for the
+log files and is a great source for seeing what's going on inside the
+door right now. The usual 'log' commands for adjusting log levels are
+provided. These allow the log level for both pinboard and log files to
+be inspected and modified. Any log level adjustments made to the
+master cell are inherited by the per connection instances.
+
+All dCache doors register periodically with a login broker. The
+current login broker registration settings are provided by the 'info'
+command of the master cell. The two adjustable settings are the
+registration frequency and the load change threshold that triggers a
+reregistration ahead of time. The registration frequency can be
+adjusted at runtime through the 'lb set update' command. It is
+unlikely that these settings will ever have to be adjusted. Permanent
+changes can be made by setting the properties loginBrokerUpdateTime
+and loginBrokerUpdateThreshold.
+
+Compliance and compatibility
+============================
+
+RFC 959: File Transfer Protocol
+RFC 1123: Requirements for Internet Hosts -- Application and Support
+RFC 2228: FTP Security Extensions
+RFC 3659: Extensions to FTP
+GFD-R.020: GridFTP: Protocol Extensions to FTP for the Grid
+GFD.47: GridFTP v2 Protocol Description
+
+
+FTP commands supported: FEAT, OPTS, DELE, AUTH, ADAT, MIC, ENC, CONF,
+CCC, USER, PASS, PBSZ, PROT, RMD, MKD, SYST, TYPE, NOOP, ALLO, PWD,
+CWD, CDUP, PORT, PASV, MODE, SITE BUFSIZE, SITE CHKSUM, SITE CHMOD,
+CKSM, SCKS, SBUF, ERET, ESTO, RETR, STOR, SIZE, MDTM, LIST, NLST,
+MLST, MLSD, DCAU, QUIT, BYE, ABOR, GET, PUT.
+
+
+The only data representation type supported by dCache is IMAGE.
+
+dCache supports the following facts for use with MLSD and MLST: SIZE,
+MODIFY, TYPE, UNIQUE and PERM.
+
+dCache supports the following data channel formats: MODE S, MODE E,
+and MODE X.
+
+dCache supports the following GridFTP features (GFD-R.020):
+PARALLEL, MODE-E-PERF, SBUF, ERET, ESTO.
+
+dCache supports the following GridFTP v2 features (GFD.47):
+EOF, GETPUT, CKSUM ADLER32,MD5,MD4, MODEX
+
+dCache supports the following RFC 3659 extensions: SIZE, MDTM
+

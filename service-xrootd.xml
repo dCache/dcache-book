@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % sharedents SYSTEM "shared-entities.xml" >
+<!ENTITY xrootd-version          "2.1.6">
+%sharedents;
+]>
+
+<chapter id="sv-xrootd">
+
+  <title>The &serv-xrootd; Service</title>
+
+  <para>
+    This chapter explains how to configure &dcache; in order to access
+    it via the &xrootd; protocol, allowing &xrootd;-Clients like
+    ROOT's TXNetfile and xrdcp to do file operations against a
+    &dcache; instance in a transparent manner. &dcache; implements
+    version &xrootd-version; of &xrootd; protocol.
+  </para>
+
+  <section id="sv-xrootd-setup">
+    <title>Setting up</title>
+
+    <para>
+      To allow file transfers in and out of &dcache; using xrootd, a
+      new &door-xrootd; must be started. This door acts then as the
+      entry point to all &xrootd; requests.  Compared to the native
+      xrootd server-implementation (produced by SLAC), the
+      &door-xrootd; corresponds to the <literal>redirector node</literal>.
+    </para>
+
+    <para>
+      To enable the &door-xrootd;, you have to change the layout file
+      corresponding to your &dcache;-instance.  Enable the
+      xrootd-service within the domain that you want to run it by adding the
+      following line
+    </para>
+
+    <programlisting>..
+[<replaceable>domainName</replaceable>/xrootd]
+..</programlisting>
+
+    <informalexample>
+    <para>
+        You can just add the following lines to the layout file:
+    </para>
+
+        <programlisting>..
+[xrootd-${host.name}Domain]
+[xrootd-${host.name}Domain/xrootd]
+..</programlisting>
+
+    </informalexample>
+
+    <para>
+      After a restart of the domain running the &door-xrootd;, done e.g. by
+      executing
+    </para>
+
+    <screen>&prompt-root; <userinput>${dCacheHome}/bin/dcache restart xrootd-babelfishDomain</userinput>
+Stopping xrootd-babelfishDomain (pid=30246) 0 1 2 3 4 5 6 7 done
+Starting xrootd-babelfishDomain done</screen>
+
+    <para>
+      the &door-xrootd; should be running. A few minutes later it
+      should appear at the web monitoring interface under "Cell
+      Services" (see <xref linkend="intouch-web" />).
+    </para>
+
+    <section id="sv-xrootd-setup-params">
+      <title>Parameters</title>
+
+      <para>
+	The default port the &door-xrootd; is listening on is
+	1094. This can be changed two ways:
+	</para>
+	<orderedlist>
+	<listitem>
+    <para>
+    <emphasis>Per door:</emphasis> Edit your instance's layout file, for
+    example
+    <filename>&path-ode-ed;/layouts/example.conf</filename> and add the
+    desired port for the &door-xrootd; in a separate line (a restart of the
+    domain(s) running the &door-xrootd; is required):
+    </para>
+    <screen>..
+[xrootd-${host.name}Domain]
+[xrootd-${host.name}Domain/xrootd]
+    port = 1095
+..</screen>
+    </listitem>
+	<listitem>
+	<para>
+	<emphasis>Globally:</emphasis> Edit
+	<filename>&path-ode-ed;/dcache.conf</filename> and
+	add the variable <varname>xrootdPort</varname> with the desired value (a
+	restart of the domain(s) running the &door-xrootd; is required):
+    </para>
+      <screen>..
+xrootdPort=1095
+..</screen>
+    </listitem>
+    </orderedlist>
+
+    <para>
+      For controlling the &tcp;-portrange within which &xrootd;-movers
+      will start listening in the &domain-pool;, you can add the properties
+      <literal>net.lan.port.min</literal> and
+      <literal>net.lan.port.max</literal> to
+      <filename>&path-ode-ed;/dcache.conf</filename> and adapt them
+      according to your preferences. The default values can be viewed in
+      <filename>&path-ods-usd;/defaults/dcache.properties</filename>.
+    </para>
+
+    <programlisting>..
+net.lan.port.min=30100
+net.lan.port.max=30200
+..</programlisting>
+
+    </section>
+  </section>
+
+
+  <section id="sv-xrootd-tests">
+    <title>Quick tests</title>
+
+    <para>
+      The subsequent paragraphs describe a quick guide on how to test
+      &xrootd; using the <filename>xrdcp</filename> and
+      <filename>ROOT</filename> clients.
+    </para>
+
+    <section id="sv-xrootd-tests-xrdcp">
+      <title>Copying files with xrdcp</title>
+
+      <para>
+	A simple way to get files in and out of &dcache; via &xrootd;
+	is the command xrdcp. It is included in every xrootd and ROOT
+	distribution.
+      </para>
+
+      <para>
+	To transfer a single file in and out of &dcache;, just issue
+      </para>
+
+      <screen>&prompt-user; <userinput>xrdcp /bin/sh root://<replaceable>xrootd-door.example.org</replaceable>/pnfs/<replaceable>example.org</replaceable>/data/xrd_test</userinput>
+&prompt-user; <userinput>xrdcp root://<replaceable>xrootd-door.example.org</replaceable>/pnfs/<replaceable>example.org</replaceable>/data/xrd_test /dev/null</userinput></screen>
+
+    </section>
+
+    <section id="sv-xrootd-tests-ROOT">
+      <title>Accessing files from within ROOT</title>
+
+      <para>
+	This simple ROOT example shows how to write a randomly filled
+	histogram to a file in &dcache;:
+      </para>
+
+      <screen>root [0] TH1F h("testhisto", "test", 100, -4, 4);
+root [1] h->FillRandom("gaus", 10000);
+root [2] TFile *f = new TXNetFile("root://<replaceable>door_hostname</replaceable>//pnfs/<replaceable>example.org</replaceable>/data/test.root","new");
+061024 12:03:52 001 Xrd: Create: (C) 2004 SLAC INFN XrdClient 0.3
+root [3] h->Write();
+root [4] f->Write();
+root [5] f->Close();
+root [6] 061101 15:57:42 14991 Xrd: XrdClientSock::RecvRaw: Error reading from socket: Success
+061101 15:57:42 14991 Xrd: XrdClientMessage::ReadRaw: Error reading header (8 bytes)</screen>
+
+      <para>
+	Closing remote &xrootd; files that live in &dcache; produces
+	this warning, but has absolutely no effect on subsequent ROOT
+	commands.  It happens because &dcache; closes all &tcp;
+	connections after finishing a file transfer, while xrootd
+	expects to keep them open for later reuse.
+      </para>
+
+      <para>
+	To read it back into ROOT from &dcache;:
+      </para>
+
+      <screen>root [7] TFile *reopen = TXNetFile ("root://<replaceable>door_hostname</replaceable>//pnfs/<replaceable>example.org</replaceable>/data/test.root","read");
+root [8] reopen->ls();
+TXNetFile**             //pnfs/<replaceable>example.org</replaceable>/data/test.root
+ TXNetFile*             //pnfs/<replaceable>example.org</replaceable>/data/test.root
+  KEY: TH1F     testhisto;1     test</screen>
+
+    </section>
+  </section>
+
+  <section id="sv-xrootd-sec">
+    <title>&xrootd; security</title>
+
+    <section id="sv-xrootd-sec-ro">
+      <title>Read-Write access</title>
+
+      <para>
+	Per default &dcache; &xrootd; is restricted to read-only,
+	because plain &xrootd; is completely unauthenticated. A
+	typical error message on the clientside if the server is
+	read-only looks like:
+      </para>
+
+      <screen> &prompt-user; <userinput>xrdcp -d 1 /bin/sh root://ford.desy.de//pnfs/desy.de/data/xrd_test2</userinput>
+Setting debug level 1
+061024 18:43:05 001 Xrd: main: (C) 2004 SLAC INFN xrdcp 0.2 beta
+061024 18:43:05 001 Xrd: Create: (C) 2004 SLAC INFN XrdClient kXR_ver002+kXR_asyncap
+061024 18:43:05 001 Xrd: ShowUrls: The converted URLs count is 1
+061024 18:43:05 001 Xrd: ShowUrls: URL n.1: root://ford.desy.de:1094//pnfs/desy.de/data/asdfas.
+061024 18:43:05 001 Xrd: Open: Access to server granted.
+061024 18:43:05 001 Xrd: Open: Opening the remote file /pnfs/desy.de/data/asdfas
+061024 18:43:05 001 Xrd: XrdClient::TryOpen: doitparallel=1
+061024 18:43:05 001 Xrd: Open: File open in progress.
+061024 18:43:06 5819 Xrd: SendGenCommand: Server declared: <command>Permission denied. Access is read only.(error code: 3003)</command>
+061024 18:43:06 001 Xrd: Close: File not opened.
+Error accessing path/file for root://ford//pnfs/desy.de/data/asdfas</screen>
+
+      <para>
+	To enable read-write access, add the following line to
+	<filename>${dCacheHome}/etc/dcache.conf</filename>
+      </para>
+
+      <programlisting>..
+xrootdIsReadOnly=false
+..</programlisting>
+
+      <para>
+	and restart any domain(s) running a &door-xrootd;.
+      </para>
+
+      <para>
+	Please note that due to the unauthenticated nature of this
+	access mode, files can be written and read to/from any
+	subdirectory in the &pnfs; namespace (including the automatic
+	creation of parent directories). If there is no user
+	information at the time of request, new files/subdirectories
+	generated through &xrootd; will inherit UID/GID from its
+	parent directory. The user used for this can be configured via the
+	xrootdUser property.
+      </para>
+
+    </section>
+
+    <section id="sv-xrootd-sec-selected">
+      <title>Permitting read/write access on selected directories</title>
+
+      <para>
+	To overcome the security issue of uncontrolled &xrootd; read and write
+	access mentioned in the previous section, it is possible to
+	restrict read and write access on a per-directory basis (including
+	subdirectories).
+      </para>
+
+      <para>
+	To activate this feature, a colon-seperated list containing
+	the full paths of authorized directories must be added
+	to <filename>&path-ode-ed;/dcache.conf</filename>. If both read and
+	write access should be authorized for certain directories, add the
+	following line to <filename>&path-ode-ed;/dcache.conf</filename>:
+      </para>
+
+      <programlisting>..
+xrootdAllowedPaths=/pnfs/<replaceable>example.org</replaceable>/path1:/pnfs/<replaceable>example.org</replaceable>/path2
+..</programlisting>
+
+       <para>
+        If you want to split permissions depending on whether the operation is
+        reading or writing, add the following lines instead:
+       </para>
+
+       <programlisting>..
+xrootdAllowedReadPaths=/pnfs/<replaceable>example.org</replaceable>/rpath1:/pnfs/<replaceable>example.org</replaceable>/rpath2
+xrootdAllowedWritePaths=/pnfs/<replaceable>example.org</replaceable>/wpath1:/pnfs/<replaceable>example.org</replaceable>/wpath2
+..</programlisting>
+
+      <para>
+	A restart of the &door-xrootd; is required to make the changes
+	take effect. As soon as any of the above properties are set, all read or write
+	requests to directories not matching the allowed path lists
+	will be refused. Symlinks are however not restricted to these prefixes.
+      </para>
+
+    </section>
+
+
+    <section id="sv-xrootd-sec-authz">
+      <title>Token-based authorization</title>
+
+      <para>
+	The &xrootd; &dcache; implementation includes a generic
+	mechanism to plug in different authorization handlers. The only
+	plugin available so far implements token-based authorization
+	as suggested in <ulink
+	url="http://people.web.psi.ch/feichtinger/doc/authz.pdf"/>.
+      </para>
+
+      <para>
+	The first thing to do is to setup the keystore. The keystore
+	file basically specifies all RSA-keypairs used within the
+	authorization process and has exactly the same syntax as in
+	the native xrootd tokenauthorization implementation. In this
+	file, each line beginning with the keyword
+	<literal>KEY</literal> corresponds to a certain Virtual
+	Organisation (VO) and specifies the remote public (owned by
+	the file catalogue) and the local private key belonging to
+	that VO. A line containing the statement <literal>"KEY
+	VO:*"</literal> defines a default keypair that is used as a
+	fallback solution if no VO is specified in token-enhanced
+	&xrootd; requests. Lines not starting with the
+	<literal>KEY</literal> keyword are ignored. A template can be
+	found in
+	<filename>&path-ods-usd;/examples/xrootd/keystore</filename>.
+      </para>
+
+      <para>
+	The keys itself have to be converted into a certain format in
+	order to be loaded into the authorization plugin. &dcache;
+	expects both keys to be binary DER-encoded (Distinguished
+	Encoding Rules for ASN.1). Furthermore the private key must be
+	PKCS #8-compliant and the public key must follow the
+	X.509-standard.
+      </para>
+
+      <para>
+	The following example demonstrates how to create and convert a
+	keypair using OpenSSL:
+      </para>
+
+      <screen><lineannotation>Generate new RSA private key</lineannotation>
+&prompt-root; <userinput>openssl genrsa -rand 12938467 -out key.pem 1024</userinput>
+
+<lineannotation>Create certificate request</lineannotation>
+&prompt-root; <userinput>openssl req -new -inform PEM -key key.pem -outform PEM -out certreq.pem</userinput>
+
+<lineannotation>Create certificate by self-signing certificate request</lineannotation>
+&prompt-root; <userinput>openssl x509 -days 3650 -signkey key.pem -in certreq.pem -req -out cert.pem</userinput>
+
+<lineannotation>Extract public key from certificate</lineannotation>
+&prompt-root; <userinput>openssl x509 -pubkey -in cert.pem -out pkey.pem</userinput>
+&prompt-root; <userinput>openssl pkcs8 -in key.pem -topk8 -nocrypt -outform DER -out <replaceable>new_private_key</replaceable></userinput>
+&prompt-root; <userinput>openssl enc -base64 -d -in pkey.pem -out <replaceable>new_public_key</replaceable></userinput></screen>
+
+      <para>
+	Only the last two lines are performing the actual conversion,
+	therefore you can skip the previous lines in case you already
+	have a keypair. Make sure that your keystore file correctly
+	points to the converted keys.
+      </para>
+
+      <para>
+	To enable the plugin, it is necessary to add the following two lines to
+	the file
+	<filename>&path-ode-ed;/dcache.conf</filename>, so that
+	it looks like
+      </para>
+
+      <programlisting>..
+	xrootdAuthzPlugin=org.dcache.xrootd.security.plugins.tokenauthz.TokenAuthorizationFactory
+	xrootdAuthzKeystore=<replaceable>Path_to_your_Keystore</replaceable>
+	..</programlisting>
+
+      <para>
+	After doing a restart of &dcache;, any requests without
+	an appropriate token should result in an error saying
+	"<literal>authorization check failed: No authorization token
+	found in open request, access denied.(error code:
+	3010)</literal>".
+      </para>
+
+      <para>
+	If both tokenbased authorization and read-only access are
+	activated, the read-only restriction will dominate (local
+	settings have precedence over remote file catalogue
+	permissions).
+      </para>
+    </section>
+
+    <section id="sv-xrootd-sec-authn">
+      <title>Strong authentication</title>
+
+      <para>
+        The &xrootd;-implementation in &dcache; includes a pluggable
+        authentication framework. To control which authentication mechanism
+        is used by &xrootd;, add the <varname>xrootdAuthNPlugin</varname>
+        option to your &dcache; configuration and set it to the desired value.
+      </para>
+
+      <informalexample>
+        <para>
+          For instance, to enable &gsi; authentication in &xrootd;, add the
+          following line to <filename>&path-ode-ed;/dcache.conf</filename>:
+
+          <programlisting>..
+xrootdAuthNPlugin=gsi
+..</programlisting>
+        </para>
+
+        <para>
+          When using &gsi; authentication, depending on your setup,
+          you may or may not want &dcache; to fail if the host
+          certificate chain can not be verified against trusted certificate
+          authorities. Whether &dcache; performs this check can be controlled
+          by setting the option <varname>grid.hostcert.verify</varname>:
+
+          <programlisting>..
+grid.hostcert.verify=true
+..
+</programlisting>
+
+        </para>
+      </informalexample>
+
+      <para>
+        <emphasis>Authorization</emphasis> of the user information obtained
+        by strong authentication is performed by contacting the &cell-gplazma;
+        service. Please refer to <xref linkend="sv-gplazma" /> for instructions
+        about how to configure &cell-gplazma;.
+      </para>
+      <warning>
+	      <title>Security consideration</title>
+	      <para>
+			In general &gsi; on &xrootd; is not secure. It does not provide
+			confidentiality and integrity guarantees and hence does not protect
+			against man-in-the-middle attacks.
+	      </para>
+      </warning>
+
+    </section>
+
+    <section id="sv-xrootd-sec-precedence">
+      <title>Precedence of security mechanisms</title>
+
+      <para>
+        The previously explained methods to restrict access via
+        &xrootd; can also be used together. The precedence
+        applied in that case is as following:
+      </para>
+
+      <note>
+      <para>
+        The &xrootd;-door can be configured to use either token authorization
+        or strong authentication with &cell-gplazma; authorization.
+        A combination of both is currently not possible.
+      </para>
+      </note>
+
+      <para>
+        The permission check executed by the authorization plugin (if
+        one is installed) is given the lowest priority, because it can
+        controlled by a remote party. E.g. in the case of token based
+        authorization, access control is determined by the file
+        catalogue (global namespace).
+      </para>
+
+      <para>
+        The same argument holds for many strong authentication mechanisms - for
+        example, both the &gsi; protocol as well as the &kerberos; protocols require
+        trust in remote authorities. However, this only affects user
+        <emphasis>authentication</emphasis>, while authorization decisions can
+        be adjusted by local site administrators by adapting the &cell-gplazma;
+        configuration.
+      </para>
+
+      <para>
+        To allow local site's administrators to override remote
+        security settings, write access can be further restricted to
+        few directories (based on the local namespace, the
+        &pnfs;). Setting &xrootd; access to read-only has the highest
+        priority, overriding all other settings.
+      </para>
+    </section>
+    <section id="sv-xrootd-other-configuration">
+      <title>Other configuration options</title>
+
+      <para>
+        The &xrootd;-door has several other configuration properties. You can configure various timeout parameters,
+        the thread pool sizes on pools, queue buffer sizes on pools, the &xrootd; root path, the &xrootd; user
+        and the &xrootd; IO queue. Full descriptions on the effect of those can be found in
+        <filename>&path-ods-usd;/defaults/xrootd.properties</filename>.
+      </para>
+
+    </section>
+  </section>
+
+</chapter>
