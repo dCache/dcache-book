@@ -153,7 +153,7 @@ srm.db.host=hostname</programlisting>
 
       <para>
 	The property
-	<varname>srm.limits.request.copy.scheduler.thread.pool.size</varname>
+	<varname>srm.request.copy.threads</varname>
 	controls number of copy requests in the running state. Copy
 	requests are 3-rd party srm transfers and therefore the
 	property
@@ -161,9 +161,8 @@ srm.db.host=hostname</programlisting>
 	is best to be set to the same value as shown below.
       </para>
 
-
-      <programlisting>srm.limits.request.copy.scheduler.thread.pool.size=250
-transfermanagers.limits.external-transfers=${srm.limits.request.copy.scheduler.thread.pool.size}</programlisting>
+      <programlisting>srm.request.copy.threads=250
+transfermanagers.limits.external-transfers=${srm.request.copy.threads}</programlisting>
 
       <para>
 	The common value should be the roughly equal to
@@ -176,7 +175,7 @@ transfermanagers.limits.external-transfers=${srm.limits.request.copy.scheduler.t
 	  have 30 pools then the number should be 3x30=90.
 	</para>
 
-      <programlisting>srm.limits.request.copy.scheduler.thread.pool.size=90
+      <programlisting>srm.request.copy.threads=90
 transfermanagers.limits.external-transfers=90</programlisting>
       </informalexample>
 
@@ -185,7 +184,7 @@ transfermanagers.limits.external-transfers=90</programlisting>
 	  US-CMS T1 has:
 	</para>
 
-	<programlisting>srm.limits.request.copy.scheduler.thread.pool.size=2000
+	<programlisting>srm.request.copy.threads=2000
 transfermanagers.limits.external-transfers=2000</programlisting>
       </informalexample>
 
@@ -213,11 +212,12 @@ transfermanagers.limits.external-transfers=2000</programlisting>
 	</para>
 
 	<para>
-	  The &dcache; administrator can make space reservations for
-	  VOs (see <xref linkend='cf-srm-space' />. Each space
-	  reservation has an associated ID (or space token). VOs then
-	  can copy directly into space tokens assigned to them by the
-	  dcache administrator.
+	  Users can create space reservations using an appropriate &srm;
+      client, although it is more common for the &dcache; administrator
+      to make space reservations for VOs (see <xref linkend='cf-srm-space'/>.
+      Each space reservation has an associated ID (or space token). VOs
+      then can copy directly into space tokens assigned to them by the
+	  &dcache; administrator.
 	</para>
 	<para>
 	  When a file is about to be transferred to a storage system,
@@ -227,7 +227,7 @@ transfermanagers.limits.external-transfers=2000</programlisting>
 	  another, concurrently transferred file. If the file is
 	  transferred successfully the allocated space becomes used
 	  space within the space reservation, else the allocated space
-	  is released back to the space reservation.
+	  is released back to the space reservation as free space.
 	</para>
 	<para>
 	  &srm; space reservation can be assigned a non-unique
@@ -310,10 +310,9 @@ transfermanagers.limits.external-transfers=2000</programlisting>
 
 	    <para>
 	      If the space reservation request does not specify a
-	      retention policy we will assign
-	      <varname>pnfsmanager.default-retention-policy</varname> a retention
-	      policy by default. The default value is
-	      <literal>CUSTODIAL</literal>.
+	      retention policy, we will assign a value given by
+          <varname>spacemanager.default-retention-policy</varname>.
+          The default value is <literal>CUSTODIAL</literal>.
 	    </para>
 	    <para>
 	      Edit the file
@@ -326,10 +325,21 @@ transfermanagers.limits.external-transfers=2000</programlisting>
 		Change the default value to
 		<literal>REPLICA</literal>.
 	      </para>
-	      <programlisting>pnfsmanager.default-retention-policy=REPLICA</programlisting>
+	      <programlisting>spacemanager.default-retention-policy=REPLICA</programlisting>
 	    </informalexample>
 
-	  </listitem>
+          <note>
+              <para>
+                  <varname>spacemanager.default-retention-policy</varname> merely specifies
+                  to value to use while allocating space reservations when no value was
+                  given by the client or &dcache; admin. It is not to be confused with
+                  <varname>pnfsmanager.default-retention-policy</varname> which specifies
+                  the default retention policy of files uploaded outside of any space
+                  reservation.
+              </para>
+          </note>
+
+      </listitem>
 	  </varlistentry>
 
 	  <varlistentry><term><literal>AccessLatency</literal></term>
@@ -373,10 +383,9 @@ transfermanagers.limits.external-transfers=2000</programlisting>
 
 	    <para>
 	      If a space reservation request does not specify an
-	      access latency we will assign
-	      <varname>spacemanager.default-access-latency</varname> an
-	      access latency by default. The default value is
-	      <literal>NEARLINE</literal>.
+	      access latency, we will assign a value given by
+	      <varname>spacemanager.default-access-latency</varname>.
+          The default value is <literal>NEARLINE</literal>.
 	    </para>
 
 	    <para>
@@ -392,15 +401,28 @@ transfermanagers.limits.external-transfers=2000</programlisting>
 	      <programlisting>spacemanager.default-access-latency=ONLINE</programlisting>
 	    </informalexample>
 
-	  </listitem>
+          <note>
+              <para>
+                  <varname>spacemanager.default-access-latency</varname> merely specifies
+                  to value to use while allocating space reservations when no value was
+                  given by the client or &dcache; admin. It is not to be confused with
+                  <varname>pnfsmanager.default-access-latency</varname> which specifies
+                  the default retention policy of files uploaded outside of any space
+                  reservation.
+              </para>
+          </note>
+
+      </listitem>
 	  </varlistentry>
 	</variablelist>
 
 	<important>
-	  Please make sure to use capital letters for
-	  <literal>REPLICA</literal>, <literal>CUSTODIAL</literal>,
-	  <literal>ONLINE</literal> and <literal>NEARLINE</literal>
-	  otherwise you will receive an error message.
+        <para>
+            Please make sure to use capital letters for
+            <literal>REPLICA</literal>, <literal>CUSTODIAL</literal>,
+            <literal>ONLINE</literal> and <literal>NEARLINE</literal>
+            otherwise you will receive an error message.
+        </para>
 	</important>
 
       </section>
@@ -421,17 +443,22 @@ transfermanagers.limits.external-transfers=2000</programlisting>
 	the &serv-spacemngr; service to your layout file
       </para>
 
-      <programlisting>[<replaceable>srm-${host.name}Domain</replaceable>]
-[<replaceable>srm-${host.name}Domain</replaceable>/srm]
-[<replaceable>srm-${host.name}Domain</replaceable>/spacemanager]</programlisting>
+      <programlisting>[<replaceable>dCacheDomain</replaceable>]
+[<replaceable>dCacheDomain</replaceable>/spacemanager]</programlisting>
 
 
       <para>
-	and add (uncomment) the following definition in the file
+	and add the following definition in the file
 	<filename>&path-ode-ed;/dcache.conf</filename>
       </para>
 
       <programlisting>dcache.enable.space-reservation=true</programlisting>
+
+        <para>
+            Unless you have reason not to, we recommend placing the
+            &serv-spacemngr; service in the same domain as the
+            &serv-poolmngr; service.
+        </para>
 
     </section>
 
@@ -458,22 +485,24 @@ transfermanagers.limits.external-transfers=2000</programlisting>
 	    </para>
 	  </important>
 	  <para>
-	    If a space reservation is specified, the file will be
-	    stored in it (assuming the user has permission to do so in
-	    the name space).
+	    If a space reservation is specified during upload, the file
+        will be stored in it.
 	  </para>
 
 	  <para>
 	    Files written into a space made within a particular link
 	    group will end up on one of the pools belonging to this
 	    link group. The difference between the link group's
-	    available space and the sum of all the current space
-	    reservation sizes is the available space in the link
-	    group.
+	    free space and the sum of all its space
+	    reservation's unused space is the available space of the link
+	    group. The available space of a link group is the space
+        that can be allocated for new space reservations.
 	  </para>
 	  <para>
 	    The total space in &dcache; that can be reserved is the
-	    sum of the available spaces of all link groups.
+	    sum of the available spaces of all link groups. Note however
+        that a space reservation can never span more than a single
+        link group.
 	  </para>
 
 	</section>
@@ -492,20 +521,45 @@ transfermanagers.limits.external-transfers=2000</programlisting>
 	    If no implicit space reservation can be made, the transfer
 	    will fail.
 	  </para>
+
+      <para>
+          Implicit space reservation means that the &serv-srm; will create
+          a space reservation for a single upload while negotiating
+          the transfer parameters with the client. The space reservation
+          will be created in a link group for which the user is
+          authorized to create space reservations, which has enough
+          available space, and which is able to hold the type of
+          file being uploaded. The space reservation will be short lived.
+          Once it expires, it will be released and the file it held
+          will live on outside any space reservation, but still within
+          the link group to which it was uploaded. Implicit space
+          reservations are thus a technical means to upload files to
+          link groups without using explicit space reservations.
+      </para>
+
+      <para>
+          The reason &dcache; cannot just allow the file to be uploaded to
+          the link group without any space reservation at all is, that
+          we have to guarantee, that space already allocated for other
+          reservations isn't used by the file being uploaded. The best
+          way to guarantee that there is enough space for the file is to
+          make a space reservation to which to upload it.
+      </para>
+
 	  <para>
-	    In case of &srm; version 1.1 data transfers, when the
+	    In case of &srm; version 1.1 data transfers, where the
 	    access latency and retention policy cannot be specified,
 	    and in case of &srm; V2.2 clients, when the access latency
-	    and retention policy are not specified, the default values
+	    and retention policy are not specified, default values
 	    will be used. First &srm; will attempt to use the values
 	    of <literal>AccessLatency</literal> and
 	    <literal>RetentionPolicy</literal> tags from the directory
-	    to which a file is being written. If the tags are present,
+	    to which a file is being written. If the tags are not present,
 	    then the <literal>AccessLatency</literal> and
 	    <literal>RetentionPolicy</literal> will be set on basis of
-	    the system wide defaults, which are controlled by
+	    &serv-pnfsmngr; defaults controlled by
 	    <varname>pnfsmanager.default-retention-policy</varname> and
-	    <varname>spacemanager.default-access-latency</varname>
+	    <varname>pnfsmanager.default-access-latency</varname>
 	    variables in
 	    <filename>&path-ode-ed;/dcache.conf</filename>.
 	  </para>
@@ -513,7 +567,7 @@ transfermanagers.limits.external-transfers=2000</programlisting>
 	  <para>
 	    You can check if the <varname>AccessLatency</varname> and
 	    <varname>RetentionPolicy</varname> tags are present by
-	    using the following commands:
+	    using the following command:
 	  </para>
 
 	  <screen>&prompt-root; <userinput>&chimera-cli; lstag /path/to/directory</userinput>
@@ -558,15 +612,15 @@ CUSTODIAL</screen>
           <note>
 	    <para>
 	      Some clients also have default values, which are used
-	      when not explicitly specified by the user. I this case
+	      when not explicitly specified by the user. In this case
 	      server side defaults will have no effect.
 	    </para>
 	  </note>
 
 	  <note>
 	    <para>
-	      If the implicit space reservation is not enabled the
-	      pools in the link groups will be excluded from
+	      If the implicit space reservation is not enabled,
+	      pools in link groups will be excluded from
 	      consideration and only the remaining pools will be
 	      considered for storing the incoming data, and classical
 	      pool selection mechanism will be used.
@@ -586,7 +640,7 @@ CUSTODIAL</screen>
    -->
 
   <section id="cf-srm-space">
-    <title>&cell-spacemngr; configuration for Explicit Space Reservations</title>
+    <title>&cell-spacemngr; configuration</title>
 
     <section id='cf-srm-space-linkgroups'>
       <title>&srm; &cell-spacemngr; and Link Groups</title>
@@ -624,26 +678,15 @@ CUSTODIAL</screen>
 	  interface</link> and <command>cd</command> to the cell
 	  <literal>SrmSpaceManager</literal>.
 	</para>
-	<screen>&prompt-user; <userinput>ssh -c blowfish -p 22223 -l admin headnode.example.org</userinput>
+	<screen>&prompt-user; <userinput>ssh -p 22224 -l admin admin.example.org</userinput>
 &dc-prompt-local; <userinput>cd SrmSpaceManager</userinput></screen>
         <para>
-	  Type <command>ls</command> to get information about
-	  reservations and link groups.
+	  Type <command>ls link groups</command> to get information about link groups.
 	</para>
-	<screen>&dc-prompt-spacemngr; <userinput>ls</userinput>
-Reservations:
-total number of reservations: 0
-total number of bytes reserved: 0
-
-LinkGroups:
-total number of linkGroups: 0
-total number of bytes reservable: 0
-total number of bytes reserved  : 0
-last time all link groups were updated: Tue Sep 20 11:15:19 CEST 2011(1316510119634)</screen>
+	<screen>&dc-prompt-spacemngr; <userinput>ls link groups</userinput></screen>
        <para>
-	 This output tells you that there are no reservations yet and
-	 no link groups. As there are no link groups no space can be
-	 reserved.
+	 The lack of output tells you that there are no link groups. As there are no link groups,
+     no space can be reserved.
        </para>
 
        <section id='cf-srm-linkgroups'>
@@ -674,7 +717,7 @@ name=spacemanager-pool</programlisting>
 <screen>&prompt-root; <userinput>mkdir -p /srv/dcache/spacemanager-pool</userinput>
 &prompt-root; <userinput>&path-odb-ub;dcache restart</userinput></screen>
 	<para>
-	  In the Admin Interface <command>cd</command> to the
+	  In the admin interface, <command>cd</command> to the
 	  &cell-poolmngr; and create a pool group, a link and a link
 	  group.
 	</para>
@@ -696,24 +739,23 @@ name=spacemanager-pool</programlisting>
 &dc-prompt-pm; <userinput>..</userinput>
 	</screen>
 	<para>
-	  Check whether the link group is available.
+	  Check whether the link group is available. Note that this can take several minutes to propagate
+      to &serv-spacemngr;.
 	</para>
 	<screen>&dc-prompt-local; <userinput>cd SrmSpaceManager</userinput>
-&dc-prompt-spacemngr; <userinput>ls</userinput>
-Reservations:
-total number of reservations: 0
-total number of bytes reserved: 0
-
-LinkGroups:
-0 Name:spacemanager_WriteLinkGroup FreeSpace:7278624768 ReservedSpace:0 AvailableSpace:7278624768 VOs: onlineAllowed:true nearlineAllowed:false replicaAllowed:true custodialAllowed:true UpdateTime:Mon Nov 28 12:12:51 CET 2011(1322478771030)
-total number of linkGroups: 1
-total number of bytes reservable: 7278624768
-total number of bytes reserved  : 0
-last time all link groups were updated: Mon Nov 28 12:12:51 CET 2011(1322478771030)</screen>
+&dc-prompt-spacemngr; <userinput>ls link groups</userinput>
+FLAGS CNT RESVD        AVAIL         FREE             UPDATED NAME
+--rc:no 0     0 + 7278624768 = 7278624768 2011-11-28 12:12:51 spacemanager_WriteLinkGroup
+    </screen>
 	<para>
 	  The link group
-	  <literal>spacemanager_WriteLinkGroup</literal> was created
-	  and has the id <literal>0</literal>.
+	  <literal>spacemanager_WriteLinkGroup</literal> was created. Here the flags indicate first
+      the status (- indicates that neither the expired [e] nor the released flags [r] are set),
+      followed by the type of reservations allowed in the link group (here replica [r], custodial [c],
+      nearline [n] and online [o] files; output [o] files are not allowed - see <command>help ls
+      link groups</command> for details on the format). No space reservations have been created, as
+      indicated by the count field. Since no space reservation has been created, no space in the
+      link group is reserved.
 	</para>
        </informalexample>
 
@@ -747,7 +789,7 @@ last time all link groups were updated: Mon Nov 28 12:12:51 CET 2011(13224787710
 	<para>
 	  LinkGroup <replaceable>NameOfLinkGroup</replaceable>
 	  followed by the list of the Fully Qualified Attribute Names
-	  (FQANs). Each FQAN on a separate line, followed by an empty
+	  (FQANs). Each FQAN is on a separate line, followed by an empty
 	  line, which is used as a record separator, or by the end of
 	  the file.
 	</para>
@@ -755,11 +797,16 @@ last time all link groups were updated: Mon Nov 28 12:12:51 CET 2011(13224787710
 	  FQAN is usually a string of the form
 	  <replaceable>VO</replaceable>/Role=<replaceable>VORole</replaceable>. Both
 	  <replaceable>VO</replaceable> and
-	  <replaceable>VORole</replaceable> could be set to
+	  <replaceable>VORole</replaceable> can be set to
 	  <literal>*</literal>, in this case all VOs or VO Roles will
 	  be allowed to make reservations in this link group. Any line
 	  that starts with # is a comment and may appear anywhere.
 	</para>
+    <para>
+        Rather than an FQAN, a mapped user name can be used. This allows clients
+        or protocols that do not provide VOMS attributes to make use of
+        space reservations.
+    </para>
 
 	<programlisting>#SpaceManagerLinkGroupAuthorizationFile
 
@@ -779,7 +826,7 @@ LinkGroup <replaceable>NameOfLinkGroup</replaceable>
 	    and the link groups have been updated.
 	  </para>
 	  <screen>&dc-prompt-spacemngr; <userinput>update link groups</userinput>
-update started</screen>
+Update started.</screen>
 	</note>
 
 
@@ -807,20 +854,20 @@ LinkGroup spacemanager_WriteLinkGroup
 	    In this more general example for a
 	    <literal>SpaceManagerLinkGroupAuthorizationFile</literal>
 	    members of the VO <literal>desy</literal> with role
-	    <literal>test</literal> get the right to make a space
+	    <literal>test</literal> are authorized to make a space
 	    reservation in a link group called
 	    <literal>desy-test-LinkGroup</literal>. Moreover, all
-	    members of the VO <literal>desy</literal> get the right to
+	    members of the VO <literal>desy</literal> are authorized to
 	    make a reservation in the link group called
-	    <literal>desy-anyone-LinkGroup</literal> and anyone will
-	    get the right to make a space reservation in the link
+	    <literal>desy-anyone-LinkGroup</literal> and anyone
+	    is authorized to make a space reservation in the link
 	    group called <literal>default-LinkGroup</literal>.
 	  </para>
 	  <programlisting>#SpaceManagerLinkGroupAuthorizationFile
-# this is comment and is ignored
+# this is a comment and is ignored
 
 LinkGroup desy-test-LinkGroup
-/desy/Role=/test
+/desy/Role=test
 
 LinkGroup desy-anyone-LinkGroup
 /desy/Role=*
@@ -845,31 +892,36 @@ LinkGroup default-LinkGroup
 	    Now you can make a space reservation for the VO <literal>desy</literal>.
 	  </para>
 
-	  <screen>&dc-prompt-spacemngr; <userinput>reserve -vog=/desy -vor=production -desc=DESY_TEST 5000000 10000</userinput>
+	  <screen>&dc-prompt-spacemngr; <userinput>reserve space -owner=/desy/Role=production -desc=DESY_TEST -lifetime=10000 -lg=spacemanager_WriteLinkGroup 5MB</userinput>
 110000 voGroup:/desy voRole:production retentionPolicy:CUSTODIAL accessLatency:NEARLINE linkGroupId:0 size:5000000 created:Fri Dec 09 12:43:48 CET 2011 lifetime:10000000ms expiration:Fri Dec 09 15:30:28 CET 2011 description:DESY_TEST state:RESERVED used:0 allocated:0</screen>
 	<para>
-	  The id of the space token is <literal>110000</literal>.
+	  The space token of the reservation is <literal>110000</literal>.
 	</para>
 	<para>
 	  Check the status of the reservation by
 	</para>
-	<screen>&dc-prompt-spacemngr; <userinput>ls</userinput>
-Reservations:
-110000 voGroup:/desy voRole:production retentionPolicy:CUSTODIAL accessLatency:NEARLINE linkGroupId:0 size:5000000 created:Fri Dec 09 12:43:48 CET 2011 lifetime:10000000ms expiration:Fri Dec 09 15:30:28 CET 2011 description:DESY_TEST state:RESERVED used:0 allocated:0
-total number of reservations: 1
-total number of bytes reserved: 5000000
+	<screen>&dc-prompt-spacemngr; <userinput>ls spaces -e -h</userinput>
+ TOKEN RETENTION LATENCY FILES ALLO   USED   FREE   SIZE             EXPIRES DESCRIPTION
+110000 CUSTODIAL NEARLINE    0   0B +   0B + 5.0M = 5.0M 2011-12-09 12:43:48 DESY_TEST
 
-LinkGroups:
-0 Name:spacemanager_WriteLinkGroup FreeSpace:23747563520 ReservedSpace:5000000 AvailableSpace:23742563520 VOs:{/desy:*} onlineAllowed:true nearlineAllowed:true replicaAllowed:true custodialAllowed:true UpdateTime:Fri Dec 09 12:49:29 CET 2011(1323431369046)
-total number of linkGroups: 1
-total number of bytes reservable: 23742563520
-total number of bytes reserved  : 5000000
-last time all link groups were updated: Fri Dec 09 12:49:29 CET 2011(1323431369046)</screen>
-
+&dc-prompt-spacemngr; <userinput>ls link groups -h</userinput>
+FLAGS CNT RESVD   AVAIL   FREE             UPDATED NAME
+--rc:no 1  5.0M +  7.3G = 7.3G 2011-11-28 12:12:51 spacemanager_WriteLinkGroup
+</screen>
 
 	<para>
+      Here the <userinput>-h</userinput> option indicates that approximate, but human readable,
+      byte sizes are to be used, and <userinput>-e</userinput> indicates that ephemeral (time
+      limited) reservations should be displayed too (by default time limited reservations are
+      not displayed as they are often implicit reservations). As can be seen, 5 MB are now reserved in
+      the link group, although with approximate byte sizes, 5 MB do not make a visible difference
+      in the 7.3 GB total size.
+    </para>
+
+    <para>
 	  You can now copy a file into that space token.
 	</para>
+
 	<screen>&prompt-user; <userinput>srmcp file:////bin/sh srm://<replaceable>dcache.example.org</replaceable>:8443/data/world-writable/space-token-test-file -space_token=110000</userinput></screen>
 	<para>
 	  Now you can check via the <link
@@ -883,35 +935,25 @@ last time all link groups were updated: Fri Dec 09 12:49:29 CET 2011(13234313690
       <para>
 	There are several parameters to be specified for a space reservation.
       </para>
-      <screen>&dc-prompt-spacemngr; <userinput>reserve [-vog=voGroup] [-vor=voRole] [-acclat=AccessLatency] \
-[-retpol=RetentionPolicy] [-desc=Description] [-lgid=LinkGroupId] [-lg=LinkGroupName] \
-<replaceable>sizeInBytes</replaceable> <replaceable>lifetimeInSecs</replaceable></userinput></screen>
+      <screen>&dc-prompt-spacemngr; <userinput>reserve space [-al=online|nearline] [-desc=<replaceable>string</replaceable>] -lg=<replaceable>name</replaceable>
+[-lifetime=<replaceable>seconds</replaceable>] [-owner=<replaceable>user</replaceable>|<replaceable>fqan</replaceable>] [-rp=output|replica|custodial] <replaceable>size</replaceable></userinput></screen>
 
       <variablelist>
-	<varlistentry><term>[-vog=voGroup]</term>
+	<varlistentry><term>[-owner=<replaceable>user</replaceable>|<replaceable>fqan</replaceable>]</term>
 	<listitem>
 	  <para>
-	    <literal>voGroup</literal> should match the VO you
-	    specified in the
-	    <filename>LinkGroupAuthorization.conf</filename> file. If
-	    you do not want to make a space reservation for a certain VO then
-	    the entry in the
-	    <filename>LinkGroupAuthorization.conf</filename> should
-	    read
-	  </para>
-	  <programlisting>LinkGroup NameOfLinkGroup
-*/Role=*</programlisting>
-	</listitem>
-	</varlistentry>
-	<varlistentry><term>[-vor=voRole]</term>
-	<listitem>
-	  <para>
-	    <literal>voRole</literal> can be specified if it is used in the
-	    <filename>LinkGroupAuthorization.conf</filename> file.
+        The owner of the space is identified by either mapped user
+        name or FQAN. The owner must be authorized to reserve space
+        in the link group in which the space is to be created. Besides
+        the &dcache; admin, only the owner can release the space. Anybody
+        can however write into the space (although the link group may
+        only allow certain storage groups and thus restrict which file
+        system paths can be written to space reservation, which in turn
+        limits who can upload files to it).
 	  </para>
 	</listitem>
 	</varlistentry>
-	<varlistentry><term>[-acclat=AccessLatency]</term>
+	<varlistentry><term>[-al=<replaceable>AccessLatency</replaceable>]</term>
 	<listitem>
 	  <para>
 	    <literal>AccessLatency</literal> needs to match one of the access
@@ -919,7 +961,7 @@ last time all link groups were updated: Fri Dec 09 12:49:29 CET 2011(13234313690
 	  </para>
 	</listitem>
 	</varlistentry>
-	<varlistentry><term>[-retpol=RetentionPolicy]</term>
+	<varlistentry><term>[-rp=<replaceable>RetentionPolicy</replaceable>]</term>
 	<listitem>
 	  <para>
 	    <literal>RetentionPolicy</literal> needs to match one of the
@@ -927,7 +969,7 @@ last time all link groups were updated: Fri Dec 09 12:49:29 CET 2011(13234313690
 	  </para>
 	</listitem>
 	</varlistentry>
-	<varlistentry><term>[-desc=Description]</term>
+	<varlistentry><term>[-desc=<replaceable>Description</replaceable>]</term>
 	<listitem>
 	  <para>
 	    You can chose a value to describe your space
@@ -935,34 +977,27 @@ last time all link groups were updated: Fri Dec 09 12:49:29 CET 2011(13234313690
 	  </para>
 	</listitem>
 	</varlistentry>
-	<varlistentry><term>[-lgid=LinkGroupId]</term>
+	<varlistentry><term>-lg=<replaceable>LinkGroupName</replaceable></term>
 	<listitem>
 	  <para>
-	    You can either use the <literal>LinkGroupId</literal> to make a space reservation or
+	   Which link group to create the reservation in.
 	  </para>
 	</listitem>
 	</varlistentry>
-	<varlistentry><term>[-lg=LinkGroupName]</term>
+	<varlistentry><term><replaceable>size</replaceable></term>
 	<listitem>
 	  <para>
-	    you use the <literal>LinkGroupName</literal> to make a space reservation.
+	    The size of the space reservation should be specified in bytes, optionally
+        using a byte unit suffix using either SI or IEEE prefixes.
 	  </para>
 	</listitem>
 	</varlistentry>
-	<varlistentry><term><replaceable>sizeInBytes</replaceable></term>
-	<listitem>
-	  <para>
-	    The size of the space reservation should be specified in bytes.
-	  </para>
-	</listitem>
-	</varlistentry>
-	<varlistentry><term><replaceable>lifetimeInSecs</replaceable></term>
+	<varlistentry><term>[-lifetime=<replaceable>lifetime]</replaceable></term>
 	<listitem>
 	  <para>
 	    The life time of the space reservation should be specified
-	    in seconds. Choose <literal>"-1"</literal> for a space
-	    reservation that will never expire (use quotes around the
-	    negative <literal>one</literal>).
+	    in seconds. If no life time is specified, the space reservation will not
+        expire automatically.
 	  </para>
 	</listitem>
 	</varlistentry>
@@ -974,18 +1009,18 @@ last time all link groups were updated: Fri Dec 09 12:49:29 CET 2011(13234313690
 	<title>Releasing a Space Reservation</title>
 
       <para>
-	If a space reservation is not needet anymore it can be released with
+	If a space reservation is not needed anymore it can be released with
       </para>
-      <screen>&dc-prompt-spacemngr; <userinput>release <replaceable>spaceTokenId</replaceable></userinput></screen>
+      <screen>&dc-prompt-spacemngr; <userinput>release space <replaceable>spaceTokenId</replaceable></userinput></screen>
       <informalexample>
-	<screen>&dc-prompt-spacemngr; <userinput>reserve -vog=/desy -vor=production -desc=DESY_TEST 5000000 600</userinput>
+	<screen>&dc-prompt-spacemngr; <userinput>reserve space -owner=/desy -desc=DESY_TEST -lifetime=600 5000000</userinput>
 110042 voGroup:/desy voRole:production retentionPolicy:CUSTODIAL accessLatency:NEARLINE linkGroupId:0 size:5000000 created:Thu Dec 15 12:00:35 CET 2011 lifetime:600000ms expiration:Thu Dec 15 12:10:35 CET 2011 description:DESY_TEST state:RESERVED used:0 allocated:0
-&dc-prompt-spacemngr; <userinput>release 110042</userinput>
+&dc-prompt-spacemngr; <userinput>release space 110042</userinput>
 110042 voGroup:/desy voRole:production retentionPolicy:CUSTODIAL accessLatency:NEARLINE linkGroupId:0 size:5000000 created:Thu Dec 15 12:00:35 CET 2011 lifetime:600000ms expiration:Thu Dec 15 12:10:35 CET 2011 description:DESY_TEST state:RELEASED used:0 allocated:0</screen>
          <para>
 	   You can see that the value for <literal>state</literal> has
 	   changed from <literal>RESERVED</literal> to
-	   <literal>RELEASED</literal>
+	   <literal>RELEASED</literal>.
 	 </para>
 
       </informalexample>
@@ -1004,10 +1039,9 @@ last time all link groups were updated: Fri Dec 09 12:49:29 CET 2011(13234313690
     <title>Making and Releasing a Space Reservation as a User</title>
 
     <para>
-      A user who has been given the right to make a space reservation
-      can make a space reservation. To achieve this the right entry in
-      the <filename>LinkGroupAuthorization.conf</filename> file is
-      required.
+      If so authorized, a user can make a space reservation through
+      the &srm; protocol. A user is authorized to do so using the
+      <filename>LinkGroupAuthorization.conf</filename> file.
     </para>
 
     <section>
@@ -1040,9 +1074,9 @@ last time all link groups were updated: Fri Dec 09 12:49:29 CET 2011(13234313690
 	    &dcache; needs to use &cell-gplazma; with modules that
 	    extract VO attributes from the user's proxy. (See <xref
 	    linkend="cf-gplazma"/>, have a look at
-	    <literal>gplazmalite-vorole-mapping</literal> plugin and
+	    <literal>voms</literal> plugin and
 	    see <xref linkend='intouch-certificates'/> for an example
-	    with <literal>gplazmalite-vorole-mapping</literal>.
+	    with <literal>voms</literal>.
 	  </para>
 	</listitem>
       </itemizedlist>
@@ -1180,6 +1214,18 @@ Space token =110044</screen>
 	  <literal>false</literal> and the default value is
 	  <literal>false</literal>.
 	</para>
+
+        <para>
+            This is analogous to implicit space reservations performed by the
+            &serv-srm;, except that these reservations are created by the
+            &serv-spacemngr; itself. Since an &srm; client uses a non-&srm; protocol
+            for the actual upload, setting the above option to true while disabling
+            implicit space reservations in the &serv-srm;, will still allow files
+            to be uploaded to a link group even when no space token is provided. Such
+            a configuration should however be avoided: If the &serv-srm; does not
+            create the reservation itself, it has no way of communicating access
+            latency, retention policy, file size, nor lifetime to &serv-spacemngr;.
+        </para>
 
     </section>
 
