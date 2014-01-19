@@ -248,39 +248,34 @@ transfermanagers.limits.external-transfers=2000</programlisting>
 	<title>Properties of Space Reservation</title>
 
 	<para>
-	  The administrator can specify a
-	  <firstterm><literal>RetentionPolicy</literal></firstterm>
-	  and an
-	  <firstterm><literal>AccessLatency</literal></firstterm> for
-	  the space reservation.
+	  A space reservation has a <firstterm>retention policy</firstterm>
+	  and an <firstterm>access latency</firstterm>.
 	</para>
 	<para>
-	  <literal>RetentionPolicy</literal> describes the quality of
+	  Retention policy describes the quality of
 	  the storage service that will be provided for the data
-	  (files) stored in this space reservation and
-	  <literal>AccessLatency</literal> describes the availability
-	  of this data. The specification requires that if a space
-	  reservation is given, then the specified
-	  <literal>RetentionPolicy</literal> or
-	  <literal>AccessLatency</literal> must match those of the
+	  (files) stored in the space reservation and
+	  access latency describes the availability
+	  of this data. The &srm; specification requires that if a space
+	  reservation is given on upload, then the specified
+	  retention policy and access latency must match those of the
 	  space reservation.
 	</para>
 
 	<para>
 	  The default values for the
-	  <literal>RetentionPolicy</literal> and
-	  <literal>AccessLatency</literal> can be changed in the file
+	  retention policy and access latency can be changed in the file
 	  <filename>&path-ode-ed;/dcache.conf</filename>.
 	</para>
 
 
 	<variablelist>
-	  <varlistentry><term><literal>RetentionPolicy</literal></term>
+	  <varlistentry><term>Retention policy</term>
 	  <listitem>
 
 	    <para>
-	      The values of <literal>RetentionPolicy</literal>
-	      used in &dcache; are <literal>REPLICA</literal> and
+	      The values of retention policy
+	      supported by &dcache; are <literal>REPLICA</literal> and
 	      <literal>CUSTODIAL</literal>.
 	    </para>
 
@@ -304,8 +299,8 @@ transfermanagers.limits.external-transfers=2000</programlisting>
 
 	    <para>
 	      Once a file is written
-              into a given space reservation, it inherits the
-              reservation's <literal>RetentionPolicy</literal>.
+          into a given space reservation, it inherits the
+          reservation's retention policy.
 	    </para>
 
 	    <para>
@@ -342,11 +337,10 @@ transfermanagers.limits.external-transfers=2000</programlisting>
       </listitem>
 	  </varlistentry>
 
-	  <varlistentry><term><literal>AccessLatency</literal></term>
+	  <varlistentry><term>Access latency</term>
 	  <listitem>
 	  <para>
-	    The two values allowed for
-	    <literal>AccessLatency</literal> are
+	    The two values allowed for access latency are
 	    <literal>NEARLINE</literal> and <literal>ONLINE</literal>.
 	  </para>
 
@@ -375,10 +369,9 @@ transfermanagers.limits.external-transfers=2000</programlisting>
 	    In case of &dcache; <literal>ONLINE</literal> means that
 	    there will always be a copy of the file on disk, while
 	    <literal>NEARLINE</literal> does not provide such
-	    guarantee. As with <literal>RetentionPolicy</literal>,
+	    guarantee. As with retention policy,
 	    once a file is written into a given space reservation, it
-	    inherits the reservation's
-	    <literal>AccessLatency</literal>.
+	    inherits the reservation's access latency.
 	  </para>
 
 	    <para>
@@ -552,11 +545,9 @@ transfermanagers.limits.external-transfers=2000</programlisting>
 	    and in case of &srm; V2.2 clients, when the access latency
 	    and retention policy are not specified, default values
 	    will be used. First &srm; will attempt to use the values
-	    of <literal>AccessLatency</literal> and
-	    <literal>RetentionPolicy</literal> tags from the directory
+	    of access latency and retention policy tags from the directory
 	    to which a file is being written. If the tags are not present,
-	    then the <literal>AccessLatency</literal> and
-	    <literal>RetentionPolicy</literal> will be set on basis of
+	    then the access latency and retention policy will be set on basis of
 	    &serv-pnfsmngr; defaults controlled by
 	    <varname>pnfsmanager.default-retention-policy</varname> and
 	    <varname>pnfsmanager.default-access-latency</varname>
@@ -1111,8 +1102,7 @@ FLAGS CNT RESVD   AVAIL   FREE             UPDATED NAME
       <para>
 	When a &srm; Space Reservation request is executed, its
 	parameters, such as reservation size, lifetime,
-	<literal>AccessLatency</literal>and
-	<literal>RetentionPolicy</literal> as well as user's VO
+	access latency and retention policy as well as user's VO
 	membership information is forwarded to the &srm;
 	&cell-spacemngr;.
       </para>
@@ -2187,14 +2177,12 @@ srm://srm.cern.ch:8443/castor/cern.ch/cms/store/cmsfile23</screen>
 	  &srm; Version 2.2 <function>srmPrepareToPut</function> and
 	  <function>srmCopy</function> PULL mode transfers allow the
 	  user to specify a space reservation token or a
-	  <literal>RetentionPolicy</literal> and
-	  <literal>AccessLatency</literal>. Any of these parameters
+	  retention policy and access latency. Any of these parameters
 	  are optional, and it is up to the implementation to decide
 	  what to do, if these properties are not specified. The
 	  specification requires that if a space reservation is given,
-	  then the specified <literal>AccessLatency</literal> or
-	  <literal>RetentionPolicy</literal> must match those of
-	  the space reservation.
+	  then the specified access latency or
+	  retention policy must match those of the space reservation.
 	</para>
 
 	  <para>

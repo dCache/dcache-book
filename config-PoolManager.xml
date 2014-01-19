@@ -2256,35 +2256,36 @@ psu set    link incoming-link -section=incoming-section
 	 </note>
 
       <formalpara>
-	<title>Properties of <link
-	linkend='cf-srm-intro-spaceReservation'>space
-	reservation</link>.</title> The &dcache; administrator can specify a
-	<firstterm><literal>RetentionPolicy</literal></firstterm> and
-	an <firstterm><literal>AccessLatency</literal></firstterm> for
-	the space reservation, where
-	<literal>RetentionPolicy</literal> describes the quality of
-	the storage service that will be provided for the data (files)
-	stored in this space reservation and
-	<literal>AccessLatency</literal> describes the availability of
-	this data.
+          <title>Access latency and retention policy</title>
+          <para>
+              A space reservation has a
+              <firstterm>retention policy</firstterm> and
+              an <firstterm>access latency</firstterm>, where
+              retention policy describes the quality of
+              the storage service that will be provided for files in
+              the space reservation and
+              access latency describes the availability of
+              the files. See <xref linkend='cf-srm-intro-spaceReservation'/>
+              for further details.</para>
       </formalpara>
       <para>
-	A link group has five boolean properties called
-	<varname>replicaAllowed</varname>,
-	<varname>outputAllowed</varname>,
-	<varname>custodialAllowed</varname>,
-	<varname>onlineAllowed</varname> and
-	<varname>nearlineAllowed</varname>. The values of these
-	properties (<literal>true</literal> or
-	<literal>false</literal>) can be configured via the Admin
-	Interface or directly in the file
+          A link group has five boolean properties called
+          <varname>replicaAllowed</varname>,
+          <varname>outputAllowed</varname>,
+          <varname>custodialAllowed</varname>,
+          <varname>onlineAllowed</varname> and
+          <varname>nearlineAllowed</varname>, which determine the access latencies and
+          retention policies allowed in the link group. The values of these
+          properties (<literal>true</literal> or
+          <literal>false</literal>) can be configured via the Admin
+          Interface or directly in the file
 	<filename>&file-poolmanager;</filename>.
       </para>
-      <para>
-	The link groups contained in a space reservation match the
-	<literal>RetentionPolicy</literal> and the
-	<literal>AccessLatency</literal> of the space reservation.
-      </para>
+        <para>
+            For a space reservation to be allowed in a link group, the
+            the retention policy and access latency
+            of the space reservation must be allowed in the link group.
+        </para>
 
       <screen>&dc-prompt-pm; <userinput>psu set linkGroup custodialAllowed <replaceable>linkgroup</replaceable> <replaceable>true|false</replaceable></userinput>
 &dc-prompt-pm; <userinput>psu set linkGroup outputAllowed <replaceable>linkgroup</replaceable> <replaceable>true|false</replaceable></userinput>
@@ -2292,29 +2293,25 @@ psu set    link incoming-link -section=incoming-section
 &dc-prompt-pm; <userinput>psu set linkGroup onlineAllowed <replaceable>linkgroup</replaceable> <replaceable>true|false</replaceable></userinput>
 &dc-prompt-pm; <userinput>psu set linkGroup nearlineAllowed <replaceable>linkgroup</replaceable> <replaceable>true|false</replaceable></userinput></screen>
 
-       <para>
-	 Moreover an attribute can be assigned to a link group.
-       </para>
-       <screen>&dc-prompt-pm; <userinput>psu set linkGroup attribute <replaceable>linkgroup</replaceable> <replaceable>key</replaceable>=<replaceable>value</replaceable></userinput></screen>
-
-       <informalexample>
-	 Possible assignments for attributes are:
-	 <screen>&dc-prompt-pm; <userinput>psu set linkGroup attribute name-of-LinkGroup VO=dteam001</userinput>
-&dc-prompt-pm; <userinput>psu set linkGroup attribute name-of-LinkGroup VO=cms001</userinput>
-&dc-prompt-pm; <userinput>psu set linkGroup attribute name-of-LinkGroup HSM=osm</userinput></screen>
-       </informalexample>
-
-       <note>
-	 <para>
-	  Please note that that it is up to administrators that the
-	  link groups' attributes are specified correctly.
-	 </para>
-	 <para>
-	   For example &dcache; will not complain if the link group
-	   that does not support tape backend will be declared as one
-	   that supports <literal>custodial</literal>.
-	 </para>
-       </note>
+        <important>
+            <para>
+                It is up to the administrator to ensure that the
+                link groups' properties are specified correctly.
+            </para>
+            <para>
+                For example &dcache; will not complain if a link group
+                that does not support a tape backend will be declared as one
+                that supports <literal>custodial</literal> files.
+            </para>
+            <para>
+                It is essential that space in a link group is homogeneous with respect
+                to access latencies, retention policies and storage groups accepted.
+                Otherwise space reservations cannot be guaranteed. For instance, if
+                only a subset of pools accessible through a link group support custodial
+                files, there is no guarantee that a custodial space reservation created
+                within the link group will fit on those pools.
+            </para>
+        </important>
     </section>
 
 
