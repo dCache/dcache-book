@@ -338,7 +338,7 @@ Rules / Guidelines / Suggestions for adding new entities:
 
 <!-- scripts -->
 
-<!ENTITY chimera-cli  "<phrase layout='opt'>/opt/d-cache/bin/chimera-cli.sh</phrase><phrase layout='fhs'>/usr/bin/chimera-cli</phrase>">
+<!ENTITY chimera-cli  "<phrase layout='opt'>/opt/d-cache/bin/chimera</phrase><phrase layout='fhs'>/usr/bin/chimera</phrase>">
 
 
 

@@ -153,7 +153,7 @@ total number of bytes reserved  : 6000000
       linkend='chimera-tags'>directory tag</link>.  Create the
       <literal>WriteToken</literal> tag with
     </para>
-    <screen>&prompt-root; <userinput>chimera-cli writetag <replaceable>directory</replaceable> WriteToken [<replaceable>IdOfSpaceReservation</replaceable>]</userinput></screen>
+    <screen>&prompt-root; <userinput>&chimera-cli; writetag <replaceable>directory</replaceable> WriteToken [<replaceable>IdOfSpaceReservation</replaceable>]</userinput></screen>
     <para>
     </para>
 
@@ -165,7 +165,7 @@ total number of bytes reserved  : 6000000
 	subdirectory <filename
 	class='directory'>/data/world-writable</filename>.
       </para>
-      <screen>&prompt-root; <userinput>chimera-cli ls /data/</userinput>
+      <screen>&prompt-root; <userinput>&chimera-cli; ls /data/</userinput>
 total 3
 drwxr-xr-x  3 0 0 512 Jul 23 14:59 .
 drwxrwxrwx  3 0 0 512 Jul 24 14:33 ..
@@ -176,9 +176,9 @@ drwxrwxrwx 12 0 0 512 Jul 24 14:41 world-writable</screen>
 	class='directory'>data/write-token</filename> into which we
 	want to write
       </para>
-      <screen>&prompt-root; <userinput>chimera-cli mkdir /data/write-token</userinput>
-&prompt-root; <userinput>chimera-cli chmod /data/write-token 777</userinput>
-&prompt-root; <userinput>chimera-cli ls /data/</userinput>
+      <screen>&prompt-root; <userinput>&chimera-cli; mkdir /data/write-token</userinput>
+&prompt-root; <userinput>&chimera-cli; 777 chmod /data/write-token</userinput>
+&prompt-root; <userinput>&chimera-cli; ls /data/</userinput>
 total 4
 drwxr-xr-x  4 0 0 512 Aug 09 12:48 .
 drwxrwxrwx  3 0 0 512 Jul 24 14:33 ..
@@ -188,7 +188,7 @@ drwxrwxrwx  2 0 0 512 Aug 09 12:48 write-token</screen>
 	and echo the space reservation into the WriteToken tag.
       </para>
 
-      <screen>&prompt-root; <userinput>chimera-cli writetag /data/write-token WriteToken [10000]</userinput></screen>
+      <screen>&prompt-root; <userinput>&chimera-cli; writetag /data/write-token WriteToken [10000]</userinput></screen>
     </informalexample>
   </section>
 

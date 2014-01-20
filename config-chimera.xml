@@ -161,15 +161,15 @@ Stopping portmap: portmap</screen>
     If you don't want to mount chimera you can create the root of the &chimera; namespace by
   </para>
 
-  <screen>&prompt-root; <userinput>&chimera-cli; Mkdir /data</userinput></screen>
+  <screen>&prompt-root; <userinput>&chimera-cli; mkdir /data</userinput></screen>
 
   <para>
     You can now add directory tags.  For more information on tags see
     <xref linkend="chimera-tags"/>.
   </para>
 
-  <screen>&prompt-root; <userinput>echo "chimera" | &chimera-cli; Writetag /data sGroup</userinput>
-&prompt-root; <userinput>echo "StoreName sql" | &chimera-cli; Writetag /data OSMTemplate</userinput></screen>
+  <screen>&prompt-root; <userinput>&chimera-cli; writetag /data sGroup "chimera"</userinput>
+&prompt-root; <userinput>&chimera-cli; writetag /data OSMTemplate "StoreName sql"</userinput></screen>
 
   <section id="chimera-useDcap">
     <title>Using &dcap; with a mounted file system</title>
@@ -373,7 +373,7 @@ examplefile</screen>
     You can create tags with
   </para>
 
-    <screen>&prompt-user; <userinput>echo "<replaceable>content</replaceable>" | &chimera-cli; writetag <replaceable>directory</replaceable> <replaceable>tagName</replaceable></userinput></screen>
+    <screen>&prompt-user; <userinput>&chimera-cli; writetag <replaceable>directory</replaceable> <replaceable>tagName</replaceable> "<replaceable>content</replaceable>"</userinput></screen>
 
     <para>
       list tags with
@@ -390,8 +390,8 @@ examplefile</screen>
     <para>
       Create tags for the directory <filename class='directory'>data</filename> with
     </para>
-      <screen>&prompt-user; <userinput>echo "myGroup" | &chimera-cli; writetag /data sGroup</userinput>
-&prompt-user; <userinput>echo "StoreName myStore" | &chimera-cli; writetag /data OSMTemplate</userinput></screen>
+      <screen>&prompt-user; <userinput>&chimera-cli; writetag /data sGroup "myGroup"</userinput>
+&prompt-user; <userinput>&chimera-cli; writetag /data OSMTemplate "StoreName myStore"</userinput></screen>
     <para>
       list the existing tags with
     </para>
@@ -692,8 +692,8 @@ sGroup</screen>
 	directories of <literal>experiment-a</literal> and
 	<literal>experiment-b</literal> can be tagged.
       </para>
-      <screen>&prompt-user; <userinput>echo "StoreName exp-a" | &chimera-cli; writetag /data/experiment-a OSMTemplate</userinput>
-&prompt-user; <userinput>echo "StoreName exp-b" | &chimera-cli; writetag /data/experiment-b OSMTemplate</userinput></screen>
+      <screen>&prompt-user; <userinput>&chimera-cli; writetag /data/experiment-a OSMTemplate "StoreName exp-a"</userinput>
+&prompt-user; <userinput>&chimera-cli; writetag /data/experiment-b OSMTemplate "StoreName exp-b"</userinput></screen>
       <para>
 	Data from <literal>experiment-a</literal> taken in 2010 shall
 	be written into the directory <filename
@@ -705,9 +705,9 @@ sGroup</screen>
 	<filename class='directory'>/data/experiment-b</filename>. Tag
 	the directories correspondingly.
       </para>
-      <screen>&prompt-user; <userinput>echo "run2010" | &chimera-cli; writetag /data/experiment-a/2010 sGroup</userinput>
-&prompt-user; <userinput>echo "run2011" | &chimera-cli; writetag /data/experiment-a/2011 sGroup</userinput>
-&prompt-user; <userinput>echo "alldata" | &chimera-cli; writetag /data/experiment-b sGroup</userinput></screen>
+      <screen>&prompt-user; <userinput>&chimera-cli; writetag /data/experiment-a/2010 sGroup "run2010"</userinput>
+&prompt-user; <userinput>&chimera-cli; writetag /data/experiment-a/2011 sGroup "run2011"</userinput>
+&prompt-user; <userinput>&chimera-cli; writetag /data/experiment-b sGroup "alldata"</userinput></screen>
 
       <para>
 	List the content of the tags by

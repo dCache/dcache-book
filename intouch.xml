@@ -45,7 +45,7 @@
       </para>
       <screen>&prompt-root; <userinput>&chimera-cli; mkdir /data</userinput>
 &prompt-root; <userinput>&chimera-cli; mkdir /data/world-writable</userinput>
-&prompt-root; <userinput>&chimera-cli; chmod /data/world-writable 777</userinput></screen>
+&prompt-root; <userinput>&chimera-cli; chmod 777 /data/world-writable</userinput></screen>
     </section>
 
     <section id="intouch-client-webdav">
