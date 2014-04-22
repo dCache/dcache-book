@@ -1011,32 +1011,6 @@ contentOfTag1</screen>
 	    </para>
 	  </listitem>
 	</varlistentry>
-	<varlistentry>
-	  <term><literal>wrandom</literal>:</term>
-	  <listitem>
-	    <para>
-	      This pool selection algorithm selects read pools
-	      randomly and write pools with a weighted probability
-	      (based on (free+removable/total) per pool. 
-	    </para>
-	    <para>
-	      The <literal>wrandom</literal> partition type is a
-	      special case of the <literal>wass</literal> partition
-	      type: by choosing the correct parameters,
-	      <literal>wass</literal> can be made to perform like
-	      <literal>wrandom</literal>.
-	    </para>	   
-	    <para>
-	      The advantage of <literal>wass</literal> over
-	      <literal>wrandom</literal> is that it is more flexible
-	      and tries to take into account a file's age. This is
-	      something like a distributed LRU cache: the system tries
-	      to delete older removable files to keep newer removable
-	      files. This is advantageous if files read recently are
-	      more likely to be re-read than older files.
-	    </para>
-	  </listitem>
-	</varlistentry>
       </variablelist>
 
         <para>Commands related to &dcache; partitioning:</para>
