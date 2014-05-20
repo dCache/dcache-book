@@ -1188,11 +1188,11 @@ Space token =110044</screen>
 	Edit the file <filename>&path-ode-ed;/dcache.conf</filename> to enable space
 	reservation for non &srm; transfers.
       </para>
-      <programlisting>spacemanager.enable.reserve-space-for-non-srm-tranfers=true</programlisting>
+      <programlisting>spacemanager.enable.reserve-space-for-non-srm-transfers=true</programlisting>
 
 	<para>
 	  If the &serv-spacemngr; is enabled,
-	  <varname>spacemanager.enable.reserve-space-for-non-srm-tranfers</varname>
+	  <varname>spacemanager.enable.reserve-space-for-non-srm-transfers</varname>
 	  is set to <literal>true</literal>, and if the transfer
 	  request comes from a door, and there was no prior space
 	  reservation made for this file, the &cell-spacemngr; will
