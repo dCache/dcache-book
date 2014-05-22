@@ -21,6 +21,7 @@
 <!ENTITY gp2-krb5 "<literal>krb5</literal> plug-in">
 <!ENTITY gp2-nsswitch "<literal>nsswitch</literal> plug-in">
 <!ENTITY gp2-banfile "<literal>banfile</literal> plug-in">
+<!ENTITY gp2-ldap "<literal>ldap</literal> plug-in">
 
 <!ENTITY auth "<literal>auth</literal>">
 <!ENTITY map "<literal>map</literal>">
@@ -743,6 +744,149 @@ session requisite nis #6</programlisting>
             </informalexample>
           </para>
         </section>
+        <section id="cf-gplazma-gp2-configuration-plugins-ldap-session">
+          <title>ldap</title>
+          <para>
+            The &gp2-ldap; is a map, session and identity plugin. As a map plugin it
+            maps user names to &uid; and &gid;. As a session plugin it adds root and
+            home path information to the session. As an identity plugin it supports
+            reverse mapping of &uid; and &gid; to user and group names repectively.
+          </para>
+          <variablelist>
+            <title>Properties</title>
+            <varlistentry>
+              <term><varname role="dcache.property">gplazma.ldap.url</varname></term>
+              <listitem>
+                <para>
+                  &ldap; server url. Use <literal>ldap://</literal> prefix to connect to plain &ldap;
+                  and <literal>ldaps://</literal> for secured &ldap;.
+                </para>
+                <para>
+                  Example: <literal>ldaps://example.org:389</literal>
+                </para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry><term><varname role="dcache.property">gplazma.ldap.organization</varname></term>
+              <listitem>
+                <para>
+                  Top level (<literal>base DN</literal>) of the &ldap; directory tree
+                </para>
+                <para>
+                  Example: <literal>o="Example, Inc.", c=DE</literal>
+                </para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry><term><varname role="dcache.property">gplazma.ldap.tree.people</varname></term>
+              <listitem>
+                <para>
+                  &ldap; subtree containing user information. The path to the
+                  user records will be formed using the <literal>base
+                    DN</literal> and the value of this property as a
+                  organizational unit (<literal>ou</literal>) subdirectory.
+                </para>
+                <para>
+                  Default: <literal>People</literal>
+                </para>
+                <para>
+                  Example: Setting
+                  <literal>gplazma.ldap.organization=o="Example, Inc.",
+                    c=DE</literal> and
+                  <literal>gplazma.ldap.tree.people=People</literal> will have
+                  the plugin looking in the &ldap; directory
+                  <literal>ou=People, o="Example, Inc.", c=DE</literal> for
+                  user information.
+                </para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry><term><varname role="dcache.property">gplazma.ldap.tree.groups</varname></term>
+              <listitem>
+                <para>
+                  &ldap; subtree containing group information. The path to the
+                  group records will be formed using the <literal>base
+                    DN</literal> and the value of this property as a
+                  organizational unit (<literal>ou</literal>) subdirectory.
+                </para>
+                <para>
+                  Default: <literal>Groups</literal>
+                </para>
+                <para>
+                  Example: Setting
+                  <literal>gplazma.ldap.organization=o="Example, Inc.",
+                    c=DE</literal> and
+                  <literal>gplazma.ldap.tree.groups=Groups</literal> will have
+                  the plugin looking in the &ldap; directory
+                  <literal>ou=Groups, o="Example, Inc.", c=DE</literal> for
+                  group information.
+                </para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry><term><varname role="dcache.property">gplazma.ldap.userfilter</varname></term>
+              <listitem>
+                <para>
+                  &ldap; filter expression to find user entries. The filter
+                  has to contain the <literal>%s</literal> exactly once. That
+                  occurence will be substituted with the user name before the
+                  filter is applied.
+                </para>
+                <para>
+                  Default: <literal>(uid=%s)</literal>
+                </para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry><term><varname role="dcache.property">gplazma.ldap.home-dir</varname></term>
+              <listitem>
+                <para>
+                  the user's home directory. &ldap; attribute identifiers
+                  surrounded by <literal>%</literal> will be expanded to their
+                  corresponding value. You may also use a literal value or mix
+                  literal values and attributes.
+                </para>
+                <para>
+                  Default: <literal>%homeDirectory%</literal>
+                </para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry><term><varname role="dcache.property">gplazma.ldap.root-dir</varname></term>
+              <listitem>
+                <para>
+                  the user's root directory. &ldap; attribute identifiers
+                  surrounded by <literal>%</literal> will be expanded to their
+                  corresponding value. You may also use a literal value or mix
+                  literal values and attributes.
+                </para>
+                <para>
+                  Default: <literal>/</literal>
+                </para>
+              </listitem>
+            </varlistentry>
+          </variablelist>
+
+          <para>As a session plugin the &gp2-ldap; assigns two directories to
+            the user's session: the root directory and the home directory. The
+            root directory is the root of the directory hierarchy visible to
+            the user, while the home directory is the directory the user starts
+            his session in. In default mode, the root directory is set to
+            <literal>/</literal> and the home directory is set to
+            <literal>%homeDirectory%</literal>, thus the user starts his
+            session in the home directory, as it is stored on the &ldap;
+            server, and is able to go up in the directory hierarchy to
+            <literal>/</literal>.  For a different use-case, for example if
+            dCache is used as a cloud storage, it may be desireable for the
+            users to see only their own storage space. For this use case
+            <literal>home-dir</literal> can be set to <literal>/</literal> and
+            <literal>root-dir</literal> be set to
+            <literal>%homeDirectory%</literal>. In both path properties any
+            <literal>%val%</literal> expression will be expanded to the the
+            value of the attribute with the name <literal>val</literal> as it
+            is stored in the user record on the &ldap; server.
+          </para>
+        </section>
       </section>
 
       <section id="cf-gplazma-gp2-configuration-plug-ins-identity">
@@ -1451,8 +1595,8 @@ storageAuthzPath="/etc/grid-security/storage-authzdb"</programlisting>
 
     <para>
       Refer to the file <filename>gplazma.properties</filename> for a full list
-      of properties for &cell-gplazma; One commonly used property is 
-      <varname>gplazma.cell.limits.threads</varname>, which is used to 
+      of properties for &cell-gplazma; One commonly used property is
+      <varname>gplazma.cell.limits.threads</varname>, which is used to
       set the maximum number of concurrent requests to &cell-gplazma;. The default
       value is <literal>30</literal>.
     </para>
@@ -1522,7 +1666,7 @@ passwd tanja 6a4cd089 read-write 500 100 / / /</programlisting>
     <section id="cf-gplazma-webadmin-example">
       <title>&cell-gplazma; config example to work with authenticated webadmin</title>
       <para>
-      This section describes how to configure &serv-gplazma; to enable the 
+      This section describes how to configure &serv-gplazma; to enable the
       webadmin servlet in authenticated mode with a grid certificate as
       well as with a username/password and how to give a user
       administrator access.
@@ -1556,7 +1700,7 @@ passwd john 8402480 read-write 1700 1000 / / /</programlisting>
           This maps the DN of a grid certificate
           <literal>subject=/C=DE/O=ExampleOrganisation/OU=EXAMPLE/CN=John Doe</literal>
           to the user <systemitem class="username">john</systemitem> and the
-          entry 
+          entry
 	</para>
 	<programlisting>login john read-write 1700 1000 / / /
   /C=DE/O=GermanGrid/OU=DESY/CN=John Doe</programlisting>
