@@ -235,26 +235,75 @@ httpdDomain     billing     billing  localhost srmdcache Yes        Yes</screen>
 
 	<listitem>
 	  <para>
-	    Database inserts are batched for performance, and are controlled by the following properties:
+	    Database inserts are batched for performance.  
+        Since 2.8, improvements have been made to the way the billing
+        service handles these inserts.  As a consequence,
+        the older in-memory caching threshold properties are now obsolete:
 	  </para>
 	  <itemizedlist>
 	    <listitem><varname>billing.db.inserts.max-before-commit</varname>
 	    (defaults to <literal>10000</literal>)</listitem>
 	    <listitem><varname>billing.db.inserts.timeout-before-commit</varname>
 	    (defaults to <literal>5</literal>)</listitem>
-	    <listitem><varname>billing.db.inserts.queue-delegate.type</varname>
-	    (defaults to
-	    <literal>org.dcache.services.billing.db.impl.DirectQueueDelegate</literal>)</listitem>
+      </itemizedlist>
+      <para>
+        Inserts can now be tuned by adjusting the queue sizes (there are
+        four of them, each mapped to the four main tables: billinginfo, storageinfo,
+        doorinfo, hitinfo), and the maximum database batch size.
+      </para>
+      <itemizedlist>	    
 	    <listitem><varname>billing.db.inserts.max-queue-size</varname>
 	    (defaults to <literal>100000</literal>)</listitem>
 	    <listitem><varname>billing.db.inserts.max-batch-size</varname>
 	    (defaults to <literal>1000</literal>)</listitem>
+      </itemizedlist>
+      <para>
+        There is further the option as to whether to drop messages (default is true)
+        or block when the queue maximum is exceeded.
+      </para>
+      <itemizedlist>
 	    <listitem><varname>billing.db.inserts.drop-messages-at-limit</varname>
 	    (defaults to <literal>true</literal>)</listitem>
 	  </itemizedlist>
+      <para>
+        The property which sets the delegate class is merely there for potentially
+        future use; currently there is only one option.
+      </para>
+      <itemizedlist>
+      <listitem><varname>billing.db.inserts.queue-delegate.type</varname>
+        (defaults to
+        <literal>org.dcache.services.billing.db.impl.DirectQueueDelegate</literal>)</listitem>
+      </itemizedlist>
 	  <para>
 	    The default settings should usually be sufficient.
 	  </para>
+      
+      <para>
+        You can now obtain statistics (printed to the billing log and pinboard) 
+        via the dcache admin command:
+        <command>display insert statistics &lt;on/off&gt;</command> command.
+        Activating this command logs the following once a minute:
+      </para>
+      <informalexample>
+        <screen>
+            insert queue (last 0, current 0, change 0/minute)
+            commits (last 0, current 0, change 0/minute)
+            dropped (last 0, current 0, change 0/minute)
+            total memory 505282560; free memory 482253512
+        </screen>
+      </informalexample>
+      <para>
+        "insert queue" refers to how many messages actually were put on the queue; 
+        "commits" are the number of messages committed to the database; 
+        "dropped" are the number of lost messages. 
+        "last" refers to the figures at the last iteration.  
+        For insert queue, this is the actual size of the queue; 
+        for commits and dropped, these are cumulative totals.
+      </para>
+      <para>
+        You can also generate a Java thread dump by issuing 
+        the <command>"dump threads"</command> command.
+      </para>
 	</listitem>
 
 	<listitem>
