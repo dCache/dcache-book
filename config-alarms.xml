@@ -3,275 +3,576 @@
                          "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
 <!ENTITY % sharedents SYSTEM "shared-entities.xml" >
 %sharedents;
-]>
 
+<!ENTITY rdbms "<acronym>RDBMS</acronym>">
+]>
 
 <chapter id="cf-alarms">
   <title>The &serv-alarms; Service</title>
   <para>
-    &dcache; has an &serv-alarms; service which allows any logging
-    event to be marked as an <firstterm>alarm</firstterm>.  This
-    capability allows administrators to be directly notified of
-    problems which need immediate attention and rectification. The
-    alarms data can be stored in an &xml; file or in a database. In
-    the basic configuration the data will be stored in an &xml; file.
+    &dcache; has an &serv-alarms; service which records errors
+    (<firstterm>alarms</firstterm>) requiring more or less urgent intervention.
+    The webadmin servlet running inside the &serv-httpd; service has a special
+    page for querying, displaying and tracking these alarms.
+    There is also an option for sending alarm notifications via email.
+    The alarms data can be stored either in an &xml; file or in
+    a database. The alarms service is turned off by default.
   </para>
-
-  <para>
-    The webadmin servlet running inside the &serv-httpd;
-    service has a special page for querying, displaying and tracking
-    these alarms.
-  </para>
-
   <section id='cf-alarms-basic'>
     <title>The Basic Setup</title>
     <para>
-      It is advisable to run the &serv-alarms; service in a separate
-      domain and list this domain first in the layout file. That way
-      the &serv-alarms; service gets booted first and can catch
-      startup errors reported by the other domains.  Since both the
-      &serv-httpd; service and the &serv-alarms; service will access
-      the storage file generated at
-      <filename>&path-od-vld;/alarms/alarms.xml</filename> the
-      &serv-alarms; service should be defined on the same host as the
-      &serv-httpd; service. You can modify where this file is placed
-      by setting the property <varname>httpd.alarms.db.xml.path</varname> to
-      a different location.
+      It is not necessary to run the &serv-alarms; service in a separate domain,
+      though depending on the individual system configuration it may still be advisable
+      not to embed the service in a domain already burdened with higher memory
+      requirements.  To handle alarms under a relatively high load
+      (100Hz on the server end) requires only about 2% more of the cpu,
+      but about 75-100 MiB of additional space.  In order to
+      capture any alarms from other domains at startup, it is also
+      necessary to arrange for the alarm service to start before the other
+      doors and pools.
     </para>
     <para>
-      Add a domain for the &serv-alarms; service to the layout file
-      where the &serv-httpd; service is defined.
+      While there is nothing strictly preventing the use of multiple &serv-alarms;
+      services, under normal circumstances this should not be necessary.
+      The only constraint on the service set-up has to do with the
+      storage option.  Unlike for the &rdbms; (relational database) back-end,
+      there is currently no option for remote access of the &xml; file.
+      Since the alarms storage needs to be written to by the &serv-alarms;
+      service but also read by the &serv-httpd; service, it is thus necessary
+      for that file to exist on a shared or mounted partition visible to both.
+      Obviously, no such requirement exists for the &rdbms; option.
     </para>
-    <programlisting>[alarmserverDomain]
-[alarmserverDomain/alarms]
-...
-
-[httpdDomain]</programlisting>
-
-      <para>
-	If all of the &dcache; domains run on the same host, then the
-	default setting (localhost) will work.
-      </para>
-
-    <section id='cf-alarms-basic-remoteServer'>
-      <title>Configure where the &serv-alarms; service is
-      Running</title>
-      <para>
-	In general your &dcache; will not be configured to run on one
-	node. In this case each node needs to know on which node the
-	&serv-alarms; service is running.  The &serv-alarms; service
-	and the &serv-httpd; will run on one of the nodes. On all the
-	other nodes you need to modify the
-	<filename>&path-ode-ed;/dcache.conf</filename> file or the
-	layout file to set the <varname>alarms.server.host</varname>
-	property to the host on which the &serv-alarms; service is
-	running and restart &dcache;.
-      </para>
-
-      <informalexample>
+    <para>
+      Add the &serv-alarms; service to a domain in the layout file:
+    </para>
+    <programlisting>
+    [alarmsDomain]
+    [alarmsDomain/alarms]
+    alarms.db.type=rdbms
+    ...
+    </programlisting>
+    <para>
+      OR
+    </para>
+    <programlisting>
+    [someotherDomain]
+    [someotherDomain/alarms]
+    alarms.db.type=rdbms
+    [someotherDomain/someotherservice]
+    ...
+    </programlisting>
+    <para>
+    Note that the storage type setting <varname>alarms.db.type</varname>
+    must be defined either in the layout or <filename>&path-ode-ed;/dcache.conf</filename>
+    file because its default value is <literal>off</literal>; this can be set to
+    either <literal>xml</literal>, or <literal>rdbms</literal>.  In the latter
+    case, the standard set of properties can be used to configure the connection
+    url, db user, and so forth.  Before using the <literal>rdbms</literal>
+    option for the first time, be sure to run:
+    </para>
+    <programlisting>
+        createdb -U <varname>alarms.db.user</varname> alarms
+    </programlisting>
+    <para>
+    to create the database; as usual, the actual schema will be initialized
+    automatically when the service is started.
+    </para>
+    <para>
+    For the &xml; option, the storage file is usually found in the shared directory
+    for alarms (corresponding to <varname>alarms.dir</varname>); the usual path is
+    <filename>&path-od-vld;/store.xml</filename>, but the location can be changed by setting
+    <varname>alarms.db.xml.path</varname>. This  will automatically be propagated
+    to <varname>alarms.db.url</varname> and consequently to
+    <varname>httpd.alarms.db.url</varname> if the two domains are on the same
+    host; if they are not (and share this file path via a mount, for instance),
+    be sure to set the httpd property in the layout or
+    <filename>&path-ode-ed;/dcache.conf</filename> on the httpd host to
+    correspond to the new <varname>alarms.db.url</varname>.
+    </para>
+    <para>
+    As a rule of thumb, the choice between &xml; and &rdbms; is dictated by two
+    factors:  whether it is feasible to share the &xml; file between the
+    two services as noted, and how much history is to be preserved.
+    While the &xml; option is more lightweight and easier to configure,
+    it is limited by performance, experiencing considerable read and write
+    slowdown as the file fills (beyond 1000 entries or so). If you do not
+    need to maintain records of alarms (and either manually delete alarms
+    which have been serviced, or use the built-in cleanup feature – see below),
+    then this option should be sufficient.  Otherwise, the extra steps of
+    installing postgreSQL on the appropriate node and creating the alarms
+    database (as above) may be worth the effort.
+    </para>
+    <section id='cf-alarms-basic-remoteConfiguration'>
+      <title>Configure where the &serv-alarms; service is Running</title>
+    <para>
+    The alarms infrastructure is actually a wrapper around the logging
+    layer and makes use of a simple tcp socket logger to transmit logging events
+    to the server.  In each domain, the <filename>&path-ode-ed;/logback.xml</filename>
+    configuration references the following properties to control remote logging:
+    </para>
+    <programlisting>
+        dcache.log.level.remote=off
+        dcache.log.server.host=localhost
+        dcache.log.server.port=9867
+    </programlisting>
+    <para>
+    As with the &serv-alarms; service database type, remote logging is
+    turned off by default.  Under normal circumstances it should be
+    sufficient to set this to <literal>error</literal> in order to receive alarms.
+    All internally generated alarms (see below) are in fact guaranteed to
+    be sent at this logging level. Remote transmission of events at lower
+    logging levels is possible, but caution should be taken inasmuch anything
+    below <literal>warn</literal> significantly increases network traffic
+    and could risk overloading the server or creating a bottleneck.
+    This service was not designed to provide robust centralized debugging.
+    </para>
+    <para>
+    If all of your &dcache; domains run on the same host, then the
+    default (<literal>localhost</literal> value will work. But usually your
+    &dcache; will not be configured to run on a single node, so each node will
+    need to know the destination of the remote logging events.  On all the nodes
+    except where the actual &serv-alarms; service resides, you will thus need to
+    modify the <filename>&path-ode-ed;/dcache.conf</filename> file or the
+    layout file to set the <varname>dcache.log.server.host</varname>
+    property (and restart &dcache; if it is already up).  The default
+    port should usually not need to be modified; in any case, it
+    needs to correspond to whatever port the service is running on.  From
+    inspection of the <filename>&path-ods-usd;/alarms.properties</filename> file, you
+    can see that the alarms-specific properties mirror the logger properties:
+    </para>
+    <programlisting>
+     #  ---- Host on which this service is running
+     alarms.net.host=${dcache.log.server.host}
+     #  ---- TCP port the alarms service listens on
+     alarms.net.port=${dcache.log.server.port}
+    </programlisting>
+    <para>
+    The first property should not need any adjustment, but if
+    <varname>alarms.net.port</varname> is modified, be sure to modify the
+    <varname>dcache.log.server.port</varname> property on the other nodes to
+    correspond to it.  In general, it is advisable to work directly with the
+    <varname>dcache.log.server</varname> properties everywhere.
+    </para>
+    <informalexample>
 	<para>
-	  Look at an example of a &dcache; which consists of a head
+	  An example of a &dcache; which consists of a head
 	  node, some door nodes and some pool nodes. Assume that the
 	  &serv-httpd; service and the &serv-alarms; service are
 	  running on the head node. Then you would need to set the
-	  property <varname>alarms.server.host</varname> on the pool
+	  property <varname>dcache.log.server.host</varname> on the pool
 	  nodes and on the door nodes to the host on which the
 	  &serv-alarms; service is running.
 	</para>
-	<programlisting>alarms.server.host=<replaceable>head-node</replaceable></programlisting>
-      </informalexample>
+	   <programlisting>
+            dcache.log.server.host=<replaceable>head-node</replaceable>
+       </programlisting>
+    </informalexample>
     </section>
-
-
-    <section id='cf-alarms-basic-definedAlarms'>
-      <title>The Defined Alarms</title>
-
-      <para>
-	The alarms defined are listed below. There are four
-	different levels of severity, <literal>CRITICAL</literal>,
-	<literal>HIGH</literal>, <literal>MODERATE</literal> and
-	<literal>LOW</literal>.
-      </para>
-      <variablelist>
-	<varlistentry>
-	  <term><literal>CRITICAL</literal></term>
-	  <listitem>
-	    <itemizedlist>
-	      <listitem>
-		<literal>SERVICE_CREATION_FAILURE</literal>
-	      </listitem>
-	      <listitem>
-		<literal>DB_OUT_OF_CONNECTIONS</literal>
-	      </listitem>
-	      <listitem>
-		<literal>DB_UNAVAILABLE</literal>
-	      </listitem>
-	      <listitem>
-		<literal>JVM_OUT_OF_MEMORY</literal>
-	      </listitem>
-	      <listitem>
-		<literal>OUT_OF_FILE_DESCRIPTORS</literal>
-	      </listitem>
-	    </itemizedlist>
-	    <para>
-	      The affected &dcache; can't work (is down).
-	    </para>
-	  </listitem>
-	</varlistentry>
-
-	<varlistentry>
-	  <term><literal>HIGH</literal></term>
-	  <listitem>
-	    <itemizedlist>
-	      <listitem>
-		<literal>IO_ERROR</literal>
-	      </listitem>
-	      <listitem>
-		<literal>HSM_READ_FAILURE</literal>
-	      </listitem>
-	      <listitem>
-		<literal>HSM_WRITE_FAILURE</literal>
-	      </listitem>
-	      <listitem>
-		<literal>LOCATION_MANAGER_UNAVAILABLE</literal>
-	      </listitem>
-	      <listitem>
-		<literal>POOL_MANAGER_UNAVAILABLE</literal>
-	      </listitem>
-	    </itemizedlist>
-	    <para>
-	      These functions are affected and not working or not
-	      working properly, even though the &dcache; domain may be
-	      running.
-	    </para>
-	  </listitem>
-	</varlistentry>
-	<varlistentry>
-	  <term><literal>MODERATE</literal></term>
-	  <listitem>
-	    <itemizedlist>
-	      <listitem>
-		<literal>POOL_DISABLED</literal>
-	      </listitem>
-	      <listitem>
-		<literal>CHECKSUM</literal>
-	      </listitem>
-	    </itemizedlist>
-	    <para>
-	      There is an issue which should be taken care of in the
-	      interest of performance or usability, but which is not
-	      impeding the functioning of the system as a whole.
-	    </para>
-	  </listitem>
-	</varlistentry>
-	<varlistentry>
-	  <term><literal>LOW</literal></term>
-	  <listitem>
-	    <para>
-	      This issue might be worth investigating if it occurs,
-	      but is not urgent.
-	    </para>
-	  </listitem>
-	</varlistentry>
-      </variablelist>
-     </section>
-
-
+    <section id='cf-alarms-basic-alarmTypes'>
+      <title>Types of Alarms</title>
     <para>
-      Given that an alarm has been triggered, you will find an entry
-      in the file
-      <filename>&path-od-vld;/alarms/alarms.xml</filename>.
+    As stated previously, the &dcache; alarm system runs on top of
+    the logging system (and more specifically, depends on the
+    <literal>ch.qos.logback</literal> logging library).  It promotes
+    normal logging events to alarm status in one of two ways.
     </para>
-
-
+    <variablelist>
+    <varlistentry>
+      <term><literal>BUILT-IN (MARKED) ALARMS</literal></term>
+      <listitem>
+        <para>
+        Some alarms are already coded into dCache.  These bear the
+        general logging marker <literal>ALARM</literal> and also
+        can carry sub-markers for type and uniqueness identifiers. They
+        also carry information indicating the host, domain
+        and service which emits them.  All such alarms are logged at
+        the ERROR event level.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><literal>SERVER-SIDE (OPTIONAL) ALARMS</literal></term>
+      <listitem>
+        <para>
+        Logging events which arrive at the alarm server, but which do
+        not carry a specific alarm type marker (these may be events
+        at any logging level, not just ERROR), can nevertheless be redefined
+        as a specific type of alarm via a set of filters provided by
+        the administrator.  These filters or custom alarm definitions
+        reside in a special &xml; file usually written to the alarms space.
+        Further explanation as to how to create such filters is given
+        in another section below.
+        </para>
+      </listitem>
+    </varlistentry>
+    </variablelist>
+    </section>
+    <section id='cf-alarms-Priority'>
+    <title>Alarm Priority</title>
     <para>
-      As it is not very convenient to read an &xml; file, the Alarms
-      Web Page can be used to inspect and manage the generated
-      warnings.
+    The notion of alarm or alert carries the implication that
+    this particular error or condition requires user attention/intervention;
+    there may be, however, differences in urgency which permit the ordering of
+    such notices in terms of degree of importance.  &dcache; allows the
+    administrator complete control over this prioritization.
     </para>
-
-  </section>
-
-  <section id='cf-alarms-webPage'>
-    <title>Using the Alarms Web Page</title>
-
+    <para>
+    The available priority levels are:
+    </para>
+    <itemizedlist>
+        <listitem>
+            <literal>CRITICAL</literal>
+        </listitem>
+        <listitem>
+            <literal>HIGH</literal>
+        </listitem>
+        <listitem>
+            <literal>MODERATE</literal>
+        </listitem>
+        <listitem>
+            <literal>LOW</literal>
+        </listitem>
+    </itemizedlist>
+    <para>
+    Any alarm can be set to whatever priority level is deemed appropriate.
+    This can be done through the admin interface commands (see below).
+    Without any customization, all alarms (of both types) are given a
+    default priority level.  This level can be changed via the value of
+    <variable>alarms.priority-mapping.default</variable>, which by default
+    is <literal>critical</literal>.
+    </para>
+    <para>
+    Filtering based on priority is possible both in the webadmin page (see below),
+    and for alarms sent via email (<variable>alarms.email.threshold</variable>;
+    fuller discussion of how to enable email alarms is given in a later section).
+    </para>
+    <note>
+    There also exists the possibility of filtering out only alarms from the main
+    database into a separate log file.  This option is enabled using
+    <variable>alarms.enable.history</variable>, and similarly has a priority
+    threshold, <variable>alarms.history.threshold</variable>.  This is
+    particularly useful in tandem with the &xml; storage option; it allows
+    preservation of a condensed record of the alarms even after their full
+    entries have been deleted from the database.
+    </note>
+    </section>
+    <section id='cf-alarms-toolsShell'>
+    <title>Working with Alarms: Shell Commands</title>
+    <para>
+    Some basic alarm commands are available as part of the dCache shell.
+    The following is an abbreviated description; for fuller information,
+    see the dCache man page.
+    </para>
+    <variablelist>
+    <varlistentry>
+      <term><literal>alarm send</literal></term>
+      <listitem>
+        <para>
+        Send an  arbitrary  alarm  message  to  the  alarm  server.
+        The remote server address is taken from the local values for
+        <variable>dcache.log.server.host</variable> and
+        <variable>dcache.log.server.port</variable>. If the [-t=TYPE] option
+        is used, it must be a predefined (internal) alarm type.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><literal>alarm list</literal></term>
+      <listitem>
+        <para>
+         Displays a list of all alarm types currently defined in dCache code
+         (i.e., predefined, internal types).  Since these types can be
+         modified with any incremental release, a listing in this
+         manual would be of limited value.  It is easy enough to
+         check which ones currently are defined using this command,
+         the <literal>predefined ls</literal> admin command, or the auto-completing
+         <literal>Alarm Type</literal> combo box on the webadmin alarms page.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><literal>alarm [add | modify | remove]</literal></term>
+      <listitem>
+        <para>
+         Activates an interpreter for adding, modifying or removing a filter
+         definition.  The interpreter walks you through the steps and
+         choices.  The results are written to the definitions file given by
+         the local value for <variable>alarms.custom-definitions.path</variable>.
+        </para>
+      </listitem>
+    </varlistentry>
+    </variablelist>
+    </section>
+    <section id='cf-alarms-toolsAdmin'>
+    <title>Working with Alarms: Admin Commands</title>
+    <para>
+    A similar set of commands is available through the admin interface.
+    To see fuller information for each of these, do <literal>help [command]</literal>.
+    </para>
+    <variablelist>
+    <varlistentry>
+      <term><literal>definition add [OPTIONS]</literal></term>
+      <listitem>
+        <para>
+        Add a new custom definition; if a definition of this type already exists,
+        the new definition will overwrite it.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><literal>definition keywords</literal></term>
+      <listitem>
+        <para>
+        Print the list of attribute names whose values can be used as keyword
+        identifiers for the alarm.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><literal>definition ls [type]</literal></term>
+      <listitem>
+        <para>
+        Print a single definition or sorted list of definitions.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><literal>definition reload [path]</literal></term>
+      <listitem>
+        <para>
+        Reinitialize the definitions from the saved changes.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><literal>definition rm type</literal></term>
+      <listitem>
+        <para>
+        Remove the existing alarm definition.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><literal>definition save [path]</literal></term>
+      <listitem>
+        <para>
+        Save the current definitions to persistent back-up.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><literal>definition set type name value </literal></term>
+      <listitem>
+        <para>
+        Set the attribute of an existing alarm definition.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><literal>definition unset type name </literal></term>
+      <listitem>
+        <para>
+        Unset (remove) the attribute of an existing alarm definition.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><literal>predefined ls</literal></term>
+      <listitem>
+        <para>
+        Print a list of all internally defined alarms.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><literal>priority get default</literal></term>
+      <listitem>
+        <para>
+        Get the current default alarm priority value.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><literal>priority ls [type]</literal></term>
+      <listitem>
+        <para>
+        Print a single priority level or sorted list of priority levels for all
+        known alarms.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><literal>priority reload [path]</literal></term>
+      <listitem>
+        <para>
+        Reinitialize priority mappings from saved changes.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><literal>priority restore all</literal></term>
+      <listitem>
+        <para>
+        Set all defined alarms to the current default priority value.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><literal>priority save [path]</literal></term>
+      <listitem>
+        <para>
+        Save the current priority mappings to persistent back-up.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><literal>priority set type low|moderate|high|critical</literal></term>
+      <listitem>
+        <para>
+        Set the priority of the alarm type.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><literal>priority set default low|moderate|high|critical</literal></term>
+      <listitem>
+        <para>
+        Set the default alarm priority value.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><literal>send [OPTIONS] message</literal></term>
+      <listitem>
+        <para>
+        Send an alarm to the alarm service.
+        </para>
+      </listitem>
+    </varlistentry>
+    </variablelist>
+    <note>
+    Custom definitions and priority mappings are backed by files corresponding
+    to the properties <variable>alarms.custom-definitions.path</variable>
+    and <variable>alarms.priority-mapping.path</variable>, respectively.  It
+    is always possible to modify these files directly by hand. These by default
+    are mapped to <filename>&path-od-vld;/alarms.custom-definitions.xml</filename>
+    and <filename>&path-od-vld;/alarms-priority.properties</filename>. In order
+    for the changes to take effect, either restart the alarms domain, or
+    use the respective <literal>reload</literal> admin command.  It should be
+    understood that when using the admin commands, any modifications are done in
+    memory only and are not flushed automatically to the underlying file,
+    so any permanent changes need to be made via the <literal>save</literal>
+    command.
+    </note>
+    <note>
+    It is possible to change the file locations by setting the above-mentioned
+    properties in the layout or <filename>&path-ode-ed;/dcache.conf</filename>.
+    As can be seen from the admin commands, it is also possible to specify the
+    path as an option on the respective <literal>save</literal> and
+    <literal>reload</literal> commands.  Note, however, that this is meant
+    mainly for temporary or back-up purposes, as the path defined in the local
+    dcache configuration will remain unaltered after that command
+    completes and the priority map or definitions will be reloaded from there
+    once again whenever the domain is restarted.
+    </note>
+    <note>
+    Any changes made via the <literal>priority set default</literal> command
+    are in-memory only.  To change this default permanently, set the
+    <variable>alarms.priority-mapping.default</variable> property
+    in the layout or <filename>&path-ode-ed;/dcache.conf</filename>.
+    </note>
+    </section>
+    <section id='cf-alarms-toolsWebadmin'>
+    <title>Working with Alarms: The Webadmin Alarms Page</title>
+    </section>
     <para>
       The Alarms Web Page is an admin page and thus requires authentication. You
-      must enable &https; and you can give a gid (by default the gid
-      is 1000):
+      must enable &https; and set an admin gid (0 by default):
     </para>
-
     <note>
       <para>
-	For the authenticated mode you need to have a host certificate
-	for your server host and place the
-	<filename>hostcert.p12</filename> in the directory <filename
-	class='directory'>/etc/dcache</filename>.
+	   For the authenticated mode you need to generate a pk12 hostcert for
+       SSL. This can be done by running the dcache command:
+       <literal>import hostcert [--hostcert=FILE] [--hostkey=FILE] [--out=FILE] [--password=PASSWORD]</literal>
+       after obtaining a hostcert and hostkey, which are by default placed in
+       <filename>/etc/grid-security</filename>.
       </para>
     </note>
-
-    <programlisting>[httpdDomain]
-    httpd.enable.authn=true
-    httpd.authz.admin-gid=<replaceable>1234</replaceable>
-[httpdDomain/httpd]</programlisting>
-
-
-  <informalfigure id="fig-alarms-webpage">
-
-    <mediaobject>
-      <imageobject role="fo">
-	<imagedata fileref="images/Alarms.png" format="PNG" align="center" contentwidth="16cm"/>
-                            <!-- width="100%" scalefit="1" contentdepth="100%" should scale optimal, but fop doesnt like it -->
-      </imageobject>
-      <imageobject role="html">
-	<imagedata fileref="/images/Alarms.png" format="PNG" align="center" width="100%"/>
-      </imageobject>
-    </mediaobject>
-  </informalfigure>
-
+    <programlisting>
+    [httpdDomain]
+        httpd.enable.authn=true
+        httpd.authz.admin-gid=<replaceable>1234</replaceable>
+    [httpdDomain/httpd]
+    </programlisting>
+    <informalfigure id="fig-alarms-webpage">
+        <mediaobject>
+            <imageobject role="fo">
+	           <imagedata fileref="images/Alarms.png" format="PNG" align="center" contentwidth="16cm"/>
+               <!-- width="100%" scalefit="1" contentdepth="100%" should scale optimally,
+                    but fop doesnt like it -->
+            </imageobject>
+            <imageobject role="html">
+	           <imagedata fileref="/images/Alarms.png" format="PNG" align="center" width="100%"/>
+            </imageobject>
+        </mediaobject>
+    </informalfigure>
     <orderedlist numeration='upperalpha' >
-      <listitem>
-	The QUERY FILTER form can be used to limit the display of
-	alarms in the table. The top three rows control an actual
-	query to the database based on <literal>after date</literal>,
-	<literal>before date</literal>, <literal>severity</literal>
-	and <literal>alarm type</literal> name. (The date is the last
-	update of the alarm, not the first arrival.)  Each click of
-	the <literal>Refresh</literal> button will reload the data
-	from the database based on these three settings. The default
-	behavior is <literal>ALL</literal> (unspecified
-	properties). Placing a single date in the Beginning box will
-	give you all alarms from that date up to today (inclusive); a
-	single date in the Ending box will give all alarms up to that
-	date (inclusive).
-      </listitem>
-      <listitem>
-	The <literal>Match Expression</literal> filters in memory by
-	appending all fields to a single string and doing a search. If
-	the <literal>Regular Expression</literal> box is checked, the
-	expression given is considered a regex (Java-style).
-      </listitem>
-      <listitem>
-	The header to the table contains two checkboxes which allow
+    <listitem>
+    The QUERY FILTER form can be used to limit the display of
+    alarms in the table. The underlying query to the database is
+    based on whether the entry has been marked as an alarm (the radio buttons
+    indicating undefined, yes and no, respectively), the time interval
+    in which to search, the <literal>alarm type</literal>, and the result
+    range; these are marked by 'D' on the example screenshot above. The date
+    referred to in <literal>after</literal> and <literal>before</literal>
+    is that of the latest update to that entry, not the timestamp of its
+    original arrival. Each click of the <literal>Refresh</literal>
+    button will reload the data from the database based on these parameters.
+    The default behavior is ALL ALARMS ONLY (unspecified type or range).
+    Placing a single date in the Beginning box will give you all entries from
+    that date up to today (inclusive); a single date in the Ending box will
+    give all entries up to that date (inclusive).  The other options,
+    marked by 'M', all do in-memory filtering.
+    </listitem>
+    <listitem>
+    The <literal>Priority</literal> choice works
+    like a debugging level, such that choosing <literal>MODERATE</literal>
+    will expose all alarms of that priority or above, thus including
+    <literal>HIGH</literal> and <literal>CRITICAL</literal>, but excluding
+    <literal>LOW</literal>.  Note that non-alarms are unaffected by this
+    setting.
+    </listitem>
+    <listitem>
+	The <literal>Match Expression</literal> filters by
+	appending all fields to a single string and searching for a matching
+	substring. If the <literal>Regular Expression</literal> box
+	is checked, the expression to match is compiled as a (Java) regex.
+    </listitem>
+    <listitem>
+	The header of the result table contains two checkboxes which allow
 	you to check or uncheck the respective columns for all
 	displayed items. Checking <literal>Delete</literal> and then
 	clicking <literal>Refresh</literal> will actually eliminate
 	the entry from persistent store.
-      </listitem>
-      <listitem>
+    </listitem>
+    <listitem>
 	<literal>Closed</literal> is a way of marking the alarm as
 	having been dealt with while maintaining a record of it. The
 	<literal>Show Closed Alarms</literal> checkbox allows you to
 	display them (turned off by default).
-      </listitem>
-      <listitem>
-	All column titles appearing in white can be clicked to sort
-	the table by that column.
-      </listitem>
-      <listitem>
+    </listitem>
+    <listitem>
+    All column titles appearing in white can be clicked to sort
+    the table by that column.  While there is no column indicating
+    alarm priority (as this attribute is external to the alarm schema),
+    alarms are sorted by priority first.  Non-alarms follow alarms.
+    If both alarms and non-alarms are displayed, alarms are colored
+    dark red.
+    </listitem>
+    <listitem>
 	<literal>Notes</literal> is an editable field to be used for
 	any special remarks.
-      </listitem>
+    </listitem>
     </orderedlist>
     <para>
       When <literal>Refresh</literal> is clicked, any updates to
@@ -280,624 +581,233 @@
       finally, the table is repopulated using the current query
       filter. The entire form is set to auto-refresh every 60 seconds.
     </para>
-
-
+  </section>
+  <section id='cf-alarms-cleanup'>
+  <title>Advanced Service Configuration:  Enabling Automatic Cleanup</title>
     <para>
       An additional feature of the alarms infrastructure is automatic
       cleanup of processed alarms. An internal thread runs every so
       often, and purges all alarms marked as <literal>closed</literal>
       with a timestamp earlier than the given window. This daemon can
       be configured using the properties
-      <varname>httpd.enable.alarm-cleaner</varname>,
-      <varname>httpd.alarm-cleaner.timeout</varname> and
-      <varname>httpd.alarm-cleaner.delete-entries-before</varname>.
+      <varname>alarms.enable.cleaner</varname>,
+      <varname>alarms.cleaner.timeout</varname>,
+      <varname>alarms.cleaner.timeout.unit</varname>,
+      <varname>alarms.cleaner.delete-entries-before</varname> and
+      <varname>alarms.cleaner.delete-entries-before.unit</varname>.  The
+      cleaner is off by default.  This feature is mainly useful when running
+      over an &xml; store, to mitigate slow-down due to bloat; nevertheless,
+      there is nothing prohibiting its use with &rdbms;.
     </para>
-
   </section>
-
-
-    <section id='cf-alarms-db'>
-      <title>Alarms Database</title>
-
+    <section id='cf-alarms-email'>
+    <title>Advanced Service Configuration:  Enabling Email Alerts</title>
     <para>
-      It might be useful to have a history of alarms. The &xml; file
-      that is (in the default setup) used to store the alarms is
-      cleaned on a regular basis as it would grow too big
-      otherwise. You can configure to use a database instead of the
-      &xml; file to obtain a history.  Another advantage of the use of
-      a database is that it is easier to search through a database
-      than through a series of log files.
+    To configure the server to send alarms via email, you need to set
+    a series of alarm properties.  No changes are necessary to any
+    <filename>logback.xml</filename> file.  The most important properties:
     </para>
-
+    <variablelist>
+    <varlistentry>
+      <term><literal>alarms.enable.email, alarms.email.threshold</literal></term>
+      <listitem>
+        <para>
+        Off (false) and <literal>critical</literal> by default.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><literal>alarms.email.smtp-host, alarms.email.smtp-port</literal></term>
+      <listitem>
+        <para>
+        Email server destination.  The port defaults to 25.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><literal>SMTP authentication and encryption</literal></term>
+      <listitem>
+        <para>
+        The SMTP client used by dCache supports authentication via plain
+        user passwords as well as both the STARTTLS and SSL protocols.
+        Note that STARTTLS differs from SSL in that, in STARTTLS,
+        the connection is initially non-encrypted and only after the
+        STARTTLS command is issued by the client (if the server supports it)
+        does the connection switch to SSL. In SSL mode, the connection is
+        encrypted right from the start. Which of these to use is usually
+        determined by the server.
+        </para>
+        <para>
+        If username and password are left undefined, unauthenticated sends
+        will be attempted, which may not be supported by the server.
+        </para>
+        <para>
+        The values to use for plain user/password authentication default
+        to undefined. NOTE:  while using SSL will guarantee encryption
+        over the wire, there is currently no way of storing an encrypted
+        password.
+        Two possible workarounds:
+            a.  Set up an admin account with a plaintext password that
+                is protected by root privileges but which can be shared among
+                adminstrators or those with access to the host containing this
+                file;
+            b.  Set up a host-based authentication to the server; the email
+                admin will usually require the client IP, and it will need
+                to be static in that case.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><literal>sender and recipient</literal></term>
+      <listitem>
+        <para>
+        Only one sender may be listed, but multiple recipients can be indicated
+        by a comma-separated list of email addresses.
+        </para>
+      </listitem>
+    </varlistentry>
+    </variablelist>
     <para>
-      To use a database instead of the &xml; file you need to modify
-      the <filename>&path-ode-ed;/dcache.conf</filename> file. Set the
-      property <varname>httpd.alarms.db.type</varname> to
-      <literal>rdbms</literal>. Moreover, as you want to maintain a
-      history you should disable the
-      <varname>httpd.enable.alarm-cleaner</varname>.
+    See the shared defaults <filename>&path-ods-usd;/alarms.properties</filename> file
+    for additional settings.
     </para>
-
-    <para>
-      Create the alarms database.  <screen>&prompt-root;
-      <userinput>createdb -U srmdcache alarms</userinput></screen>
-    </para>
-    <para>
-      Modify the <filename>&path-ode-ed;/dcache.conf</filename> file
-      <programlisting>httpd.alarms.db.type=rdbms
-httpd.enable.alarm-cleaner=false</programlisting>
-      and restart &dcache;.
-      <screen>&prompt-root; <userinput>dcache restart</userinput></screen>
-    </para>
-
     </section>
-
-    <section id='cf-alarms-advanced'>
-      <title>Advanced</title>
-
-      <section id='cf-alarms-advanced-email'>
-	<title>Email on Alarm</title>
-
-	<para>
-	  To configure to send an email on alarm you need to modify
-	  the <filename>&path-ode-ed;logback.xml</filename> file.
-	</para>
-	<programlisting><![CDATA[<appender name="ALARM_MAIL" class="ch.qos.logback.classic.net.SMTPAppender">
-        <!-- this filter ensures that only events sent marked as ALARM
-             are received by this appender -->
-        <filter class="org.dcache.alarms.logback.AlarmMarkerFilter"/>
-        <smtpHost></smtpHost>
-        <to></to>
-        <to></to>
-        <from></from>
-        <subject>dCache Alarm</subject>
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <pattern>%d{dd MMM yyyy HH:mm:ss} \(%X{cells.cell}\) [%X{org.dcache.ndc}] %m%n</pattern>
-        </layout>
-        <cyclicBufferTracker class="ch.qos.logback.core.spi.CyclicBufferTrackerImpl">
-            <!-- send just one log entry per email -->
-            <bufferSize>1</bufferSize>
-        </cyclicBufferTracker>
-    </appender>]]></programlisting>
-
-      </section>
-
-
-      <section id='cf-alarms-advanced-defineAlarm'>
-	<title>Defining an Alarm</title>
-	<para>
-	  The file <filename>logback.xml</filename> found in the
-	  <filename class='directory'>&path-ode-ed;</filename>
-	  directory adds an
-	  <varname>org.dcache.alarms.logback.AlarmDefinitionAppender</varname>
-	  to the root logger.  This alarm appender embeds a child
-	  SocketAppender set to send events on the port specified by
-	  the property <varname>alarms.server.port</varname> to a host
-	  specified by the property
-	  <varname>alarms.server.host</varname>.
-	</para>
-	<para>
-	  The alarms defined are listed in the <xref
-	  linkend='cf-alarms-basic-definedAlarms'/>.
-	</para>
-	<para>
-	  Define additional alarms simply by including other
-	  <literal>&lt;alarmType&gt;</literal> elements in the
-	  <literal>&lt;filter&gt;</literal> element.
-	</para>
-
-	<informalexample>
-	  <para>
-	    Extract of the definition of the
-	    <literal>SERVICE_CREATION_FAILURE</literal> and the
-	    <literal>CHECKSUM</literal> alarms in the
-	    <filename>&path-ode-ed;/logback.xml</filename> file.
-
-	    <programlisting><![CDATA[
-            <alarmType>
-                regex:"(.+) from ac_create",
-                type:SERVICE_CREATION_FAILURE,
-                level:ERROR,
-                severity:CRITICAL,
-                include-in-key:group1 type host domain service
-            </alarmType>
-            .
-            .
-            .
-            <alarmType>
-                logger:org.dcache.pool.classic.ChecksumScanner,
-                regex:"Checksum mismatch detected for (.+) - marking as BROKEN",
-                type:CHECKSUM,
-                level:ERROR,
-                severity:MODERATE,
-                include-in-key:group1 type host service domain
-            </alarmType>]]></programlisting>
-            </para>
-	</informalexample>
-
-	<para>
-	  The text of the <literal>&lt;alarmType&gt;</literal> element
-	  must be formed as a <ulink
-	  url='http://www.json.org'>JSON</ulink> string but without
-	  the beginning and ending braces ( '{', '}' ); this means, in
-	  essence, a comma-delimited list of
-	  <literal>NAME:VALUE</literal> pairs, with arbitrary
-	  whitespace between the pairs. The set of properties and
-	  their possible values is as follows:
-	</para>
-
-	<informaltable tabstyle='small' frame='all'>
-	  <tgroup cols='3' align='left'>
-	    <colspec colwidth='*'/>
-	    <colspec colwidth='2*'/>
-	    <colspec colwidth='*'/>
-
-      <thead>
-	<row><entry>Property</entry><entry>Possible
-	values</entry><entry>Required</entry></row>
-      </thead>
-      <tbody>
-	<row>
-	  <entry><varname>logger</varname></entry>
-	  <entry>name of the logger (see example above)</entry>
-	  <entry>at least one of <varname>logger</varname>,
-	  <varname>regex</varname></entry>
-	</row>
-	<row>
-	  <entry><varname>regex</varname></entry>
-	  <entry>A pattern to match the message with.
-	  <note>
-	    It is advisable to place the regex pattern in double
-	    quotes, so that the JSON parser will accept the special
-	    characters used in regular expressions: e.g., "[=].[\w]*"
-	  </note>
-	  </entry>
-	  <entry>at least one of <varname>logger</varname>,
-	  <varname>regex</varname></entry>
-	</row>
-
-	<row>
-	  <entry><varname>match-exception</varname></entry>
-	  <entry> &false;, &true;</entry>
-	  <entry><literal>NO</literal></entry>
-	</row>
-	<row>
-	  <entry><varname>depth</varname></entry>
-	  <entry>Integer &ge; 0</entry>
-	  <entry><literal>NO</literal></entry>
-	</row>
-	<row>
-	  <entry><varname>type</varname></entry>
-	  <entry>An arbitrary name which will serve as the alarm’s
-	  marker.</entry>
-	  <entry><literal>YES</literal></entry>
-	</row>
-	<row>
-	  <entry><varname>level</varname></entry>
-	  <entry><literal>TRACE</literal>, <literal>DEBUG</literal>,
-	  <literal>INFO</literal>, <literal>WARN</literal>,
-	  <literal>ERROR</literal></entry><entry><literal>YES</literal></entry></row>
-	<row>
-	  <entry><varname>severity</varname></entry>
-	  <entry><literal>INDETERMINATE</literal> (default),
-	  <literal>LOW</literal>, <literal>MODERATE</literal>,
-	  <literal>HIGH</literal>, <literal>CRITICAL</literal></entry>
-	  <entry><literal>NO</literal></entry>
-	</row>
-	<row>
-	  <entry><varname>regex-flags</varname></entry>
-	  <entry>A string representation of the (Java) regex flags options,
-	  joined by the 'or' pipe symbol: e.g.,
-	  <literal>CASE_INSENSITIVE | DOTALL</literal>. For fuller
-	  explanation, see the Java Tutorials on <ulink
-	  url="http://docs.oracle.com/javase/tutorial/essential/regex">Regular
-	  Expressions</ulink>.</entry>
-	  <entry><literal>NO</literal></entry>
-	</row>
-	<row>
-	  <entry><varname>thread</varname></entry>
-	  <entry>Thread	name (restricts this alarm type only to this particular
-	  thread). </entry>
-	  <entry><literal>NO</literal></entry>
-	</row>
-	<row>
-	  <entry><varname>include-in-key</varname></entry>
-	  <entry>Concatenation of key field names (see below)</entry>
-	  <entry><literal>YES</literal></entry>
-	</row>
-      </tbody>
+    <section id='cf-alarms-Definitions'>
+    <title>Advanced Service Configuration:  Custom Alarm Definitions</title>
+    <para>
+    It should be fairly straightforward to add or modify custom definitions
+    via either the interpreter from the dcache shell, or the admin
+    <literal>definition</literal> commands.
+    </para>
+    <para>
+    An alarm definition consists of the following:
+    </para>
+    <informaltable tabstyle='small' frame='all'>
+    <tgroup cols='3' align='left'>
+        <colspec colwidth='*'/>
+        <colspec colwidth='2*'/>
+        <colspec colwidth='*'/>
+    <thead>
+        <row><entry>Property</entry>
+             <entry>Possible values</entry>
+             <entry>Required</entry></row>
+    </thead>
+    <tbody>
+    <row>
+      <entry><varname>type</varname></entry>
+      <entry>Name of this alarm type (settable only once).</entry>
+      <entry><literal>YES</literal></entry>
+    </row>
+    <row>
+      <entry><varname>keyWords</varname></entry>
+      <entry>Whitespace-delimited concatenation of key field names (see below).</entry>
+      <entry><literal>YES</literal></entry>
+    </row>
+    <row>
+      <entry><varname>regex</varname></entry>
+      <entry>A pattern to match the message with.
+      <note>
+        It is advisable to place the regex pattern in double
+        quotes, e.g., "[=].[\w]*"
+      </note>
+      </entry>
+      <entry><literal>YES</literal></entry>
+    </row>
+    <row>
+      <entry><varname>regex-flags</varname></entry>
+      <entry>A string representation of the (Java) regex flags options,
+      joined by the 'or' pipe symbol: e.g.,
+      <literal>CASE_INSENSITIVE | DOTALL</literal>. For fuller
+      explanation, see the Java Tutorial on <ulink
+      url="http://docs.oracle.com/javase/tutorial/essential/regex">Regular
+      Expressions</ulink>.</entry>
+      <entry><literal>NO</literal></entry>
+    </row>
+    <row>
+      <entry><varname>match-exception</varname></entry>
+      <entry>&true; = recur over embedded exception messages
+      when applying the regex match (default is &false;).</entry>
+      <entry><literal>NO</literal></entry>
+    </row>
+    <row>
+      <entry><varname>depth</varname></entry>
+      <entry>Integer &ge; 0, = depth of exception trace to examine when
+      applying match-exception; undefined means unbounded (default).</entry>
+      <entry><literal>NO</literal></entry>
+    </row>
+    </tbody>
     </tgroup>
-  </informaltable>
-
-  <section>
-    <title>The Properties <varname>match-exception</varname> and
-    <varname>depth</varname></title>
+    </informaltable>
     <para>
-      The property <varname>match-exception</varname> is &false; by
-      default. If set to &true;, it applies the regex pattern to all
-      embedded exception messages, recursively, until a match is
-      found.
+    For example:
     </para>
+    <programlisting>
+      <literal>&lt;alarmType</literal>&gt;
+      <literal>&lt;type</literal>&gt;SERVICE_CREATION_FAILURE<literal>&lt;/type</literal>&gt;
+      <literal>&lt;regex</literal>&gt;(.+) from ac_create<literal>&lt;/regex</literal>&gt;
+      <literal>&lt;keyWords</literal>&gt;group1 type host domain service<literal>&lt;/keyWords</literal>&gt;
+      <literal>&lt;/alarmType</literal>&gt;
+    </programlisting>
     <para>
-      The property <varname>depth</varname> is to be used with
-      the property <varname>match-exception</varname>. The default is
-      undefined (null), meaning unbounded. Setting
-      <varname>depth</varname> to an integer &gt; 0 indicates the
-      level to which the match will be applied (in terms of nested
-      messages). Setting it to 0 is equivalent to setting
-      <varname>match-exception</varname> to false.
+      The alarm key (the property <varname>keyWords</varname>) is
+      the set of attributes whose values uniquely identify the alarm
+      instance. For example, an alarm defined using <literal>message</literal>,
+      but without including <literal>timestamp</literal> in its key,
+      would suggest that all events with exactly the same message content are
+      to be considered duplicates of the first such alarm. The key field names
+      which can be used to constitute the key include the attributes defined
+      for all alarms, plus the parsing of the message field into regex groups:
     </para>
-
-    <informalexample>
-      <para>
-	Have a look at the extract of the definition of the
-	<literal>DB_UNAVAILABLE</literal> alarm in the
-	<filename>&path-ode-ed;/logback.xml</filename> file.
-      </para>
-      <programlisting><![CDATA[
-            <alarmType>
-                regex:"Unable to open a test connection to the given database|Connections could not be acquired from the underlying database",
-                match-exception:true,
-                depth:1,
-                type:DB_UNAVAILABLE,
-                level:ERROR,
-                severity:CRITICAL,
-                include-in-key:type host
-            </alarmType>]]></programlisting>
-    </informalexample>
-
-  </section>
-
-  <section>
-    <title>The property <varname>include-in-key</varname></title>
-
+    <itemizedlist>
+        <listitem>
+            <literal>timestamp</literal>
+        </listitem>
+        <listitem>
+            <literal>domain</literal>
+        </listitem>
+        <listitem>
+            <literal>service</literal>
+        </listitem>
+        <listitem>
+            <literal>host</literal>
+        </listitem>
+        <listitem>
+            <literal>message (= group0)</literal>
+        </listitem>
+        <listitem>
+            <literal>groupN</literal>
+        </listitem>
+    </itemizedlist>
     <para>
-      The alarm key (the property <varname>include-in-key</varname>) is
-      the set of properties whose values uniquely identify the alarm
-      instance. For example, the checksum alarm defined above does not
-      include the timestamp in its key, as all reports of this kind of
-      error for a given file (PNFS id is given in the message body) are
-      to be considered as duplicates of the first such alarm. The key
-      field names which can be used to constitute the key are those
-      which all alarms have in common:
-    </para>
-    <para>
-      <varname>groupN</varname>, <varname>timestamp</varname>,
-      <varname>message</varname>, <varname>logger</varname>,
-      <varname>type</varname>, <varname>domain</varname>,
-      <varname>service</varname>, <varname>host</varname> and
-      <varname>thread</varname>.
-    </para>
-
-    <para>
-      These property names should be delimited by (an arbitrary number
-      of) whitespace characters. Note that <varname>logger</varname>,
-      <varname>timestamp</varname> and <varname>message</varname>
-      derive from the logging event, <varname>host</varname> is
-      determined by static lookup, and <varname>domain</varname> and
-      <varname>service</varname> correspond to the
-      <varname>cells.domain</varname> and
-      <varname>cells.cell</varname> properties in the event's MDC map.
+      These attribute names should be delimited by (an arbitrary number
+      of) whitespace characters. Note that <varname>timestamp</varname>
+      and <varname>message</varname> derive from the logging event, while
+      <varname>host</varname>, <varname>domain</varname> and
+      <varname>service</varname> are properties added to the event's
+      diagnostic context map.
     </para>
     <para>
       The key field name <varname>groupN</varname>, where
       <literal>N</literal> is an integer, means that the
       <literal>Nth</literal> substring (specified by parentheses) will
-      be included.  For <literal>N=0</literal>,
-      <varname>group0</varname> is identical to
-      <literal>message</literal>, which means that the whole message
-      string should be included as an identifier.
+      be included.  For <literal>N=0</literal>, <varname>group0</varname>
+      is identical to <literal>message</literal>, which means that the whole
+      message string should be included as an identifier.
     </para>
-    <informalexample>
-    <formalpara>
-      <title>Matching on Regex Groups</title> Have a look at the
-      extract of the definition of the <literal>CHECKSUM</literal>
-      alarm in the <filename>&path-ode-ed;/logback.xml</filename>
-      file.
-    </formalpara>
-      <programlisting><![CDATA[
-            <alarmType>
-                logger:org.dcache.pool.classic.ChecksumScanner,
-                regex:"Checksum mismatch detected for (.+) - marking as BROKEN",
-                type:CHECKSUM,
-                level:ERROR,
-                severity:MODERATE,
-                include-in-key:group1 type host service domain
-            </alarmType>]]></programlisting>
-      <para>
-	Here the tag <varname>group1</varname> in the
-	<varname>include-in-key</varname> extracts the &pnfsid; from the
-	message and includes only that portion of the message string
-	as an identifier. As usual, group0 is the same as the entire
-	message.
-      </para>
-    </informalexample>
-
-     <para>
-       When the appender applies this alarm definition filter, it
-       relies on an implicit matching function: (logger, level, regex,
-       thread) &xrArr; type; hence a given alarm can be generated by
-       more than one logger, and a logger in turn can send multiple
-       types of alarms if these are mapped to different logging
-       levels, thread names and/or regex patterns for the message
-       body.
-     </para>
-
-  </section>
-
-</section>
-
-
-
-
-
-
-  <section id='cf-alarms-advanced-logbackServer'>
-    <title>Run the Logback Server Independently from &dcache;</title>
     <para>
-      In most cases, running the alarm server as a &dcache; service
-      will be adequate. Nevertheless, it is always possible to run the
-      logback server entirely independently from &dcache;. In that
-      case, you must be sure that the classpath carries the necessary
-      &dcache; dependencies to provide the alarm appending
-      functionality. Here is a bash snippet which will sufficiently
-      define the classpath based on the &dcache; classes directory:
+    Alarms that are generated by the code at the origin of the problem
+    may carry with them other arbitrary unique identifier values, but custom
+    definitions are limited to the values associated with these fixed fields.
     </para>
-    <programlisting><![CDATA[ #!/bin/sh
-case $# in
-    0)
-        PORT=60001
-	;;
-    1)
-        PORT=${1}
-        ;;
-    *)
-        echo "Usage: $(basename $0) [PORT]" >&2
-	exit 1
-	;;
-esac
-DC=/etc/dcache
-CL=/usr/share/dcache/classes
-
-CP=.
-CP=${CP}:`find ${CL} -name "activation-*.jar"`
-CP=${CP}:`find ${CL} -name "datanucleus-api-jdo-*.jar"`
-CP=${CP}:`find ${CL} -name "datanucleus-cache*.jar"`
-CP=${CP}:`find ${CL} -name "datanucleus-core*.jar"`
-CP=${CP}:`find ${CL} -name "datanucleus-xml*.jar"`
-CP=${CP}:`find ${CL} -name "dcache-core*.jar"`
-CP=${CP}:`find ${CL} -name "guava-*.jar"`
-CP=${CP}:`find ${CL} -name "jargs-*.jar"`
-CP=${CP}:`find ${CL} -name "jaxb-*.jar" | tr '\n' ':'`
-CP=${CP}:`find ${CL} -name "jaxrpc-*.jar" | tr '\n' ':'`
-CP=${CP}:`find ${CL} -name "jdo-api-*.jar"`
-CP=${CP}:`find ${CL} -name "json-*.jar"`
-CP=${CP}:`find ${CL} -name "log4j-over-slf4j-*.jar"`
-CP=${CP}:`find ${CL} -name "logback-classic-*.jar"`
-CP=${CP}:`find ${CL} -name "logback-core-*.jar"`
-CP=${CP}:`find ${CL} -name "mail-*.jar"`
-CP=${CP}:`find ${CL} -name "slf4j-api-*.jar"`
-
-java -cp ${CP} ch.qos.logback.classic.net.SimpleSocketServer ${PORT} /var/lib/dcache/alarms/logback-server.xml &]]></programlisting>
-
-  </section>
-
-</section>
-
+    </section>
     <section id="cf-alarms-prop">
-      <title>Properties of the &serv-alarms; Service</title>
-
-      <para>
-	This is a set of properties you might want to modify. Check
-	the files
-	<filename>&path-ods-usd;/alarms.properties</filename> and
-	<filename>&path-ods-usd;/httpd.properties</filename> for the
-	complete list.
-      </para>
-      <variablelist>
-	<varlistentry>
-	  <term>alarms.dir</term>
-	  <listitem>
-	    <para>
-	      Default: <literal>&path-od-vld;/alarms</literal>
-	    </para>
-	    <para>
-	      The main alarms area.
-	    </para>
-	  </listitem>
-	</varlistentry>
-
-
-	<varlistentry>
-	  <term>alarms.server.port</term>
-	  <listitem>
-	    <para>
-	      Default: <literal>60001</literal>
-	    </para>
-	    <para>
-	      The port on which the alarm server will listen.
-	    </para>
-	  </listitem>
-	</varlistentry>
-
-        <varlistentry>
-	 <term>alarms.server.host</term>
-	 <listitem>
-	   <para>
-	     Default: <literal>localhost</literal>
-	   </para>
-	   <para>
-	     The host on which the &serv-alarms; service is running.
-	   </para>
-	 </listitem>
-       </varlistentry>
-
-
-       <varlistentry>
-	 <term>alarms.log.config.path</term>
-	 <listitem>
-	   <para>
-	     Default: <literal>${alarms.dir}/logback-server.xml</literal>
-	   </para>
-	   <para>
-	     The logback configuration for the alarm server.
-	   </para>
-	 </listitem>
-       </varlistentry>
-
-       <varlistentry>
-	 <term>httpd.alarms.db.type</term>
-	 <listitem>
-	   <para>
-	     Default: <literal>xml</literal>
-	   </para>
-	   <para>
-	     Defines what kind of database (either XML or
-	     &psql;). Set
-	     <varname>httpd.alarms.db.type</varname>=<literal>rdbms</literal>
-	     to use &psql;.
-	   </para>
-	 </listitem>
-       </varlistentry>
-
-       <varlistentry>
-	 <term>httpd.alarms.db.xml.path</term>
-	 <listitem>
-	   <para>
-	     Default: <literal>${alarms.dir}/alarms.xml</literal>
-	   </para>
-	   <para>
-	     The path of the <filename>alarms.xml</filename>. Used if
-	     <varname>httpd.alarms.db.type</varname>=<literal>xml</literal>.
-	   </para>
-	 </listitem>
-       </varlistentry>
-
-       <varlistentry>
-	 <term>alarms.db.rdbms.type</term>
-	 <listitem>
-	   <para>
-	     Default: <literal>postgresql</literal>
-	   </para>
-	   <para>
-	     If this value is changed from its default the
-	     <varname>httpd.alarms.db.driver</varname> property must
-	     also be changed.
-	   </para>
-	 </listitem>
-       </varlistentry>
-
-       <varlistentry>
-	 <term>httpd.alarms.db.driver</term>
-	 <listitem>
-	   <para>
-	     Default: <literal>org.postgresql.Driver</literal>
-	   </para>
-	   <para>
-	     This property should give the correct namespace for the
-	     RDBMS set by the property
-	     <varname>alarms.db.rdbms.type</varname>.
-	   </para>
-	 </listitem>
-       </varlistentry>
-
-       <varlistentry>
-	 <term>alarms.db.host</term>
-	 <listitem>
-	   <para>
-	     Default: <literal>localhost</literal>
-	   </para>
-	   <para>
-	     RDBMS/JDBC Database host name.
-	   </para>
-	 </listitem>
-       </varlistentry>
-
-       <varlistentry>
-	 <term>httpd.alarms.db.user</term>
-	 <listitem>
-	   <para>
-	     Default:
-	   </para>
-	   <para>
-	     RDBMS/JDBC Database user name.
-	   </para>
-	 </listitem>
-       </varlistentry>
-
-       <varlistentry>
-	 <term>httpd.alarms.db.password</term>
-	 <listitem>
-	   <para>
-	     Default: <literal>no password</literal>
-	   </para>
-	   <para>
-	     RDBMS/JDBC Database user password.
-	   </para>
-	 </listitem>
-       </varlistentry>
-
-       <varlistentry>
-	 <term>httpd.alarms.db.config.path</term>
-	 <listitem>
-	   <para>
-	     Default: <literal>${alarms.dir}/datanucleus.properties</literal>
-	   </para>
-	   <para>
-	     Path for overriding the internally set DAO (DataNucleus)
-	     properties for alarm storage, for instance, to configure
-	     an RDBMS database; will be used only if the &url; does
-	     not point to the &xml; default.
-	   </para>
-	 </listitem>
-       </varlistentry>
-
-       <varlistentry>
-	 <term>httpd.enable.alarm-cleaner</term>
-	 <listitem>
-	   <para>
-	     Default: <literal>true</literal>
-	   </para>
-	   <para>
-	     If set to true a thread which automatically removes
-	     closed alarms older than a given threshold will run.
-	   </para>
-	 </listitem>
-       </varlistentry>
-
-       <varlistentry>
-	 <term>httpd.alarm-cleaner.timeout</term>
-	 <listitem>
-	   <para>
-	     Default: <literal>168</literal> (24 x 7 hours)
-	   </para>
-	   <para>
-	     Wait interval between successive sweeps of the cleanup
-	     daemon.
-	   </para>
-	 </listitem>
-       </varlistentry>
-
-       <varlistentry>
-	 <term>httpd.alarm-cleaner.delete-entries-before</term>
-	 <listitem>
-	   <para>
-	     Default: <literal>336</literal> (24 X 14 hours)
-	   </para>
-	   <para>
-	     Closed alarms will be deleted after this time.
-	   </para>
-	 </listitem>
-       </varlistentry>
-
-     </variablelist>
-
-
-
-
-
-
-   </section>
-
-
+    <title>Miscellaneous Properties of the &serv-alarms; Service</title>
+    <para>
+       There are a number of other settings avaible for customization;
+       check the files
+	   <filename>&path-ods-usd;/alarms.properties</filename> and
+	   <filename>&path-ods-usd;/httpd.properties</filename> for the complete list
+       with explanations.
+    </para>
+    </section>
 </chapter>
