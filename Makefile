@@ -66,6 +66,8 @@ GFX_FILES = images/important.png images/warning.png images/caution.png images/no
 ALL = $(HTML_SINGLE_FILES) $(PDF_FILES) $(HTML_ALL_CHUNK_FILES) $(EPUB_FILES) book.css $(GFX_FILES)
 ALL_INSTALLED = $(ALL:%=%__INSTALL__)
 ALL_TEST_INSTALLED = $(ALL:%=%__TEST_INSTALL__)
+ALL_INSTALLED_LOCAL = $(ALL:%=%__INSTALL_LOCAL__)
+ALL_TEST_INSTALLED_LOCAL = $(ALL:%=%__TEST_INSTALL_LOCAL__)
 
 
 WWW_USER = root@
@@ -73,6 +75,9 @@ WWW_SERVER = www.dcache.org
 WWW_SERVER_BASE_DIR = /www/www/dcache.org
 WWW_LOCATION = /manuals/Book-$(DCACHE_VERSION)/
 WWW_TEST_LOCATION = /manuals/Book-$(DCACHE_VERSION)-test/
+
+LOCAL_LOCATION = /www/www/dcache.org/manuals/Book-$(DCACHE_VERSION)/
+LOCAL_TEST_LOCATION = /www/www/dcache.org/manuals/Book-$(DCACHE_VERSION)-test/
 
 # NB we don't do deps on txt as it depends on html-single output.  This
 #    is cheating, but hey, it works.
@@ -284,9 +289,19 @@ deploy: $(ALL_INSTALLED)
 	@echo "Book now updated at http://${WWW_SERVER}${WWW_LOCATION}"
 	@echo
 
+deploy-local: $(ALL_INSTALLED_LOCAL)
+	@echo
+	@echo "Book now updated at ${LOCAL_LOCATION}"
+	@echo
+
 test-deploy: $(ALL_TEST_INSTALLED)
 	@echo
 	@echo "Book now updated at http://${WWW_SERVER}${WWW_TEST_LOCATION}"
+	@echo
+
+test-deploy-local: $(ALL_TEST_INSTALLED_LOCAL)
+	@echo
+	@echo "Book now updated at ${LOCAL_TEST_LOCATION}"
 	@echo
 
 comments-deploy: $(COMMENTS_INSTALLED)
@@ -316,7 +331,26 @@ Book__TEST_INSTALL__: $(HTML_CHUNK_FILES)
 	find Book -type d -exec chmod g+s \{\} \;
 	scp -pr Book/* $(WWW_USER)$(WWW_SERVER):$(WWW_SERVER_BASE_DIR)$(WWW_TEST_LOCATION)
 
+%__INSTALL_LOCAL__: %
+	chmod a+r,g+w $<
+	cp -p $< $(LOCAL_LOCATION)
 
+%__TEST_INSTALL_LOCAL__: %
+	chmod a+r,g+w $<
+	cp -p $< $(LOCAL_TEST_LOCATION)
+
+#  Unfortunately, we need a special case here.
+Book__INSTALL_LOCAL__: $(HTML_CHUNK_FILES)
+	chmod -R a+Xr,g+w Book/*
+	chmod g+s Book
+	find Book -type d -exec chmod g+s \{\} \;
+	cp -pr Book/* $(LOCAL_LOCATION)
+
+Book__TEST_INSTALL_LOCAL__: $(HTML_CHUNK_FILES)
+	chmod -R a+Xr,g+w Book/*
+	chmod g+s Book
+	find Book -type d -exec chmod g+s \{\} \;
+	cp -pr Book/* $(LOCAL_TEST_LOCATION)
 
 ###### Cleaning targets
 #
