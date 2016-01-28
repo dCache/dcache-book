@@ -331,26 +331,32 @@ Book__TEST_INSTALL__: $(HTML_CHUNK_FILES)
 	find Book -type d -exec chmod g+s \{\} \;
 	scp -pr Book/* $(WWW_USER)$(WWW_SERVER):$(WWW_SERVER_BASE_DIR)$(WWW_TEST_LOCATION)
 
-%__INSTALL_LOCAL__: %
+%__INSTALL_LOCAL__: $(LOCAL_LOCATION) %
 	chmod a+r,g+w $<
 	cp -p $< $(LOCAL_LOCATION)
 
-%__TEST_INSTALL_LOCAL__: %
+%__TEST_INSTALL_LOCAL__: $(LOCAL_TEST_LOCATION) %
 	chmod a+r,g+w $<
 	cp -p $< $(LOCAL_TEST_LOCATION)
 
 #  Unfortunately, we need a special case here.
-Book__INSTALL_LOCAL__: $(HTML_CHUNK_FILES)
+Book__INSTALL_LOCAL__: $(LOCAL_LOCATION) $(HTML_CHUNK_FILES)
 	chmod -R a+Xr,g+w Book/*
 	chmod g+s Book
 	find Book -type d -exec chmod g+s \{\} \;
 	cp -pr Book/* $(LOCAL_LOCATION)
 
-Book__TEST_INSTALL_LOCAL__: $(HTML_CHUNK_FILES)
+Book__TEST_INSTALL_LOCAL__: $(LOCAL_TEST_LOCATION) $(HTML_CHUNK_FILES)
 	chmod -R a+Xr,g+w Book/*
 	chmod g+s Book
 	find Book -type d -exec chmod g+s \{\} \;
 	cp -pr Book/* $(LOCAL_TEST_LOCATION)
+
+$(LOCAL_LOCATION):
+	mkdir -p $(LOCAL_LOCATION)
+
+$(LOCAL_TEST_LOCATION):
+	mkdir -p $(LOCAL_TEST_LOCATION)
 
 ###### Cleaning targets
 #
