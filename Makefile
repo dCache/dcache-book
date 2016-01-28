@@ -331,11 +331,11 @@ Book__TEST_INSTALL__: $(HTML_CHUNK_FILES)
 	find Book -type d -exec chmod g+s \{\} \;
 	scp -pr Book/* $(WWW_USER)$(WWW_SERVER):$(WWW_SERVER_BASE_DIR)$(WWW_TEST_LOCATION)
 
-%__INSTALL_LOCAL__: $(LOCAL_LOCATION) %
+%__INSTALL_LOCAL__: % $(LOCAL_LOCATION)
 	chmod a+r,g+w $<
 	cp -p $< $(LOCAL_LOCATION)
 
-%__TEST_INSTALL_LOCAL__: $(LOCAL_TEST_LOCATION) %
+%__TEST_INSTALL_LOCAL__: % $(LOCAL_TEST_LOCATION)
 	chmod a+r,g+w $<
 	cp -p $< $(LOCAL_TEST_LOCATION)
 
