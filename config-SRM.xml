@@ -1398,14 +1398,14 @@ Space token =110044</screen>
       </para>
 
       <para>
-	Default value is  <literal>dcache</literal>.
+	Default value is  <literal>srm</literal>.
       </para>
 
       <para>
 	Usage example:
       </para>
 
-      <programlisting>srm.db.name=dcache</programlisting>
+      <programlisting>srm.db.name=srm</programlisting>
     </section>
 
     <section>
@@ -1418,14 +1418,14 @@ Space token =110044</screen>
       </para>
 
       <para>
-	Default value is <literal>srmdcache</literal>.
+	Default value is <literal>dcache</literal>.
       </para>
 
       <para>
 	Usage example:
       </para>
 
-      <programlisting>srm.db.user=srmdcache</programlisting>
+      <programlisting>srm.db.user=dcache</programlisting>
     </section>
 
     <section>
@@ -1434,7 +1434,7 @@ Space token =110044</screen>
       <para>
 	<varname>srm.db.password</varname> tells &cell-srm; which
 	database password to use when connecting to database. The
-	default value is <literal>srmdcache</literal>.
+	default value is an <literal>empty</literal> value (no password).
       </para>
 
       <para>
