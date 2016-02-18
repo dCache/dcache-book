@@ -194,23 +194,23 @@ export dbConnectString="user=pnfsserver password=<replaceable>yourPassword</repl
 	        <row>
 	          <entry>SRM</entry>
 	          <entry><varname>srm.db.host</varname>or if not set: <varname>srmDbHost</varname> or if not set: <systemitem class="systemname">localhost</systemitem></entry>
-	          <entry>dcache</entry>
-	          <entry><database class="user">srmdcache</database></entry>
-              <entry><userinput>srmdcache</userinput></entry>
+	          <entry>srm</entry>
+	          <entry><database class="user">dcache</database></entry>
+              <entry><userinput>--free--</userinput></entry>
 	        </row>
 	        <row>
-	          <entry>pin manag</entry>
+	          <entry>PinManager</entry>
 	          <entry><varname>pinManagerDatabaseHost</varname> or if not set: <varname>srmDbHost</varname> or if not set: <systemitem class="systemname">localhost</systemitem></entry>
-	          <entry>dcache</entry>
-	          <entry><database class="user">srmdcache</database></entry>
-              <entry><userinput>srmdcache</userinput></entry>
+	          <entry>pinmanager</entry>
+	          <entry><database class="user">pinmanager</database></entry>
+              <entry><userinput>--free--</userinput></entry>
 	        </row>
             <row>
 	          <entry>&cell-replicamngr;</entry>
 	          <entry><varname>replica.db.host</varname> or if not set: <systemitem class="systemname">localhost</systemitem></entry>
-	          <entry>replicas</entry>
-	          <entry><database class="user">srmdcache</database></entry>
-              <entry><userinput>srmdcache</userinput></entry>
+	          <entry>replica</entry>
+	          <entry><database class="user">dcache</database></entry>
+              <entry><userinput>--free--</userinput></entry>
 	        </row>
             <row>
 	          <entry>&pnfs; server</entry>
@@ -223,8 +223,8 @@ export dbConnectString="user=pnfsserver password=<replaceable>yourPassword</repl
 	          <entry>billing</entry>
 	          <entry><varname>billingDatabaseHost</varname> or if not set: <systemitem class="systemname">localhost</systemitem></entry>
 	          <entry>billing</entry>
-	          <entry><database class="user">srmdcache</database></entry>
-              <entry><userinput>srmdcache</userinput></entry>
+	          <entry><database class="user">dcache</database></entry>
+              <entry><userinput>--free--</userinput></entry>
 	        </row>
           </tbody>
         </tgroup>

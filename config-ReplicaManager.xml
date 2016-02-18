@@ -40,12 +40,12 @@
     </para>
     <para>
       To create and configure the database
-      <firstterm>replicas</firstterm> used by the &serv-replica;
+      <firstterm>replica</firstterm> used by the &serv-replica;
       service in the database server do:
     </para>
 
-    <screen>&prompt-root; <userinput>createdb -U srmdcache replicas</userinput>
-&prompt-root; <userinput>psql -U srmdcache -d replicas -f &path-ode-usdr;/psql_install_replicas.sql</userinput></screen>
+    <screen>&prompt-root; <userinput>createdb -U dcache replica</userinput>
+&prompt-root; <userinput>psql -U dcache -d replica -f &path-ode-usdr;/psql_install_replicas.sql</userinput></screen>
 
     <para>
       To activate the &serv-replica; service you need to
@@ -693,7 +693,7 @@ tag.hostname=Berlin</programlisting>
 	 <term>replica.db.name</term>
 	 <listitem>
 	   <para>
-	     Default: <literal>replicas</literal>
+	     Default: <literal>replica</literal>
 	   </para>
 	   <para>
 	     Name of the replica database table.
@@ -704,12 +704,12 @@ tag.hostname=Berlin</programlisting>
 	 <term>replica.db.user</term>
 	 <listitem>
 	   <para>
-	     Default: <literal>srmdcache</literal>
+	     Default: <literal>dcache</literal>
 	   </para>
 	   <para>
 	     Change if the <literal>replicas</literal> database was
 	     created with a user other than
-	     <literal>srmdcache</literal>.
+	     <literal>dcache</literal>.
 	   </para>
 	 </listitem>
        </varlistentry>
