@@ -149,12 +149,12 @@
 	  further below on migrating from an existing one), create it
 	  (we assume &psql; here):
 	</para>
-	<screen>&prompt-root; <userinput>createdb -O srmdcache -U postgres billing</userinput></screen>
+	<screen>&prompt-root; <userinput>createdb -O dcache -U postgres billing</userinput></screen>
 	<para>
 	  If you are using a version of &psql; prior to 8.4, you will
 	  also need to do:
 	</para>
-	<screen>&prompt-root; <userinput>createlang -U srmdcache plpgsql billing</userinput></screen>
+	<screen>&prompt-root; <userinput>createlang -U dcache plpgsql billing</userinput></screen>
 	<para>
 	  No further manual preparation is needed, as the necessary
 	  tables, indices, functions and triggers will automatically
@@ -226,9 +226,9 @@ Starting httpdDomain done</screen>
 	  <informalexample>
 	    <screen># dcache database ls
 DOMAIN          CELL        DATABASE HOST      USER      MANAGEABLE AUTO
-namespaceDomain PnfsManager chimera  localhost chimera   Yes        Yes
-namespaceDomain cleaner     chimera  localhost chimera   No         No
-httpdDomain     billing     billing  localhost srmdcache Yes        Yes</screen>
+namespaceDomain PnfsManager chimera  localhost dcache    Yes        Yes
+namespaceDomain cleaner     chimera  localhost dcache    No         No
+httpdDomain     billing     billing  localhost dcache   Yes        Yes</screen>
 	  </informalexample>
 	</listitem>
 
@@ -490,7 +490,7 @@ INFO 8/23/12 10:35 AM:liquibase: Successfully released change log lock</programl
     in this case is to do a clean re-initialization by dropping the
     Liquibase tables from the database:
   </para>
-  <screen>&prompt-root; <userinput>psql -U srmdcache billing</userinput>
+  <screen>&prompt-root; <userinput>psql -U dcache billing</userinput>
 
 billing=> <userinput>drop table databasechangelog</userinput>
 billing=> <userinput>drop table databasechangeloglock</userinput>
@@ -505,23 +505,23 @@ billing-> <userinput>\q</userinput>
       If the <database>billing</database> database already exists, but
       contains tables other than the following:
     </para>
-<screen>&prompt-root; <userinput>psql -U srmdcache billing</userinput>
+<screen>&prompt-root; <userinput>psql -U dcache billing</userinput>
 billing=> \dt
                      List of relations
  Schema	|         Name          | Type  |   Owner
  -------+-----------------------+-------+-----------
- public	| billinginfo           | table | srmdcache
- public	| billinginfo_rd_daily  | table | srmdcache
- public	| billinginfo_tm_daily  | table | srmdcache
- public	| billinginfo_wr_daily  | table | srmdcache
- public	| databasechangelog     | table | srmdcache
- public	| databasechangeloglock | table | srmdcache
- public	| doorinfo              | table | srmdcache
- public	| hitinfo               | table | srmdcache
- public	| hitinfo_daily         | table | srmdcache
- public	| storageinfo           | table | srmdcache
- public	| storageinfo_rd_daily  | table | srmdcache
- public	| storageinfo_wr_daily  | table | srmdcache
+ public	| billinginfo           | table | dcache
+ public	| billinginfo_rd_daily  | table | dcache
+ public	| billinginfo_tm_daily  | table | dcache
+ public	| billinginfo_wr_daily  | table | dcache
+ public	| databasechangelog     | table | dcache
+ public	| databasechangeloglock | table | dcache
+ public	| doorinfo              | table | dcache
+ public	| hitinfo               | table | dcache
+ public	| hitinfo_daily         | table | dcache
+ public	| storageinfo           | table | dcache
+ public	| storageinfo_rd_daily  | table | dcache
+ public	| storageinfo_wr_daily  | table | dcache
 
 billing-> <userinput>\q</userinput>
 &prompt-root;</screen>
@@ -533,7 +533,7 @@ billing-> <userinput>\q</userinput>
     existence of such extraneous tables should not impede &dcache;
     from working correctly, provided those other tables are
     <literal>READ</literal>-accessible by the database user for
-    billing, which by default is <literal>srmdcache</literal>. This is
+    billing, which by default is <literal>dcache</literal>. This is
     a requirement imposed by the use of Liquibase.  You thus may need
     explicitly to grant <literal>READ</literal> privileges to the
     <database>billing</database> database user on any such tables if
@@ -552,7 +552,7 @@ billing-> <userinput>\q</userinput>
     the data in the main tables (otherwise the histograms will not
     reflect the data recorded prior to the date of upgrade):
   </para>
-  <screen>&prompt-root; <userinput>psql -U srmdcache -f &path-ods-usd;/migration/migrate_from_messageinfo.sql</userinput></screen>
+  <screen>&prompt-root; <userinput>psql -U dcache -f &path-ods-usd;/migration/migrate_from_messageinfo.sql</userinput></screen>
   <para>
     It is highly recommended that you do this while the &serv-billing;
     service domain is offline, as it may take several hours, depending
@@ -572,7 +572,7 @@ billing-> <userinput>\q</userinput>
       dCache Book 1.9.12, Chapter 15, dCache Web Monitoring )</ulink>,
       use instead:
     </para>
-    <screen>&prompt-root; <userinput>psql -U srmdcache -f &path-ods-usd;/migration/migrate_from_preexistent.sql</userinput></screen>
+    <screen>&prompt-root; <userinput>psql -U dcache -f &path-ods-usd;/migration/migrate_from_preexistent.sql</userinput></screen>
   </section>
 
 -->
