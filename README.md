@@ -113,19 +113,19 @@ Do `make` (equiv. to `make info`) to see a summary of what targets are
 available.  Here are a few useful options:
 
 <dl>
-<dt>`make all`</dt>
+<dt>make all</dt>
 <dd>builds everything,</dd>
-<dt>`make pdf`</dt>
+<dt>make pdf</dt>
 <dd>builds all PDF,</dd>
-<dt>`make html`</dt>
+<dt>make html</dt>
 <dd>builds all HTML output,</dd>
-<dt>`make test-deploy`</dt>
+<dt>make test-deploy</dt>
 <dd>builds and deploys on the web-server at the test location,</dd>
-<dt>`make deploy`</dt>
+<dt>make deploy</dt>
 <dd>builds and deploys on the web-server at the live location,</dd>
-<dt>`make clean`</dt>
+<dt>make clean</dt>
 <dd>remove backup files,</dd>
-<dt>`make distclean`</dt>
+<dt>make distclean</dt>
 <dd>remove all generated files.</dd>
 </dl>
 
