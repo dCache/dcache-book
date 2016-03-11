@@ -1,0 +1,15 @@
+.Book*.d
+dcache-version.xml
+Book-*.fo
+Book-*.pdf
+Book/
+Book.shtml
+Book-fhs.shtml
+Book.epub
+Book-fhs.epub
+Book.txt
+Book-fhs.txt
+Book-opt.xml
+Book-fhs.xml
+man-fhs/
+man-opt/
