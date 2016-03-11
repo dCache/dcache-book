@@ -220,7 +220,7 @@ Enter it again:
       </para>
 
       <screen>&prompt-root; <userinput>createuser -U postgres --no-superuser --no-createrole --createdb --pwprompt srmdcache</userinput>
-Enter password for new role: 
+Enter password for new role:
 Enter it again:
 <lineannotation>You do not need to enter a password.</lineannotation></screen>
 
@@ -248,7 +248,7 @@ Enter it again:
 	And run the command <command>dcache database update</command>.
       </para>
       <screen>&prompt-root; <userinput>dcache database update</userinput>
-PnfsManager@dCacheDomain: 
+PnfsManager@dCacheDomain:
 INFO  - Successfully acquired change log lock
 INFO  - Creating database history table with name: databasechangelog
 INFO  - Reading from databasechangelog
@@ -707,6 +707,35 @@ dcache.java.memory.direct=16m</programlisting>
 
 </section>
 
+<section id="in-securing">
+  <title>Securiting your dCache installation</title>
+  <para>
+    &dcache; uses the LocationManager to discover the network topology
+    of the internal communication: to which domains this domain should
+    connect.  The domain contacts a specific host and queries the
+    information using UDP port <literal>11111</literal>.  The response
+    describes how the domain should react: whether it should allow
+    incoming connections and whether it should contact any other
+    domains.
+  </para>
+
+  <para>
+    Once the topology is understood, &dcache; domains connect to each
+    other to build a network topology.  Messages will flow over this
+    topology, enabling the distributed system to function correctly.
+    By default, these connections use TCP port
+    <literal>11111</literal>.
+  </para>
+
+  <para>
+    It is essential that both UDP and TCP port
+    <literal>11111</literal> are firewalled and that only other nodes
+    within the &dcache; cluster are allowed access to these ports.
+    Failure to do so can result in remote users running arbitrary
+    commands on any node within the dCache cluster.
+  </para>
+</section>
+
 <section id="in-upgrade">
   <title>Upgrading a &dcache; Instance</title>
     <important>
@@ -719,29 +748,10 @@ dcache.java.memory.direct=16m</programlisting>
     &dcache-patch-version; to  &dcache-next-patch-version;) may be done by
     upgrading the packages with
   </para>
-    <screen>&prompt-root; <userinput>rpm -Uvh <replaceable>packageName</replaceable></userinput></screen> 
+    <screen>&prompt-root; <userinput>rpm -Uvh <replaceable>packageName</replaceable></userinput></screen>
     <para>
       Now &dcache; needs to be started again.
     </para>
-    <para>
-      For major upgrades please
-    </para>
-    <itemizedlist>
-      <listitem>
-	use <ulink url='http://www.dcache.org/manuals/2011/goettingen/upgradeguide/upgrade-guide.html'>The Ultimate Golden Release Upgrade Guide I</ulink> to upgrade from 1.9.5 to 1.9.12.
-      </listitem>
-      <listitem>
-	use the <ulink url='http://www.dcache.org/manuals/upgrade-1.9.12-to-2.2.shtml'>The Ultimate Golden Release Upgrade Guide II</ulink> to upgrade from 1.9.12 to 2.2.
-      </listitem>
-      <listitem>
-	use the <ulink url='http://www.dcache.org/manuals/upgrade/upgrade-2.2-to-2.6.html'>The Ultimate Golden Release Upgrade Guide III</ulink> to upgrade from 2.2 to 2.6. 
-      </listitem>
-      <listitem>
-	use the <ulink url='http://trac.dcache.org/wiki/optToUsr'>/opt
-	to /usr</ulink> migration guide to migrate from the /opt
-	layout to the fhs-compliant layout.
-      </listitem>
-    </itemizedlist>
 </section>
 
 </chapter>

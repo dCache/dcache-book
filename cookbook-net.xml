@@ -22,6 +22,18 @@
     &dcache; is required.
   </para>
 
+  <warning>
+    <para>
+      The TCP and UDP ports used for dCache internal communication
+      (port <literal>11111</literal> by default)
+      <emphasis>MUST</emphasis> be subject to firewall control so that
+      only other dCache nodes can access them.  Failure to do this
+      will allow an attacker to issue arbitrary commands on any node
+      within your dCache cluster, as whichever user the dCache process
+      runs.
+    </para>
+  </warning>
+
   <section id="cb-net-firewall">
     <title>Firewall Configuration</title>
 
@@ -105,7 +117,8 @@
 	      <literal>11111</literal>. Hence, on the head node port
 	      <literal>11111</literal> needs to be opened in the
 	      firewall to allow connections to the
-	      &cell-locationmngr;.
+	      &cell-locationmngr;.  Remember to limit this so that
+	      only other dCache nodes are allowed access.
 	    </para>
 	  </listitem>
 	  <listitem>
