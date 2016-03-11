@@ -61,42 +61,60 @@
   <preface>
     <title>Preface</title>
 
-    <para> Welcome to the &dcache;. &dcache; is a distributed storage solution for storing huge
-      amounts of data without a hard limit, used to provide storage in the petabyte range. Therefore it qualifies
-      as the storage system supporting data intensive experiments.
+    <para>
+      Welcome to the &dcache;. &dcache; is a distributed storage
+      solution for storing huge amounts of data without a hard limit,
+      used to provide storage in the petabyte range. Therefore it
+      qualifies as the storage system supporting data intensive
+      experiments.
     </para>
 
     <para>
-      &dcache; is a joined effort between the Deutsches Elektronen-Synchrotron (DESY)
-      in Hamburg, Nordic Data Grid Facility (NDGF based in Copenhagen), the Fermi National Accelerator Laboratory near Chicago
-      with significant distributions and support from the University of California, San
-      Diego, INFN, Bari as well as Rutherford Appleton Laboratory, UK and CERN in Geneva.
+      &dcache; is a joined effort between the Deutsches
+      Elektronen-Synchrotron (DESY) in Hamburg, Nordic Data Grid
+      Facility (NDGF based in Copenhagen), the Fermi National
+      Accelerator Laboratory near Chicago with significant
+      distributions and support from the University of California, San
+      Diego, INFN, Bari as well as Rutherford Appleton Laboratory, UK
+      and CERN in Geneva.
     </para>
 
     <para>
-      &dcache; can use hierarchical storage management (e.g., hard disk and tape), provides
-      mechanisms to automatically increase performance and balance loads, increase resilience
-      and availability. It also supplies advanced control systems to manage data as well as data
-      flows. Normal filesystem (btrfs, ext4, XFS, ZFS) is used to store data on storage nodes.
+      &dcache; can use hierarchical storage management (e.g., hard
+      disk and tape), provides mechanisms to automatically increase
+      performance and balance loads, increase resilience and
+      availability. It also supplies advanced control systems to
+      manage data as well as data flows. Normal filesystem (btrfs,
+      ext4, XFS, ZFS) is used to store data on storage nodes.
+    </para>
 
+    <para>
       There are several ways of accessing data stored in &dcache;:
 
       <itemizedlist>
-        <listitem><para>&nfs; 4.1 (&chimera;)</para></listitem>
+        <listitem><para>&nfs; v4.1 (&chimera;)</para></listitem>
         <listitem><para>&http; and &webdav; </para></listitem>
         <listitem><para>&gridftp; (&gsiftp;)</para></listitem>
         <listitem><para>xrootd</para></listitem>
         <listitem><para>&srm; (versions 1.1 and 2.2) </para></listitem>
         <listitem><para>&dcap; and &gsidcap; </para></listitem>
       </itemizedlist>
+    </para>
 
-      &dcache; supports certificate based authentication through the Grid Security Infrastructure
-      used in &gsiftp;, &gsidcap; transfer protocols and  the &srm; management protocol.
-      Certificate authentication is also available for &http; and &webdav;.
+    <para>
+      &dcache; supports certificate based authentication through the
+      Grid Security Infrastructure used in &gsiftp;, &gsidcap;
+      transfer protocols and the &srm; management protocol.
+      Certificate authentication is also available for &http; and
+      &webdav;.
+    </para>
 
-      &dcache; also supports fine-grain authorization with support for POSIX file permissions
-      and &nfs;-style access control lists.
+    <para>
+      &dcache; also supports fine-grain authorization with support for
+      POSIX file permissions and &nfs;-style access control lists.
+    </para>
 
+    <para>
       Other features of &dcache; are:
       <itemizedlist>
         <listitem><para>Resilience and high availability can be implemented in different ways by having multiple replicas of the same files.</para></listitem>
@@ -111,30 +129,34 @@
         <listitem><para>Web-interface with live information of the most important information.</para></listitem>
         <listitem><para>Ensuring data integrity through checksumming.</para></listitem>
       </itemizedlist>
-
     </para>
 
     <para>
       &dcache; / &srm; can transparently manage data distributed among
-      dozens of disk storage nodes (sometimes distributed over several countries).
-      The system has shown to significantly improve the efficiency of connected tape storage
-      systems, by caching, gather and flush and scheduled staging techniques.
-      Furthermore, it optimizes the throughput to and from data clients by dynamically
-      replicating datasets on the detection of load hot spots. The system
-      is tolerant against failures of its data servers, which allows administrators
-      to deploy commodity disk storage components.
+      dozens of disk storage nodes (sometimes distributed over several
+      countries).  The system has shown to significantly improve the
+      efficiency of connected tape storage systems, by caching, gather
+      and flush and scheduled staging techniques.  Furthermore, it
+      optimizes the throughput to and from data clients by dynamically
+      replicating datasets on the detection of load hot spots. The
+      system is tolerant against failures of its data servers, which
+      allows administrators to deploy commodity disk storage
+      components.
     </para>
 
     <para>
-      Access to the data is provided by various standard protocols. Furthermore
-      the software comes with an implementation of the Storage Resource Manager
-      protocol (&srm;), which is an open standard for grid middleware
-      to communicate with site specific storage fabrics.
+      Access to the data is provided by various standard
+      protocols. Furthermore the software comes with an implementation
+      of the Storage Resource Manager protocol (&srm;), which is an
+      open standard for grid middleware to communicate with site
+      specific storage fabrics.
     </para>
 
     <section>
       <title>Who should read this book?</title>
-      <para>This book is primerally targeted at system administrators.</para>
+      <para>
+	This book is primerally targeted at system administrators.
+      </para>
     </section>
 
     <section>
@@ -146,24 +168,27 @@
           <listitem><para>Software: Oracle/Sun Java, Postgres SQL Server</para></listitem>
         </itemizedlist>
       </para>
+      
       <para>
-        For a high performance Grid scenario the hardware requirements highly differ, which
-        makes it impossible to provide such parameters here. However, if you wish to setup a
-        &dcache;-based storage system, just let us know and we will help you with your system
-        specifications. Just contact us: <email>support@dcache.org</email>.
+        For a high performance Grid scenario the hardware requirements
+        highly differ, which makes it impossible to provide such
+        parameters here. However, if you wish to setup a
+        &dcache;-based storage system, just let us know and we will
+        help you with your system specifications. Just contact us:
+        <email>support@dcache.org</email>.
       </para>
     </section>
 
 
     <section>
-
-
       <title>What is inside?</title>
 
       <para>
-        This book shall introduce you to &dcache; and provide you with the details of the installation.
-        It describes configuration, customization of &dcache; as well as the usage of several protocols
-        that &dcache; supports. Additionally, it provides cookbooks for standard tasks.
+        This book shall introduce you to &dcache; and provide you with
+        the details of the installation.  It describes configuration,
+        customization of &dcache; as well as the usage of several
+        protocols that &dcache; supports. Additionally, it provides
+        cookbooks for standard tasks.
       </para>
 
       <para>
@@ -171,21 +196,22 @@
       </para>
 
       <para>
-        Part 1, Getting started:
-        This part introduces you to the cells and domain concept in &dcache;. It provides a detailed
-        description of installing, the basic configuration, and upgrading &dcache;.
+        Part 1, Getting started: This part introduces you to the cells
+        and domain concept in &dcache;. It provides a detailed
+        description of installing, the basic configuration, and
+        upgrading &dcache;.
       </para>
 
       <para>
-        Part 2, Configuration of dCache:
-        Within this part the configuration of several additional features of &dcache; is described.
-        They are not necessary to run &dcache; but will be needed by some users depending on
-        their requirements.
+        Part 2, Configuration of dCache: Within this part the
+        configuration of several additional features of &dcache; is
+        described.  They are not necessary to run &dcache; but will be
+        needed by some users depending on their requirements.
       </para>
 
       <para>
-        Part 3, Cookbook: This part comprises guides for specific tasks a system
-        administrator might want to perform.
+        Part 3, Cookbook: This part comprises guides for specific
+        tasks a system administrator might want to perform.
       </para>
 
     </section>
@@ -250,13 +276,6 @@
 	    <ulink url="http://www.dcache.org/downloads">our downloads page</ulink>.
           </para>
         </listitem>
-        <listitem>
-          <para>
-            For EMI releases of &dcache; please visit the <ulink
-            url="http://www.eu-emi.eu/releases">EMI
-            &dcache; download page</ulink>.
-          </para>
-        </listitem>
       </itemizedlist>
 
 
@@ -265,10 +284,9 @@
   </preface>
 
   <toc/>
-
+  
   <xi:include href="start.xml"/>
   <xi:include href="config.xml"/>
   <xi:include href="cookbook.xml"/>
   <xi:include href="reference.xml"/>
-
 </book>
