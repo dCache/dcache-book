@@ -55,8 +55,8 @@
 
         <listitem>
           <para>
-           &dcache; requires Java 1.7 JRE. Please use the
-           latest patch-level and check for upgrades frequently. It is
+           &dcache; requires Java 8 JRE. Please use the latest
+           patch-level and check for upgrades frequently. It is
            recommended to use JDK as &dcache; scripts can make use of
            some extra features that JDK provides to gather more
            diagnostic information (heap-dump, etc). This helps when
