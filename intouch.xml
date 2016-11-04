@@ -650,7 +650,7 @@ java.lang.IllegalArgumentException: Cannot cd to this cell as it doesn't exist</
 &dc-prompt-local; <userinput>cd RoutingMgr@dCacheDomain</userinput>
 &dc-prompt-routingmgr; <userinput>ls</userinput>
 Our routing knowledge :
- Local : [PoolManager, topo, broadcast, LoginBroker, info]
+ Local : [PoolManager, topo, LoginBroker, info]
  adminDoorDomain : [pam]
  gsidcapDomain : [DCap-gsi-example.dcache.org]
  dcapDomain : [DCap-example.dcache.org]
