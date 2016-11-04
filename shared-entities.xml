@@ -135,7 +135,6 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY serv-admin           "<literal>admin</literal>">
 <!ENTITY serv-alarms          "<literal>alarms</literal>">
 <!ENTITY serv-billing         "<literal>billing</literal>">
-<!ENTITY serv-broadcast       "<literal>broadcast</literal>">
 <!ENTITY serv-cleaner         "<literal>cleaner</literal>">
 <!ENTITY serv-cns             "<literal>cns</literal>">
 <!ENTITY serv-dcap            "<literal>dcap</literal>">

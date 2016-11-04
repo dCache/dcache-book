@@ -439,7 +439,6 @@ pnfsmanager.default-access-latency=ONLINE</programlisting>
 
 [dCacheDomain]
 [dCacheDomain/admin]
-[dCacheDomain/broadcast]
 [dCacheDomain/poolmanager]</programlisting>
 
  	    <para>
@@ -464,7 +463,6 @@ pnfsmanager.default-access-latency=ONLINE</programlisting>
 	      &dcache; with several domains.
 	    </para>
 	    <programlisting>[dCacheDomain]
-[dCacheDomain/broadcast]
 [dCacheDomain/loginbroker]
 [dCacheDomain/topo]
 [dCacheDomain/info]
