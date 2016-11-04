@@ -44,7 +44,6 @@
 [httpdDomain]
 [httpdDomain/billing]
 [httpdDomain/httpd]
-[httpdDomain/loginbroker]
 ...</programlisting>
 
     <para>
