@@ -203,7 +203,7 @@
       <title>Solution</title>
       <para>
 	Define two domains, one for the internal and one for the
-	external use.  Start a separate &serv-loginbroker;, &serv-srm;
+	external use.  Start a separate &serv-srm;
 	and &serv-gridftp; service in these domains.
       </para>
       
@@ -231,8 +231,6 @@
 listen=111.111.111.5
 dcache.authn.hostcert.cert=&path-ode-ed;/interface-cert-internal.pem
 dcache.authn.hostcert.key=&path-ode-ed;/interface-key-internal.pem
-[internalDomain/loginbroker]
-loginbroker.cell.name=loginbroker-internal
 [internalDomain/srm]
 srm.cell.name=srm-internal
 srm.protocols.loginbroker=loginbroker-internal
@@ -246,8 +244,6 @@ dcache.service.loginbroker=loginbroker-internal
 listen=222.222.222.5
 dcache.authn.hostcert.cert=&path-ode-ed;/interface-cert-external.pem
 dcache.authn.hostcert.key=&path-ode-ed;/interface-key-external.pem
-[externalDomain/loginbroker]
-loginbroker.cell.name=loginbroker-external
 [externalDomain/srm]
 srm.cell.name=srm-external
 srm.protocols.loginbroker=loginbroker-external
