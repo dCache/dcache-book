@@ -146,7 +146,6 @@ Rules / Guidelines / Suggestions for adding new entities:
 <!ENTITY serv-hoppingmanager  "<literal>hoppingmanager</literal>">
 <!ENTITY serv-httpd           "<literal>httpd</literal>">
 <!ENTITY serv-info            "<literal>info</literal>">
-<!ENTITY serv-loginbroker     "<literal>loginbroker</literal>">
 <!ENTITY serv-nfs             "<literal>nfs</literal>">
 <!ENTITY serv-pinmngr         "<literal>pinmanager</literal>">
 <!ENTITY serv-pnfsmngr        "<literal>pnfsmanager</literal>">
