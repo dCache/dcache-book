@@ -10,7 +10,7 @@
 #  in turn, providing the correct headers).  The value is made available
 #  as the XML entity 'dcache-version'.
 #
-DCACHE_VERSION=2.17
+DCACHE_VERSION=3.0
 
 #
 #  This makefile supports multiple targets.  Currently we have only one.
