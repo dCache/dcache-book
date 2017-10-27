@@ -171,3 +171,4 @@ For example, on Solaris with docbook-xsl installed under the
 
 TODO: a quick how-to on writing your own catalog files.  In the
 mean-time, just Google and/or read the spec.
+
